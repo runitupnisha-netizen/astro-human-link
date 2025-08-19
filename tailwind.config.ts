@@ -63,6 +63,17 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			backgroundImage: {
+				'gradient-cosmic': 'var(--gradient-cosmic)',
+				'gradient-mystical': 'var(--gradient-mystical)',
+				'gradient-golden': 'var(--gradient-golden)',
+				'gradient-aurora': 'var(--gradient-aurora)',
+			},
+			boxShadow: {
+				'cosmic': 'var(--shadow-cosmic)',
+				'mystical': 'var(--shadow-mystical)',
+				'glow': 'var(--shadow-glow)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',

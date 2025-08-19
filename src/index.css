@@ -2,41 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Cosmic Spiritual Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Cosmic background palette */
+    --background: 249 30% 8%;
+    --foreground: 45 100% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card system with cosmic depth */
+    --card: 249 25% 12%;
+    --card-foreground: 45 100% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover cosmic styling */
+    --popover: 249 25% 12%;
+    --popover-foreground: 45 100% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary cosmic purple */
+    --primary: 260 60% 65%;
+    --primary-foreground: 249 30% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary mystical accent */
+    --secondary: 290 40% 25%;
+    --secondary-foreground: 45 100% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted cosmic tones */
+    --muted: 249 20% 18%;
+    --muted-foreground: 45 30% 70%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent golden cosmic */
+    --accent: 45 85% 70%;
+    --accent-foreground: 249 30% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Cosmic energy destructive */
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 45 100% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Border and input cosmic */
+    --border: 249 15% 25%;
+    --input: 249 15% 25%;
+    --ring: 260 60% 65%;
 
-    --radius: 0.5rem;
+    /* Enhanced cosmic gradients */
+    --gradient-cosmic: linear-gradient(135deg, hsl(260 60% 20%), hsl(290 50% 15%), hsl(240 70% 10%));
+    --gradient-mystical: linear-gradient(180deg, hsl(260 40% 30%), hsl(290 30% 20%));
+    --gradient-golden: linear-gradient(45deg, hsl(45 85% 70%), hsl(35 80% 65%));
+    --gradient-aurora: linear-gradient(135deg, hsl(260 60% 65%), hsl(290 50% 55%), hsl(45 85% 70%));
+
+    /* Sacred geometry shadows */
+    --shadow-cosmic: 0 20px 60px -10px hsl(260 60% 20% / 0.4);
+    --shadow-mystical: 0 10px 40px -5px hsl(290 50% 30% / 0.3);
+    --shadow-glow: 0 0 30px hsl(260 60% 65% / 0.3);
+
+    /* Smooth cosmic transitions */
+    --transition-cosmic: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -55,34 +76,29 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+  .light {
+    /* Light mode cosmic theme */
+    --background: 45 100% 97%;
+    --foreground: 249 30% 15%;
+    
+    --card: 45 50% 94%;
+    --card-foreground: 249 30% 15%;
+    
+    --primary: 260 60% 55%;
+    --primary-foreground: 45 100% 97%;
+    
+    --secondary: 45 40% 85%;
+    --secondary-foreground: 249 30% 15%;
+    
+    --muted: 45 30% 90%;
+    --muted-foreground: 249 20% 40%;
+    
+    --accent: 45 85% 60%;
+    --accent-foreground: 249 30% 15%;
+    
+    --border: 45 20% 80%;
+    --input: 45 20% 80%;
+    --ring: 260 60% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

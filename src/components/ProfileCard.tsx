@@ -7,7 +7,17 @@ interface ProfileCardProps {
   name: string;
   age: number;
   zodiacSign: string;
+  sunSign: string;
+  moonSign: string;
+  risingSign: string;
+  venusHouse: number;
+  marsAspect: string;
   humanDesignType: string;
+  geneKey: {
+    number: number;
+    name: string;
+    gift: string;
+  };
   compatibility: number;
   location: string;
   avatar?: string;
@@ -16,8 +26,14 @@ interface ProfileCardProps {
 const ProfileCard = ({ 
   name, 
   age, 
-  zodiacSign, 
-  humanDesignType, 
+  zodiacSign,
+  sunSign,
+  moonSign, 
+  risingSign,
+  venusHouse,
+  marsAspect,
+  humanDesignType,
+  geneKey,
   compatibility, 
   location 
 }: ProfileCardProps) => {
@@ -43,23 +59,36 @@ const ProfileCard = ({
           </div>
         </div>
 
-        <div className="flex gap-2 mb-4">
-          <Badge variant="secondary" className="bg-secondary/50">
-            <Star className="w-3 h-3 mr-1" />
-            {zodiacSign}
-          </Badge>
-          <Badge variant="outline" className="border-accent/30 text-accent">
-            {humanDesignType}
-          </Badge>
+        <div className="space-y-3 mb-4">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="bg-secondary/50 text-xs">
+              <Star className="w-3 h-3 mr-1" />
+              {sunSign} ☽ {moonSign} ↗ {risingSign}
+            </Badge>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="border-accent/30 text-accent text-xs">
+              ♀ {venusHouse}H • {marsAspect}
+            </Badge>
+            <Badge variant="outline" className="border-primary/30 text-primary text-xs">
+              {humanDesignType}
+            </Badge>
+          </div>
+
+          <div className="bg-gradient-mystical/20 rounded-lg p-2 border border-accent/20">
+            <div className="text-xs text-accent font-medium">Gene Key {geneKey.number}: {geneKey.name}</div>
+            <div className="text-xs text-muted-foreground mt-1">Gift: {geneKey.gift}</div>
+          </div>
         </div>
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="flex-1 border-border hover:bg-secondary/20">
-            View Profile
+            Deep Dive
           </Button>
           <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90 shadow-glow">
             <Heart className="w-4 h-4 mr-1" />
-            Connect
+            Soul Connect
           </Button>
         </div>
       </CardContent>

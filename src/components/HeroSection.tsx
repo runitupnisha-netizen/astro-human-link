@@ -22,12 +22,11 @@ const HeroSection = () => {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-aurora bg-clip-text text-transparent leading-tight">
-          Cosmic Connections
+          Find Your Person
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-          Discover your perfect match through the wisdom of astrology and human design. 
-          Connect with souls aligned to your cosmic blueprint.
+          Where ancient wisdom meets modern love. Connect with someone who truly sees and understands the real you—through the language of the stars and the blueprint of your soul.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -36,7 +35,7 @@ const HeroSection = () => {
             className="bg-primary hover:bg-primary/90 shadow-glow px-8 py-4 text-lg font-medium"
           >
             <Heart className="w-5 h-5 mr-2" />
-            Find Your Match
+            Start Your Soul Search
           </Button>
           
           <Button 
@@ -45,7 +44,7 @@ const HeroSection = () => {
             className="border-accent/30 hover:bg-accent/10 px-8 py-4 text-lg"
           >
             <Star className="w-5 h-5 mr-2" />
-            Create Profile
+            Reveal Your Blueprint
           </Button>
         </div>
 
@@ -54,24 +53,24 @@ const HeroSection = () => {
             <div className="w-12 h-12 bg-gradient-mystical rounded-lg mx-auto mb-4 flex items-center justify-center">
               <Star className="w-6 h-6 text-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Natal Chart Matching</h3>
-            <p className="text-muted-foreground">Deep astrological compatibility based on your birth chart</p>
+            <h3 className="text-lg font-semibold mb-2">Sacred Timing</h3>
+            <p className="text-muted-foreground">Houses, aspects, and planetary placements reveal your deepest compatibility</p>
           </div>
           
           <div className="text-center">
             <div className="w-12 h-12 bg-gradient-mystical rounded-lg mx-auto mb-4 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Human Design</h3>
-            <p className="text-muted-foreground">Connect through your unique energetic blueprint</p>
+            <h3 className="text-lg font-semibold mb-2">Gene Keys Wisdom</h3>
+            <p className="text-muted-foreground">Your shadow, gift, and genius pathways guide authentic connections</p>
           </div>
           
           <div className="text-center">
             <div className="w-12 h-12 bg-gradient-mystical rounded-lg mx-auto mb-4 flex items-center justify-center">
               <Heart className="w-6 h-6 text-accent" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Soul Connections</h3>
-            <p className="text-muted-foreground">Find relationships that align with your spiritual path</p>
+            <h3 className="text-lg font-semibold mb-2">Beyond Surface</h3>
+            <p className="text-muted-foreground">Real connection that honors your authentic self and growth journey</p>
           </div>
         </div>
       </div>

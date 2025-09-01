@@ -21,6 +21,12 @@ interface ProfileCardProps {
   compatibility: number;
   location: string;
   avatar?: string;
+  interests: {
+    music: string[];
+    books: string[];
+    lifestyle: string[];
+    thoughtSystems: string[];
+  };
 }
 
 const ProfileCard = ({ 
@@ -35,7 +41,8 @@ const ProfileCard = ({
   humanDesignType,
   geneKey,
   compatibility, 
-  location 
+  location,
+  interests
 }: ProfileCardProps) => {
   const getCompatibilityColor = (score: number) => {
     if (score >= 80) return "bg-gradient-golden";
@@ -79,6 +86,35 @@ const ProfileCard = ({
           <div className="bg-gradient-mystical/20 rounded-lg p-2 border border-accent/20">
             <div className="text-xs text-accent font-medium">Gene Key {geneKey.number}: {geneKey.name}</div>
             <div className="text-xs text-muted-foreground mt-1">Gift: {geneKey.gift}</div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-1">
+              <div className="text-xs text-muted-foreground">Music:</div>
+              {interests.music.slice(0, 2).map((genre, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs py-0 px-1 bg-secondary/30">
+                  {genre}
+                </Badge>
+              ))}
+            </div>
+            
+            <div className="flex flex-wrap gap-1">
+              <div className="text-xs text-muted-foreground">Books:</div>
+              {interests.books.slice(0, 2).map((book, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs py-0 px-1 border-accent/20">
+                  {book}
+                </Badge>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-1">
+              <div className="text-xs text-muted-foreground">Lifestyle:</div>
+              {interests.lifestyle.slice(0, 2).map((item, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs py-0 px-1 bg-primary/20 text-primary">
+                  {item}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -14,7 +14,13 @@ const DiscoverySection = () => {
       humanDesignType: "Manifestor",
       geneKey: { number: 64, name: "Confusion", gift: "Imagination" },
       compatibility: 94,
-      location: "San Francisco, CA"
+      location: "San Francisco, CA",
+      interests: {
+        music: ["Ambient", "Binaural Beats", "Indie Folk"],
+        books: ["The Power of Now", "Women Who Run With Wolves"],
+        lifestyle: ["Meditation", "Yoga", "Plant-based"],
+        thoughtSystems: ["Non-dualism", "Jungian Psychology"]
+      }
     },
     {
       name: "Sage",
@@ -28,7 +34,13 @@ const DiscoverySection = () => {
       humanDesignType: "Generator",
       geneKey: { number: 18, name: "Correction", gift: "Healing" },
       compatibility: 87,
-      location: "Austin, TX"
+      location: "Austin, TX",
+      interests: {
+        music: ["Jazz", "Classical", "Lo-fi Hip Hop"],
+        books: ["Maps of Meaning", "The Alchemist"],
+        lifestyle: ["Rock Climbing", "Minimalism", "Cold Therapy"],
+        thoughtSystems: ["Stoicism", "Systems Thinking"]
+      }
     },
     {
       name: "Aurora",
@@ -42,7 +54,13 @@ const DiscoverySection = () => {
       humanDesignType: "Projector", 
       geneKey: { number: 41, name: "Contraction", gift: "Anticipation" },
       compatibility: 78,
-      location: "Portland, OR"
+      location: "Portland, OR",
+      interests: {
+        music: ["Electronic", "Synthwave", "Experimental"],
+        books: ["Neuromancer", "The Left Hand of Darkness"],
+        lifestyle: ["Digital Nomad", "Biohacking", "Art Collecting"],
+        thoughtSystems: ["Transhumanism", "Effective Altruism"]
+      }
     },
     {
       name: "Phoenix",
@@ -56,7 +74,13 @@ const DiscoverySection = () => {
       humanDesignType: "Reflector",
       geneKey: { number: 30, name: "Recognition", gift: "Lightness" },
       compatibility: 82,
-      location: "Denver, CO"
+      location: "Denver, CO",
+      interests: {
+        music: ["Rock", "Psychedelic", "World Music"],
+        books: ["Be Here Now", "The Hero with a Thousand Faces"],
+        lifestyle: ["Adventure Travel", "Festival Culture", "Permaculture"],
+        thoughtSystems: ["Shamanism", "Sacred Geometry"]
+      }
     },
     {
       name: "River",
@@ -70,7 +94,13 @@ const DiscoverySection = () => {
       humanDesignType: "Manifestor",
       geneKey: { number: 6, name: "Conflict", gift: "Diplomacy" },
       compatibility: 91,
-      location: "Sedona, AZ"
+      location: "Sedona, AZ",
+      interests: {
+        music: ["Nature Sounds", "Healing Frequencies", "Acoustic"],
+        books: ["The Celestine Prophecy", "A New Earth"],
+        lifestyle: ["Forest Bathing", "Herbalism", "Crystal Healing"],
+        thoughtSystems: ["Indigenous Wisdom", "Eco-Psychology"]
+      }
     },
     {
       name: "Star",
@@ -84,7 +114,13 @@ const DiscoverySection = () => {
       humanDesignType: "Generator",
       geneKey: { number: 57, name: "Intuitive Insight", gift: "Clarity" },
       compatibility: 76,
-      location: "Asheville, NC"
+      location: "Asheville, NC",
+      interests: {
+        music: ["Indie Pop", "Reggae", "Acoustic Folk"],
+        books: ["Big Magic", "The Four Agreements"],
+        lifestyle: ["Community Living", "Sustainable Fashion", "Art Therapy"],
+        thoughtSystems: ["Positive Psychology", "Social Innovation"]
+      }
     }
   ];
 

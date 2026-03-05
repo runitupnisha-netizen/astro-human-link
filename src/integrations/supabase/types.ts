@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          astro_summary: string | null
+          avatar_url: string | null
+          birth_date: string | null
+          birth_latitude: number | null
+          birth_longitude: number | null
+          birth_place: string | null
+          birth_time: string | null
+          compatibility_tags: string[] | null
+          created_at: string
+          display_name: string | null
+          gene_keys_evolution: string | null
+          gene_keys_life_purpose: string | null
+          gene_keys_radiance: string | null
+          gene_keys_summary: string | null
+          human_design_authority: string | null
+          human_design_profile: string | null
+          human_design_strategy: string | null
+          human_design_summary: string | null
+          human_design_type: string | null
+          id: string
+          interests: string[] | null
+          moon_sign: string | null
+          onboarding_complete: boolean | null
+          rising_sign: string | null
+          social_energy: number | null
+          sun_sign: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          astro_summary?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          birth_latitude?: number | null
+          birth_longitude?: number | null
+          birth_place?: string | null
+          birth_time?: string | null
+          compatibility_tags?: string[] | null
+          created_at?: string
+          display_name?: string | null
+          gene_keys_evolution?: string | null
+          gene_keys_life_purpose?: string | null
+          gene_keys_radiance?: string | null
+          gene_keys_summary?: string | null
+          human_design_authority?: string | null
+          human_design_profile?: string | null
+          human_design_strategy?: string | null
+          human_design_summary?: string | null
+          human_design_type?: string | null
+          id?: string
+          interests?: string[] | null
+          moon_sign?: string | null
+          onboarding_complete?: boolean | null
+          rising_sign?: string | null
+          social_energy?: number | null
+          sun_sign?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          astro_summary?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          birth_latitude?: number | null
+          birth_longitude?: number | null
+          birth_place?: string | null
+          birth_time?: string | null
+          compatibility_tags?: string[] | null
+          created_at?: string
+          display_name?: string | null
+          gene_keys_evolution?: string | null
+          gene_keys_life_purpose?: string | null
+          gene_keys_radiance?: string | null
+          gene_keys_summary?: string | null
+          human_design_authority?: string | null
+          human_design_profile?: string | null
+          human_design_strategy?: string | null
+          human_design_summary?: string | null
+          human_design_type?: string | null
+          id?: string
+          interests?: string[] | null
+          moon_sign?: string | null
+          onboarding_complete?: boolean | null
+          rising_sign?: string | null
+          social_energy?: number | null
+          sun_sign?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

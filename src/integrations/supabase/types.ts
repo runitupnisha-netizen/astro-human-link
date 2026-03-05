@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      matches: {
+        Row: {
+          compatibility_score: number | null
+          compatibility_summary: string | null
+          created_at: string
+          id: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          compatibility_score?: number | null
+          compatibility_summary?: string | null
+          created_at?: string
+          id?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          compatibility_score?: number | null
+          compatibility_summary?: string | null
+          created_at?: string
+          id?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           astro_summary: string | null
@@ -106,6 +133,30 @@ export type Database = {
           social_energy?: number | null
           sun_sign?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      swipes: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          target_user_id?: string
           user_id?: string
         }
         Relationships: []

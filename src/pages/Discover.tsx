@@ -113,15 +113,17 @@ const Discover = () => {
               <p className="text-muted-foreground text-sm">Reading the stars...</p>
             </div>
           ) : profiles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-              <Sparkles className="w-12 h-12 text-accent" />
-              <h3 className="text-xl font-semibold text-foreground">No more souls to discover</h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
-                You've explored all available cosmic connections. Check back later as new souls join.
+            <div className="flex flex-col items-center justify-center h-full gap-5 text-center px-4">
+              <div className="w-24 h-24 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical animate-pulse">
+                <Sparkles className="w-12 h-12 text-accent" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground">The cosmos is aligning...</h3>
+              <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
+                Your cosmic blueprint is ready, but there are no new souls to discover right now. As more people join, AI-curated matches based on your unique astrological synastry will appear here.
               </p>
-              <Button onClick={fetchProfiles} variant="outline" className="mt-2">
+              <Button onClick={fetchProfiles} variant="outline" className="mt-2 border-primary/30 hover:bg-primary/10">
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh
+                Check Again
               </Button>
             </div>
           ) : (

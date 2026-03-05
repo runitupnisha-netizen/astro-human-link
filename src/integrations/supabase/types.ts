@@ -53,6 +53,7 @@ export type Database = {
           compatibility_tags: string[] | null
           created_at: string
           display_name: string | null
+          drinking: string | null
           gene_keys_evolution: string | null
           gene_keys_life_purpose: string | null
           gene_keys_radiance: string | null
@@ -64,11 +65,14 @@ export type Database = {
           human_design_type: string | null
           id: string
           interests: string[] | null
+          kids_preference: string | null
           life_path_number: number | null
           moon_sign: string | null
           onboarding_complete: boolean | null
           rising_sign: string | null
+          smoking: string | null
           social_energy: number | null
+          substances: string | null
           sun_sign: string | null
           updated_at: string
           user_id: string
@@ -84,6 +88,7 @@ export type Database = {
           compatibility_tags?: string[] | null
           created_at?: string
           display_name?: string | null
+          drinking?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
@@ -95,11 +100,14 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          kids_preference?: string | null
           life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           rising_sign?: string | null
+          smoking?: string | null
           social_energy?: number | null
+          substances?: string | null
           sun_sign?: string | null
           updated_at?: string
           user_id: string
@@ -115,6 +123,7 @@ export type Database = {
           compatibility_tags?: string[] | null
           created_at?: string
           display_name?: string | null
+          drinking?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
@@ -126,11 +135,14 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          kids_preference?: string | null
           life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           rising_sign?: string | null
+          smoking?: string | null
           social_energy?: number | null
+          substances?: string | null
           sun_sign?: string | null
           updated_at?: string
           user_id?: string

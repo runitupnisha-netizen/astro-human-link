@@ -1,1 +1,4 @@
 project_id = "wquzijmkiotkupygoxdf"
+
+[functions.generate-cosmic-profile]
+verify_jwt = false

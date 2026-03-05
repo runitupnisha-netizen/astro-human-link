@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Music, Film, Dumbbell, Mountain, BookOpen, Users, Zap } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 
 const Profile = () => {
@@ -45,6 +45,9 @@ const Profile = () => {
                     <Badge className="bg-gradient-golden text-background">95% Profile Complete</Badge>
                     <Badge variant="outline" className="border-primary/30 text-primary">
                       Looking for Deep Connection
+                    </Badge>
+                    <Badge variant="secondary" className="bg-accent/20 text-accent">
+                      🌙 Introvert • Manifestor
                     </Badge>
                   </div>
                 </div>
@@ -146,7 +149,7 @@ const Profile = () => {
                       <p className="text-sm text-muted-foreground mb-3">
                         You are here to initiate and create. Your aura naturally moves energy and gets things started.
                       </p>
-                      <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="grid grid-cols-3 gap-3 text-xs">
                         <div>
                           <span className="text-muted-foreground">Strategy:</span>
                           <div className="font-medium">Inform & Initiate</div>
@@ -154,6 +157,13 @@ const Profile = () => {
                         <div>
                           <span className="text-muted-foreground">Authority:</span>
                           <div className="font-medium">Emotional</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Social Energy:</span>
+                          <div className="font-medium flex items-center gap-1">
+                            <Zap className="w-3 h-3" /> Introvert
+                          </div>
+                          <div className="text-muted-foreground italic">Initiates from within</div>
                         </div>
                       </div>
                     </div>
@@ -211,6 +221,85 @@ const Profile = () => {
             </Card>
           </div>
 
+          {/* Interests & Lifestyle */}
+          <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                Your Interests & Lifestyle
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <Music className="w-4 h-4 text-accent" /> Music
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Ambient</Badge>
+                    <Badge variant="secondary">Binaural Beats</Badge>
+                    <Badge variant="secondary">Indie Folk</Badge>
+                    <Badge variant="secondary">Jazz</Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <Film className="w-4 h-4 text-accent" /> Movies & TV
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Sci-Fi</Badge>
+                    <Badge variant="secondary">Documentary</Badge>
+                    <Badge variant="secondary">Art House</Badge>
+                    <Badge variant="secondary">Studio Ghibli</Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <BookOpen className="w-4 h-4 text-accent" /> Books
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="border-accent/30">The Power of Now</Badge>
+                    <Badge variant="outline" className="border-accent/30">Siddhartha</Badge>
+                    <Badge variant="outline" className="border-accent/30">Dune</Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <Dumbbell className="w-4 h-4 text-primary" /> Sports & Fitness
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="bg-primary/20 text-primary">Yoga</Badge>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary">Swimming</Badge>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary">Martial Arts</Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <Mountain className="w-4 h-4 text-primary" /> Health & Adventure
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="border-primary/30 text-primary">Plant-based</Badge>
+                    <Badge variant="outline" className="border-primary/30 text-primary">Breathwork</Badge>
+                    <Badge variant="outline" className="border-primary/30 text-primary">Cold Therapy</Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
+                    <Sparkles className="w-4 h-4 text-accent" /> Thought Systems
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="border-accent/30 text-accent">Non-dualism</Badge>
+                    <Badge variant="outline" className="border-accent/30 text-accent">Jungian Psychology</Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Connection Preferences */}
           <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
             <CardContent className="p-6">
@@ -227,6 +316,7 @@ const Profile = () => {
                     <Badge variant="secondary">Spiritual Growth Partner</Badge>
                     <Badge variant="secondary">Creative Collaboration</Badge>
                     <Badge variant="secondary">Sacred Union</Badge>
+                    <Badge variant="secondary">Adventure Buddy</Badge>
                   </div>
                 </div>
                 
@@ -244,6 +334,10 @@ const Profile = () => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Venus Harmony:</span>
                       <span>Essential</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Social Energy Match:</span>
+                      <span>Introvert/Ambivert</span>
                     </div>
                   </div>
                 </div>

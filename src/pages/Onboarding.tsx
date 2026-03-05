@@ -202,6 +202,7 @@ const Onboarding = () => {
           smoking: smoking || null,
           substances: substances || null,
           interests: selectedInterests.length > 0 ? selectedInterests : null,
+          onboarding_complete: true,
         })
         .eq("user_id", session.user.id);
 

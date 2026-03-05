@@ -9,6 +9,7 @@ import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import Discover from "./pages/Discover";
 import Profile from "./pages/Profile";
 import Connections from "./pages/Connections";
 import Messages from "./pages/Messages";
@@ -43,7 +44,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
         <Route path="/onboarding" element={<ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute>} />
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />

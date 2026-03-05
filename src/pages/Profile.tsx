@@ -1,12 +1,82 @@
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Music, Film, Dumbbell, Mountain, BookOpen, Users, Zap } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2 } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
+  kids_preference: {
+    want_kids: "👶 Want kids",
+    have_kids: "👨‍👧 Have kids",
+    open_to_kids: "🤔 Open to kids",
+    dont_want_kids: "🚫 Don't want kids",
+    not_sure: "🤷 Not sure yet",
+    decline: "🔒 Prefer not to say",
+  },
+  drinking: {
+    never: "🚫 Never",
+    rarely: "🥂 Rarely",
+    socially: "🍷 Socially",
+    regularly: "🍺 Regularly",
+    sober: "💪 Sober",
+    decline: "🔒 Prefer not to say",
+  },
+  smoking: {
+    never: "🚫 Never",
+    occasionally: "💨 Occasionally",
+    regularly: "🚬 Regularly",
+    trying_to_quit: "🌱 Trying to quit",
+    decline: "🔒 Prefer not to say",
+  },
+  substances: {
+    never: "🚫 Never",
+    occasionally: "🍃 Occasionally",
+    plant_medicine: "🌿 Plant medicine only",
+    microdosing: "🔬 Microdosing",
+    open_minded: "🧠 Open-minded",
+    decline: "🔒 Prefer not to say",
+  },
+};
 
 const Profile = () => {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        setProfile(data);
+        setLoading(false);
+      });
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) return null;
+
+  const socialLabel = (e: number | null) => {
+    if (!e) return "Balanced";
+    if (e <= 3) return "🌙 Introvert";
+    if (e >= 8) return "☀️ Extrovert";
+    return "🌗 Ambivert";
+  };
+
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
@@ -18,12 +88,16 @@ const Profile = () => {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <div className="w-32 h-32 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
-                  <Sparkles className="w-16 h-16 text-foreground" />
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    <Sparkles className="w-16 h-16 text-foreground" />
+                  )}
                 </div>
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-2">
-                    <h1 className="text-3xl font-bold text-foreground">Your Cosmic Blueprint</h1>
+                    <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Cosmic Blueprint"}</h1>
                     <Button variant="outline" size="sm" className="border-accent/30">
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
@@ -31,24 +105,36 @@ const Profile = () => {
                   </div>
                   
                   <div className="flex items-center gap-4 text-muted-foreground mb-4">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>San Francisco, CA</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>March 15, 1995</span>
-                    </div>
+                    {profile.birth_place && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{profile.birth_place}</span>
+                      </div>
+                    )}
+                    {profile.birth_date && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{new Date(profile.birth_date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge className="bg-gradient-golden text-background">95% Profile Complete</Badge>
-                    <Badge variant="outline" className="border-primary/30 text-primary">
-                      Looking for Deep Connection
-                    </Badge>
-                    <Badge variant="secondary" className="bg-accent/20 text-accent">
-                      🌙 Introvert • Manifestor
-                    </Badge>
+                    {profile.sun_sign && (
+                      <Badge variant="outline" className="border-primary/30 text-primary">
+                        ☉ {profile.sun_sign}
+                      </Badge>
+                    )}
+                    {profile.human_design_type && (
+                      <Badge variant="secondary" className="bg-accent/20 text-accent">
+                        {socialLabel(profile.social_energy)} • {profile.human_design_type}
+                      </Badge>
+                    )}
+                    {profile.life_path_number && (
+                      <Badge variant="outline" className="border-accent/30 text-accent">
+                        Life Path {profile.life_path_number}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
@@ -63,72 +149,26 @@ const Profile = () => {
                   <Star className="w-5 h-5 text-accent" />
                   Your Celestial Signature
                 </h2>
-                
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">☉</div>
-                      <div className="text-sm text-muted-foreground">Sun</div>
-                      <div className="font-medium">Pisces</div>
-                      <div className="text-xs text-muted-foreground">12th House</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-accent">☽</div>
-                      <div className="text-sm text-muted-foreground">Moon</div>
-                      <div className="font-medium">Cancer</div>
-                      <div className="text-xs text-muted-foreground">4th House</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-secondary">↗</div>
-                      <div className="text-sm text-muted-foreground">Rising</div>
-                      <div className="font-medium">Scorpio</div>
-                      <div className="text-xs text-muted-foreground">1st House</div>
-                    </div>
+                    {[
+                      { symbol: "☉", label: "Sun", value: profile.sun_sign },
+                      { symbol: "☽", label: "Moon", value: profile.moon_sign },
+                      { symbol: "↗", label: "Rising", value: profile.rising_sign },
+                    ].map((item) => (
+                      <div key={item.label} className="text-center">
+                        <div className="text-2xl font-bold text-primary">{item.symbol}</div>
+                        <div className="text-sm text-muted-foreground">{item.label}</div>
+                        <div className="font-medium">{item.value || "—"}</div>
+                      </div>
+                    ))}
                   </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-3">
-                    <h3 className="font-medium text-sm">Personal Planets</h3>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">♀ Venus:</span>
-                        <span>Aquarius 7H</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">♂ Mars:</span>
-                        <span>Taurus 2H</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">☿ Mercury:</span>
-                        <span>Pisces 12H</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">♃ Jupiter:</span>
-                        <span>Sagittarius 9H</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <h3 className="font-medium text-sm">Key Aspects</h3>
-                    <div className="text-sm space-y-1">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">♀ ⚹ ♆</span>
-                        <span>Venus Sextile Neptune</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">☽ △ ♃</span>
-                        <span>Moon Trine Jupiter</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">☉ ☌ ☿</span>
-                        <span>Sun Conjunct Mercury</span>
-                      </div>
-                    </div>
-                  </div>
+                  {profile.astro_summary && (
+                    <>
+                      <Separator />
+                      <p className="text-sm text-muted-foreground leading-relaxed">{profile.astro_summary}</p>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -137,213 +177,122 @@ const Profile = () => {
             <Card className="bg-card/80 backdrop-blur-sm border-border/50">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
+                  <Zap className="w-5 h-5 text-primary" />
                   Your Energetic Blueprint
                 </h2>
-                
                 <div className="space-y-6">
-                  <div>
-                    <h3 className="font-medium mb-3">Human Design</h3>
-                    <div className="bg-gradient-mystical/20 rounded-lg p-4 border border-primary/20">
-                      <div className="text-lg font-semibold text-primary mb-2">Manifestor</div>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        You are here to initiate and create. Your aura naturally moves energy and gets things started.
-                      </p>
-                      <div className="grid grid-cols-3 gap-3 text-xs">
-                        <div>
-                          <span className="text-muted-foreground">Strategy:</span>
-                          <div className="font-medium">Inform & Initiate</div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Authority:</span>
-                          <div className="font-medium">Emotional</div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Social Energy:</span>
-                          <div className="font-medium flex items-center gap-1">
-                            <Zap className="w-3 h-3" /> Introvert
+                  {profile.human_design_type && (
+                    <div>
+                      <h3 className="font-medium mb-3">Human Design</h3>
+                      <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
+                        <div className="text-lg font-semibold text-primary mb-2">{profile.human_design_type}</div>
+                        {profile.human_design_summary && (
+                          <p className="text-sm text-muted-foreground mb-3">{profile.human_design_summary}</p>
+                        )}
+                        <div className="grid grid-cols-3 gap-3 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">Strategy:</span>
+                            <div className="font-medium">{profile.human_design_strategy || "—"}</div>
                           </div>
-                          <div className="text-muted-foreground italic">Initiates from within</div>
+                          <div>
+                            <span className="text-muted-foreground">Authority:</span>
+                            <div className="font-medium">{profile.human_design_authority || "—"}</div>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Profile:</span>
+                            <div className="font-medium">{profile.human_design_profile || "—"}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div>
-                    <h3 className="font-medium mb-3">Primary Gene Key</h3>
-                    <div className="bg-gradient-aurora/20 rounded-lg p-4 border border-accent/20">
-                      <div className="text-lg font-semibold text-accent mb-2">Gene Key 64: Confusion</div>
-                      <div className="space-y-2 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Shadow:</span>
-                          <span className="ml-2">Confusion</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Gift:</span>
-                          <span className="ml-2">Imagination</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Siddhi:</span>
-                          <span className="ml-2">Illumination</span>
-                        </div>
+                  {profile.gene_keys_life_purpose && (
+                    <div>
+                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                        <Dna className="w-4 h-4 text-accent" /> Gene Keys
+                      </h3>
+                      <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm">
+                        <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
+                        {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
+                        {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
+                        {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
                       </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium mb-3">Activation Progress</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Self-Awareness</span>
-                          <span>85%</span>
-                        </div>
-                        <Progress value={85} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Emotional Intelligence</span>
-                          <span>72%</span>
-                        </div>
-                        <Progress value={72} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Spiritual Connection</span>
-                          <span>91%</span>
-                        </div>
-                        <Progress value={91} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Interests & Lifestyle */}
-          <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                Your Interests & Lifestyle
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <Music className="w-4 h-4 text-accent" /> Music
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Ambient</Badge>
-                    <Badge variant="secondary">Binaural Beats</Badge>
-                    <Badge variant="secondary">Indie Folk</Badge>
-                    <Badge variant="secondary">Jazz</Badge>
-                  </div>
+          {/* Lifestyle Preferences */}
+          {(profile.kids_preference || profile.drinking || profile.smoking || profile.substances) && (
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-accent" />
+                  Lifestyle
+                  <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Judgment-Free Zone 🕊️</Badge>
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { icon: Baby, label: "Kids", field: "kids_preference" },
+                    { icon: Wine, label: "Drinking", field: "drinking" },
+                    { icon: Cigarette, label: "Smoking", field: "smoking" },
+                    { icon: Pill, label: "Substances", field: "substances" },
+                  ].map(({ icon: Icon, label, field }) => {
+                    const value = profile[field];
+                    if (!value || value === "decline") return null;
+                    return (
+                      <div key={field} className="bg-muted/30 rounded-xl p-4 text-center">
+                        <Icon className="w-5 h-5 text-primary mx-auto mb-2" />
+                        <p className="text-xs text-muted-foreground mb-1">{label}</p>
+                        <p className="text-sm font-medium text-foreground">
+                          {LIFESTYLE_LABELS[field]?.[value]?.replace(/^[^\s]+\s/, "") || value}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
+              </CardContent>
+            </Card>
+          )}
 
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <Film className="w-4 h-4 text-accent" /> Movies & TV
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Sci-Fi</Badge>
-                    <Badge variant="secondary">Documentary</Badge>
-                    <Badge variant="secondary">Art House</Badge>
-                    <Badge variant="secondary">Studio Ghibli</Badge>
-                  </div>
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" />
+                  Interests
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {profile.interests.map((interest: string) => (
+                    <Badge key={interest} variant="secondary" className="bg-primary/15 text-primary border border-primary/20">
+                      {interest}
+                    </Badge>
+                  ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
 
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <BookOpen className="w-4 h-4 text-accent" /> Books
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="border-accent/30">The Power of Now</Badge>
-                    <Badge variant="outline" className="border-accent/30">Siddhartha</Badge>
-                    <Badge variant="outline" className="border-accent/30">Dune</Badge>
-                  </div>
+          {/* Compatibility Tags */}
+          {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                  Cosmic Tags
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {profile.compatibility_tags.map((tag: string) => (
+                    <Badge key={tag} variant="outline" className="border-accent/30 text-accent">{tag}</Badge>
+                  ))}
                 </div>
-
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <Dumbbell className="w-4 h-4 text-primary" /> Sports & Fitness
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="bg-primary/20 text-primary">Yoga</Badge>
-                    <Badge variant="secondary" className="bg-primary/20 text-primary">Swimming</Badge>
-                    <Badge variant="secondary" className="bg-primary/20 text-primary">Martial Arts</Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <Mountain className="w-4 h-4 text-primary" /> Health & Adventure
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="border-primary/30 text-primary">Plant-based</Badge>
-                    <Badge variant="outline" className="border-primary/30 text-primary">Breathwork</Badge>
-                    <Badge variant="outline" className="border-primary/30 text-primary">Cold Therapy</Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                    <Sparkles className="w-4 h-4 text-accent" /> Thought Systems
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="border-accent/30 text-accent">Non-dualism</Badge>
-                    <Badge variant="outline" className="border-accent/30 text-accent">Jungian Psychology</Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Connection Preferences */}
-          <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-accent" />
-                Your Soul Connection Preferences
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium mb-3">Seeking</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Deep Emotional Connection</Badge>
-                    <Badge variant="secondary">Spiritual Growth Partner</Badge>
-                    <Badge variant="secondary">Creative Collaboration</Badge>
-                    <Badge variant="secondary">Sacred Union</Badge>
-                    <Badge variant="secondary">Adventure Buddy</Badge>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium mb-3">Compatibility Factors</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Water Sign Energy:</span>
-                      <span>High Priority</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Generator/Manifestor:</span>
-                      <span>Preferred</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Venus Harmony:</span>
-                      <span>Essential</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Social Energy Match:</span>
-                      <span>Introvert/Ambivert</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

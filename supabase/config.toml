@@ -2,3 +2,6 @@ project_id = "wquzijmkiotkupygoxdf"
 
 [functions.generate-cosmic-profile]
 verify_jwt = false
+
+[functions.discover-profiles]
+verify_jwt = false

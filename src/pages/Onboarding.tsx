@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +24,7 @@ type CosmicProfile = {
   gene_keys_radiance: string;
   gene_keys_summary: string;
   compatibility_tags: string[];
+  life_path_number: number;
 };
 
 const Onboarding = () => {
@@ -30,8 +32,8 @@ const Onboarding = () => {
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
+  const [knowsBirthTime, setKnowsBirthTime] = useState(true);
   const [profile, setProfile] = useState<CosmicProfile | null>(null);
-  const [revealSection, setRevealSection] = useState(0);
   const navigate = useNavigate();
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -54,7 +56,11 @@ const Onboarding = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ birthDate, birthTime, birthPlace }),
+          body: JSON.stringify({
+            birthDate,
+            birthTime: knowsBirthTime ? birthTime : "",
+            birthPlace,
+          }),
         }
       );
 
@@ -66,7 +72,6 @@ const Onboarding = () => {
       const data = await response.json();
       setProfile(data.profile);
       setStep("reveal");
-      setRevealSection(0);
     } catch (err: any) {
       toast.error(err.message || "Failed to generate your cosmic profile");
       setStep("input");
@@ -76,6 +81,24 @@ const Onboarding = () => {
   const handleFinish = () => {
     toast.success("Your cosmic blueprint is complete! ✨");
     navigate("/profile");
+  };
+
+  const lifePathMeaning = (num: number): string => {
+    const meanings: Record<number, string> = {
+      1: "The Leader — Independent, ambitious, pioneering",
+      2: "The Peacemaker — Diplomatic, intuitive, cooperative",
+      3: "The Creative — Expressive, social, artistic",
+      4: "The Builder — Practical, disciplined, grounded",
+      5: "The Adventurer — Freedom-loving, dynamic, versatile",
+      6: "The Nurturer — Compassionate, responsible, harmonious",
+      7: "The Seeker — Analytical, spiritual, introspective",
+      8: "The Powerhouse — Ambitious, authoritative, abundant",
+      9: "The Humanitarian — Wise, generous, visionary",
+      11: "Master Number — Visionary, intuitive, inspirational",
+      22: "Master Builder — Practical idealist, powerful manifestor",
+      33: "Master Teacher — Compassionate healer, selfless guide",
+    };
+    return meanings[num] || "Unique Path";
   };
 
   return (
@@ -119,17 +142,35 @@ const Onboarding = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Time</label>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      type="time"
-                      value={birthTime}
-                      onChange={(e) => setBirthTime(e.target.value)}
-                      className="pl-10 bg-muted/50 border-border"
-                      required
-                    />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-sm font-medium text-foreground">Birth Time</label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <Checkbox
+                        checked={!knowsBirthTime}
+                        onCheckedChange={(checked) => {
+                          setKnowsBirthTime(!checked);
+                          if (checked) setBirthTime("");
+                        }}
+                      />
+                      <span className="text-xs text-muted-foreground">I don't know my birth time</span>
+                    </label>
                   </div>
+                  {knowsBirthTime ? (
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        type="time"
+                        value={birthTime}
+                        onChange={(e) => setBirthTime(e.target.value)}
+                        className="pl-10 bg-muted/50 border-border"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
+                      No worries! We'll use noon as a standard reference point — this gives the most statistically accurate results for your rising sign and Human Design.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -191,14 +232,39 @@ const Onboarding = () => {
             >
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-foreground">Your Cosmic Blueprint</h1>
-                <p className="text-muted-foreground mt-1">Born {birthDate} at {birthTime} in {birthPlace}</p>
+                <p className="text-muted-foreground mt-1">
+                  Born {birthDate}{knowsBirthTime && birthTime ? ` at ${birthTime}` : ""} in {birthPlace}
+                </p>
               </div>
+
+              {/* Life Path Number */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                    <Hash className="w-5 h-5 text-accent" />
+                  </div>
+                  <h2 className="text-xl font-bold text-foreground">Life Path Number</h2>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30" style={{ background: "var(--gradient-mystical)" }}>
+                    {profile.life_path_number}
+                  </div>
+                  <p className="text-sm text-muted-foreground flex-1">
+                    {lifePathMeaning(profile.life_path_number)}
+                  </p>
+                </div>
+              </motion.div>
 
               {/* Astrology Section */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.3 }}
                 className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -228,7 +294,7 @@ const Onboarding = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.6 }}
                 className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -259,7 +325,7 @@ const Onboarding = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.9 }}
                 className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6"
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -289,7 +355,7 @@ const Onboarding = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.1 }}
+                transition={{ delay: 1.2 }}
                 className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6"
               >
                 <h3 className="text-lg font-bold text-foreground mb-3">Your Cosmic Tags</h3>
@@ -309,7 +375,7 @@ const Onboarding = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.4 }}
+                transition={{ delay: 1.5 }}
               >
                 <Button
                   onClick={handleFinish}

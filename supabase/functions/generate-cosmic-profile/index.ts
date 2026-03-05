@@ -7,6 +7,27 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function calculateLifePathNumber(dateStr: string): number {
+  // Reduce each component (month, day, year) to a single digit, then sum and reduce
+  const [year, month, day] = dateStr.split("-").map(Number);
+  
+  const reduceToDigit = (n: number): number => {
+    // Master numbers 11, 22, 33 are kept
+    while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+      n = String(n).split("").reduce((sum, d) => sum + Number(d), 0);
+    }
+    return n;
+  };
+
+  const monthReduced = reduceToDigit(month);
+  const dayReduced = reduceToDigit(day);
+  const yearReduced = reduceToDigit(
+    String(year).split("").reduce((sum, d) => sum + Number(d), 0)
+  );
+
+  return reduceToDigit(monthReduced + dayReduced + yearReduced);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -24,20 +45,30 @@ serve(async (req) => {
     if (authError || !user) throw new Error("Unauthorized");
 
     const { birthDate, birthTime, birthPlace } = await req.json();
-    if (!birthDate || !birthTime || !birthPlace) {
-      throw new Error("Missing birth data: birthDate, birthTime, and birthPlace are required");
+    if (!birthDate || !birthPlace) {
+      throw new Error("Missing birth data: birthDate and birthPlace are required");
     }
+
+    const lifePathNumber = calculateLifePathNumber(birthDate);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are an expert astrologer, Human Design analyst, and Gene Keys guide. Given a person's birth date, time, and place, generate their complete cosmic profile.
+    const hasBirthTime = birthTime && birthTime.trim() !== "";
+    
+    const timeContext = hasBirthTime 
+      ? `at ${birthTime}` 
+      : "(birth time unknown — use noon/12:00 PM as the default for rising sign and Human Design calculations, and note this in your summaries)";
+
+    const systemPrompt = `You are an expert astrologer, Human Design analyst, and Gene Keys guide. Given a person's birth data, generate their complete cosmic profile.
 
 You MUST respond using the provided tool/function call format. Do not respond with plain text.
 
-Be specific, insightful, and mystical in tone. Use the actual birth data to calculate approximate positions. Be creative but grounded in real astrological frameworks.`;
+Be specific, insightful, and mystical in tone. Use the actual birth data to calculate approximate positions. Be creative but grounded in real astrological frameworks.
 
-    const userPrompt = `Generate a complete cosmic profile for someone born on ${birthDate} at ${birthTime} in ${birthPlace}.
+${!hasBirthTime ? "IMPORTANT: The user does not know their birth time. Use noon (12:00 PM) as a standard default — this gives the most statistically accurate rising sign estimate. Clearly note in your astro_summary that the rising sign is approximate. For Human Design, use noon as well and note the approximation in the summary." : ""}`;
+
+    const userPrompt = `Generate a complete cosmic profile for someone born on ${birthDate} ${timeContext} in ${birthPlace}. Their Life Path Number is ${lifePathNumber}.
 
 Include their sun sign, moon sign, rising sign, a rich astrology summary, their Human Design type/strategy/authority/profile with summary, and their Gene Keys life purpose/evolution/radiance paths with summary. Also generate 5-8 compatibility tags (personality traits useful for matching) based on their cosmic blueprint.`;
 
@@ -64,7 +95,7 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
                 properties: {
                   sun_sign: { type: "string", description: "Zodiac sun sign" },
                   moon_sign: { type: "string", description: "Zodiac moon sign" },
-                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign" },
+                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign (note if approximate due to unknown birth time)" },
                   astro_summary: { type: "string", description: "Rich paragraph about their astrological blueprint (3-5 sentences)" },
                   human_design_type: { type: "string", description: "e.g. Generator, Manifestor, Projector, Reflector, Manifesting Generator" },
                   human_design_strategy: { type: "string", description: "Their strategy e.g. To Respond, To Inform, Wait for Invitation, Wait a Lunar Cycle" },
@@ -124,8 +155,9 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
       .from("profiles")
       .update({
         birth_date: birthDate,
-        birth_time: birthTime,
+        birth_time: hasBirthTime ? birthTime : null,
         birth_place: birthPlace,
+        life_path_number: lifePathNumber,
         sun_sign: cosmicData.sun_sign,
         moon_sign: cosmicData.moon_sign,
         rising_sign: cosmicData.rising_sign,
@@ -150,7 +182,10 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
       throw new Error("Failed to save cosmic profile");
     }
 
-    return new Response(JSON.stringify({ success: true, profile: cosmicData }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      profile: { ...cosmicData, life_path_number: lifePathNumber } 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

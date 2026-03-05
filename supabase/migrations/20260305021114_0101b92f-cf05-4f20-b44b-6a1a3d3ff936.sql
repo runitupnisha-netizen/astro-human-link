@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN life_path_number INTEGER;

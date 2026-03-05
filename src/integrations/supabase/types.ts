@@ -37,6 +37,7 @@ export type Database = {
           human_design_type: string | null
           id: string
           interests: string[] | null
+          life_path_number: number | null
           moon_sign: string | null
           onboarding_complete: boolean | null
           rising_sign: string | null
@@ -67,6 +68,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           rising_sign?: string | null
@@ -97,6 +99,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           rising_sign?: string | null

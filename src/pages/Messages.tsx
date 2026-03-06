@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2 } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -459,6 +460,14 @@ const Messages = () => {
               </Card>
             </div>
           )}
+
+          {/* Disclaimer banner */}
+          <div className="mt-2 text-center">
+            <Link to="/disclaimer" className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+              <ShieldAlert className="w-3 h-3" />
+              Cosmic is not responsible for meetups or shared information. Read our full disclaimer.
+            </Link>
+          </div>
         </div>
       </div>
     </div>

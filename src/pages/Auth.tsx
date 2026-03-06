@@ -51,11 +51,9 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-           <div className="relative w-56 h-56 mx-auto mb-2 mix-blend-screen">
-             <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-2xl animate-pulse scale-110 opacity-30 mix-blend-normal" />
-             <div className="relative w-56 h-56 bg-black rounded-lg overflow-hidden">
-               <img src={alignedLogo} alt="Aligned" className="w-full h-full object-contain" />
-             </div>
+           <div className="relative w-56 h-56 mx-auto mb-2">
+             <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-2xl animate-pulse scale-125 opacity-25" />
+             <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
            </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}

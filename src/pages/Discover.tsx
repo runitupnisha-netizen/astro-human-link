@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
-import { Sparkles, Loader2, RefreshCw, Heart, Star } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,6 +16,7 @@ const Discover = () => {
   const [profiles, setProfiles] = useState<DiscoverProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [matchPopup, setMatchPopup] = useState<DiscoverProfile | null>(null);
+  const [swipeCount, setSwipeCount] = useState(0);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -70,12 +71,20 @@ const Discover = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, profiles, toast]);
 
-  const handleSwipe = async (direction: "left" | "right") => {
+  const handleSwipe = async (direction: "left" | "right" | "super") => {
     if (profiles.length === 0) return;
     const topProfile = profiles[0];
-    const action = direction === "right" ? "like" : "pass";
+    const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
 
     setProfiles((prev) => prev.slice(1));
+    setSwipeCount((c) => c + 1);
+
+    if (direction === "super") {
+      toast({
+        title: "⭐ Super Like Sent!",
+        description: `${topProfile.display_name || "Cosmic Soul"} will see your cosmic enthusiasm`,
+      });
+    }
 
     try {
       const { error } = await supabase.from("swipes").insert({
@@ -119,7 +128,7 @@ const Discover = () => {
                 <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
                 <Loader2 className="relative w-10 h-10 text-primary animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm">Reading the stars...</p>
+              <p className="text-muted-foreground text-sm font-serif">Reading the stars...</p>
             </motion.div>
           ) : profiles.length === 0 ? (
             <motion.div
@@ -133,37 +142,58 @@ const Discover = () => {
                   <Star className="w-12 h-12 text-accent" />
                 </div>
               </div>
-              <h3 className="font-display text-2xl font-bold text-foreground">The Cosmos Is Aligning...</h3>
+              <h3 className="font-display text-2xl font-bold text-foreground">
+                {swipeCount > 0 ? "You've Explored Every Soul" : "The Cosmos Is Aligning..."}
+              </h3>
               <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
-                Your cosmic blueprint is ready, but there are no new souls to discover right now. As more people join, AI-curated matches based on your unique astrological synastry will appear here.
+                {swipeCount > 0
+                  ? "You've seen everyone available right now. New cosmic souls join daily — check back soon for fresh connections."
+                  : "Your cosmic blueprint is ready, but there are no new souls to discover right now. As more people join, AI-curated matches will appear here."}
               </p>
-              <Button onClick={fetchProfiles} variant="outline" className="mt-2 border-primary/30 hover:bg-primary/10">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Check Again
-              </Button>
+              <div className="flex gap-3">
+                <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Check Again
+                </Button>
+                {swipeCount > 0 && (
+                  <Button
+                    onClick={() => navigate("/connections")}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    View Matches
+                  </Button>
+                )}
+              </div>
             </motion.div>
           ) : (
-            <>
+            <AnimatePresence>
               {profiles.slice(0, 3).map((profile, index) => (
                 <SwipeCard
                   key={profile.user_id}
                   profile={profile}
                   onSwipe={handleSwipe}
                   isTop={index === 0}
+                  stackIndex={index}
                 />
               ))}
-            </>
+            </AnimatePresence>
           )}
         </div>
 
         {!loading && profiles.length > 0 && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-muted-foreground text-xs mt-4"
+            className="flex flex-col items-center gap-2 mt-4"
           >
-            {profiles.length} soul{profiles.length !== 1 ? "s" : ""} in your queue
-          </motion.p>
+            <p className="text-muted-foreground text-xs">
+              {profiles.length} soul{profiles.length !== 1 ? "s" : ""} in your queue
+            </p>
+            <p className="text-muted-foreground/50 text-[10px]">
+              Swipe up for ⭐ Super Like
+            </p>
+          </motion.div>
         )}
       </div>
 
@@ -187,10 +217,10 @@ const Discover = () => {
             >
               {/* Decorative sparkles */}
               <div className="absolute inset-0 pointer-events-none">
-                {[...Array(12)].map((_, i) => (
+                {[...Array(16)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-1.5 h-1.5 rounded-full bg-accent"
+                    className={`absolute w-1.5 h-1.5 rounded-full ${i % 3 === 0 ? "bg-accent" : i % 3 === 1 ? "bg-primary" : "bg-foreground/50"}`}
                     initial={{
                       x: "50%",
                       y: "40%",
@@ -198,57 +228,86 @@ const Discover = () => {
                       scale: 0,
                     }}
                     animate={{
-                      x: `${15 + Math.random() * 70}%`,
-                      y: `${10 + Math.random() * 80}%`,
+                      x: `${10 + Math.random() * 80}%`,
+                      y: `${5 + Math.random() * 90}%`,
                       opacity: [0, 1, 0],
-                      scale: [0, 1.5, 0],
+                      scale: [0, 1.5 + Math.random(), 0],
                     }}
                     transition={{
-                      duration: 1.5,
-                      delay: 0.2 + i * 0.08,
+                      duration: 1.8,
+                      delay: 0.1 + i * 0.06,
                       ease: "easeOut",
                     }}
                   />
                 ))}
               </div>
 
+              {/* Glowing background pulse */}
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", delay: 0.2, damping: 12 }}
-                className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-golden flex items-center justify-center shadow-glow"
-              >
-                <Heart className="w-10 h-10 text-foreground fill-current" />
-              </motion.div>
+                className="absolute inset-0 bg-gradient-to-b from-accent/5 via-primary/5 to-transparent rounded-3xl"
+                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
 
-              <h2 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">
-                Soul Connection!
-              </h2>
-              <p className="text-muted-foreground mb-4 font-serif">
-                You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> share a{" "}
-                <span className="text-accent font-semibold">{matchPopup.connection_type}</span> bond
-              </p>
-              <p className="text-sm text-muted-foreground mb-6 italic font-serif">
-                "{matchPopup.compatibility_reason}"
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-border/50"
-                  onClick={() => setMatchPopup(null)}
+              <div className="relative z-10">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", delay: 0.15, damping: 12 }}
+                  className="w-24 h-24 mx-auto mb-5 rounded-full flex items-center justify-center shadow-glow"
+                  style={{ background: "var(--gradient-golden)" }}
                 >
-                  Keep Exploring
-                </Button>
-                <Button
-                  className="flex-1"
-                  style={{ background: "var(--gradient-aurora)" }}
-                  onClick={() => {
-                    setMatchPopup(null);
-                    navigate("/messages");
-                  }}
+                  <Heart className="w-12 h-12 text-accent-foreground fill-current" />
+                </motion.div>
+
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2"
                 >
-                  Send Message
-                </Button>
+                  Soul Connection!
+                </motion.h2>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.45 }}
+                >
+                  <p className="text-muted-foreground mb-1 font-serif">
+                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> share a
+                  </p>
+                  <p className="text-accent font-display font-bold text-lg mb-3">{matchPopup.connection_type}</p>
+                  <p className="text-sm text-muted-foreground mb-6 italic font-serif leading-relaxed">
+                    "{matchPopup.compatibility_reason}"
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex gap-3"
+                >
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-border/50"
+                    onClick={() => setMatchPopup(null)}
+                  >
+                    Keep Exploring
+                  </Button>
+                  <Button
+                    className="flex-1 gap-2"
+                    style={{ background: "var(--gradient-aurora)" }}
+                    onClick={() => {
+                      setMatchPopup(null);
+                      navigate("/messages");
+                    }}
+                  >
+                    <Send className="w-4 h-4" />
+                    Message
+                  </Button>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>

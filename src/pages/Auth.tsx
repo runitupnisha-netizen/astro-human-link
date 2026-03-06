@@ -55,7 +55,7 @@ const Auth = () => {
              <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-2xl animate-pulse scale-110 opacity-30" />
              <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain drop-shadow-[0_0_25px_hsl(260_60%_65%/0.5)]" />
            </div>
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}
           </h1>
           <p className="text-muted-foreground mt-2">

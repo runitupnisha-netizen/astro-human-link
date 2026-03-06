@@ -229,7 +229,7 @@ const Onboarding = () => {
 
       if (error) throw error;
 
-      toast.success("Your cosmic blueprint is complete! ✨");
+      toast.success("Your Aligned blueprint is complete! ✨");
       navigate("/profile");
     } catch (err: any) {
       toast.error("Failed to save preferences");

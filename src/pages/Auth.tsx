@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
+import alignedLogo from "@/assets/aligned-logo.png";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -50,9 +51,7 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: "var(--gradient-aurora)" }}>
-            <Sparkles className="w-8 h-8 text-background" />
-          </div>
+          <img src={alignedLogo} alt="Aligned" className="w-20 h-20 mx-auto mb-2 object-contain drop-shadow-[0_0_15px_hsl(260_60%_65%/0.4)]" />
           <h1 className="text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}
           </h1>
@@ -114,7 +113,7 @@ const Auth = () => {
                 <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
                   Disclaimer &amp; Terms of Use
                 </Link>
-                , including that AI-generated content is for entertainment only and Cosmic is not responsible for meetups or shared information.
+                , including that AI-generated content is for entertainment only and Aligned is not responsible for meetups or shared information.
               </label>
             </div>
           )}

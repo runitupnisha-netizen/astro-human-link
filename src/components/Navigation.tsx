@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, User, MessageCircle, Settings, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import alignedLogo from "@/assets/aligned-logo.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,11 +21,9 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-aurora rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-background" />
-            </div>
+            <img src={alignedLogo} alt="Aligned" className="w-9 h-9 object-contain" />
             <span className="text-xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
-              Cosmic
+              Aligned
             </span>
           </Link>
 

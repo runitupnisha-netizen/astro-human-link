@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star } from "lucide-react";
 import cosmicHero from "@/assets/cosmic-hero.jpg";
+import alignedLogo from "@/assets/aligned-logo.png";
 
 const HeroSection = () => {
   return (
@@ -14,10 +15,8 @@ const HeroSection = () => {
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
         <div className="mb-8 flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-lg animate-pulse" />
-            <div className="relative bg-card/10 backdrop-blur-sm rounded-full p-4 border border-accent/20">
-              <Sparkles className="w-12 h-12 text-accent" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-xl animate-pulse scale-110" />
+            <img src={alignedLogo} alt="Aligned" className="relative w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(260_60%_65%/0.5)]" />
           </div>
         </div>
 

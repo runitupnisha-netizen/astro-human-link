@@ -28,11 +28,46 @@ interface SwipeCardProps {
   isTop: boolean;
 }
 
+const CompatibilityRing = ({ score }: { score: number }) => {
+  const circumference = 2 * Math.PI * 38;
+  const offset = circumference - (score / 100) * circumference;
+  const color = score >= 80 ? "hsl(var(--accent))" : score >= 60 ? "hsl(var(--primary))" : "hsl(var(--secondary))";
+
+  return (
+    <div className="relative w-20 h-20 flex items-center justify-center">
+      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="38" fill="none" stroke="hsl(var(--border))" strokeWidth="3" opacity={0.3} />
+        <motion.circle
+          cx="40" cy="40" r="38" fill="none"
+          stroke={color}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+        />
+      </svg>
+      <div className="text-center">
+        <motion.span
+          className="text-lg font-bold text-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          {score}%
+        </motion.span>
+      </div>
+    </div>
+  );
+};
+
 const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 300], [-25, 25]);
+  const rotate = useTransform(x, [-300, 300], [-18, 18]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
   const passOpacity = useTransform(x, [-100, 0], [1, 0]);
+  const cardScale = useTransform(x, [-300, 0, 300], [0.95, 1, 0.95]);
   const [exiting, setExiting] = useState(false);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
@@ -49,98 +84,98 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
     return "🌗 Ambivert";
   };
 
-  const scoreColor = profile.compatibility_score >= 80 
-    ? "bg-gradient-golden" 
-    : profile.compatibility_score >= 60 
-      ? "bg-gradient-aurora" 
-      : "bg-gradient-mystical";
-
   return (
     <motion.div
       className={`absolute inset-0 ${isTop ? "z-10 cursor-grab active:cursor-grabbing" : "z-0"}`}
-      style={{ x, rotate }}
+      style={{ x, rotate, scale: isTop ? cardScale : 0.95 }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
-      animate={exiting ? { x: x.get() > 0 ? 500 : -500, opacity: 0 } : {}}
-      transition={{ duration: 0.3 }}
+      animate={
+        exiting
+          ? { x: x.get() > 0 ? 500 : -500, opacity: 0, transition: { duration: 0.3 } }
+          : isTop
+            ? {}
+            : { scale: 0.95, y: 8, opacity: 0.6 }
+      }
     >
       {/* Swipe overlays */}
       {isTop && (
         <>
           <motion.div
-            className="absolute top-8 right-8 z-20 border-4 border-green-400 rounded-xl px-6 py-2 -rotate-12"
+            className="absolute top-8 right-8 z-20 border-4 border-green-400 rounded-xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
             style={{ opacity: likeOpacity }}
           >
-            <span className="text-green-400 text-3xl font-black tracking-wider">SOUL YES</span>
+            <span className="font-display text-green-400 text-2xl font-black tracking-wider">SOUL YES</span>
           </motion.div>
           <motion.div
-            className="absolute top-8 left-8 z-20 border-4 border-red-400 rounded-xl px-6 py-2 rotate-12"
+            className="absolute top-8 left-8 z-20 border-4 border-red-400 rounded-xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
             style={{ opacity: passOpacity }}
           >
-            <span className="text-red-400 text-3xl font-black tracking-wider">PASS</span>
+            <span className="font-display text-red-400 text-2xl font-black tracking-wider">PASS</span>
           </motion.div>
         </>
       )}
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/50 bg-card/95 backdrop-blur-xl shadow-cosmic flex flex-col">
-        {/* Header with avatar & score */}
-        <div className="relative p-6 pb-4">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/30">
-              {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
-              ) : (
-                <User className="w-10 h-10 text-foreground" />
-              )}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-foreground">
-                {profile.display_name || "Cosmic Soul"}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge className={`${scoreColor} text-foreground font-bold text-sm`}>
-                  {profile.compatibility_score}% Match
-                </Badge>
+        {/* Header with avatar & animated score ring */}
+        <div className="relative p-5 pb-3">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/20 overflow-hidden">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-foreground" />
+                )}
               </div>
             </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-display text-xl font-bold text-foreground truncate">
+                {profile.display_name || "Cosmic Soul"}
+              </h2>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <span className="text-xs text-accent font-semibold">{profile.connection_type}</span>
+              </div>
+            </div>
+            <CompatibilityRing score={profile.compatibility_score} />
           </div>
 
-          {/* Connection type */}
-          <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-sm font-semibold text-accent">{profile.connection_type}</span>
+          {/* Connection reason */}
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-primary/8 border border-primary/15 rounded-xl p-3"
+          >
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+              <p className="text-sm text-muted-foreground leading-relaxed">{profile.compatibility_reason}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{profile.compatibility_reason}</p>
-          </div>
+          </motion.div>
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-6 pb-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
           {/* Cosmic signature */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Cosmic Signature</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {profile.sun_sign && (
-                <Badge variant="secondary" className="bg-secondary/50 text-xs">
-                  <Star className="w-3 h-3 mr-1" />
-                  ☉ {profile.sun_sign}
+                <Badge variant="secondary" className="bg-secondary/40 text-xs">
+                  <Star className="w-3 h-3 mr-1" /> ☉ {profile.sun_sign}
                 </Badge>
               )}
               {profile.moon_sign && (
-                <Badge variant="secondary" className="bg-secondary/50 text-xs">☽ {profile.moon_sign}</Badge>
+                <Badge variant="secondary" className="bg-secondary/40 text-xs">☽ {profile.moon_sign}</Badge>
               )}
               {profile.rising_sign && (
-                <Badge variant="secondary" className="bg-secondary/50 text-xs">↗ {profile.rising_sign}</Badge>
+                <Badge variant="secondary" className="bg-secondary/40 text-xs">↗ {profile.rising_sign}</Badge>
               )}
-            </div>
-            <div className="flex flex-wrap gap-2">
               {profile.human_design_type && (
                 <Badge variant="outline" className="border-primary/30 text-primary text-xs">
-                  <Zap className="w-3 h-3 mr-1" />
-                  {profile.human_design_type}
+                  <Zap className="w-3 h-3 mr-1" /> {profile.human_design_type}
                 </Badge>
               )}
               {profile.life_path_number && (
@@ -148,7 +183,7 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
                   Life Path {profile.life_path_number}
                 </Badge>
               )}
-              <Badge variant="secondary" className="bg-accent/20 text-accent text-xs">
+              <Badge variant="secondary" className="bg-accent/15 text-accent text-xs">
                 {socialLabel(profile.social_energy)}
               </Badge>
             </div>
@@ -158,9 +193,9 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
           {profile.shared_aspects?.length > 0 && (
             <div className="space-y-2">
               <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Cosmic Resonances</h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {profile.shared_aspects.map((a, i) => (
-                  <Badge key={i} variant="secondary" className="bg-primary/15 text-primary text-xs">{a}</Badge>
+                  <Badge key={i} variant="secondary" className="bg-primary/12 text-primary text-xs">{a}</Badge>
                 ))}
               </div>
             </div>
@@ -168,32 +203,25 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
 
           {/* Gene Keys */}
           {profile.gene_keys_life_purpose && (
-            <div className="bg-gradient-mystical/20 rounded-lg p-3 border border-accent/20">
-              <div className="text-xs text-accent font-medium">Gene Keys Life Purpose</div>
-              <div className="text-xs text-muted-foreground mt-1">{profile.gene_keys_life_purpose}</div>
-            </div>
-          )}
-
-          {/* Tags */}
-          {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Soul Traits</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {profile.compatibility_tags.map((tag, i) => (
-                  <Badge key={i} variant="outline" className="text-xs border-border/50 text-muted-foreground">{tag}</Badge>
-                ))}
-              </div>
+            <div className="bg-accent/5 rounded-lg p-3 border border-accent/15">
+              <div className="text-xs text-accent font-medium mb-1">Gene Keys Life Purpose</div>
+              <div className="text-xs text-muted-foreground">{profile.gene_keys_life_purpose}</div>
             </div>
           )}
 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Interests</h3>
+              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Shared Vibes</h3>
               <div className="flex flex-wrap gap-1.5">
-                {profile.interests.map((interest, i) => (
+                {profile.interests.slice(0, 8).map((interest, i) => (
                   <Badge key={i} variant="secondary" className="text-xs bg-secondary/30">{interest}</Badge>
                 ))}
+                {profile.interests.length > 8 && (
+                  <Badge variant="secondary" className="text-xs bg-secondary/20 text-muted-foreground">
+                    +{profile.interests.length - 8} more
+                  </Badge>
+                )}
               </div>
             </div>
           )}
@@ -201,19 +229,23 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
 
         {/* Action buttons */}
         {isTop && (
-          <div className="p-6 pt-2 flex justify-center gap-6">
-            <button
+          <div className="p-5 pt-2 flex justify-center gap-8">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => { setExiting(true); onSwipe("left"); }}
-              className="w-16 h-16 rounded-full bg-card border-2 border-destructive/40 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-lg"
+              className="w-16 h-16 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-lg"
             >
-              <X className="w-8 h-8 text-destructive" />
-            </button>
-            <button
+              <X className="w-7 h-7 text-destructive" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => { setExiting(true); onSwipe("right"); }}
-              className="w-16 h-16 rounded-full bg-card border-2 border-green-400/40 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-lg"
+              className="w-16 h-16 rounded-full bg-card border-2 border-green-400/30 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-lg"
             >
-              <Heart className="w-8 h-8 text-green-400" />
-            </button>
+              <Heart className="w-7 h-7 text-green-400" />
+            </motion.button>
           </div>
         )}
       </div>

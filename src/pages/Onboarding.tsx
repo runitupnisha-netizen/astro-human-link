@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import { useAuth } from "@/hooks/useAuth";
+import AvatarUpload from "@/components/AvatarUpload";
 
 type CosmicProfile = {
   sun_sign: string;
@@ -136,6 +138,7 @@ const INTEREST_CATEGORIES = {
 type OnboardingStep = "input" | "generating" | "reveal" | "lifestyle" | "interests";
 
 const Onboarding = () => {
+  const { user } = useAuth();
   const [step, setStep] = useState<OnboardingStep>("input");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
@@ -599,6 +602,25 @@ const Onboarding = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Avatar Upload */}
+              <div className="bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6">
+                <div className="text-center space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground">Add a Profile Photo</h3>
+                  <p className="text-sm text-muted-foreground">Show the world your cosmic self ✨</p>
+                  {user && (
+                    <div className="flex justify-center">
+                      <AvatarUpload
+                        userId={user.id}
+                        currentUrl={null}
+                        onUpload={() => {}}
+                        size="lg"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">Tap to upload — you can change it anytime</p>
+                </div>
+              </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep("lifestyle")} className="h-12 px-6">

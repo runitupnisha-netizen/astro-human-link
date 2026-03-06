@@ -7,11 +7,13 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Large logo as background */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <img 
-          src={alignedHeroLogo} 
-          alt="" 
-          className="w-[90vw] md:w-[70vw] lg:w-[60vw] max-w-[900px] object-contain opacity-20 select-none pointer-events-none"
-        />
+        <div className="mix-blend-screen">
+          <img 
+            src={alignedHeroLogo} 
+            alt="" 
+            className="w-[90vw] md:w-[70vw] lg:w-[60vw] max-w-[900px] object-contain opacity-30 select-none pointer-events-none"
+          />
+        </div>
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
       

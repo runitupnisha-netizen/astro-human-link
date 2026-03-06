@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star } from "lucide-react";
 import cosmicHero from "@/assets/cosmic-hero.jpg";
-import alignedLogo from "@/assets/aligned-logo.png";
+import alignedLogo from "@/assets/aligned-logo-clean.png";
 
 const HeroSection = () => {
   return (

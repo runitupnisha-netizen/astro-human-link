@@ -9,7 +9,7 @@ import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine,
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
-import alignedLogo from "@/assets/aligned-logo.png";
+import alignedLogo from "@/assets/aligned-logo-clean.png";
 
 type CosmicProfile = {
   sun_sign: string;

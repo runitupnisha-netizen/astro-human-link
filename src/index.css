@@ -6,53 +6,56 @@
 
 @layer base {
   :root {
-    /* Deep cosmic background with teal undertone */
-    --background: 220 35% 7%;
-    --foreground: 45 80% 93%;
+    /* Deep cosmic purple background */
+    --background: 260 30% 6%;
+    --foreground: 210 40% 95%;
 
-    /* Card system with deep teal-purple depth */
-    --card: 225 28% 11%;
-    --card-foreground: 45 80% 93%;
+    /* Card system with deep purple depth */
+    --card: 260 25% 10%;
+    --card-foreground: 210 40% 95%;
 
     /* Popover matching cards */
-    --popover: 225 28% 11%;
-    --popover-foreground: 45 80% 93%;
+    --popover: 260 25% 10%;
+    --popover-foreground: 210 40% 95%;
 
-    /* Primary — rich purple from logo */
-    --primary: 270 45% 58%;
-    --primary-foreground: 220 35% 7%;
+    /* Primary — deep vibrant purple */
+    --primary: 265 85% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary — deep teal from logo */
-    --secondary: 180 45% 22%;
-    --secondary-foreground: 45 80% 93%;
+    /* Secondary — midnight indigo */
+    --secondary: 240 40% 20%;
+    --secondary-foreground: 210 40% 95%;
 
     /* Muted cosmic tones */
-    --muted: 220 20% 16%;
-    --muted-foreground: 200 20% 65%;
+    --muted: 260 20% 14%;
+    --muted-foreground: 240 15% 65%;
 
-    /* Accent — warm gold from logo */
-    --accent: 42 75% 62%;
-    --accent-foreground: 220 35% 7%;
+    /* Accent — violet-pink glow */
+    --accent: 280 70% 65%;
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive */
     --destructive: 0 70% 55%;
-    --destructive-foreground: 45 80% 93%;
+    --destructive-foreground: 210 40% 95%;
 
-    /* Borders with teal hint */
-    --border: 210 18% 22%;
-    --input: 210 18% 22%;
-    --ring: 270 45% 58%;
+    /* Borders with purple hint */
+    --border: 260 20% 20%;
+    --input: 260 20% 20%;
+    --ring: 265 85% 60%;
 
-    /* Refined gradients matching logo palette */
-    --gradient-cosmic: linear-gradient(135deg, hsl(270 45% 18%), hsl(195 50% 12%), hsl(220 50% 8%));
-    --gradient-mystical: linear-gradient(180deg, hsl(270 40% 28%), hsl(195 40% 18%));
-    --gradient-golden: linear-gradient(45deg, hsl(42 75% 62%), hsl(35 70% 55%));
-    --gradient-aurora: linear-gradient(135deg, hsl(180 50% 40%), hsl(42 75% 62%), hsl(270 45% 58%));
+    /* Deep purple gradients */
+    --gradient-cosmic: linear-gradient(135deg, hsl(270 50% 15%), hsl(240 40% 10%), hsl(260 30% 6%));
+    --gradient-mystical: linear-gradient(180deg, hsl(265 45% 25%), hsl(240 35% 15%));
+    --gradient-golden: linear-gradient(45deg, hsl(280 70% 65%), hsl(265 85% 60%));
+    --gradient-aurora: linear-gradient(135deg, hsl(265 85% 60%), hsl(280 70% 65%), hsl(320 60% 55%));
 
-    /* Shadows with logo tones */
-    --shadow-cosmic: 0 20px 60px -10px hsl(270 45% 18% / 0.4);
-    --shadow-mystical: 0 10px 40px -5px hsl(195 50% 25% / 0.3);
-    --shadow-glow: 0 0 30px hsl(270 45% 58% / 0.25);
+    /* Button ombre gradient — teal to gold to rose */
+    --gradient-blueprint: linear-gradient(135deg, hsl(175 65% 45%), hsl(42 80% 58%), hsl(340 65% 55%));
+
+    /* Shadows with deep purple tones */
+    --shadow-cosmic: 0 20px 60px -10px hsl(265 60% 20% / 0.5);
+    --shadow-mystical: 0 10px 40px -5px hsl(280 50% 30% / 0.3);
+    --shadow-glow: 0 0 30px hsl(265 85% 60% / 0.3);
 
     /* Smooth transitions */
     --transition-cosmic: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -77,28 +80,28 @@
   }
 
   .light {
-    /* Light mode with logo tones */
-    --background: 45 60% 97%;
-    --foreground: 220 35% 15%;
+    /* Light mode with deep purple tones */
+    --background: 250 30% 97%;
+    --foreground: 260 30% 12%;
     
-    --card: 45 40% 94%;
-    --card-foreground: 220 35% 15%;
+    --card: 250 25% 94%;
+    --card-foreground: 260 30% 12%;
     
-    --primary: 270 45% 50%;
-    --primary-foreground: 45 60% 97%;
+    --primary: 265 85% 55%;
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 180 30% 88%;
-    --secondary-foreground: 220 35% 15%;
+    --secondary: 250 25% 90%;
+    --secondary-foreground: 260 30% 12%;
     
-    --muted: 45 25% 90%;
-    --muted-foreground: 220 15% 40%;
+    --muted: 250 20% 90%;
+    --muted-foreground: 260 15% 40%;
     
-    --accent: 42 75% 55%;
-    --accent-foreground: 220 35% 15%;
+    --accent: 280 60% 58%;
+    --accent-foreground: 0 0% 100%;
     
-    --border: 45 15% 82%;
-    --input: 45 15% 82%;
-    --ring: 270 45% 50%;
+    --border: 250 15% 85%;
+    --input: 250 15% 85%;
+    --ring: 265 85% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

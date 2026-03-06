@@ -289,7 +289,7 @@ const Onboarding = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="text-center mb-8">
-                <img src={alignedLogo} alt="Aligned" className="w-20 h-20 mx-auto mb-2 object-contain drop-shadow-[0_0_15px_hsl(260_60%_65%/0.4)]" />
+                <img src={alignedLogo} alt="Aligned" className="w-24 h-24 mx-auto mb-2 object-contain brightness-[1.8] contrast-[1.1] drop-shadow-[0_0_15px_hsl(260_60%_65%/0.4)]" style={{ mixBlendMode: 'screen' }} />
                 <h1 className="text-3xl font-bold text-foreground">Unlock Your Aligned Blueprint</h1>
                 <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                   Enter your birth details and our AI will decode your astrology, Human Design, and Gene Keys

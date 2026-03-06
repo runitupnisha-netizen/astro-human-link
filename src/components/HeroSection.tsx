@@ -16,7 +16,7 @@ const HeroSection = () => {
         <div className="mb-8 flex justify-center">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-xl animate-pulse scale-110" />
-            <img src={alignedLogo} alt="Aligned" className="relative w-28 h-28 object-contain drop-shadow-[0_0_20px_hsl(260_60%_65%/0.5)]" />
+            <img src={alignedLogo} alt="Aligned" className="relative w-32 h-32 object-contain brightness-[1.8] contrast-[1.1] drop-shadow-[0_0_20px_hsl(260_60%_65%/0.5)]" style={{ mixBlendMode: 'screen' }} />
           </div>
         </div>
 

@@ -73,12 +73,17 @@ const INTEREST_CATEGORIES = {
   "🎵 Music": [
     "Ambient", "Binaural Beats", "Indie Folk", "Jazz", "R&B", "Hip-Hop",
     "Electronic", "Classical", "Reggae", "Afrobeats", "Latin", "K-Pop",
-    "Rock", "Metal", "Country", "Lo-fi", "Soul", "Gospel", "World Music"
+    "Rock", "Metal", "Country", "Lo-fi", "Soul", "Gospel", "World Music",
+    "Punk", "Blues", "Funk", "Disco", "House", "Techno", "Drum & Bass",
+    "Trap", "Pop", "Alternative", "Grunge", "Ska", "Bossa Nova", "Opera"
   ],
   "🎬 Movies & TV": [
     "Sci-Fi", "Documentary", "Art House", "Studio Ghibli", "Horror",
     "Comedy", "Drama", "Anime", "Thriller", "Romance", "Reality TV",
-    "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero"
+    "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
+    "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
+    "Satire", "Dystopian", "Noir", "Slasher", "Found Footage",
+    "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [
     "The Power of Now", "Siddhartha", "Dune", "Self-Help", "Philosophy",
@@ -108,6 +113,22 @@ const INTEREST_CATEGORIES = {
   "💻 Tech & Gaming": [
     "Coding", "AI/ML", "Crypto", "Gaming", "VR/AR",
     "Podcasting", "Content Creation", "Startups", "Web3"
+  ],
+  "🐾 Pets & Animals": [
+    "Dogs", "Cats", "Horses", "Birds", "Reptiles",
+    "Marine Life", "Wildlife Conservation", "Animal Rescue",
+    "Veterinary", "Pet Training", "Exotic Pets"
+  ],
+  "🌍 Social Causes": [
+    "Climate Action", "Racial Justice", "Gender Equality", "Mental Health Advocacy",
+    "Homelessness", "Education Access", "LGBTQ+ Rights", "Food Security",
+    "Ocean Conservation", "Volunteering", "Human Rights", "Sustainability"
+  ],
+  "🍜 Food & Drinks": [
+    "Coffee Culture", "Wine Tasting", "Craft Beer", "Tea Ceremony",
+    "Vegan Cooking", "Baking", "Street Food", "Fine Dining",
+    "Mixology", "Fermentation", "Farm-to-Table", "Food Photography",
+    "Ethnic Cuisine", "BBQ & Grilling", "Chocolate", "Smoothies & Juices"
   ],
 };
 

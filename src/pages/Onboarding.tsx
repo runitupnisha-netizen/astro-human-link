@@ -138,6 +138,7 @@ const INTEREST_CATEGORIES = {
 type OnboardingStep = "input" | "generating" | "reveal" | "lifestyle" | "interests";
 
 const Onboarding = () => {
+  const { user } = useAuth();
   const [step, setStep] = useState<OnboardingStep>("input");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");

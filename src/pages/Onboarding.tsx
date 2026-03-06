@@ -335,7 +335,7 @@ const Onboarding = () => {
 
                 <Button type="submit" className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Generate My Cosmic Blueprint
+                  Generate My Aligned Blueprint
                 </Button>
               </form>
             </motion.div>

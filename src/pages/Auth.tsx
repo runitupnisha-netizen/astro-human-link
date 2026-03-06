@@ -101,9 +101,27 @@ const Auth = () => {
             />
           </div>
 
+          {!isLogin && (
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="terms"
+                checked={agreedToTerms}
+                onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
+                I am 18+ and agree to the{" "}
+                <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
+                  Disclaimer &amp; Terms of Use
+                </Link>
+                , including that AI-generated content is for entertainment only and Cosmic is not responsible for meetups or shared information.
+              </label>
+            </div>
+          )}
+
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || (!isLogin && !agreedToTerms)}
             className="w-full h-12 text-base font-semibold"
             style={{ background: "var(--gradient-aurora)" }}
           >

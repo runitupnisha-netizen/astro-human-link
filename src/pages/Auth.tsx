@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
-import alignedLogo from "@/assets/aligned-logo-transparent.png";
+import alignedLogo from "@/assets/aligned-hero-logo.png";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);

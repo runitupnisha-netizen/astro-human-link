@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star } from "lucide-react";
-import alignedHeroLogo from "@/assets/aligned-logo-transparent.png";
+import alignedHeroLogo from "@/assets/aligned-hero-logo.png";
 
 const HeroSection = () => {
   return (

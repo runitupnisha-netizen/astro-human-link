@@ -96,9 +96,9 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
     }
   };
 
-  const getExitAnimation = () => {
+  const getExitAnimation = (): Record<string, any> => {
     if (!exiting) return isTop ? {} : { scale: 1 - stackIndex * 0.04, y: stackIndex * 10, opacity: 1 - stackIndex * 0.15 };
-    if (exitDir === "up") return { y: -600, opacity: 0, scale: 0.8, transition: { duration: 0.4, ease: "easeIn" } };
+    if (exitDir === "up") return { y: -600, opacity: 0, scale: 0.8, transition: { duration: 0.4, ease: "easeIn" as const } };
     return { x: exitDir === "right" ? 500 : -500, opacity: 0, rotate: exitDir === "right" ? 20 : -20, transition: { duration: 0.35 } };
   };
 

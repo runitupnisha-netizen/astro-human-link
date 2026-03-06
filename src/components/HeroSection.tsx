@@ -1,25 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star } from "lucide-react";
-import cosmicHero from "@/assets/cosmic-hero.jpg";
-import alignedLogo from "@/assets/aligned-logo-clean.png";
+import alignedHeroLogo from "@/assets/aligned-hero-logo.png";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
-        style={{ backgroundImage: `url(${cosmicHero})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-cosmic/60" />
+      {/* Large logo as background */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img 
+          src={alignedHeroLogo} 
+          alt="" 
+          className="w-[90vw] md:w-[70vw] lg:w-[60vw] max-w-[900px] object-contain opacity-20 select-none pointer-events-none"
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
       
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-        <div className="mb-8 flex justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-xl animate-pulse scale-125 opacity-40" />
-            <img src={alignedLogo} alt="Aligned" className="relative w-44 h-44 object-contain drop-shadow-[0_0_25px_hsl(260_60%_65%/0.5)]" />
-          </div>
-        </div>
-
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-aurora bg-clip-text text-transparent leading-tight">
           Find Your Person
         </h1>

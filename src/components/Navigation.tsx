@@ -22,7 +22,7 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
             <img src={alignedLogo} alt="Aligned" className="w-9 h-9 object-contain" />
-            <span className="text-xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
+            <span className="font-display text-xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
               Aligned
             </span>
           </Link>

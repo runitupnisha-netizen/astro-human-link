@@ -10,7 +10,7 @@ const HeroSection = () => {
         <img 
           src={alignedHeroLogo} 
           alt="" 
-          className="w-[90vw] md:w-[70vw] lg:w-[60vw] max-w-[900px] object-contain opacity-20 select-none pointer-events-none"
+          className="w-[90vw] md:w-[70vw] lg:w-[60vw] max-w-[900px] object-contain opacity-20 mix-blend-screen select-none pointer-events-none"
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />

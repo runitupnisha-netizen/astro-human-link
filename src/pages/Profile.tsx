@@ -7,6 +7,7 @@ import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, W
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import AvatarUpload from "@/components/AvatarUpload";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -87,13 +88,12 @@ const Profile = () => {
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="w-32 h-32 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
-                  {profile.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <Sparkles className="w-16 h-16 text-foreground" />
-                  )}
-                </div>
+                <AvatarUpload
+                  userId={user!.id}
+                  currentUrl={profile.avatar_url}
+                  onUpload={(url) => setProfile({ ...profile, avatar_url: url })}
+                  size="lg"
+                />
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-2">

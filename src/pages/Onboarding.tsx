@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import { useAuth } from "@/hooks/useAuth";
+import AvatarUpload from "@/components/AvatarUpload";
 
 type CosmicProfile = {
   sun_sign: string;

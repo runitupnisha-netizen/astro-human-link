@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, User, MessageCircle, Settings, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import alignedLogo from "@/assets/aligned-logo.png";
+import alignedLogo from "@/assets/aligned-logo-clean.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);

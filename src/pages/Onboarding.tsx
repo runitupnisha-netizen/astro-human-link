@@ -9,6 +9,7 @@ import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine,
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
+import alignedLogo from "@/assets/aligned-logo-clean.png";
 
 type CosmicProfile = {
   sun_sign: string;
@@ -288,10 +289,10 @@ const Onboarding = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="text-center mb-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: "var(--gradient-aurora)" }}>
-                  <Sparkles className="w-8 h-8 text-background" />
+                <div className="w-24 h-24 mx-auto mb-2 rounded-2xl bg-foreground/90 p-2 flex items-center justify-center shadow-glow">
+                  <img src={alignedLogo} alt="Aligned" className="w-full h-full object-contain" />
                 </div>
-                <h1 className="text-3xl font-bold text-foreground">Unlock Your Cosmic Blueprint</h1>
+                <h1 className="text-3xl font-bold text-foreground">Unlock Your Aligned Blueprint</h1>
                 <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                   Enter your birth details and our AI will decode your astrology, Human Design, and Gene Keys
                 </p>
@@ -336,7 +337,7 @@ const Onboarding = () => {
 
                 <Button type="submit" className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Generate My Cosmic Blueprint
+                  Generate My Aligned Blueprint
                 </Button>
               </form>
             </motion.div>

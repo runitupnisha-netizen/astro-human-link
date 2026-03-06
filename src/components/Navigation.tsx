@@ -21,7 +21,7 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <img src={alignedLogo} alt="Aligned" style={{ filter: 'contrast(1.5) brightness(1.2)' }} className="w-9 h-9 object-contain mix-blend-screen" />
+            <img src={alignedLogo} alt="Aligned" style={{ filter: 'contrast(3) brightness(1.3)' }} className="w-9 h-9 object-contain mix-blend-screen" />
             <span className="font-display text-xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
               Aligned
             </span>

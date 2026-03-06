@@ -51,7 +51,9 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <img src={alignedLogo} alt="Aligned" className="w-24 h-24 mx-auto mb-2 object-contain brightness-[1.8] contrast-[1.1] drop-shadow-[0_0_15px_hsl(260_60%_65%/0.4)]" style={{ mixBlendMode: 'screen' }} />
+          <div className="w-24 h-24 mx-auto mb-2 rounded-2xl bg-foreground/90 p-2 flex items-center justify-center shadow-glow">
+            <img src={alignedLogo} alt="Aligned" className="w-full h-full object-contain" />
+          </div>
           <h1 className="text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}
           </h1>

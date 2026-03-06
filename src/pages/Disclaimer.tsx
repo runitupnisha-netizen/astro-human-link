@@ -22,14 +22,14 @@ const Disclaimer = () => {
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">1. No Responsibility for Meetups</h2>
                 <p>
-                  Cosmic is a platform that facilitates online introductions only. We do not organize, supervise, or take any responsibility for in-person meetings between users. Any decision to meet another user in person is made entirely at your own risk. We strongly encourage users to meet in public places, inform a trusted friend or family member, and exercise caution.
+                  Aligned is a platform that facilitates online introductions only. We do not organize, supervise, or take any responsibility for in-person meetings between users. Any decision to meet another user in person is made entirely at your own risk. We strongly encourage users to meet in public places, inform a trusted friend or family member, and exercise caution.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">2. User-Shared Information</h2>
                 <p>
-                  You are solely responsible for the information you choose to share on your profile or in messages. Cosmic is not liable for any consequences resulting from personal data, contact details, location, or other sensitive information that you voluntarily disclose to other users. We strongly advise against sharing financial information, home addresses, or other highly sensitive data through this platform.
+                  You are solely responsible for the information you choose to share on your profile or in messages. Aligned is not liable for any consequences resulting from personal data, contact details, location, or other sensitive information that you voluntarily disclose to other users. We strongly advise against sharing financial information, home addresses, or other highly sensitive data through this platform.
                 </p>
               </section>
 
@@ -43,21 +43,21 @@ const Disclaimer = () => {
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">4. User Conduct</h2>
                 <p>
-                  Users are expected to interact respectfully. Cosmic is not responsible for the behavior, statements, or actions of any user on or off the platform. We reserve the right to remove accounts that engage in harassment, fraud, misrepresentation, or any conduct that violates community standards.
+                  Users are expected to interact respectfully. Aligned is not responsible for the behavior, statements, or actions of any user on or off the platform. We reserve the right to remove accounts that engage in harassment, fraud, misrepresentation, or any conduct that violates community standards.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">5. Limitation of Liability</h2>
                 <p>
-                  To the fullest extent permitted by applicable law, Cosmic and its creators, operators, affiliates, and partners shall not be held liable for any direct, indirect, incidental, consequential, or punitive damages arising from: (a) your use or inability to use the platform; (b) any interactions with other users, whether online or offline; (c) unauthorized access to your data; (d) reliance on any content, including AI-generated cosmic profiles; or (e) any other matter relating to the service.
+                  To the fullest extent permitted by applicable law, Aligned and its creators, operators, affiliates, and partners shall not be held liable for any direct, indirect, incidental, consequential, or punitive damages arising from: (a) your use or inability to use the platform; (b) any interactions with other users, whether online or offline; (c) unauthorized access to your data; (d) reliance on any content, including AI-generated cosmic profiles; or (e) any other matter relating to the service.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">6. Privacy &amp; Data</h2>
                 <p>
-                  We collect and process personal data including birth data, preferences, and messaging content to provide our services. While we implement reasonable security measures, no system is 100% secure. By using Cosmic, you acknowledge and accept the inherent risks of sharing personal information online. We do not sell your personal data to third parties.
+                  We collect and process personal data including birth data, preferences, and messaging content to provide our services. While we implement reasonable security measures, no system is 100% secure. By using Aligned, you acknowledge and accept the inherent risks of sharing personal information online. We do not sell your personal data to third parties.
                 </p>
               </section>
 
@@ -71,7 +71,7 @@ const Disclaimer = () => {
               <section>
                 <h2 className="text-lg font-semibold text-foreground mb-2">8. Indemnification</h2>
                 <p>
-                  You agree to indemnify and hold harmless Cosmic and its operators from any claims, damages, losses, or expenses (including legal fees) arising from your use of the platform, your interactions with other users, or your violation of these terms.
+                  You agree to indemnify and hold harmless Aligned and its operators from any claims, damages, losses, or expenses (including legal fees) arising from your use of the platform, your interactions with other users, or your violation of these terms.
                 </p>
               </section>
 
@@ -84,7 +84,7 @@ const Disclaimer = () => {
 
               <section className="border-t border-border pt-4 mt-6">
                 <p className="text-xs text-muted-foreground/70 text-center">
-                  By using Cosmic, you acknowledge that you have read, understood, and agree to be bound by this disclaimer. If you do not agree, please discontinue use of the platform.
+                  By using Aligned, you acknowledge that you have read, understood, and agree to be bound by this disclaimer. If you do not agree, please discontinue use of the platform.
                 </p>
               </section>
             </CardContent>

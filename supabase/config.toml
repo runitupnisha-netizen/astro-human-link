@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.discover-profiles]
 verify_jwt = false
+
+[functions.generate-icebreaker]
+verify_jwt = false

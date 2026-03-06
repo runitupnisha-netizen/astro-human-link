@@ -80,28 +80,28 @@
   }
 
   .light {
-    /* Light mode with logo tones */
-    --background: 45 60% 97%;
-    --foreground: 220 35% 15%;
+    /* Light mode with deep purple tones */
+    --background: 250 30% 97%;
+    --foreground: 260 30% 12%;
     
-    --card: 45 40% 94%;
-    --card-foreground: 220 35% 15%;
+    --card: 250 25% 94%;
+    --card-foreground: 260 30% 12%;
     
-    --primary: 270 45% 50%;
-    --primary-foreground: 45 60% 97%;
+    --primary: 265 85% 55%;
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 180 30% 88%;
-    --secondary-foreground: 220 35% 15%;
+    --secondary: 250 25% 90%;
+    --secondary-foreground: 260 30% 12%;
     
-    --muted: 45 25% 90%;
-    --muted-foreground: 220 15% 40%;
+    --muted: 250 20% 90%;
+    --muted-foreground: 260 15% 40%;
     
-    --accent: 42 75% 55%;
-    --accent-foreground: 220 35% 15%;
+    --accent: 280 60% 58%;
+    --accent-foreground: 0 0% 100%;
     
-    --border: 45 15% 82%;
-    --input: 45 15% 82%;
-    --ring: 270 45% 50%;
+    --border: 250 15% 85%;
+    --input: 250 15% 85%;
+    --ring: 265 85% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

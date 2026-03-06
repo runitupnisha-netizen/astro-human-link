@@ -15,6 +15,7 @@ interface Match {
   user_b: string;
   compatibility_score: number | null;
   compatibility_summary: string | null;
+  created_at: string;
 }
 
 interface Profile {

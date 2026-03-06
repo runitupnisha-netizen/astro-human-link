@@ -290,7 +290,7 @@ const Onboarding = () => {
             >
               <div className="text-center mb-8">
                 <div className="relative w-56 h-56 mx-auto mb-2">
-                  <div className="absolute inset-0 bg-gradient-aurora rounded-full blur-2xl animate-pulse scale-125 opacity-25" />
+                  <div className="absolute inset-0 bg-white/15 rounded-full blur-3xl animate-pulse scale-110" />
                   <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
                 </div>
                 <h1 className="font-display text-3xl font-bold text-foreground">Unlock Your Aligned Blueprint</h1>

@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Sparkles, Star, Zap, User } from "lucide-react";
+import { Heart, X, Sparkles, Star, Zap, User, ChevronUp, Eye } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {
@@ -24,14 +24,16 @@ export interface DiscoverProfile {
 
 interface SwipeCardProps {
   profile: DiscoverProfile;
-  onSwipe: (direction: "left" | "right") => void;
+  onSwipe: (direction: "left" | "right" | "super") => void;
   isTop: boolean;
+  stackIndex?: number;
+  onViewProfile?: (profile: DiscoverProfile) => void;
 }
 
 const CompatibilityRing = ({ score }: { score: number }) => {
   const circumference = 2 * Math.PI * 38;
   const offset = circumference - (score / 100) * circumference;
-  const color = score >= 80 ? "hsl(var(--accent))" : score >= 60 ? "hsl(var(--primary))" : "hsl(var(--secondary))";
+  const color = score >= 80 ? "hsl(var(--accent))" : score >= 60 ? "hsl(var(--primary))" : "hsl(var(--secondary-foreground))";
 
   return (
     <div className="relative w-20 h-20 flex items-center justify-center">
@@ -62,43 +64,59 @@ const CompatibilityRing = ({ score }: { score: number }) => {
   );
 };
 
-const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
+const socialLabel = (e: number | null) => {
+  if (!e) return "Balanced";
+  if (e <= 3) return "🌙 Introvert";
+  if (e >= 8) return "☀️ Extrovert";
+  return "🌗 Ambivert";
+};
+
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: SwipeCardProps) => {
   const x = useMotionValue(0);
+  const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-18, 18]);
   const likeOpacity = useTransform(x, [0, 100], [0, 1]);
   const passOpacity = useTransform(x, [-100, 0], [1, 0]);
-  const cardScale = useTransform(x, [-300, 0, 300], [0.95, 1, 0.95]);
+  const superLikeOpacity = useTransform(y, [-100, 0], [1, 0]);
   const [exiting, setExiting] = useState(false);
+  const [exitDir, setExitDir] = useState<"left" | "right" | "up">("right");
 
   const handleDragEnd = (_: any, info: PanInfo) => {
+    // Super like on upward swipe
+    if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
+      setExitDir("up");
+      setExiting(true);
+      onSwipe("super");
+      return;
+    }
     if (Math.abs(info.offset.x) > 120) {
+      setExitDir(info.offset.x > 0 ? "right" : "left");
       setExiting(true);
       onSwipe(info.offset.x > 0 ? "right" : "left");
     }
   };
 
-  const socialLabel = (e: number | null) => {
-    if (!e) return "Balanced";
-    if (e <= 3) return "🌙 Introvert";
-    if (e >= 8) return "☀️ Extrovert";
-    return "🌗 Ambivert";
+  const getExitAnimation = (): Record<string, any> => {
+    if (!exiting) return isTop ? {} : { scale: 1 - stackIndex * 0.04, y: stackIndex * 10, opacity: 1 - stackIndex * 0.15 };
+    if (exitDir === "up") return { y: -600, opacity: 0, scale: 0.8, transition: { duration: 0.4, ease: "easeIn" as const } };
+    return { x: exitDir === "right" ? 500 : -500, opacity: 0, rotate: exitDir === "right" ? 20 : -20, transition: { duration: 0.35 } };
   };
 
   return (
     <motion.div
-      className={`absolute inset-0 ${isTop ? "z-10 cursor-grab active:cursor-grabbing" : "z-0"}`}
-      style={{ x, rotate, scale: isTop ? cardScale : 0.95 }}
-      drag={isTop ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
+      className={`absolute inset-0 ${isTop ? "z-10 cursor-grab active:cursor-grabbing" : ""}`}
+      style={{
+        x: isTop ? x : undefined,
+        y: isTop ? y : undefined,
+        rotate: isTop ? rotate : undefined,
+        zIndex: 10 - stackIndex,
+      }}
+      drag={isTop ? true : false}
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
-      animate={
-        exiting
-          ? { x: x.get() > 0 ? 500 : -500, opacity: 0, transition: { duration: 0.3 } }
-          : isTop
-            ? {}
-            : { scale: 0.95, y: 8, opacity: 0.6 }
-      }
+      initial={isTop ? { scale: 1 } : { scale: 1 - stackIndex * 0.04, y: stackIndex * 10, opacity: 1 - stackIndex * 0.15 }}
+      animate={getExitAnimation()}
     >
       {/* Swipe overlays */}
       {isTop && (
@@ -114,6 +132,12 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
             style={{ opacity: passOpacity }}
           >
             <span className="font-display text-red-400 text-2xl font-black tracking-wider">PASS</span>
+          </motion.div>
+          <motion.div
+            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-4 border-accent rounded-xl px-6 py-2 bg-accent/10 backdrop-blur-sm"
+            style={{ opacity: superLikeOpacity }}
+          >
+            <span className="font-display text-accent text-2xl font-black tracking-wider">⭐ SUPER</span>
           </motion.div>
         </>
       )}
@@ -229,22 +253,33 @@ const SwipeCard = ({ profile, onSwipe, isTop }: SwipeCardProps) => {
 
         {/* Action buttons */}
         {isTop && (
-          <div className="p-5 pt-2 flex justify-center gap-8">
+          <div className="p-5 pt-2 flex justify-center items-center gap-5">
             <motion.button
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => { setExiting(true); onSwipe("left"); }}
-              className="w-16 h-16 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-lg"
+              whileTap={{ scale: 0.85 }}
+              onClick={() => { setExitDir("left"); setExiting(true); onSwipe("left"); }}
+              className="w-14 h-14 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-lg"
             >
-              <X className="w-7 h-7 text-destructive" />
+              <X className="w-6 h-6 text-destructive" />
             </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.15, y: -4 }}
+              whileTap={{ scale: 0.85 }}
+              onClick={() => { setExitDir("up"); setExiting(true); onSwipe("super"); }}
+              className="w-16 h-16 rounded-full border-2 border-accent/40 flex items-center justify-center shadow-lg"
+              style={{ background: "var(--gradient-golden)" }}
+            >
+              <Star className="w-8 h-8 text-accent-foreground fill-current" />
+            </motion.button>
+
             <motion.button
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => { setExiting(true); onSwipe("right"); }}
-              className="w-16 h-16 rounded-full bg-card border-2 border-green-400/30 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-lg"
+              whileTap={{ scale: 0.85 }}
+              onClick={() => { setExitDir("right"); setExiting(true); onSwipe("right"); }}
+              className="w-14 h-14 rounded-full bg-card border-2 border-green-400/30 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-lg"
             >
-              <Heart className="w-7 h-7 text-green-400" />
+              <Heart className="w-6 h-6 text-green-400" />
             </motion.button>
           </div>
         )}

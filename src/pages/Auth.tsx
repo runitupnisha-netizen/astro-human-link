@@ -51,7 +51,7 @@ const Auth = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <img src={alignedLogo} alt="Aligned" className="w-36 h-36 mx-auto mb-2 object-contain drop-shadow-[0_0_20px_hsl(260_60%_65%/0.4)]" />
+          <img src={alignedLogo} alt="Aligned" className="w-56 h-56 mx-auto mb-2 object-contain drop-shadow-[0_0_20px_hsl(260_60%_65%/0.4)]" />
           <h1 className="text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}
           </h1>

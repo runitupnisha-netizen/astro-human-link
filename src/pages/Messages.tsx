@@ -460,6 +460,14 @@ const Messages = () => {
               </Card>
             </div>
           )}
+
+          {/* Disclaimer banner */}
+          <div className="mt-2 text-center">
+            <Link to="/disclaimer" className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+              <ShieldAlert className="w-3 h-3" />
+              Cosmic is not responsible for meetups or shared information. Read our full disclaimer.
+            </Link>
+          </div>
         </div>
       </div>
     </div>

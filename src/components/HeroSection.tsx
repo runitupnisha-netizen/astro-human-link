@@ -21,8 +21,6 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-          </div>
-        </div>
 
         <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-aurora bg-clip-text text-transparent leading-tight">
           Find Your Person

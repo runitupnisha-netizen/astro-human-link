@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
-import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send } from "lucide-react";
+import SacredIntentionFilters from "@/components/SacredIntentionFilters";
+import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +18,8 @@ const Discover = () => {
   const [loading, setLoading] = useState(true);
   const [matchPopup, setMatchPopup] = useState<DiscoverProfile | null>(null);
   const [swipeCount, setSwipeCount] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<any>(null);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -116,6 +119,36 @@ const Discover = () => {
             Swipe through souls aligned with your cosmic blueprint
           </p>
         </motion.div>
+
+        {/* Filter button */}
+        <div className="w-full max-w-sm mx-auto px-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-primary/30 hover:bg-primary/10"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Sacred Filters
+            {activeFilters && Object.values(activeFilters).flat().length > 0 && (
+              <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                {Object.values(activeFilters).flat().length}
+              </span>
+            )}
+          </Button>
+        </div>
+
+        {/* Filter Panel */}
+        <AnimatePresence>
+          {showFilters && (
+            <div className="w-full max-w-sm mx-auto px-4 mb-4">
+              <SacredIntentionFilters
+                onApply={(filters) => setActiveFilters(filters)}
+                onClose={() => setShowFilters(false)}
+              />
+            </div>
+          )}
+        </AnimatePresence>
 
         <div className="relative w-full max-w-sm mx-auto px-4" style={{ height: 560 }}>
           {loading ? (

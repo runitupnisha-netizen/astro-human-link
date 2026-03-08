@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      alignment_posts: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          likes_count: number
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          likes_count?: number
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          likes_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_reveals: {
+        Row: {
+          created_at: string
+          id: string
+          reveal_date: string
+          revealed_user_id: string
+          user_id: string
+          viewed: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reveal_date?: string
+          revealed_user_id: string
+          user_id: string
+          viewed?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reveal_date?: string
+          revealed_user_id?: string
+          user_id?: string
+          viewed?: boolean
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           compatibility_score: number | null
@@ -76,6 +130,35 @@ export type Database = {
           },
         ]
       }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "alignment_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           astro_summary: string | null
@@ -93,6 +176,7 @@ export type Database = {
           gene_keys_life_purpose: string | null
           gene_keys_radiance: string | null
           gene_keys_summary: string | null
+          growth_commitment: string | null
           human_design_authority: string | null
           human_design_profile: string | null
           human_design_strategy: string | null
@@ -104,9 +188,13 @@ export type Database = {
           life_path_number: number | null
           moon_sign: string | null
           onboarding_complete: boolean | null
+          preferred_elements: string[] | null
+          preferred_hd_types: string[] | null
+          relationship_goal: string | null
           rising_sign: string | null
           smoking: string | null
           social_energy: number | null
+          spiritual_practice: string | null
           substances: string | null
           sun_sign: string | null
           updated_at: string
@@ -128,6 +216,7 @@ export type Database = {
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
           gene_keys_summary?: string | null
+          growth_commitment?: string | null
           human_design_authority?: string | null
           human_design_profile?: string | null
           human_design_strategy?: string | null
@@ -139,9 +228,13 @@ export type Database = {
           life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
+          preferred_elements?: string[] | null
+          preferred_hd_types?: string[] | null
+          relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
           social_energy?: number | null
+          spiritual_practice?: string | null
           substances?: string | null
           sun_sign?: string | null
           updated_at?: string
@@ -163,6 +256,7 @@ export type Database = {
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
           gene_keys_summary?: string | null
+          growth_commitment?: string | null
           human_design_authority?: string | null
           human_design_profile?: string | null
           human_design_strategy?: string | null
@@ -174,9 +268,13 @@ export type Database = {
           life_path_number?: number | null
           moon_sign?: string | null
           onboarding_complete?: boolean | null
+          preferred_elements?: string[] | null
+          preferred_hd_types?: string[] | null
+          relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
           social_energy?: number | null
+          spiritual_practice?: string | null
           substances?: string | null
           sun_sign?: string | null
           updated_at?: string

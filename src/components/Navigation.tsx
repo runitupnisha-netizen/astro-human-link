@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,9 +11,12 @@ const Navigation = () => {
 
   const navItems = [
     { path: "/", label: "Discover", icon: Sparkles },
-    { path: "/profile", label: "Blueprint", icon: User },
+    { path: "/reveal", label: "Reveal", icon: Star },
+    { path: "/feed", label: "Feed", icon: BookOpen },
     { path: "/connections", label: "Connections", icon: Heart },
     { path: "/messages", label: "Messages", icon: MessageCircle },
+    { path: "/insights", label: "Insights", icon: TrendingUp },
+    { path: "/profile", label: "Blueprint", icon: User },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
 

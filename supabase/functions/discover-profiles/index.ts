@@ -7,6 +7,227 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ═══════════════════════════════════════════════════════════════
+// DETERMINISTIC SCIENCE — Same as analyze-compatibility
+// ═══════════════════════════════════════════════════════════════
+
+const signElements: Record<string, string> = {
+  Aries: "Fire", Leo: "Fire", Sagittarius: "Fire",
+  Taurus: "Earth", Virgo: "Earth", Capricorn: "Earth",
+  Gemini: "Air", Libra: "Air", Aquarius: "Air",
+  Cancer: "Water", Scorpio: "Water", Pisces: "Water",
+};
+
+const signModalities: Record<string, string> = {
+  Aries: "Cardinal", Cancer: "Cardinal", Libra: "Cardinal", Capricorn: "Cardinal",
+  Taurus: "Fixed", Leo: "Fixed", Scorpio: "Fixed", Aquarius: "Fixed",
+  Gemini: "Mutable", Virgo: "Mutable", Sagittarius: "Mutable", Pisces: "Mutable",
+};
+
+// Clean rising sign strings like "Aquarius (Approximate)" → "Aquarius"
+function cleanSignName(sign: string | null): string {
+  if (!sign) return "";
+  return sign.replace(/\s*\(.*\)\s*$/, "").trim();
+}
+
+// Element compatibility (based on traditional elemental polarity)
+function elementScore(e1: string, e2: string): number {
+  if (e1 === e2) return 90; // Same element — natural harmony
+  const compatible: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
+  if (compatible[e1] === e2) return 80; // Complementary (same polarity)
+  // Square energy (opposite polarity, 90° apart): Fire↔Water, Earth↔Air
+  const square = (e1 === "Fire" && e2 === "Water") || (e1 === "Water" && e2 === "Fire") ||
+                 (e1 === "Earth" && e2 === "Air") || (e1 === "Air" && e2 === "Earth");
+  if (square) return 50; // Most challenging
+  return 62; // Inconjunct — moderate tension
+}
+
+// Modality compatibility
+function modalityScore(m1: string, m2: string): number {
+  if (m1 === m2) return 70; // Same modality — understand each other's pace but can clash
+  // Cardinal + Fixed or Mutable + Fixed = moderate
+  // Cardinal + Mutable = complementary (one initiates, other adapts)
+  if ((m1 === "Cardinal" && m2 === "Mutable") || (m1 === "Mutable" && m2 === "Cardinal")) return 85;
+  return 65;
+}
+
+// HD Type pairing score
+const hdPairingScores: Record<string, Record<string, number>> = {
+  Generator: {
+    Generator: 75, "Manifesting Generator": 82, Manifestor: 70, Projector: 85, Reflector: 65,
+  },
+  "Manifesting Generator": {
+    "Manifesting Generator": 72, Manifestor: 75, Projector: 80, Reflector: 68,
+  },
+  Manifestor: {
+    Manifestor: 60, Projector: 82, Reflector: 70,
+  },
+  Projector: {
+    Projector: 72, Reflector: 75,
+  },
+  Reflector: {
+    Reflector: 65,
+  },
+};
+
+function getHDScore(type1: string, type2: string): number {
+  return hdPairingScores[type1]?.[type2] ?? hdPairingScores[type2]?.[type1] ?? 65;
+}
+
+// Life Path compatibility (numerology)
+function lifePathScore(lp1: number | null, lp2: number | null): number {
+  if (!lp1 || !lp2) return 60;
+  if (lp1 === lp2) return 85; // Same path — deep understanding
+  // Highly compatible pairs in Pythagorean numerology
+  const highCompat: Record<number, number[]> = {
+    1: [3, 5, 7], 2: [4, 6, 8], 3: [1, 5, 9], 4: [2, 6, 8],
+    5: [1, 3, 7], 6: [2, 4, 9], 7: [1, 5, 9], 8: [2, 4, 6],
+    9: [3, 6, 7], 11: [2, 4, 6], 22: [4, 6, 8], 33: [3, 6, 9],
+  };
+  if (highCompat[lp1]?.includes(lp2) || highCompat[lp2]?.includes(lp1)) return 80;
+  // Challenging pairs
+  const challenging: Record<number, number[]> = {
+    1: [4, 8], 2: [5, 7], 3: [4, 8], 4: [1, 3, 5],
+    5: [2, 4], 6: [7], 7: [2, 6, 8], 8: [1, 3, 7],
+    9: [1, 5],
+  };
+  if (challenging[lp1]?.includes(lp2) || challenging[lp2]?.includes(lp1)) return 50;
+  return 65; // Neutral
+}
+
+// Gene Keys resonance — check if they share any Gene Key numbers
+function geneKeysScore(gk1: string | null, gk2: string | null): number {
+  if (!gk1 || !gk2) return 60;
+  const extractNum = (s: string) => {
+    const m = s.match(/Gene Key (\d+)/);
+    return m ? parseInt(m[1]) : null;
+  };
+  const n1 = extractNum(gk1);
+  const n2 = extractNum(gk2);
+  if (!n1 || !n2) return 60;
+  if (n1 === n2) return 95; // Same Gene Key — extraordinary resonance
+  // Programming partners (opposite hexagram pairs) — high resonance
+  const partners: Record<number, number> = {
+    1: 2, 3: 4, 5: 35, 6: 36, 7: 13, 8: 14, 9: 16, 10: 15, 11: 12,
+    17: 18, 19: 33, 20: 34, 21: 48, 22: 47, 23: 43, 24: 44, 25: 46,
+    26: 45, 27: 28, 29: 30, 31: 41, 32: 42, 37: 40, 38: 39, 49: 4,
+    50: 3, 51: 57, 52: 58, 53: 54, 55: 59, 56: 60, 61: 62, 63: 64,
+  };
+  if (partners[n1] === n2 || partners[n2] === n1) return 88;
+  return 65;
+}
+
+// Shared interests bonus
+function interestsScore(i1: string[] | null, i2: string[] | null): number {
+  if (!i1?.length || !i2?.length) return 50;
+  const set2 = new Set(i2);
+  const shared = i1.filter(i => set2.has(i)).length;
+  const maxPossible = Math.min(i1.length, i2.length);
+  if (maxPossible === 0) return 50;
+  const ratio = shared / maxPossible;
+  return Math.round(50 + ratio * 45); // 50-95 range
+}
+
+// Social energy compatibility (1-10 scale)
+function socialEnergyScore(s1: number | null, s2: number | null): number {
+  if (!s1 || !s2) return 60;
+  const diff = Math.abs(s1 - s2);
+  if (diff <= 1) return 90;
+  if (diff <= 3) return 75;
+  if (diff <= 5) return 55;
+  return 40;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPOSITE SCORING
+// ═══════════════════════════════════════════════════════════════
+
+interface PreComputedScore {
+  overall: number;
+  element: number;
+  modality: number;
+  hdType: number;
+  lifePath: number;
+  geneKeys: number;
+  interests: number;
+  socialEnergy: number;
+  breakdown: string;
+}
+
+function computeCompatibility(myProfile: any, candidate: any): PreComputedScore {
+  const mySun = cleanSignName(myProfile.sun_sign);
+  const theirSun = cleanSignName(candidate.sun_sign);
+  const myMoon = cleanSignName(myProfile.moon_sign);
+  const theirMoon = cleanSignName(candidate.moon_sign);
+
+  const myEl = signElements[mySun] || "Unknown";
+  const theirEl = signElements[theirSun] || "Unknown";
+
+  // Sun element compatibility
+  const element = myEl !== "Unknown" && theirEl !== "Unknown" ? elementScore(myEl, theirEl) : 60;
+
+  // Moon element cross-compatibility (Sun-Moon synastry)
+  const myMoonEl = signElements[myMoon] || null;
+  const theirMoonEl = signElements[theirMoon] || null;
+  let moonCross = 60;
+  if (myMoonEl && theirEl) {
+    const sunMoonScore = elementScore(signElements[mySun] || "Fire", theirMoonEl || "Fire");
+    const moonSunScore = elementScore(myMoonEl, signElements[theirSun] || "Fire");
+    moonCross = Math.round((sunMoonScore + moonSunScore) / 2);
+  }
+
+  // Modality
+  const myMod = signModalities[mySun] || "Unknown";
+  const theirMod = signModalities[theirSun] || "Unknown";
+  const modality = myMod !== "Unknown" && theirMod !== "Unknown" ? modalityScore(myMod, theirMod) : 60;
+
+  // HD Type
+  const hdType = (myProfile.human_design_type && candidate.human_design_type)
+    ? getHDScore(myProfile.human_design_type, candidate.human_design_type)
+    : 60;
+
+  // Life Path
+  const lifePath = lifePathScore(myProfile.life_path_number, candidate.life_path_number);
+
+  // Gene Keys
+  const geneKeys = geneKeysScore(myProfile.gene_keys_life_purpose, candidate.gene_keys_life_purpose);
+
+  // Interests
+  const interests = interestsScore(myProfile.interests, candidate.interests);
+
+  // Social Energy
+  const socialEnergy = socialEnergyScore(myProfile.social_energy, candidate.social_energy);
+
+  // Weighted composite (astrological factors weighted heavier for this app's identity)
+  const overall = Math.round(
+    element * 0.20 +       // Sun element compatibility
+    moonCross * 0.12 +     // Sun-Moon cross synastry
+    modality * 0.08 +      // Modality harmony
+    hdType * 0.20 +        // Human Design pairing
+    lifePath * 0.10 +      // Numerology
+    geneKeys * 0.10 +      // Gene Keys resonance
+    interests * 0.12 +     // Shared interests
+    socialEnergy * 0.08    // Social energy match
+  );
+
+  const breakdown = `Element: ${element}, Moon Cross: ${moonCross}, Modality: ${modality}, HD: ${hdType}, LifePath: ${lifePath}, GeneKeys: ${geneKeys}, Interests: ${interests}, Social: ${socialEnergy}`;
+
+  return { overall, element, modality, hdType, lifePath, geneKeys, interests, socialEnergy, breakdown };
+}
+
+function connectionType(score: number): string {
+  if (score >= 90) return "Twin Flame";
+  if (score >= 82) return "Soul Mate";
+  if (score >= 74) return "Cosmic Companion";
+  if (score >= 65) return "Karmic Teacher";
+  if (score >= 55) return "Growth Catalyst";
+  return "Cosmic Mirror";
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN HANDLER
+// ═══════════════════════════════════════════════════════════════
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -47,7 +268,7 @@ serve(async (req) => {
       .select("*")
       .eq("onboarding_complete", true)
       .not("user_id", "in", `(${swipedIds.join(",")})`)
-      .limit(10);
+      .limit(20);
 
     if (candErr) {
       console.error("Candidate fetch error:", candErr);
@@ -60,14 +281,27 @@ serve(async (req) => {
       });
     }
 
-    // Use AI to score compatibility
+    // ── Pre-compute deterministic compatibility scores ──
+    const scoredCandidates = candidates.map((candidate: any) => {
+      const scores = computeCompatibility(myProfile, candidate);
+      return { candidate, scores, type: connectionType(scores.overall) };
+    }).sort((a, b) => b.scores.overall - a.scores.overall);
+
+    console.log(`Scored ${scoredCandidates.length} candidates. Top: ${scoredCandidates[0]?.scores.overall} (${scoredCandidates[0]?.scores.breakdown})`);
+
+    // ── AI layer: generate mystical reasons using pre-computed scores ──
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const myBlueprint = formatProfile(myProfile);
-    const candidateSummaries = candidates.map((c: any, i: number) => 
-      `[${i}] ${formatProfile(c)}`
-    ).join("\n\n");
+    const candidateSummaries = scoredCandidates.map((sc, i) => {
+      const c = sc.candidate;
+      const s = sc.scores;
+      return `[${i}] ${c.display_name || "Unknown"} — Score: ${s.overall}/100 (${sc.type})
+  Sun: ${c.sun_sign || "?"}, Moon: ${c.moon_sign || "?"}, Rising: ${c.rising_sign || "?"}
+  HD: ${c.human_design_type || "?"}, Life Path: ${c.life_path_number || "?"}
+  Gene Keys: ${c.gene_keys_life_purpose || "?"}
+  Breakdown: ${s.breakdown}`;
+    }).join("\n\n");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -76,104 +310,100 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           {
             role: "system",
-            content: `You are an expert cosmic matchmaker. Given a user's profile and candidates, score compatibility (0-100) and provide a short mystical reason. Consider astrological synastry (sun/moon/rising compatibility), Human Design type pairing, Gene Keys resonance, shared interests, and social energy alignment. Be specific about WHY they match.`,
+            content: `You are a cosmic matchmaker. Given pre-computed compatibility scores and astrological data, generate a short mystical reason (1-2 sentences) and 2-3 symbolic aspects for each match. The scores are ALREADY calculated deterministically — do NOT override them. Just provide the poetic interpretation.`,
           },
           {
             role: "user",
-            content: `MY PROFILE:\n${myBlueprint}\n\nCANDIDATES:\n${candidateSummaries}\n\nScore each candidate's compatibility with me. Return results sorted by score descending.`,
+            content: `MY PROFILE: ${formatProfile(myProfile)}\n\nMATCHES (pre-scored, sorted by compatibility):\n${candidateSummaries}\n\nFor each candidate, provide a mystical reason and symbolic aspects. Keep the pre-computed scores exactly as-is.`,
           },
         ],
         tools: [
           {
             type: "function",
             function: {
-              name: "return_scores",
-              description: "Return compatibility scores for all candidates",
+              name: "return_descriptions",
+              description: "Return mystical descriptions for pre-scored matches",
               parameters: {
                 type: "object",
                 properties: {
-                  scores: {
+                  matches: {
                     type: "array",
                     items: {
                       type: "object",
                       properties: {
-                        index: { type: "number", description: "Candidate index from the list" },
-                        score: { type: "number", description: "Compatibility 0-100" },
-                        connection_type: { type: "string", description: "e.g. Soul Mate Potential, Twin Flame, Karmic Teacher, Cosmic Companion" },
-                        reason: { type: "string", description: "1-2 sentence mystical reason for the match" },
+                        index: { type: "number", description: "Candidate index" },
+                        reason: { type: "string", description: "1-2 sentence mystical reason grounded in their actual cosmic data" },
                         shared_aspects: {
                           type: "array",
                           items: { type: "string" },
-                          description: "2-3 astrological aspects they share, using symbols like ☉ ☌ ☽, ♀ △ ♂",
+                          description: "2-3 astrological aspect symbols like ☉ △ ☽, ♀ ☌ ♂ based on their actual signs",
                         },
                       },
-                      required: ["index", "score", "connection_type", "reason", "shared_aspects"],
+                      required: ["index", "reason", "shared_aspects"],
                       additionalProperties: false,
                     },
                   },
                 },
-                required: ["scores"],
+                required: ["matches"],
                 additionalProperties: false,
               },
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "return_scores" } },
+        tool_choice: { type: "function", function: { name: "return_descriptions" } },
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again shortly." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+    let aiDescriptions: any[] = [];
+    if (response.ok) {
+      try {
+        const aiResult = await response.json();
+        const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
+        if (toolCall) {
+          const parsed = JSON.parse(toolCall.function.arguments);
+          aiDescriptions = parsed.matches || [];
+        }
+      } catch (e) {
+        console.error("AI description parse error:", e);
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    } else {
       const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
-      throw new Error("AI scoring failed");
+      console.error("AI description error:", response.status, errText);
     }
 
-    const aiResult = await response.json();
-    const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("AI did not return scores");
+    // Build AI lookup by index
+    const aiLookup = new Map<number, any>();
+    for (const desc of aiDescriptions) {
+      aiLookup.set(desc.index, desc);
+    }
 
-    const { scores } = JSON.parse(toolCall.function.arguments);
-
-    // Merge AI scores with profile data
-    const enrichedProfiles = (scores as any[])
-      .sort((a, b) => b.score - a.score)
-      .map((s: any) => {
-        const candidate = candidates[s.index];
-        if (!candidate) return null;
-        return {
-          user_id: candidate.user_id,
-          display_name: candidate.display_name,
-          avatar_url: candidate.avatar_url,
-          sun_sign: candidate.sun_sign,
-          moon_sign: candidate.moon_sign,
-          rising_sign: candidate.rising_sign,
-          human_design_type: candidate.human_design_type,
-          life_path_number: candidate.life_path_number,
-          social_energy: candidate.social_energy,
-          interests: candidate.interests,
-          compatibility_tags: candidate.compatibility_tags,
-          gene_keys_life_purpose: candidate.gene_keys_life_purpose,
-          compatibility_score: s.score,
-          connection_type: s.connection_type,
-          compatibility_reason: s.reason,
-          shared_aspects: s.shared_aspects,
-        };
-      })
-      .filter(Boolean);
+    // Merge deterministic scores with AI descriptions
+    const enrichedProfiles = scoredCandidates.map((sc, i) => {
+      const c = sc.candidate;
+      const aiDesc = aiLookup.get(i);
+      return {
+        user_id: c.user_id,
+        display_name: c.display_name,
+        avatar_url: c.avatar_url,
+        sun_sign: c.sun_sign,
+        moon_sign: c.moon_sign,
+        rising_sign: c.rising_sign,
+        human_design_type: c.human_design_type,
+        life_path_number: c.life_path_number,
+        social_energy: c.social_energy,
+        interests: c.interests,
+        compatibility_tags: c.compatibility_tags,
+        gene_keys_life_purpose: c.gene_keys_life_purpose,
+        compatibility_score: sc.scores.overall,
+        connection_type: sc.type,
+        compatibility_reason: aiDesc?.reason || `A ${sc.type} connection with ${sc.scores.overall}% cosmic alignment.`,
+        shared_aspects: aiDesc?.shared_aspects || [],
+      };
+    });
 
     return new Response(JSON.stringify({ profiles: enrichedProfiles }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

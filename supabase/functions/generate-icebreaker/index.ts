@@ -72,15 +72,15 @@ VOICE & TONE:
 RULES:
 - Reference 1-2 specific details from their profiles (signs, HD type, Gene Keys, shared interests) but keep it breezy
 - Each icebreaker must be 1-2 sentences MAX
-- One should lean flirty/playful, one curious/deep, one fun/lighthearted
+- One should lean flirty/playful, one curious/deep, one fun/lighthearted, and two should be bold/cheeky-flirty
 - NO jargon dumps. "Your Sacral energy is magnetic" > "As a Generator with Sacral authority you have defined centers that..."
 - Avoid: "the stars aligned", "cosmic connection", "written in the stars", "universe brought us together" — too cliché
 
-Generate exactly 3 icebreakers that Person A can send to Person B.`,
+Generate exactly 5 icebreakers that Person A can send to Person B.`,
           },
           {
             role: "user",
-            content: `Person A: ${formatProfile(myProfile)}\nPerson B: ${formatProfile(theirProfile)}\n\nGenerate 3 cosmic icebreakers.`,
+            content: `Person A: ${formatProfile(myProfile)}\nPerson B: ${formatProfile(theirProfile)}\n\nGenerate 5 cosmic icebreakers.`,
           },
         ],
         tools: [
@@ -95,7 +95,7 @@ Generate exactly 3 icebreakers that Person A can send to Person B.`,
                   icebreakers: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Exactly 3 icebreaker messages",
+                    description: "Exactly 5 icebreaker messages",
                   },
                 },
                 required: ["icebreakers"],
@@ -128,7 +128,7 @@ Generate exactly 3 icebreakers that Person A can send to Person B.`,
 
     const { icebreakers } = JSON.parse(toolCall.function.arguments);
 
-    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 3) }), {
+    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 5) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

@@ -223,7 +223,32 @@ const Profile = () => {
                             <span className="text-muted-foreground">Profile:</span>
                             <div className="font-medium">{profile.human_design_profile || "—"}</div>
                           </div>
-                        </div>
+          </div>
+
+          {/* Soul Blueprint Card */}
+          <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold flex items-center gap-2 font-display">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                  Soul Blueprint Card
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-accent/30 text-accent hover:bg-accent/10"
+                  onClick={handleShareBlueprint}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4 font-serif">Your shareable cosmic identity card</p>
+              <div ref={blueprintRef}>
+                <SoulBlueprintCard profile={profile} />
+              </div>
+            </CardContent>
+          </Card>
                       </div>
                     </div>
                   )}

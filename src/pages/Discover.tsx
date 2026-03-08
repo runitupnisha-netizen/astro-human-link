@@ -150,20 +150,46 @@ const Discover = () => {
                   ? "You've seen everyone available right now. New cosmic souls join daily — check back soon for fresh connections."
                   : "Your cosmic blueprint is ready, but there are no new souls to discover right now. As more people join, AI-curated matches will appear here."}
               </p>
-              <div className="flex gap-3">
-                <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Check Again
-                </Button>
-                {swipeCount > 0 && (
-                  <Button
-                    onClick={() => navigate("/connections")}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    View Matches
+              <div className="flex flex-col gap-3 items-center">
+                <div className="flex gap-3">
+                  <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Check Again
                   </Button>
-                )}
+                  {swipeCount > 0 && (
+                    <Button
+                      onClick={() => navigate("/connections")}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      View Matches
+                    </Button>
+                  )}
+                </div>
+                {/* DEBUG: Preview match popup — remove before production */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-accent/30 text-accent hover:bg-accent/10 text-xs"
+                  onClick={() => setMatchPopup({
+                    user_id: "debug-preview",
+                    display_name: "Luna Solstice",
+                    sun_sign: "Gemini",
+                    moon_sign: "Pisces",
+                    rising_sign: "Scorpio",
+                    human_design_type: "Manifesting Generator",
+                    compatibility_score: 87,
+                    compatibility_reason: "Your Sacral energy and her Pisces Moon create an effortless emotional magnetism — rare and worth exploring.",
+                    connection_type: "Twin Flame",
+                    shared_aspects: ["Moon Trine Venus", "Sacral Synergy", "Gate 55 Resonance"],
+                    avatar_url: null,
+                    interests: ["Yoga", "Astrology", "Sound Healing"],
+                    compatibility_tags: ["Deep Thinker", "Empath"],
+                  } as any)}
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Preview Match Popup
+                </Button>
               </div>
             </motion.div>
           ) : (

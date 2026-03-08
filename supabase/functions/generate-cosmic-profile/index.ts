@@ -202,19 +202,23 @@ GENE KEY DETERMINATION:
 - The Earth's position (opposite the Sun) determines the Evolution Gene Key
 - Lunar nodes determine Radiance and Purpose Gene Keys
 
-SUN SIGN TO APPROXIMATE GENE KEY MAPPING:
-- Aries (0°-30°): Gene Keys 25, 51, 21, 17 (approximate range)
-- Taurus: Gene Keys 24, 2, 23, 8
-- Gemini: Gene Keys 20, 16, 35, 45
-- Cancer: Gene Keys 12, 15, 52, 39
-- Leo: Gene Keys 53, 62, 56, 31
-- Virgo: Gene Keys 33, 7, 4, 29
-- Libra: Gene Keys 59, 40, 64, 47
-- Scorpio: Gene Keys 6, 46, 18, 48
-- Sagittarius: Gene Keys 57, 32, 50, 28
-- Capricorn: Gene Keys 44, 1, 43, 14
-- Aquarius: Gene Keys 34, 9, 5, 26
-- Pisces: Gene Keys 11, 10, 58, 38
+SUN SIGN TO GENE KEY MAPPING (based on the Rave Mandala / I Ching wheel):
+Each zodiac sign spans ~5-6 Gene Keys. The Sun's exact degree determines the Life's Work Gene Key.
+- Aries (Mar 21 – Apr 19): Gene Keys 25, 51, 21, 17, 42
+- Taurus (Apr 20 – May 20): Gene Keys 3, 27, 24, 2, 23
+- Gemini (May 21 – Jun 20): Gene Keys 8, 20, 16, 35, 45
+- Cancer (Jun 21 – Jul 22): Gene Keys 12, 15, 52, 39, 53
+- Leo (Jul 23 – Aug 22): Gene Keys 62, 56, 31, 33, 7
+- Virgo (Aug 23 – Sep 22): Gene Keys 4, 29, 59, 40, 64
+- Libra (Sep 23 – Oct 22): Gene Keys 47, 6, 46, 18, 48
+- Scorpio (Oct 23 – Nov 21): Gene Keys 57, 32, 50, 28, 44
+- Sagittarius (Nov 22 – Dec 21): Gene Keys 1, 43, 14, 34, 9
+- Capricorn (Dec 22 – Jan 19): Gene Keys 5, 26, 11, 10, 58
+- Aquarius (Jan 20 – Feb 18): Gene Keys 38, 54, 61, 60, 41
+- Pisces (Feb 19 – Mar 20): Gene Keys 19, 13, 49, 30, 55
+
+The Evolution Gene Key is always the PROGRAMMING PARTNER (opposite side of the wheel) of the Life's Work Gene Key.
+Use your knowledge of the exact Gene Key degree ranges for precision.
 
 ALWAYS format Gene Keys as: "Gene Key [number]: [Shadow] → [Gift] → [Siddhi]"
 Example: "Gene Key 25: Constriction → Acceptance → Universal Love"

@@ -43,7 +43,7 @@ const SacredReveal = () => {
       // Check if already revealed today
       const { data: existing } = await supabase
         .from("daily_reveals")
-        .select("*, profiles:revealed_user_id(user_id, display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests)")
+        .select("*")
         .eq("user_id", user.id)
         .eq("reveal_date", today)
         .maybeSingle();

@@ -7,12 +7,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ═══════════════════════════════════════════════════════════════
+// DETERMINISTIC CALCULATIONS — No AI guessing
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Life Path Number — Pythagorean reduction with master numbers preserved.
+ * Uses the standard 3-group reduction method (Month + Day + Year reduced separately).
+ */
 function calculateLifePathNumber(dateStr: string): number {
-  // Reduce each component (month, day, year) to a single digit, then sum and reduce
   const [year, month, day] = dateStr.split("-").map(Number);
-  
+
   const reduceToDigit = (n: number): number => {
-    // Master numbers 11, 22, 33 are kept
     while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
       n = String(n).split("").reduce((sum, d) => sum + Number(d), 0);
     }
@@ -27,6 +33,200 @@ function calculateLifePathNumber(dateStr: string): number {
 
   return reduceToDigit(monthReduced + dayReduced + yearReduced);
 }
+
+/**
+ * Sun Sign — Deterministic from birth date using tropical zodiac boundaries.
+ * These are the standard Western astrology date ranges.
+ */
+function calculateSunSign(dateStr: string): string {
+  const [_, month, day] = dateStr.split("-").map(Number);
+
+  const signs: [number, number, string][] = [
+    // [month, day-cutoff, sign] — if date >= cutoff, use this sign
+    // Ordered by month, with the transition day
+    [1, 20, "Aquarius"],
+    [2, 19, "Pisces"],
+    [3, 21, "Aries"],
+    [4, 20, "Taurus"],
+    [5, 21, "Gemini"],
+    [6, 21, "Cancer"],
+    [7, 23, "Leo"],
+    [8, 23, "Virgo"],
+    [9, 23, "Libra"],
+    [10, 23, "Scorpio"],
+    [11, 22, "Sagittarius"],
+    [12, 22, "Capricorn"],
+  ];
+
+  // Find the sign: check if we're past the transition date for our month
+  for (let i = signs.length - 1; i >= 0; i--) {
+    const [m, d, sign] = signs[i];
+    if (month === m && day >= d) return sign;
+    if (month > m) {
+      // We're in the next sign's range — find it
+      const nextIndex = (i + 1) % signs.length;
+      return signs[nextIndex][2];
+    }
+  }
+
+  // January before the 20th = Capricorn
+  return "Capricorn";
+}
+
+/**
+ * Expression Number (Destiny Number) — from full birth date using all digits.
+ * This provides an additional numerology data point.
+ */
+function calculateExpressionContext(lifePathNumber: number): string {
+  const meanings: Record<number, string> = {
+    1: "Leadership, independence, pioneering spirit. Driven to forge their own path.",
+    2: "Diplomacy, sensitivity, partnership. Natural mediator seeking harmony.",
+    3: "Creative expression, communication, joy. Born storyteller and artist.",
+    4: "Structure, discipline, foundation-building. Creates lasting systems.",
+    5: "Freedom, adventure, change. Thrives on variety and sensory experience.",
+    6: "Nurturing, responsibility, beauty. The cosmic caretaker and healer.",
+    7: "Introspection, spirituality, analysis. Seeker of hidden truths.",
+    8: "Power, abundance, material mastery. Karmic lessons around authority.",
+    9: "Humanitarianism, wisdom, completion. Old soul with universal compassion.",
+    11: "Master Intuitive — Visionary channel between spiritual and material realms.",
+    22: "Master Builder — Ability to manifest grand visions into physical reality.",
+    33: "Master Teacher — Embodiment of compassionate wisdom and selfless service.",
+  };
+  return meanings[lifePathNumber] || "Unique numerological path with special significance.";
+}
+
+/**
+ * Geocode a place name to latitude/longitude using OpenStreetMap Nominatim.
+ * Free, no API key required. Returns [lat, lng] or null.
+ */
+async function geocodeBirthPlace(place: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const encoded = encodeURIComponent(place);
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,
+      {
+        headers: {
+          "User-Agent": "AlignedApp/1.0 (cosmic-dating-app)",
+        },
+      }
+    );
+    if (!response.ok) return null;
+
+    const results = await response.json();
+    if (results.length > 0) {
+      return {
+        lat: parseFloat(results[0].lat),
+        lng: parseFloat(results[0].lon),
+      };
+    }
+    return null;
+  } catch (e) {
+    console.error("Geocoding error:", e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ZODIAC & SCIENCE REFERENCE DATA — For the AI prompt
+// ═══════════════════════════════════════════════════════════════
+
+const MOON_SIGN_REFERENCE = `
+MOON SIGN ESTIMATION GUIDE (the Moon moves ~13° per day, spending ~2.5 days in each sign):
+The Moon's position depends on the EXACT date. Use these approximate monthly Moon sign tables:
+- The Moon cycles through all 12 signs every 27.3 days
+- Without an ephemeris, estimate based on the birth YEAR and DAY within the lunar cycle
+- If birth time is unknown, acknowledge the Moon sign may be off by one sign
+- ALWAYS state your confidence level (high/medium/low) in the astro_summary
+`;
+
+const RISING_SIGN_REFERENCE = `
+RISING SIGN (ASCENDANT) RULES:
+- The Ascendant changes sign every ~2 hours throughout the day
+- It requires EXACT birth time and location (latitude/longitude) to calculate precisely
+- The Ascendant at sunrise roughly equals the Sun sign
+- Each hour after sunrise advances the Ascendant by ~15°
+- IF BIRTH TIME IS UNKNOWN: Do NOT guess. State "Rising sign requires exact birth time" and use the Sun sign as a placeholder with clear notation
+- IF BIRTH TIME IS KNOWN: Estimate based on: sunrise time at birth location + hours elapsed = approximate Ascendant sign
+`;
+
+const HUMAN_DESIGN_REFERENCE = `
+HUMAN DESIGN SYSTEM — SCIENTIFIC FRAMEWORK:
+Human Design combines the I Ching, Kabbalah, the Hindu-Brahmin Chakra system, and quantum physics.
+
+THE 5 TYPES (determined by defined/undefined centers and channels):
+1. MANIFESTOR (~9% of population): Defined Throat connected to a motor center (Heart/Solar Plexus/Root/Sacral) BUT Sacral is UNDEFINED. Strategy: To Inform. Aura: Closed and repelling.
+2. GENERATOR (~37%): Defined Sacral center, NO motor-to-throat connection. Strategy: To Respond. Aura: Open and enveloping. 
+3. MANIFESTING GENERATOR (~33%): Defined Sacral AND motor-to-throat connection. Strategy: To Respond then Inform. Aura: Open and enveloping.
+4. PROJECTOR (~20%): Undefined Sacral, NO motor-to-throat connection. Strategy: Wait for the Invitation. Aura: Focused and absorbing.
+5. REFLECTOR (~1%): ALL centers undefined. Strategy: Wait a Lunar Cycle. Aura: Sampling and reflecting.
+
+THE 7 AUTHORITIES (decision-making hierarchy):
+1. Emotional/Solar Plexus — Wait for emotional clarity (wave)
+2. Sacral — Gut response (uh-huh/un-un sounds)
+3. Splenic — Instant intuitive knowing
+4. Ego/Heart — Willpower-based
+5. Self-Projected — Speak to hear your truth
+6. Environmental/Mental — No inner authority, use environment
+7. Lunar — Wait full lunar cycle (Reflectors only)
+
+THE 12 PROFILES (personality/design lines):
+1/3 Investigator/Martyr, 1/4 Investigator/Opportunist
+2/4 Hermit/Opportunist, 2/5 Hermit/Heretic
+3/5 Martyr/Heretic, 3/6 Martyr/Role Model
+4/6 Opportunist/Role Model, 4/1 Opportunist/Investigator
+5/1 Heretic/Investigator, 5/2 Heretic/Hermit
+6/2 Role Model/Hermit, 6/3 Role Model/Martyr
+
+RULES FOR HD DETERMINATION:
+- Type and Authority are determined by planetary gate activations at exact birth time AND 88 days before birth (Design/Personality crystals)
+- Without an ephemeris, use the birth data to make an EDUCATED estimation based on statistical distributions
+- ALWAYS note in the summary that precise HD requires a formal chart calculation
+- The profile lines (1-6) correspond to hexagram lines in the I Ching
+`;
+
+const GENE_KEYS_REFERENCE = `
+GENE KEYS SYSTEM — Richard Rudd's framework based on the 64 hexagrams of the I Ching:
+Each Gene Key has three frequency bands:
+- SHADOW (fear-based pattern) → GIFT (creative potential) → SIDDHI (highest expression)
+
+THE GOLDEN PATH has three primary sequences:
+1. ACTIVATION SEQUENCE (Life's Work, Evolution, Radiance, Purpose):
+   - Life's Work (Sun Gene Key) — Your core creative genius
+   - Evolution (Earth Gene Key) — Your growth edge
+   - Radiance (South Node Gene Key) — Your natural radiance/health
+   - Purpose (North Node Gene Key) — Your higher purpose
+
+2. VENUS SEQUENCE (relationships): Opens the heart
+3. PEARL SEQUENCE (prosperity): Material abundance
+
+GENE KEY DETERMINATION:
+- Gene Keys are derived from planetary positions mapped to I Ching hexagrams
+- Each of the 64 Gene Keys corresponds to specific zodiacal degrees
+- The Sun's position determines the Life's Work Gene Key
+- The Earth's position (opposite the Sun) determines the Evolution Gene Key
+- Lunar nodes determine Radiance and Purpose Gene Keys
+
+SUN SIGN TO APPROXIMATE GENE KEY MAPPING:
+- Aries (0°-30°): Gene Keys 25, 51, 21, 17 (approximate range)
+- Taurus: Gene Keys 24, 2, 23, 8
+- Gemini: Gene Keys 20, 16, 35, 45
+- Cancer: Gene Keys 12, 15, 52, 39
+- Leo: Gene Keys 53, 62, 56, 31
+- Virgo: Gene Keys 33, 7, 4, 29
+- Libra: Gene Keys 59, 40, 64, 47
+- Scorpio: Gene Keys 6, 46, 18, 48
+- Sagittarius: Gene Keys 57, 32, 50, 28
+- Capricorn: Gene Keys 44, 1, 43, 14
+- Aquarius: Gene Keys 34, 9, 5, 26
+- Pisces: Gene Keys 11, 10, 58, 38
+
+ALWAYS format Gene Keys as: "Gene Key [number]: [Shadow] → [Gift] → [Siddhi]"
+Example: "Gene Key 25: Constriction → Acceptance → Universal Love"
+`;
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN HANDLER
+// ═══════════════════════════════════════════════════════════════
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -49,28 +249,66 @@ serve(async (req) => {
       throw new Error("Missing birth data: birthDate and birthPlace are required");
     }
 
+    // ── Deterministic calculations ──
     const lifePathNumber = calculateLifePathNumber(birthDate);
+    const sunSign = calculateSunSign(birthDate);
+    const lifePathContext = calculateExpressionContext(lifePathNumber);
+
+    // ── Geocode birth place ──
+    const coords = await geocodeBirthPlace(birthPlace);
+    const latLng = coords
+      ? `Latitude: ${coords.lat.toFixed(4)}, Longitude: ${coords.lng.toFixed(4)}`
+      : "Coordinates unavailable";
+
+    console.log(`Birth data: ${birthDate} ${birthTime || "no time"} in ${birthPlace} (${latLng})`);
+    console.log(`Deterministic: Sun=${sunSign}, LifePath=${lifePathNumber}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const hasBirthTime = birthTime && birthTime.trim() !== "";
-    
-    const timeContext = hasBirthTime 
-      ? `at ${birthTime}` 
-      : "(birth time unknown — use noon/12:00 PM as the default for rising sign and Human Design calculations, and note this in your summaries)";
 
-    const systemPrompt = `You are an expert astrologer, Human Design analyst, and Gene Keys guide. Given a person's birth data, generate their complete cosmic profile.
+    const timeContext = hasBirthTime
+      ? `at exactly ${birthTime} local time`
+      : "(birth time UNKNOWN — use noon/12:00 PM as default, and clearly note all time-dependent calculations are approximate)";
 
-You MUST respond using the provided tool/function call format. Do not respond with plain text.
+    const systemPrompt = `You are an expert astrologer, Human Design analyst, and Gene Keys guide with deep knowledge of ephemeris-based calculations.
 
-Be specific, insightful, and mystical in tone. Use the actual birth data to calculate approximate positions. Be creative but grounded in real astrological frameworks.
+CRITICAL RULES:
+1. The Sun Sign has ALREADY been calculated deterministically and is: ${sunSign}. You MUST use this exact value. Do NOT recalculate it.
+2. For Moon sign: Use your knowledge of lunar ephemeris patterns to estimate as accurately as possible for the given date.
+3. For Rising sign: ${hasBirthTime ? "Estimate using birth time and location coordinates." : "State that rising sign requires exact birth time. Provide your best estimate using noon but clearly mark it as approximate."}
+4. For Human Design: Follow the type/authority/profile framework strictly. Use statistical distributions and birth data correlations.
+5. For Gene Keys: Map from the Sun's zodiacal position to the appropriate Gene Key number. Use the exact Shadow → Gift → Siddhi format.
+6. Be HONEST about confidence levels. If something requires an ephemeris for precision, say so.
+7. In summaries, distinguish between CALCULATED facts and ESTIMATED positions.
 
-${!hasBirthTime ? "IMPORTANT: The user does not know their birth time. Use noon (12:00 PM) as a standard default — this gives the most statistically accurate rising sign estimate. Clearly note in your astro_summary that the rising sign is approximate. For Human Design, use noon as well and note the approximation in the summary." : ""}`;
+${MOON_SIGN_REFERENCE}
 
-    const userPrompt = `Generate a complete cosmic profile for someone born on ${birthDate} ${timeContext} in ${birthPlace}. Their Life Path Number is ${lifePathNumber}.
+${RISING_SIGN_REFERENCE}
 
-Include their sun sign, moon sign, rising sign, a rich astrology summary, their Human Design type/strategy/authority/profile with summary, and their Gene Keys life purpose/evolution/radiance paths with summary. Also generate 5-8 compatibility tags (personality traits useful for matching) based on their cosmic blueprint.`;
+${HUMAN_DESIGN_REFERENCE}
+
+${GENE_KEYS_REFERENCE}
+
+You MUST respond using the provided tool/function call format. Do not respond with plain text.`;
+
+    const userPrompt = `Generate a complete cosmic profile for:
+- Birth Date: ${birthDate}
+- Birth Time: ${timeContext}
+- Birth Place: ${birthPlace}
+- Coordinates: ${latLng}
+- CONFIRMED Sun Sign: ${sunSign} (use this exactly)
+- Life Path Number: ${lifePathNumber} (${lifePathContext})
+
+Provide:
+1. Moon sign (best estimate with confidence note)
+2. Rising sign (${hasBirthTime ? "estimate from birth time + coordinates" : "note as approximate, requires exact birth time"})
+3. Rich astrology summary (3-5 sentences, noting which positions are calculated vs estimated)
+4. Human Design type, strategy, authority, profile with detailed summary
+5. Gene Keys Life's Work, Evolution, and Radiance paths in "Gene Key [N]: Shadow → Gift → Siddhi" format
+6. Gene Keys summary explaining their Golden Path activation
+7. 5-8 compatibility tags derived from the actual cosmic blueprint`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -79,7 +317,7 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -93,23 +331,23 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
               parameters: {
                 type: "object",
                 properties: {
-                  sun_sign: { type: "string", description: "Zodiac sun sign" },
-                  moon_sign: { type: "string", description: "Zodiac moon sign" },
-                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign (note if approximate due to unknown birth time)" },
-                  astro_summary: { type: "string", description: "Rich paragraph about their astrological blueprint (3-5 sentences)" },
-                  human_design_type: { type: "string", description: "e.g. Generator, Manifestor, Projector, Reflector, Manifesting Generator" },
-                  human_design_strategy: { type: "string", description: "Their strategy e.g. To Respond, To Inform, Wait for Invitation, Wait a Lunar Cycle" },
-                  human_design_authority: { type: "string", description: "Their authority e.g. Sacral, Emotional, Splenic" },
-                  human_design_profile: { type: "string", description: "e.g. 1/3, 2/4, 3/5, 4/6, 5/1, 6/2" },
-                  human_design_summary: { type: "string", description: "Rich paragraph about their Human Design (3-5 sentences)" },
-                  gene_keys_life_purpose: { type: "string", description: "Their Life's Work Gene Key path (Shadow → Gift → Siddhi)" },
-                  gene_keys_evolution: { type: "string", description: "Their Evolution Gene Key path" },
-                  gene_keys_radiance: { type: "string", description: "Their Radiance Gene Key path" },
-                  gene_keys_summary: { type: "string", description: "Rich paragraph about their Gene Keys (3-5 sentences)" },
+                  sun_sign: { type: "string", description: "Zodiac sun sign (MUST match the pre-calculated value)" },
+                  moon_sign: { type: "string", description: "Estimated zodiac moon sign" },
+                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign (note if approximate)" },
+                  astro_summary: { type: "string", description: "Rich paragraph about their astrological blueprint (3-5 sentences). MUST note which positions are calculated vs estimated." },
+                  human_design_type: { type: "string", enum: ["Generator", "Manifesting Generator", "Projector", "Manifestor", "Reflector"], description: "One of the 5 HD types" },
+                  human_design_strategy: { type: "string", enum: ["To Respond", "To Respond & Inform", "Wait for the Invitation", "To Inform", "Wait a Lunar Cycle"], description: "Strategy matching the type" },
+                  human_design_authority: { type: "string", enum: ["Emotional/Solar Plexus", "Sacral", "Splenic", "Ego/Heart", "Self-Projected", "Environmental/Mental", "Lunar"], description: "Inner authority" },
+                  human_design_profile: { type: "string", enum: ["1/3", "1/4", "2/4", "2/5", "3/5", "3/6", "4/6", "4/1", "5/1", "5/2", "6/2", "6/3"], description: "Profile lines" },
+                  human_design_summary: { type: "string", description: "Rich paragraph about their Human Design (3-5 sentences). Note that precise calculation requires a formal HD chart." },
+                  gene_keys_life_purpose: { type: "string", description: "Life's Work Gene Key in format: 'Gene Key N: Shadow → Gift → Siddhi'" },
+                  gene_keys_evolution: { type: "string", description: "Evolution Gene Key in format: 'Gene Key N: Shadow → Gift → Siddhi'" },
+                  gene_keys_radiance: { type: "string", description: "Radiance Gene Key in format: 'Gene Key N: Shadow → Gift → Siddhi'" },
+                  gene_keys_summary: { type: "string", description: "Rich paragraph about their Gene Keys Golden Path (3-5 sentences)" },
                   compatibility_tags: {
                     type: "array",
                     items: { type: "string" },
-                    description: "5-8 personality/compatibility tags like 'Deep Thinker', 'Adventure Seeker', 'Emotionally Intuitive'",
+                    description: "5-8 personality/compatibility tags derived from the cosmic blueprint",
                   },
                 },
                 required: [
@@ -150,15 +388,20 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
 
     const cosmicData = JSON.parse(toolCall.function.arguments);
 
-    // Save to profile
+    // ── Enforce deterministic sun sign (override AI if it deviated) ──
+    cosmicData.sun_sign = sunSign;
+
+    // ── Save to profile ──
     const { error: updateError } = await supabase
       .from("profiles")
       .update({
         birth_date: birthDate,
         birth_time: hasBirthTime ? birthTime : null,
         birth_place: birthPlace,
+        birth_latitude: coords?.lat ?? null,
+        birth_longitude: coords?.lng ?? null,
         life_path_number: lifePathNumber,
-        sun_sign: cosmicData.sun_sign,
+        sun_sign: sunSign,
         moon_sign: cosmicData.moon_sign,
         rising_sign: cosmicData.rising_sign,
         astro_summary: cosmicData.astro_summary,
@@ -182,9 +425,15 @@ Include their sun sign, moon sign, rising sign, a rich astrology summary, their 
       throw new Error("Failed to save cosmic profile");
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      profile: { ...cosmicData, life_path_number: lifePathNumber } 
+    return new Response(JSON.stringify({
+      success: true,
+      profile: {
+        ...cosmicData,
+        sun_sign: sunSign,
+        life_path_number: lifePathNumber,
+        birth_latitude: coords?.lat ?? null,
+        birth_longitude: coords?.lng ?? null,
+      },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

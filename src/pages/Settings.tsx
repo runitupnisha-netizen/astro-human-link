@@ -26,7 +26,7 @@ const Settings = () => {
 
           <div className="grid gap-6">
             {/* Account Settings */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <SettingsIcon className="w-5 h-5 text-primary" />
@@ -63,7 +63,7 @@ const Settings = () => {
             </Card>
 
             {/* Connection Preferences */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-accent" />
@@ -135,7 +135,7 @@ const Settings = () => {
             </Card>
 
             {/* Notifications */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="w-5 h-5 text-primary" />
@@ -178,7 +178,7 @@ const Settings = () => {
             </Card>
 
             {/* Privacy & Security */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="w-5 h-5 text-accent" />
@@ -222,7 +222,7 @@ const Settings = () => {
             </Card>
 
             {/* Theme Settings */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-accent" />
@@ -247,7 +247,7 @@ const Settings = () => {
             </Card>
 
             <div className="flex justify-center pt-6">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-glow">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-glow btn-shimmer">
                 Save All Changes
               </Button>
             </div>

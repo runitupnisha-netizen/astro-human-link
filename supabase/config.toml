@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.generate-weekly-insights]
 verify_jwt = false
+
+[functions.generate-daily-intention]
+verify_jwt = false
+
+[functions.push-vapid-key]
+verify_jwt = false

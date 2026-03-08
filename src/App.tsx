@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import Navigation from "./components/Navigation";
+import PageTransition from "./components/PageTransition";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -37,24 +39,27 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
+  const location = useLocation();
 
   if (loading) return null;
 
   return (
     <>
       {user && onboardingComplete && <Navigation />}
-      <Routes>
-        <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-        <Route path="/onboarding" element={<ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute>} />
-        <Route path="/" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
-        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-        <Route path="/compatibility/:matchId" element={<ProtectedRoute><Compatibility /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/disclaimer" element={<Disclaimer />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+          <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
+          <Route path="/" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
+          <Route path="/connections" element={<PageTransition><ProtectedRoute><Connections /></ProtectedRoute></PageTransition>} />
+          <Route path="/messages" element={<PageTransition><ProtectedRoute><Messages /></ProtectedRoute></PageTransition>} />
+          <Route path="/compatibility/:matchId" element={<PageTransition><ProtectedRoute><Compatibility /></ProtectedRoute></PageTransition>} />
+          <Route path="/settings" element={<PageTransition><ProtectedRoute><Settings /></ProtectedRoute></PageTransition>} />
+          <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
     </>
   );
 };

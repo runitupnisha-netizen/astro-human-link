@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import { motion } from "framer-motion";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -48,25 +49,46 @@ const Auth = () => {
     <div className="min-h-screen relative flex items-center justify-center px-4">
       <CosmicBackground />
 
-      <div className="w-full max-w-md relative z-10">
+      <motion.div
+        className="w-full max-w-md relative z-10"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
         {/* Logo */}
-        <div className="text-center mb-8">
-           <div className="relative w-56 h-56 mx-auto mb-2">
-             <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl animate-pulse scale-125" />
-             <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
-           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+        >
+          <div className="relative w-56 h-56 mx-auto mb-2">
+            <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl animate-pulse scale-125" />
+            <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
+          </div>
+          <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
             {isLogin ? "Welcome Back" : "Begin Your Journey"}
           </h1>
           <p className="text-muted-foreground mt-2">
             {isLogin ? "Your cosmic connections await" : "Discover your soul's blueprint"}
           </p>
-        </div>
+        </motion.div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 bg-card/60 backdrop-blur-xl border border-border rounded-2xl p-6">
+        <motion.form
+          onSubmit={handleSubmit}
+          className="glass-card glow-border p-6 space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           {!isLogin && (
-            <div className="relative">
+            <motion.div
+              className="relative"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+            >
               <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Full Name"
@@ -75,7 +97,7 @@ const Auth = () => {
                 className="pl-10 bg-muted/50 border-border"
                 required={!isLogin}
               />
-            </div>
+            </motion.div>
           )}
 
           <div className="relative">
@@ -146,8 +168,8 @@ const Auth = () => {
               {isLogin ? "New soul? Create an account" : "Already have an account? Sign in"}
             </button>
           </div>
-        </form>
-      </div>
+        </motion.form>
+      </motion.div>
     </div>
   );
 };

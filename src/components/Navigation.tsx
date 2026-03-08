@@ -44,10 +44,10 @@ const Navigation = () => {
                   className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                     isActive
                       ? "nav-pill-active"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30 nav-link-hover"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 nav-icon" />
                   <span>{item.label}</span>
                 </Link>
               );

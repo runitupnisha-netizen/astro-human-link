@@ -123,13 +123,67 @@
     box-shadow: var(--shadow-elevated);
   }
 
-  /* Glowing border on hover */
+  /* Glowing border on hover with lift */
   .glow-border {
     @apply relative overflow-hidden;
-    transition: box-shadow 0.4s ease;
+    transition: box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .glow-border:hover {
     box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Interactive card — subtle scale + glow on hover */
+  .interactive-card {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+  .interactive-card:hover {
+    @apply border-primary/30;
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Nav link hover — icon lift + underline */
+  .nav-link-hover {
+    @apply relative;
+  }
+  .nav-link-hover::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 h-0.5 rounded-full;
+    width: 0;
+    background: hsl(var(--primary));
+    transform: translateX(-50%);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .nav-link-hover:hover::after {
+    width: 60%;
+  }
+  .nav-link-hover:hover .nav-icon {
+    transform: translateY(-1px) scale(1.1);
+  }
+  .nav-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Button shimmer on hover */
+  .btn-shimmer {
+    @apply relative overflow-hidden;
+  }
+  .btn-shimmer::before {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      hsl(45 80% 93% / 0.12) 45%,
+      hsl(45 80% 93% / 0.12) 55%,
+      transparent 60%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .btn-shimmer:hover::before {
+    transform: translateX(100%);
   }
 
   /* Section heading with accent underline */

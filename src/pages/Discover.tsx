@@ -166,30 +166,6 @@ const Discover = () => {
                     </Button>
                   )}
                 </div>
-                {/* DEBUG: Preview match popup — remove before production */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-accent/30 text-accent hover:bg-accent/10 text-xs"
-                  onClick={() => setMatchPopup({
-                    user_id: "debug-preview",
-                    display_name: "Luna Solstice",
-                    sun_sign: "Gemini",
-                    moon_sign: "Pisces",
-                    rising_sign: "Scorpio",
-                    human_design_type: "Manifesting Generator",
-                    compatibility_score: 87,
-                    compatibility_reason: "Your Sacral energy and her Pisces Moon create an effortless emotional magnetism — rare and worth exploring.",
-                    connection_type: "Twin Flame",
-                    shared_aspects: ["Moon Trine Venus", "Sacral Synergy", "Gate 55 Resonance"],
-                    avatar_url: null,
-                    interests: ["Yoga", "Astrology", "Sound Healing"],
-                    compatibility_tags: ["Deep Thinker", "Empath"],
-                  } as any)}
-                >
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Preview Match Popup
-                </Button>
               </div>
             </motion.div>
           ) : (

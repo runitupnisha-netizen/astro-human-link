@@ -120,6 +120,36 @@ const Discover = () => {
           </p>
         </motion.div>
 
+        {/* Filter button */}
+        <div className="w-full max-w-sm mx-auto px-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-primary/30 hover:bg-primary/10"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Sacred Filters
+            {activeFilters && Object.values(activeFilters).flat().length > 0 && (
+              <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                {Object.values(activeFilters).flat().length}
+              </span>
+            )}
+          </Button>
+        </div>
+
+        {/* Filter Panel */}
+        <AnimatePresence>
+          {showFilters && (
+            <div className="w-full max-w-sm mx-auto px-4 mb-4">
+              <SacredIntentionFilters
+                onApply={(filters) => setActiveFilters(filters)}
+                onClose={() => setShowFilters(false)}
+              />
+            </div>
+          )}
+        </AnimatePresence>
+
         <div className="relative w-full max-w-sm mx-auto px-4" style={{ height: 560 }}>
           {loading ? (
             <motion.div

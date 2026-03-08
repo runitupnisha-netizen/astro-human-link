@@ -77,6 +77,8 @@ export default {
 				'cosmic': 'var(--shadow-cosmic)',
 				'mystical': 'var(--shadow-mystical)',
 				'glow': 'var(--shadow-glow)',
+				'golden': 'var(--shadow-golden)',
+				'elevated': 'var(--shadow-elevated)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

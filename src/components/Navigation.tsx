@@ -4,6 +4,7 @@ import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, Trendin
 import { Link, useLocation } from "react-router-dom";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
+import NotificationBell from "@/components/NotificationBell";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,8 +58,10 @@ const Navigation = () => {
             })}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
+          {/* Notification Bell & Mobile Menu */}
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <button
             className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-xl hover:bg-muted/30 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
           >
@@ -70,7 +73,8 @@ const Navigation = () => {
               animate={isOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }}
               className="w-5 h-0.5 bg-foreground rounded-full"
             />
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}

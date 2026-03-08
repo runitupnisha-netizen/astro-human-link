@@ -5,10 +5,25 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { toast } from "sonner";
 
 const Settings = () => {
+  const { isSupported, permission, subscribe } = usePushNotifications();
+
+  const handleEnablePush = async () => {
+    const success = await subscribe();
+    if (success) {
+      toast.success("Push notifications enabled ✨");
+    } else if (permission === "denied") {
+      toast.error("Notifications are blocked in your browser settings");
+    } else {
+      toast.error("Could not enable push notifications");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
@@ -173,6 +188,39 @@ const Settings = () => {
                     <p className="text-sm text-muted-foreground">When someone views your profile</p>
                   </div>
                   <Switch />
+                </div>
+
+                <Separator />
+
+                {/* Push Notifications */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Smartphone className="w-4 h-4" /> Browser Push Notifications
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      {!isSupported
+                        ? "Not supported in this browser"
+                        : permission === "granted"
+                        ? "Enabled — you'll receive daily cosmic intentions"
+                        : permission === "denied"
+                        ? "Blocked — update in browser settings"
+                        : "Get daily intentions even when the app is closed"}
+                    </p>
+                  </div>
+                  {isSupported && permission !== "granted" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleEnablePush}
+                      className="border-primary/30 text-primary hover:bg-primary/10"
+                    >
+                      Enable
+                    </Button>
+                  )}
+                  {permission === "granted" && (
+                    <Badge className="bg-green-500/20 text-green-400">Active</Badge>
+                  )}
                 </div>
               </CardContent>
             </Card>

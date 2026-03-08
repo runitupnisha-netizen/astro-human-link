@@ -1,0 +1,1 @@
+UPDATE profiles SET birth_date = '1981-12-23' WHERE user_id = '9ca6a760-5bb1-45ac-85f5-926d37ec0cf8';

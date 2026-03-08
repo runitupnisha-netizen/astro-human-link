@@ -1,11 +1,14 @@
-import { generateVapidKeys, exportVapidKeys } from "jsr:@negrel/webpush";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { encode as base64UrlEncode } from "https://deno.land/std@0.224.0/encoding/base64url.ts";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -13,8 +16,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Check if VAPID keys already exist in env
-    let publicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+    const publicKey = Deno.env.get("VAPID_PUBLIC_KEY");
 
     if (publicKey) {
       return new Response(
@@ -23,32 +25,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Generate new VAPID keys using Web Crypto
+    // Generate new VAPID key pair
     const keyPair = await crypto.subtle.generateKey(
       { name: "ECDSA", namedCurve: "P-256" },
       true,
       ["sign", "verify"]
     );
 
-    // Export public key as raw bytes then base64url encode
     const publicKeyRaw = await crypto.subtle.exportKey("raw", keyPair.publicKey);
-    const publicKeyBase64Url = base64UrlEncode(new Uint8Array(publicKeyRaw));
+    const publicKeyBase64Url = arrayBufferToBase64Url(publicKeyRaw);
 
-    // Export private key as JWK for storage
     const privateKeyJwk = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
-    // Store both keys as secrets for persistence
-    // For now, return the generated public key
-    // The keys should be stored as Supabase secrets
-    console.log("Generated new VAPID keys. Public key:", publicKeyBase64Url);
-    console.log("IMPORTANT: Store VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY as secrets");
-    console.log("Private key JWK:", JSON.stringify(privateKeyJwk));
+    console.log("VAPID_PUBLIC_KEY:", publicKeyBase64Url);
+    console.log("VAPID_PRIVATE_KEY_JWK:", JSON.stringify(privateKeyJwk));
 
     return new Response(
       JSON.stringify({ 
         publicKey: publicKeyBase64Url,
+        privateKeyJwk,
         setup_required: true,
-        message: "VAPID keys generated. Store them as secrets for persistence."
+        message: "Store VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY_JWK as secrets for persistence."
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

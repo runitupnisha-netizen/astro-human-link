@@ -47,8 +47,27 @@ const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
 
 const Profile = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const blueprintRef = useRef<HTMLDivElement>(null);
+
+  const handleShareBlueprint = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${profile?.display_name || "My"} Soul Blueprint — Aligned`,
+          text: `☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"} | ${profile?.human_design_type || ""}`,
+          url: window.location.href,
+        });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(
+        `✨ My Soul Blueprint ✨\n☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"}\n⚡ ${profile?.human_design_type || ""}\n🧬 ${profile?.gene_keys_life_purpose || ""}\n\n— Aligned`
+      );
+      toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
+    }
+  };
 
   useEffect(() => {
     if (!user) return;

@@ -195,7 +195,7 @@ const Connections = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
                 >
-                  <Card className="bg-card/70 backdrop-blur-sm border-border/40 hover:border-primary/30 hover:shadow-glow transition-all duration-300 group cursor-pointer"
+                  <Card className="bg-card/70 backdrop-blur-sm border-border/40 interactive-card group"
                     onClick={() => navigate("/messages")}
                   >
                     <CardContent className="p-5">

@@ -10,10 +10,10 @@ interface SoulBlueprintProps {
     moon_sign: string | null;
     rising_sign: string | null;
     human_design_type: string | null;
-    human_design_profile: string | null;
+    human_design_profile?: string | null;
     gene_keys_life_purpose: string | null;
     life_path_number: number | null;
-    compatibility_tags: string[] | null;
+    compatibility_tags?: string[] | null;
   };
   compact?: boolean;
 }

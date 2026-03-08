@@ -322,7 +322,7 @@ const Messages = () => {
                           setShowMobileChat(true);
                           setIcebreakers([]);
                         }}
-                        className={`p-4 cursor-pointer transition-all border-b border-border/30 hover:bg-primary/5 ${
+                        className={`p-4 cursor-pointer transition-all duration-300 border-b border-border/30 hover:bg-primary/8 hover:pl-5 ${
                           selectedMatchId === convo.match.id
                             ? "bg-primary/10 border-l-2 border-l-primary"
                             : ""

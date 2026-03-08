@@ -142,7 +142,7 @@ const SectionCard = ({ title, icon, children, delay = 0 }: { title: string; icon
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
   >
-    <Card className="bg-card/70 backdrop-blur-sm border-border/40">
+    <Card className="bg-card/70 backdrop-blur-sm border-border/40 glow-border">
       <CardContent className="p-5">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center text-primary">

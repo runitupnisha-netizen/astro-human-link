@@ -85,7 +85,7 @@ const Profile = () => {
       <div className="relative z-10 pt-20 pb-12">
         <div className="max-w-4xl mx-auto px-6">
           {/* Profile Header */}
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50">
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <AvatarUpload
@@ -143,7 +143,7 @@ const Profile = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Astrological Profile */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-accent" />
@@ -174,7 +174,7 @@ const Profile = () => {
             </Card>
 
             {/* Human Design & Gene Keys */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Zap className="w-5 h-5 text-primary" />
@@ -227,7 +227,7 @@ const Profile = () => {
 
           {/* Lifestyle Preferences */}
           {(profile.kids_preference || profile.drinking || profile.smoking || profile.substances) && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <Heart className="w-5 h-5 text-accent" />
@@ -260,7 +260,7 @@ const Profile = () => {
 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />
@@ -279,7 +279,7 @@ const Profile = () => {
 
           {/* Compatibility Tags */}
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50">
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-accent" />

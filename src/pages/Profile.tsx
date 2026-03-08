@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2 } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
+import SoulBlueprintCard from "@/components/SoulBlueprintCard";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
@@ -45,8 +47,27 @@ const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
 
 const Profile = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const blueprintRef = useRef<HTMLDivElement>(null);
+
+  const handleShareBlueprint = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${profile?.display_name || "My"} Soul Blueprint — Aligned`,
+          text: `☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"} | ${profile?.human_design_type || ""}`,
+          url: window.location.href,
+        });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(
+        `✨ My Soul Blueprint ✨\n☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"}\n⚡ ${profile?.human_design_type || ""}\n🧬 ${profile?.gene_keys_life_purpose || ""}\n\n— Aligned`
+      );
+      toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -202,7 +223,32 @@ const Profile = () => {
                             <span className="text-muted-foreground">Profile:</span>
                             <div className="font-medium">{profile.human_design_profile || "—"}</div>
                           </div>
-                        </div>
+          </div>
+
+          {/* Soul Blueprint Card */}
+          <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold flex items-center gap-2 font-display">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                  Soul Blueprint Card
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-accent/30 text-accent hover:bg-accent/10"
+                  onClick={handleShareBlueprint}
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4 font-serif">Your shareable cosmic identity card</p>
+              <div ref={blueprintRef}>
+                <SoulBlueprintCard profile={profile} />
+              </div>
+            </CardContent>
+          </Card>
                       </div>
                     </div>
                   )}

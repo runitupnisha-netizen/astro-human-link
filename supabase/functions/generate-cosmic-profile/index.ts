@@ -41,35 +41,31 @@ function calculateLifePathNumber(dateStr: string): number {
 function calculateSunSign(dateStr: string): string {
   const [_, month, day] = dateStr.split("-").map(Number);
 
-  const signs: [number, number, string][] = [
-    // [month, day-cutoff, sign] — if date >= cutoff, use this sign
-    // Ordered by month, with the transition day
-    [1, 20, "Aquarius"],
-    [2, 19, "Pisces"],
-    [3, 21, "Aries"],
-    [4, 20, "Taurus"],
-    [5, 21, "Gemini"],
-    [6, 21, "Cancer"],
-    [7, 23, "Leo"],
-    [8, 23, "Virgo"],
-    [9, 23, "Libra"],
-    [10, 23, "Scorpio"],
-    [11, 22, "Sagittarius"],
-    [12, 22, "Capricorn"],
+  // Each entry: [startMonth, startDay, sign]
+  // Standard tropical zodiac boundaries
+  const zodiac: [number, number, string][] = [
+    [1, 20, "Aquarius"],    // Jan 20 – Feb 18
+    [2, 19, "Pisces"],      // Feb 19 – Mar 20
+    [3, 21, "Aries"],       // Mar 21 – Apr 19
+    [4, 20, "Taurus"],      // Apr 20 – May 20
+    [5, 21, "Gemini"],      // May 21 – Jun 20
+    [6, 21, "Cancer"],      // Jun 21 – Jul 22
+    [7, 23, "Leo"],         // Jul 23 – Aug 22
+    [8, 23, "Virgo"],       // Aug 23 – Sep 22
+    [9, 23, "Libra"],       // Sep 23 – Oct 22
+    [10, 23, "Scorpio"],    // Oct 23 – Nov 21
+    [11, 22, "Sagittarius"],// Nov 22 – Dec 21
+    [12, 22, "Capricorn"],  // Dec 22 – Jan 19
   ];
 
-  // Find the sign: check if we're past the transition date for our month
-  for (let i = signs.length - 1; i >= 0; i--) {
-    const [m, d, sign] = signs[i];
-    if (month === m && day >= d) return sign;
-    if (month > m) {
-      // We're in the next sign's range — find it
-      const nextIndex = (i + 1) % signs.length;
-      return signs[nextIndex][2];
+  // Walk backwards: find the first entry where (month, day) >= (startMonth, startDay)
+  for (let i = zodiac.length - 1; i >= 0; i--) {
+    const [sm, sd] = zodiac[i];
+    if (month > sm || (month === sm && day >= sd)) {
+      return zodiac[i][2];
     }
   }
-
-  // January before the 20th = Capricorn
+  // Before Jan 20 = Capricorn (from previous Dec 22)
   return "Capricorn";
 }
 

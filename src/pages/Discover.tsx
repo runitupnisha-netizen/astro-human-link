@@ -254,17 +254,17 @@ const Discover = () => {
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: "spring", delay: 0.15, damping: 12 }}
-                  className="w-24 h-24 mx-auto mb-5 rounded-full flex items-center justify-center shadow-glow"
+                  className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center shadow-glow"
                   style={{ background: "var(--gradient-golden)" }}
                 >
-                  <Heart className="w-12 h-12 text-accent-foreground fill-current" />
+                  <Heart className="w-10 h-10 text-accent-foreground fill-current" />
                 </motion.div>
 
                 <motion.h2
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2"
+                  className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
                 >
                   Soul Connection!
                 </motion.h2>
@@ -272,16 +272,92 @@ const Discover = () => {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 }}
+                  transition={{ delay: 0.4 }}
                 >
-                  <p className="text-muted-foreground mb-1 font-serif">
-                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> share a
-                  </p>
-                  <p className="text-accent font-display font-bold text-lg mb-3">{matchPopup.connection_type}</p>
-                  <p className="text-sm text-muted-foreground mb-6 italic font-serif leading-relaxed">
-                    "{matchPopup.compatibility_reason}"
+                  <p className="text-muted-foreground text-sm font-serif mb-3">
+                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span>
                   </p>
                 </motion.div>
+
+                {/* Compatibility Score Ring */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.5, type: "spring", damping: 15 }}
+                  className="flex flex-col items-center mb-4"
+                >
+                  <div className="relative w-28 h-28">
+                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" opacity="0.3" />
+                      <motion.circle
+                        cx="50" cy="50" r="42" fill="none"
+                        stroke={
+                          (matchPopup.compatibility_score || 0) >= 80 ? "hsl(var(--accent))"
+                          : (matchPopup.compatibility_score || 0) >= 65 ? "hsl(var(--primary))"
+                          : "hsl(var(--muted-foreground))"
+                        }
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 42}`}
+                        initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
+                        animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - (matchPopup.compatibility_score || 0) / 100) }}
+                        transition={{ delay: 0.7, duration: 1.2, ease: "easeOut" }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1 }}
+                        className="font-display text-2xl font-bold text-foreground"
+                      >
+                        {matchPopup.compatibility_score || "?"}%
+                      </motion.span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">aligned</span>
+                    </div>
+                  </div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
+                    className="mt-2"
+                  >
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
+                      (matchPopup.compatibility_score || 0) >= 82 ? "bg-accent/15 text-accent border border-accent/30"
+                      : (matchPopup.compatibility_score || 0) >= 65 ? "bg-primary/15 text-primary border border-primary/30"
+                      : "bg-muted text-muted-foreground border border-border"
+                    }`}>
+                      {matchPopup.connection_type || "Cosmic Connection"}
+                    </span>
+                  </motion.div>
+                </motion.div>
+
+                {/* Shared Aspects Pills */}
+                {matchPopup.shared_aspects && matchPopup.shared_aspects.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.1 }}
+                    className="flex flex-wrap justify-center gap-1.5 mb-3"
+                  >
+                    {matchPopup.shared_aspects.slice(0, 3).map((aspect, i) => (
+                      <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground border border-border/40">
+                        {aspect}
+                      </span>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Reason */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                  className="text-xs text-muted-foreground mb-5 italic font-serif leading-relaxed px-2"
+                >
+                  "{matchPopup.compatibility_reason}"
+                </motion.p>
 
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}

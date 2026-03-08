@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       // Generate intention with AI
       const prompt = `Generate a single cosmic daily intention for a person with Sun in ${profile.sun_sign || "unknown"}, Moon in ${profile.moon_sign || "unknown"}, Rising in ${profile.rising_sign || "unknown"}, Human Design type ${profile.human_design_type || "unknown"}. Today is ${dayName}. Return ONLY a JSON object: {"title": "short 3-5 word title", "intention": "1-2 sentence cosmic intention for today"}`;
 
-      const aiResponse = await fetch("https://api.lovable.dev/v1/chat/completions", {
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

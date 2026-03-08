@@ -1,0 +1,19 @@
+UPDATE profiles SET 
+  life_path_number = 9,
+  sun_sign = 'Capricorn',
+  moon_sign = 'Aries',
+  rising_sign = 'Aquarius (Approximate)',
+  human_design_type = 'Projector',
+  human_design_strategy = 'Wait for the Invitation',
+  human_design_authority = 'Splenic',
+  human_design_profile = '4/6',
+  human_design_summary = 'Based on statistical likelihood for your birth data, your Human Design is estimated to be a Splenic Projector with a 4/6 profile. This means you are not designed for a conventional work-life, but rather to guide and manage the energy of others with your deep perception. Your Splenic authority gives you instant, intuitive "knowings" for decision-making, and your strategy is to wait for recognition and invitations before sharing your wisdom. The 4/6 profile suggests a life path of building social networks and foundations in your earlier years, before transitioning into a respected "Role Model" of wisdom later in life. Please note, a precise Human Design chart requires the exact birth time.',
+  gene_keys_life_purpose = 'Gene Key 58: Dissatisfaction → Vitality → Bliss',
+  gene_keys_evolution = 'Gene Key 52: Stress → Restraint → Stillness',
+  gene_keys_radiance = 'Gene Key 1: Entropy → Freshness → Beauty',
+  gene_keys_summary = 'Your Gene Keys Golden Path is initiated by your Life''s Work (Gene Key 58), the core theme of your creative genius. Your journey is about transforming the shadow of Dissatisfaction into the gift of Vitality, which is your true service to the world. This is grounded by your Evolution (Gene Key 52), the primary challenge you must overcome, which involves turning Stress into Restraint and ultimately Stillness. Your Radiance (Gene Key 1) reveals your core essence, showing a path from Entropy to Freshness, unlocking your inner beauty and creative fire.',
+  astro_summary = 'Your astrological blueprint is built on a foundation of disciplined Capricorn energy, providing ambition, structure, and a practical approach to life. Your Moon sign is estimated in Aries, adding emotional independence and passion. Your Rising sign is estimated as Aquarius, suggesting an unconventional, intellectual, and humanitarian-focused approach to the world.',
+  compatibility_tags = ARRAY['Ambitious', 'Grounded', 'Humanitarian', 'Passionate', 'Wise Soul', 'Independent', 'Perceptive Guide'],
+  birth_latitude = 38.2542376,
+  birth_longitude = -85.759407
+WHERE user_id = '9ca6a760-5bb1-45ac-85f5-926d37ec0cf8';

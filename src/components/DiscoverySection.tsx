@@ -1,4 +1,5 @@
 import ProfileCard from "./ProfileCard";
+import { motion } from "framer-motion";
 
 const DiscoverySection = () => {
   const mockProfiles = [
@@ -149,16 +150,22 @@ const DiscoverySection = () => {
   ];
 
   return (
-    <section className="py-20 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-5 text-gradient-aurora">
             Your Soul Tribe Awaits
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            These beautiful souls share a cosmic resonance with your unique blueprint. Each connection reveals the intricate dance of planets, houses, and Gene Keys that bind us together across time and space.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-serif leading-relaxed">
+            These beautiful souls share a resonance with your unique blueprint. Each connection reveals the intricate dance of planets, houses, and Gene Keys.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mockProfiles.map((profile, index) => (

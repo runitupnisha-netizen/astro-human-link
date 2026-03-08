@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Sparkles, Star, Zap, User, ChevronUp, Eye } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {
@@ -52,7 +52,7 @@ const CompatibilityRing = ({ score }: { score: number }) => {
       </svg>
       <div className="text-center">
         <motion.span
-          className="text-lg font-bold text-foreground"
+          className="text-lg font-bold text-foreground font-display"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -71,7 +71,7 @@ const socialLabel = (e: number | null) => {
   return "🌗 Ambivert";
 };
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: SwipeCardProps) => {
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-18, 18]);
@@ -82,7 +82,6 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
   const [exitDir, setExitDir] = useState<"left" | "right" | "up">("right");
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    // Super like on upward swipe
     if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
       setExitDir("up");
       setExiting(true);
@@ -122,36 +121,36 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
       {isTop && (
         <>
           <motion.div
-            className="absolute top-8 right-8 z-20 border-4 border-green-400 rounded-xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
+            className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
             style={{ opacity: likeOpacity }}
           >
-            <span className="font-display text-green-400 text-2xl font-black tracking-wider">SOUL YES</span>
+            <span className="font-display text-green-400 text-xl font-black tracking-wider">SOUL YES</span>
           </motion.div>
           <motion.div
-            className="absolute top-8 left-8 z-20 border-4 border-red-400 rounded-xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
+            className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
             style={{ opacity: passOpacity }}
           >
-            <span className="font-display text-red-400 text-2xl font-black tracking-wider">PASS</span>
+            <span className="font-display text-red-400 text-xl font-black tracking-wider">PASS</span>
           </motion.div>
           <motion.div
-            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-4 border-accent rounded-xl px-6 py-2 bg-accent/10 backdrop-blur-sm"
+            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm"
             style={{ opacity: superLikeOpacity }}
           >
-            <span className="font-display text-accent text-2xl font-black tracking-wider">⭐ SUPER</span>
+            <span className="font-display text-accent text-xl font-black tracking-wider">⭐ SUPER</span>
           </motion.div>
         </>
       )}
 
-      <div className="w-full h-full rounded-3xl overflow-hidden border border-border/50 bg-card/95 backdrop-blur-xl shadow-cosmic flex flex-col">
-        {/* Header with avatar & animated score ring */}
+      <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
+        {/* Header */}
         <div className="relative p-5 pb-3">
           <div className="flex items-center gap-4 mb-3">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/20 overflow-hidden">
+              <div className="w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-primary/20 overflow-hidden shadow-mystical">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-10 h-10 text-foreground" />
+                  <User className="w-10 h-10 text-foreground/70" />
                 )}
               </div>
             </div>
@@ -159,8 +158,8 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
               <h2 className="font-display text-xl font-bold text-foreground truncate">
                 {profile.display_name || "Cosmic Soul"}
               </h2>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                <span className="text-xs text-accent font-semibold">{profile.connection_type}</span>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-accent font-semibold tracking-wide">{profile.connection_type}</span>
               </div>
             </div>
             <CompatibilityRing score={profile.compatibility_score} />
@@ -175,7 +174,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
           >
             <div className="flex items-start gap-2">
               <Sparkles className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-              <p className="text-sm text-muted-foreground leading-relaxed">{profile.compatibility_reason}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed font-serif">{profile.compatibility_reason}</p>
             </div>
           </motion.div>
         </div>
@@ -184,7 +183,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
         <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
           {/* Cosmic signature */}
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Cosmic Signature</h3>
+            <h3 className="section-heading">Cosmic Signature</h3>
             <div className="flex flex-wrap gap-1.5">
               {profile.sun_sign && (
                 <Badge variant="secondary" className="bg-secondary/40 text-xs">
@@ -216,7 +215,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
           {/* Shared aspects */}
           {profile.shared_aspects?.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Cosmic Resonances</h3>
+              <h3 className="section-heading">Cosmic Resonances</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.shared_aspects.map((a, i) => (
                   <Badge key={i} variant="secondary" className="bg-primary/12 text-primary text-xs">{a}</Badge>
@@ -227,16 +226,16 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
 
           {/* Gene Keys */}
           {profile.gene_keys_life_purpose && (
-            <div className="bg-accent/5 rounded-lg p-3 border border-accent/15">
+            <div className="bg-accent/5 rounded-xl p-3 border border-accent/15">
               <div className="text-xs text-accent font-medium mb-1">Gene Keys Life Purpose</div>
-              <div className="text-xs text-muted-foreground">{profile.gene_keys_life_purpose}</div>
+              <div className="text-xs text-muted-foreground font-serif">{profile.gene_keys_life_purpose}</div>
             </div>
           )}
 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider">Shared Vibes</h3>
+              <h3 className="section-heading">Shared Vibes</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.slice(0, 8).map((interest, i) => (
                   <Badge key={i} variant="secondary" className="text-xs bg-secondary/30">{interest}</Badge>
@@ -255,10 +254,10 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
         {isTop && (
           <div className="p-5 pt-2 flex justify-center items-center gap-5">
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.85 }}
               onClick={() => { setExitDir("left"); setExiting(true); onSwipe("left"); }}
-              className="w-14 h-14 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-lg"
+              className="w-14 h-14 rounded-full bg-card border border-destructive/20 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-elevated"
             >
               <X className="w-6 h-6 text-destructive" />
             </motion.button>
@@ -267,17 +266,17 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, onViewProfile }: S
               whileHover={{ scale: 1.15, y: -4 }}
               whileTap={{ scale: 0.85 }}
               onClick={() => { setExitDir("up"); setExiting(true); onSwipe("super"); }}
-              className="w-16 h-16 rounded-full border-2 border-accent/40 flex items-center justify-center shadow-lg"
-              style={{ background: "var(--gradient-golden)" }}
+              className="w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center"
+              style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
               <Star className="w-8 h-8 text-accent-foreground fill-current" />
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.85 }}
               onClick={() => { setExitDir("right"); setExiting(true); onSwipe("right"); }}
-              className="w-14 h-14 rounded-full bg-card border-2 border-green-400/30 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-lg"
+              className="w-14 h-14 rounded-full bg-card border border-green-400/20 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-elevated"
             >
               <Heart className="w-6 h-6 text-green-400" />
             </motion.button>

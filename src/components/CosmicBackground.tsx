@@ -1,41 +1,73 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const CosmicBackground = () => {
-  const [stars, setStars] = useState<Array<{ id: number; x: number; y: number; size: number; delay: number }>>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const generateStars = () => {
-      const newStars = Array.from({ length: 100 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 2 + 1,
-        delay: Math.random() * 3,
-      }));
-      setStars(newStars);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    const stars: { x: number; y: number; r: number; a: number; speed: number; phase: number }[] = [];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
 
-    generateStars();
+    const init = () => {
+      resize();
+      stars.length = 0;
+      for (let i = 0; i < 120; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.4 + 0.3,
+          a: Math.random() * 0.6 + 0.2,
+          speed: Math.random() * 0.0008 + 0.0003,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+    };
+
+    const draw = (time: number) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const s of stars) {
+        const alpha = s.a * (0.5 + 0.5 * Math.sin(time * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(42, 75%, 80%, ${alpha})`;
+        ctx.fill();
+      }
+
+      animationId = requestAnimationFrame(draw);
+    };
+
+    init();
+    animationId = requestAnimationFrame(draw);
+    window.addEventListener("resize", resize);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-cosmic" />
-      <div className="absolute inset-0">
-        {stars.map((star) => (
-          <div
-            key={star.id}
-            className="absolute w-1 h-1 bg-accent rounded-full animate-pulse"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              transform: `scale(${star.size})`,
-              animationDelay: `${star.delay}s`,
-              animationDuration: `${2 + star.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Subtle aurora wash */}
+      <div
+        className="absolute inset-0 opacity-[0.07]"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 20% 80%, hsl(270 45% 40%), transparent), radial-gradient(ellipse 60% 40% at 80% 20%, hsl(180 50% 30%), transparent)",
+        }}
+      />
+      <canvas ref={canvasRef} className="absolute inset-0" />
     </div>
   );
 };

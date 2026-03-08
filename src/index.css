@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Cosmic Spiritual Design System - All colors MUST be HSL */
+/* Aligned — Premium Cosmic Design System */
 
 @layer base {
   :root {
@@ -10,7 +12,7 @@
     --background: 220 35% 7%;
     --foreground: 45 80% 93%;
 
-    /* Card system with deep teal-purple depth */
+    /* Card system with depth */
     --card: 225 28% 11%;
     --card-foreground: 45 80% 93%;
 
@@ -18,11 +20,11 @@
     --popover: 225 28% 11%;
     --popover-foreground: 45 80% 93%;
 
-    /* Primary — rich purple from logo */
+    /* Primary — rich purple */
     --primary: 270 45% 58%;
     --primary-foreground: 220 35% 7%;
 
-    /* Secondary — deep teal from logo */
+    /* Secondary — deep teal */
     --secondary: 180 45% 22%;
     --secondary-foreground: 45 80% 93%;
 
@@ -30,7 +32,7 @@
     --muted: 220 20% 16%;
     --muted-foreground: 200 20% 65%;
 
-    /* Accent — warm gold from logo */
+    /* Accent — warm gold */
     --accent: 42 75% 62%;
     --accent-foreground: 220 35% 7%;
 
@@ -43,16 +45,19 @@
     --input: 210 18% 22%;
     --ring: 270 45% 58%;
 
-    /* Refined gradients matching logo palette */
+    /* Premium gradients */
     --gradient-cosmic: linear-gradient(135deg, hsl(270 45% 18%), hsl(195 50% 12%), hsl(220 50% 8%));
     --gradient-mystical: linear-gradient(180deg, hsl(270 40% 28%), hsl(195 40% 18%));
     --gradient-golden: linear-gradient(45deg, hsl(42 75% 62%), hsl(35 70% 55%));
     --gradient-aurora: linear-gradient(135deg, hsl(180 50% 40%), hsl(42 75% 62%), hsl(270 45% 58%));
+    --gradient-glass: linear-gradient(135deg, hsl(220 30% 14% / 0.6), hsl(225 28% 11% / 0.8));
 
-    /* Shadows with logo tones */
+    /* Layered shadows */
     --shadow-cosmic: 0 20px 60px -10px hsl(270 45% 18% / 0.4);
     --shadow-mystical: 0 10px 40px -5px hsl(195 50% 25% / 0.3);
     --shadow-glow: 0 0 30px hsl(270 45% 58% / 0.25);
+    --shadow-golden: 0 0 40px hsl(42 75% 62% / 0.2);
+    --shadow-elevated: 0 8px 32px -4px hsl(220 35% 5% / 0.6), 0 2px 8px -2px hsl(220 35% 5% / 0.3);
 
     /* Smooth transitions */
     --transition-cosmic: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -60,42 +65,28 @@
     --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .light {
-    /* Light mode with logo tones */
     --background: 45 60% 97%;
     --foreground: 220 35% 15%;
-    
     --card: 45 40% 94%;
     --card-foreground: 220 35% 15%;
-    
     --primary: 270 45% 50%;
     --primary-foreground: 45 60% 97%;
-    
     --secondary: 180 30% 88%;
     --secondary-foreground: 220 35% 15%;
-    
     --muted: 45 25% 90%;
     --muted-foreground: 220 15% 40%;
-    
     --accent: 42 75% 55%;
     --accent-foreground: 220 35% 15%;
-    
     --border: 45 15% 82%;
     --input: 45 15% 82%;
     --ring: 270 45% 50%;
@@ -116,6 +107,86 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-serif antialiased;
   }
+
+  /* Premium typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-wide;
+  }
+}
+
+@layer components {
+  /* Glass card — reusable premium card surface */
+  .glass-card {
+    @apply bg-card/70 backdrop-blur-xl border border-border/40 rounded-2xl;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /* Glowing border on hover */
+  .glow-border {
+    @apply relative overflow-hidden;
+    transition: box-shadow 0.4s ease;
+  }
+  .glow-border:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Section heading with accent underline */
+  .section-heading {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+  }
+
+  /* Smooth page entry */
+  .page-enter {
+    animation: pageEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Navigation pill active state */
+  .nav-pill-active {
+    @apply bg-primary/15 text-primary border border-primary/25;
+    box-shadow: 0 0 16px hsl(270 45% 58% / 0.15);
+  }
+}
+
+@layer utilities {
+  /* Text gradient helper */
+  .text-gradient-aurora {
+    @apply bg-gradient-aurora bg-clip-text text-transparent;
+  }
+  .text-gradient-golden {
+    @apply bg-gradient-golden bg-clip-text text-transparent;
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Selection color */
+::selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
 }

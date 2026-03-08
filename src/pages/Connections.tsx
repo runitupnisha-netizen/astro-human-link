@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -273,6 +273,15 @@ const Connections = () => {
                             <Clock className="w-3 h-3" />
                             {formatTime(match.lastMessageAt || match.created_at)}
                           </span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-3 text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Synastry
+                          </Button>
                           <Button
                             size="sm"
                             variant="ghost"

@@ -305,6 +305,35 @@ const Compatibility = () => {
             <MiniScore score={numerology.score} label="Numbers" />
           </motion.div>
 
+          {/* Soul Blueprint Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"
+          >
+            <SoulBlueprintCard profile={profiles.mine} compact />
+            <SoulBlueprintCard profile={profiles.theirs} compact />
+          </motion.div>
+
+          {/* Interactive Synastry Chart */}
+          <SectionCard title="Synastry Wheel" icon={<Star className="w-4 h-4" />} delay={0.28}>
+            <SynastryChart
+              mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
+              theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
+              score={data.overall_score}
+            />
+          </SectionCard>
+
+          {/* Energy Attraction Map */}
+          <SectionCard title="Energy Attraction Map" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
+            <EnergyAttractionMap
+              myProfile={profiles.mine}
+              theirProfile={profiles.theirs}
+              score={data.overall_score}
+            />
+          </SectionCard>
+
           <div className="space-y-4">
             {/* Synastry Section */}
             <SectionCard title="Astrological Synastry" icon={<Star className="w-4 h-4" />} delay={0.3}>

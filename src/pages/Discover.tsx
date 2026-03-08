@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
-import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send } from "lucide-react";
+import SacredIntentionFilters from "@/components/SacredIntentionFilters";
+import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +18,8 @@ const Discover = () => {
   const [loading, setLoading] = useState(true);
   const [matchPopup, setMatchPopup] = useState<DiscoverProfile | null>(null);
   const [swipeCount, setSwipeCount] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<any>(null);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

@@ -276,6 +276,15 @@ const Connections = () => {
                           <Button
                             size="sm"
                             variant="ghost"
+                            className="h-8 px-3 text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Synastry
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             className="h-8 px-3 text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => { e.stopPropagation(); navigate("/messages"); }}
                           >

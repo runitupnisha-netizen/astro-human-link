@@ -128,7 +128,7 @@ Generate exactly 5 icebreakers that Person A can send to Person B.`,
 
     const { icebreakers } = JSON.parse(toolCall.function.arguments);
 
-    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 3) }), {
+    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 5) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

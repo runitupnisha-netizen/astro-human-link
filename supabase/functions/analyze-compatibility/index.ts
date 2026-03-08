@@ -146,16 +146,16 @@ serve(async (req) => {
       ? getHDPairing(myProfile.human_design_type, theirProfile.human_design_type)
       : "Complete Human Design data needed for pairing analysis.";
 
-    // 4. Element distribution
+    // 4. Element distribution (clean sign names for lookup)
     const myElements = {
-      sun: signElements[myProfile.sun_sign || ""] || null,
-      moon: signElements[myProfile.moon_sign || ""] || null,
-      rising: signElements[myProfile.rising_sign || ""] || null,
+      sun: signElements[cleanSignName(myProfile.sun_sign)] || null,
+      moon: signElements[cleanSignName(myProfile.moon_sign)] || null,
+      rising: signElements[cleanSignName(myProfile.rising_sign)] || null,
     };
     const theirElements = {
-      sun: signElements[theirProfile.sun_sign || ""] || null,
-      moon: signElements[theirProfile.moon_sign || ""] || null,
-      rising: signElements[theirProfile.rising_sign || ""] || null,
+      sun: signElements[cleanSignName(theirProfile.sun_sign)] || null,
+      moon: signElements[cleanSignName(theirProfile.moon_sign)] || null,
+      rising: signElements[cleanSignName(theirProfile.rising_sign)] || null,
     };
 
     // --- AI-Enhanced Deep Analysis ---

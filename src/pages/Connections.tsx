@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";

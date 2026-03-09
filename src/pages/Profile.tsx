@@ -375,7 +375,7 @@ const Profile = () => {
                         {tag}
                       </button>
                       {expandedTag === tag && (
-                        <div className="absolute z-20 top-full mt-1 left-0 w-56 bg-card border border-border/50 rounded-lg p-3 shadow-lg">
+                        <div className="absolute z-20 top-full mt-1 left-0 w-72 bg-card border border-border/50 rounded-lg p-3 shadow-lg">
                           <div className="flex items-start gap-2">
                             <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
                             <p className="text-xs text-muted-foreground leading-relaxed">

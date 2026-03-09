@@ -45,12 +45,41 @@ const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   },
 };
 
+const COSMIC_TAG_DESCRIPTIONS: Record<string, string> = {
+  "Deep Thinker": "You process life through introspection and philosophical inquiry.",
+  "Empath": "You naturally absorb and feel the emotions of those around you.",
+  "Visionary": "You see possibilities others miss and dream of what could be.",
+  "Healer": "You carry a natural gift for helping others restore balance.",
+  "Old Soul": "You possess wisdom and depth beyond your years.",
+  "Free Spirit": "You thrive on freedom, spontaneity, and authentic expression.",
+  "Mystic": "You're drawn to the unseen realms and hidden truths of existence.",
+  "Warrior": "You face challenges head-on with courage and determination.",
+  "Nurturer": "You instinctively care for and support those in your circle.",
+  "Creator": "You channel life force into art, ideas, and new realities.",
+  "Seeker": "You're on a lifelong quest for truth, meaning, and growth.",
+  "Leader": "You naturally inspire and guide others toward a shared vision.",
+  "Rebel": "You challenge the status quo and forge your own path.",
+  "Dreamer": "You live in the realm of imagination and infinite possibility.",
+  "Philosopher": "You explore the big questions about life, meaning, and existence.",
+  "Intuitive": "You trust your inner knowing and make heart-led decisions.",
+  "Alchemist": "You transform challenges into wisdom and growth.",
+  "Adventurer": "You seek new experiences and thrive on exploration.",
+  "Peacemaker": "You harmonize conflict and create unity wherever you go.",
+  "Teacher": "You share knowledge and uplift others through understanding.",
+  "Lightworker": "You're here to raise the vibration of those around you.",
+  "Manifester": "You bring ideas into reality with focused intention.",
+  "Connector": "You build bridges between people and ideas effortlessly.",
+  "Sage": "You offer grounded wisdom drawn from deep inner knowing.",
+  "Transformer": "You catalyze change and evolution in yourself and others.",
+};
+
 const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const blueprintRef = useRef<HTMLDivElement>(null);
+  const [expandedTag, setExpandedTag] = useState<string | null>(null);
 
   const handleShareBlueprint = async () => {
     if (navigator.share) {

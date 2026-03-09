@@ -353,8 +353,8 @@ const Onboarding = () => {
               >
                 <motion.div 
                   className="relative w-44 h-44 mx-auto mb-4"
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ scale: [1, 1.03, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
                   <motion.div 
                     className="absolute inset-0 bg-accent/20 rounded-full blur-3xl"

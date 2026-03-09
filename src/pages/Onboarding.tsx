@@ -729,19 +729,24 @@ const Onboarding = () => {
           {step === "lifestyle" && (
             <motion.div
               key="lifestyle"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
               transition={{ duration: 0.5 }}
-              className="space-y-6"
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center shadow-mystical">
+                <motion.div 
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center shadow-mystical"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.1 }}
+                >
                   <ShieldCheck className="w-8 h-8 text-accent" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Lifestyle & Preferences</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                  This is a <span className="text-accent font-semibold">judgment-free zone</span> ✨ Share what you're comfortable with — you can always skip.
+                </motion.div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Lifestyle & Preferences</h1>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
+                  This is a <span className="text-accent font-semibold">judgment-free zone</span> ✨ Share what feels right.
                 </p>
               </motion.div>
 

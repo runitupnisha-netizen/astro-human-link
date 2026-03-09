@@ -307,6 +307,8 @@ const Onboarding = () => {
       const { error } = await supabase
         .from("profiles")
         .update({
+          gender: gender || null,
+          preferred_genders: preferredGenders.length > 0 ? preferredGenders : null,
           kids_preference: kidsPreference || null,
           drinking: drinking || null,
           smoking: smoking || null,

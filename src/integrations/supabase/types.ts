@@ -202,6 +202,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           drinking: string | null
+          gender: string | null
           gene_keys_evolution: string | null
           gene_keys_life_purpose: string | null
           gene_keys_radiance: string | null
@@ -219,6 +220,7 @@ export type Database = {
           moon_sign: string | null
           onboarding_complete: boolean | null
           preferred_elements: string[] | null
+          preferred_genders: string[] | null
           preferred_hd_types: string[] | null
           relationship_goal: string | null
           rising_sign: string | null
@@ -242,6 +244,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           drinking?: string | null
+          gender?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
@@ -259,6 +262,7 @@ export type Database = {
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           preferred_elements?: string[] | null
+          preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
           relationship_goal?: string | null
           rising_sign?: string | null
@@ -282,6 +286,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           drinking?: string | null
+          gender?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
           gene_keys_radiance?: string | null
@@ -299,6 +304,7 @@ export type Database = {
           moon_sign?: string | null
           onboarding_complete?: boolean | null
           preferred_elements?: string[] | null
+          preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
           relationship_goal?: string | null
           rising_sign?: string | null

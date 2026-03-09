@@ -167,38 +167,100 @@ const Discover = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center h-full gap-5 text-center px-4"
+              className="flex flex-col items-center justify-center h-full gap-6 text-center px-4"
             >
+              {/* Animated constellation icon */}
               <div className="relative">
-                <div className="absolute inset-0 bg-white/15 rounded-full blur-2xl animate-pulse scale-150" />
-                <div className="relative w-24 h-24 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
-                  <Star className="w-12 h-12 text-accent" />
-                </div>
+                <motion.div
+                  className="absolute inset-0 bg-accent/10 rounded-full blur-3xl"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute inset-0 bg-primary/10 rounded-full blur-2xl"
+                  animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                  className="relative w-28 h-28 rounded-full border border-primary/20 flex items-center justify-center"
+                >
+                  {/* Orbiting dots */}
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-2 h-2 rounded-full bg-accent shadow-glow"
+                      style={{
+                        top: `${50 - 45 * Math.cos((i * 2 * Math.PI) / 3)}%`,
+                        left: `${50 + 45 * Math.sin((i * 2 * Math.PI) / 3)}%`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                      animate={{ opacity: [0.4, 1, 0.4], scale: [0.8, 1.2, 0.8] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.6, ease: "easeInOut" }}
+                    />
+                  ))}
+                  <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
+                    <Sparkles className="w-8 h-8 text-accent" />
+                  </div>
+                </motion.div>
               </div>
-              <h3 className="font-display text-2xl font-bold text-foreground">
-                {swipeCount > 0 ? "You've Explored Every Soul" : "The Cosmos Is Aligning..."}
-              </h3>
-              <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
-                {swipeCount > 0
-                  ? "You've seen everyone available right now. New cosmic souls join daily — check back soon for fresh connections."
-                  : "Your cosmic blueprint is ready, but there are no new souls to discover right now. As more people join, AI-curated matches will appear here."}
-              </p>
-              <div className="flex flex-col gap-3 items-center">
-                <div className="flex gap-3">
-                  <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Check Again
-                  </Button>
-                  {swipeCount > 0 && (
-                    <Button
-                      onClick={() => navigate("/connections")}
-                      className="bg-primary hover:bg-primary/90"
+
+              <div className="space-y-2">
+                <h3 className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent">
+                  {swipeCount > 0 ? "You've Explored Every Soul" : "The Stars Are Gathering"}
+                </h3>
+                <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
+                  {swipeCount > 0
+                    ? "You've seen everyone available. New cosmic souls join daily — check back soon for fresh connections."
+                    : "Your cosmic blueprint is ready and waiting. As kindred spirits join, AI-curated matches will appear right here."}
+                </p>
+              </div>
+
+              {/* Tips section */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="w-full max-w-xs glass-card rounded-2xl p-4 space-y-3"
+              >
+                <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">While you wait</p>
+                <div className="space-y-2.5">
+                  {[
+                    { icon: "✨", text: "Complete your profile to attract better matches", action: () => navigate("/profile") },
+                    { icon: "🔮", text: "Read your weekly cosmic insights", action: () => navigate("/insights") },
+                    { icon: "💫", text: "Share an intention in the Alignment Feed", action: () => navigate("/feed") },
+                  ].map((tip, i) => (
+                    <motion.button
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      onClick={tip.action}
+                      className="flex items-center gap-3 w-full text-left p-2 rounded-xl hover:bg-primary/10 transition-colors group"
                     >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      View Matches
-                    </Button>
-                  )}
+                      <span className="text-lg">{tip.icon}</span>
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors font-serif">{tip.text}</span>
+                    </motion.button>
+                  ))}
                 </div>
+              </motion.div>
+
+              <div className="flex gap-3 pt-1">
+                <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10 gap-2">
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh
+                </Button>
+                {swipeCount > 0 && (
+                  <Button
+                    onClick={() => navigate("/connections")}
+                    className="gap-2"
+                    style={{ background: "var(--gradient-aurora)" }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    View Matches
+                  </Button>
+                )}
               </div>
             </motion.div>
           ) : (

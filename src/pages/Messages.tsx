@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +34,7 @@ interface Message {
   content: string;
   message_type: string;
   created_at: string;
+  read_at: string | null;
 }
 
 interface ConversationData {
@@ -178,6 +179,27 @@ const Messages = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Mark incoming messages as read
+  useEffect(() => {
+    if (!selectedMatchId || !user) return;
+    const unreadIds = messages
+      .filter((m) => m.sender_id !== user.id && !m.read_at && !m.id.startsWith("temp-"))
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+
+    const markRead = async () => {
+      const now = new Date().toISOString();
+      await supabase
+        .from("messages")
+        .update({ read_at: now })
+        .in("id", unreadIds);
+      setMessages((prev) =>
+        prev.map((m) => (unreadIds.includes(m.id) ? { ...m, read_at: now } : m))
+      );
+    };
+    markRead();
+  }, [messages, selectedMatchId, user]);
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedMatchId || !user || sending) return;
     const content = newMessage.trim();
@@ -192,6 +214,7 @@ const Messages = () => {
       content,
       message_type: "text",
       created_at: new Date().toISOString(),
+      read_at: null,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 
@@ -244,6 +267,7 @@ const Messages = () => {
       content: text,
       message_type: "icebreaker",
       created_at: new Date().toISOString(),
+      read_at: null,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 
@@ -492,12 +516,21 @@ const Messages = () => {
                                     </span>
                                   )}
                                   <p className="text-sm leading-relaxed">{msg.content}</p>
-                                  <span className="text-[10px] opacity-50 mt-1 block text-right">
-                                    {new Date(msg.created_at).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </span>
+                                  <div className="flex items-center justify-end gap-1 mt-1">
+                                    <span className="text-[10px] opacity-50">
+                                      {new Date(msg.created_at).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                    {isMe && (
+                                      msg.read_at ? (
+                                        <CheckCheck className="w-3.5 h-3.5 text-accent" />
+                                      ) : (
+                                        <Check className="w-3.5 h-3.5 opacity-50" />
+                                      )
+                                    )}
+                                  </div>
                                 </div>
                               </motion.div>
                             );

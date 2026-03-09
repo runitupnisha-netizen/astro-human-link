@@ -516,12 +516,21 @@ const Messages = () => {
                                     </span>
                                   )}
                                   <p className="text-sm leading-relaxed">{msg.content}</p>
-                                  <span className="text-[10px] opacity-50 mt-1 block text-right">
-                                    {new Date(msg.created_at).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </span>
+                                  <div className="flex items-center justify-end gap-1 mt-1">
+                                    <span className="text-[10px] opacity-50">
+                                      {new Date(msg.created_at).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                    {isMe && (
+                                      msg.read_at ? (
+                                        <CheckCheck className="w-3.5 h-3.5 text-accent" />
+                                      ) : (
+                                        <Check className="w-3.5 h-3.5 opacity-50" />
+                                      )
+                                    )}
+                                  </div>
                                 </div>
                               </motion.div>
                             );

@@ -804,13 +804,15 @@ const Onboarding = () => {
               </motion.div>
 
               <motion.div {...staggerCard(0.5)} className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6">
-                  <ChevronLeft className="w-5 h-5 mr-1" />
+                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleContinueToInterests} className="flex-1 h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  Continue — Pick Your Interests
-                  <ChevronRight className="w-5 h-5 ml-2" />
+                <Button onClick={handleContinueToInterests} className="flex-1 h-12 text-base font-semibold group" style={{ background: "var(--gradient-aurora)" }}>
+                  <span className="flex items-center justify-center gap-2">
+                    Continue — Pick Interests
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>
@@ -820,46 +822,65 @@ const Onboarding = () => {
           {step === "interests" && (
             <motion.div
               key="interests"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
               transition={{ duration: 0.5 }}
-              className="space-y-6"
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center shadow-mystical">
+                <motion.div 
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center shadow-mystical"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.1 }}
+                >
                   <Sparkles className="w-8 h-8 text-primary" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">What Lights You Up?</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+                </motion.div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">What Lights You Up?</h1>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
                   Select the things you love — the more you pick, the better your matches ✨
                 </p>
-                {selectedInterests.length > 0 && (
-                  <Badge className="mt-3 bg-primary/20 text-primary border border-primary/30">
-                    {selectedInterests.length} selected
-                  </Badge>
-                )}
+                <AnimatePresence>
+                  {selectedInterests.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                    >
+                      <Badge className="mt-3 bg-primary/20 text-primary border border-primary/30">
+                        {selectedInterests.length} selected
+                      </Badge>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               {Object.entries(INTEREST_CATEGORIES).map(([category, items], idx) => (
-                <motion.div key={category} {...staggerCard(0.05 * (idx + 1))} className="glass-card glow-border p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-3">{category}</h3>
+                <motion.div 
+                  key={category} 
+                  {...staggerCard(0.03 * (idx + 1))} 
+                  className="glass-card glow-border p-5 md:p-6 hover:shadow-mystical transition-shadow"
+                >
+                  <h3 className="text-base md:text-lg font-semibold text-foreground mb-3">{category}</h3>
                   <div className="flex flex-wrap gap-2">
                     {items.map((interest) => {
                       const isSelected = selectedInterests.includes(interest);
                       return (
-                        <button
+                        <motion.button
                           key={interest}
                           type="button"
                           onClick={() => toggleInterest(interest)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${
                             isSelected
-                              ? "bg-primary/20 text-primary border border-primary/40 ring-1 ring-primary/20"
+                              ? "bg-primary/20 text-primary border border-primary/40 ring-1 ring-primary/20 shadow-sm"
                               : "bg-muted/40 text-muted-foreground border border-border/50 hover:bg-muted/60 hover:text-foreground"
                           }`}
                         >
                           {interest}
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
@@ -867,32 +888,37 @@ const Onboarding = () => {
               ))}
 
               {/* Avatar Upload */}
-              <motion.div {...staggerCard(0.6)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6">
                 <div className="text-center space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">Add a Profile Photo</h3>
+                  <h3 className="text-base md:text-lg font-semibold text-foreground">Add a Profile Photo</h3>
                   <p className="text-sm text-muted-foreground">Show the world your cosmic self ✨</p>
                   {user && (
-                    <div className="flex justify-center">
+                    <motion.div 
+                      className="flex justify-center"
+                      whileHover={{ scale: 1.02 }}
+                    >
                       <AvatarUpload
                         userId={user.id}
                         currentUrl={null}
                         onUpload={() => {}}
                         size="lg"
                       />
-                    </div>
+                    </motion.div>
                   )}
                   <p className="text-xs text-muted-foreground">Tap to upload — you can change it anytime</p>
                 </div>
               </motion.div>
 
-              <motion.div {...staggerCard(0.65)} className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("lifestyle")} className="h-12 px-6">
-                  <ChevronLeft className="w-5 h-5 mr-1" />
+              <motion.div {...staggerCard(0.45)} className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep("lifestyle")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Complete My Profile
+                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    Complete My Profile
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>

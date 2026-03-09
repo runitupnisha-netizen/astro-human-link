@@ -179,6 +179,27 @@ const Messages = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Mark incoming messages as read
+  useEffect(() => {
+    if (!selectedMatchId || !user) return;
+    const unreadIds = messages
+      .filter((m) => m.sender_id !== user.id && !m.read_at && !m.id.startsWith("temp-"))
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+
+    const markRead = async () => {
+      const now = new Date().toISOString();
+      await supabase
+        .from("messages")
+        .update({ read_at: now })
+        .in("id", unreadIds);
+      setMessages((prev) =>
+        prev.map((m) => (unreadIds.includes(m.id) ? { ...m, read_at: now } : m))
+      );
+    };
+    markRead();
+  }, [messages, selectedMatchId, user]);
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedMatchId || !user || sending) return;
     const content = newMessage.trim();

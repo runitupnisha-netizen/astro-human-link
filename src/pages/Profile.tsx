@@ -363,30 +363,32 @@ const Profile = () => {
                 <p className="text-xs text-muted-foreground mb-4">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.compatibility_tags.map((tag: string) => (
-                    <div key={tag} className="relative">
-                      <button
-                        onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
-                          expandedTag === tag
-                            ? "bg-accent/30 text-accent border-accent/50 ring-1 ring-accent/30"
-                            : "bg-accent/10 text-accent border-accent/30 hover:bg-accent/20"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                      {expandedTag === tag && (
-                        <div className="absolute z-20 top-full mt-1 left-0 w-72 bg-card border border-border/50 rounded-lg p-3 shadow-lg">
-                          <div className="flex items-start gap-2">
-                            <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                              {COSMIC_TAG_DESCRIPTIONS[tag] || "A unique cosmic quality that shapes your energetic signature."}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <button
+                      key={tag}
+                      onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                        expandedTag === tag
+                          ? "bg-accent/30 text-accent border-accent/50 ring-1 ring-accent/30"
+                          : "bg-accent/10 text-accent border-accent/30 hover:bg-accent/20"
+                      }`}
+                    >
+                      {tag}
+                    </button>
                   ))}
                 </div>
+                {expandedTag && (
+                  <div className="mt-3 bg-accent/5 border border-border/50 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="text-xs font-medium text-accent">{expandedTag}</span>
+                        <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+                          {COSMIC_TAG_DESCRIPTIONS[expandedTag] || "A unique cosmic quality that shapes your energetic signature."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

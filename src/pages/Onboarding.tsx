@@ -763,7 +763,94 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 4: Lifestyle Preferences */}
+          {/* STEP 4: Identity & Dating Preferences */}
+          {step === "identity" && (
+            <motion.div
+              key="identity"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-5"
+            >
+              <motion.div className="text-center mb-6" {...staggerCard(0)}>
+                <motion.div 
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center shadow-mystical"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.1 }}
+                >
+                  <Heart className="w-8 h-8 text-primary" />
+                </motion.div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Identity & Dating</h1>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
+                  Tell us about yourself and who you're looking to connect with ✨
+                </p>
+              </motion.div>
+
+              {/* Gender Identity */}
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <User className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold text-foreground">I identify as...</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {GENDER_OPTIONS.map((opt) => (
+                    <LifestyleOptionButton 
+                      key={opt.value} 
+                      option={opt} 
+                      selected={gender === opt.value} 
+                      onSelect={() => setGender(gender === opt.value ? "" : opt.value)} 
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Dating Preferences */}
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Heart className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold text-foreground">I'm interested in...</h3>
+                  <Badge variant="outline" className="border-primary/30 text-primary text-xs ml-auto">Multi-select</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">Select all that apply — your matches will be filtered accordingly.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {DATING_PREFERENCE_OPTIONS.map((opt) => (
+                    <motion.button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => togglePreferredGender(opt.value)}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left w-full ${
+                        preferredGenders.includes(opt.value)
+                          ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary/30 shadow-mystical"
+                          : "border-border/50 bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:border-border"
+                      }`}
+                    >
+                      <span className="text-xl">{opt.emoji}</span>
+                      <span className="text-sm font-medium">{opt.label}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div {...staggerCard(0.3)} className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+                  Back
+                </Button>
+                <Button onClick={handleContinueToLifestyle} className="flex-1 h-12 text-base font-semibold group" style={{ background: "var(--gradient-aurora)" }}>
+                  <span className="flex items-center justify-center gap-2">
+                    Continue — Lifestyle
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* STEP 5: Lifestyle Preferences */}
           {step === "lifestyle" && (
             <motion.div
               key="lifestyle"

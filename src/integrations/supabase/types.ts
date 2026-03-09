@@ -102,6 +102,7 @@ export type Database = {
           id: string
           match_id: string
           message_type: string
+          read_at: string | null
           sender_id: string
         }
         Insert: {
@@ -110,6 +111,7 @@ export type Database = {
           id?: string
           match_id: string
           message_type?: string
+          read_at?: string | null
           sender_id: string
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           id?: string
           match_id?: string
           message_type?: string
+          read_at?: string | null
           sender_id?: string
         }
         Relationships: [

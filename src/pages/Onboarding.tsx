@@ -1095,6 +1095,28 @@ const Onboarding = () => {
                         </motion.button>
                       );
                     })}
+                    {/* Custom interests for this category */}
+                    {selectedInterests.filter(i => !items.includes(i) && !Object.values(INTEREST_CATEGORIES).flat().includes(i)).length > 0 && null}
+                  </div>
+                  {/* Other / Custom Interest Input */}
+                  <div className="mt-3 flex gap-2">
+                    <Input
+                      type="text"
+                      placeholder="Other — type your own..."
+                      value={customInterestInputs[category] || ""}
+                      onChange={(e) => setCustomInterestInputs(prev => ({ ...prev, [category]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomInterest(category); } }}
+                      className="h-8 text-xs bg-muted/30 border-border/50 flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 border-primary/30 text-primary"
+                      onClick={() => addCustomInterest(category)}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
                 </motion.div>
               ))}

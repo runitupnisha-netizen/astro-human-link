@@ -271,6 +271,18 @@ const Onboarding = () => {
     }
   };
 
+  const handleContinueToIdentity = () => {
+    setStep("identity");
+  };
+
+  const togglePreferredGender = (value: string) => {
+    setPreferredGenders(prev =>
+      prev.includes(value)
+        ? prev.filter(g => g !== value)
+        : [...prev, value]
+    );
+  };
+
   const handleContinueToLifestyle = () => {
     setStep("lifestyle");
   };

@@ -356,13 +356,35 @@ const Profile = () => {
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-accent" />
                   Cosmic Tags
                 </h2>
+                <p className="text-xs text-muted-foreground mb-4">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.compatibility_tags.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="border-accent/30 text-accent">{tag}</Badge>
+                    <div key={tag} className="relative">
+                      <button
+                        onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          expandedTag === tag
+                            ? "bg-accent/30 text-accent border-accent/50 ring-1 ring-accent/30"
+                            : "bg-accent/10 text-accent border-accent/30 hover:bg-accent/20"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                      {expandedTag === tag && (
+                        <div className="absolute z-20 top-full mt-1 left-0 w-56 bg-card border border-border/50 rounded-lg p-3 shadow-lg">
+                          <div className="flex items-start gap-2">
+                            <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {COSMIC_TAG_DESCRIPTIONS[tag] || "A unique cosmic quality that shapes your energetic signature."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </CardContent>

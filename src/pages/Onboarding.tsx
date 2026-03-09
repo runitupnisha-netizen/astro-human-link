@@ -363,7 +363,7 @@ const Onboarding = () => {
     return COSMIC_TAG_DESCRIPTIONS[tag] || "A unique cosmic quality that shapes your energetic signature.";
   };
 
-
+  const handleFinish = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;

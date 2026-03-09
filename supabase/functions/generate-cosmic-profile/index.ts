@@ -308,7 +308,7 @@ Provide:
 4. Human Design type, strategy, authority, profile with detailed summary
 5. Gene Keys Life's Work, Evolution, and Radiance paths in "Gene Key [N]: Shadow → Gift → Siddhi" format
 6. Gene Keys summary explaining their Golden Path activation
-7. 5-8 compatibility tags derived from the actual cosmic blueprint`;
+7. 5-8 compatibility tags chosen ONLY from this list: Deep Thinker, Empath, Visionary, Healer, Old Soul, Free Spirit, Mystic, Warrior, Nurturer, Creator, Seeker, Leader, Rebel, Dreamer, Philosopher, Intuitive, Alchemist, Adventurer, Peacemaker, Teacher, Lightworker, Manifester, Connector, Sage, Transformer`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

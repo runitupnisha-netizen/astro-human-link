@@ -135,10 +135,30 @@ const INTEREST_CATEGORIES = {
   ],
 };
 
-type OnboardingStep = "input" | "generating" | "reveal" | "lifestyle" | "interests";
+const GENDER_OPTIONS: LifestyleOption[] = [
+  { value: "male", label: "Male", emoji: "♂️" },
+  { value: "female", label: "Female", emoji: "♀️" },
+  { value: "non_binary", label: "Non-Binary", emoji: "⚧️" },
+  { value: "trans_male", label: "Trans Male", emoji: "🏳️‍⚧️" },
+  { value: "trans_female", label: "Trans Female", emoji: "🏳️‍⚧️" },
+  { value: "genderqueer", label: "Genderqueer", emoji: "🌈" },
+  { value: "genderfluid", label: "Genderfluid", emoji: "💫" },
+  { value: "two_spirit", label: "Two-Spirit", emoji: "🪶" },
+  { value: "agender", label: "Agender", emoji: "✨" },
+  { value: "prefer_not_to_say", label: "Prefer not to say", emoji: "🔒" },
+];
 
-const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "lifestyle", "interests"];
-const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Lifestyle", "Interests"];
+const DATING_PREFERENCE_OPTIONS: LifestyleOption[] = [
+  { value: "men", label: "Men", emoji: "♂️" },
+  { value: "women", label: "Women", emoji: "♀️" },
+  { value: "non_binary_people", label: "Non-Binary People", emoji: "⚧️" },
+  { value: "everyone", label: "Everyone", emoji: "💖" },
+];
+
+type OnboardingStep = "input" | "generating" | "reveal" | "identity" | "lifestyle" | "interests";
+
+const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "identity", "lifestyle", "interests"];
+const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Identity", "Lifestyle", "Interests"];
 
 const staggerCard = (delay: number) => ({
   initial: { opacity: 0, y: 24, scale: 0.98 },

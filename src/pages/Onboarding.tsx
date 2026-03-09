@@ -137,11 +137,54 @@ const INTEREST_CATEGORIES = {
 
 type OnboardingStep = "input" | "generating" | "reveal" | "lifestyle" | "interests";
 
+const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "lifestyle", "interests"];
+const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Lifestyle", "Interests"];
+
 const staggerCard = (delay: number) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+  initial: { opacity: 0, y: 24, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
 });
+
+const ProgressIndicator = ({ currentStep }: { currentStep: OnboardingStep }) => {
+  const visibleSteps = STEPS_ORDER.filter(s => s !== "generating");
+  const currentIndex = visibleSteps.indexOf(currentStep === "generating" ? "input" : currentStep);
+  
+  return (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {visibleSteps.map((step, idx) => {
+        const isActive = idx === currentIndex;
+        const isComplete = idx < currentIndex;
+        return (
+          <motion.div
+            key={step}
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.1 }}
+          >
+            <motion.div
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                isActive 
+                  ? "bg-accent shadow-glow scale-125" 
+                  : isComplete 
+                    ? "bg-primary" 
+                    : "bg-muted-foreground/30"
+              }`}
+              animate={isActive ? { scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            {idx < visibleSteps.length - 1 && (
+              <div className={`w-8 h-0.5 rounded-full transition-colors duration-300 ${
+                isComplete ? "bg-primary/50" : "bg-muted-foreground/20"
+              }`} />
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
 const Onboarding = () => {
   const { user } = useAuth();

@@ -82,16 +82,19 @@ const INTEREST_CATEGORIES = {
   ],
   "🎬 Movies & TV": [
     "Sci-Fi", "Documentary", "Art House", "Studio Ghibli", "Horror",
-    "Comedy", "Drama", "Anime", "Thriller", "Romance", "Reality TV",
+    "Comedy", "Drama", "Anime", "Thriller", "Romance", "Rom-Com", "Reality TV",
     "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
     "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
     "Satire", "Dystopian", "Noir", "Slasher", "Found Footage",
     "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [
-    "The Power of Now", "Siddhartha", "Dune", "Self-Help", "Philosophy",
-    "Poetry", "Fiction", "Non-Fiction", "Astrology Books", "Tarot",
-    "Psychology", "History", "Biographies", "Science", "Spirituality"
+    "Self-Help", "Philosophy", "Poetry", "Fiction", "Non-Fiction",
+    "Astrology Books", "Tarot", "Psychology", "History", "Biographies",
+    "Science", "Spirituality", "Memoir", "Fantasy", "Sci-Fi",
+    "Mystery & Thriller", "Romance", "Horror", "True Crime",
+    "Business & Finance", "Health & Wellness", "Classic Literature",
+    "Graphic Novels", "Young Adult", "Essays", "Mythology"
   ],
   "💪 Sports & Fitness": [
     "Yoga", "Swimming", "Martial Arts", "Running", "Weight Training",
@@ -104,9 +107,12 @@ const INTEREST_CATEGORIES = {
     "Camping", "Scuba Diving", "Paragliding", "Fasting", "Herbalism"
   ],
   "✨ Thought Systems": [
-    "Non-dualism", "Jungian Psychology", "Buddhism", "Stoicism",
-    "Astrology", "Human Design", "Gene Keys", "Kabbalah", "Taoism",
-    "Manifestation", "Quantum Physics", "Sacred Geometry", "Shamanism"
+    "Non-dualism", "Jungian Psychology", "Buddhism", "Christianity", "Judaism",
+    "Islam", "Hinduism", "Sufism", "Stoicism", "Astrology", "Human Design",
+    "Gene Keys", "Kabbalah", "Taoism", "Manifestation", "Quantum Physics",
+    "Sacred Geometry", "Shamanism", "Hermeticism", "Gnosticism",
+    "Existentialism", "Zen", "Advaita Vedanta", "Mysticism",
+    "Indigenous Wisdom", "Paganism", "Animism"
   ],
   "🎨 Creative": [
     "Photography", "Painting", "Writing", "Music Production",

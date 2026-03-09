@@ -134,7 +134,7 @@ const Auth = () => {
                 className="mt-0.5"
               />
               <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
-                I am 10 years or older and agree to the{" "}
+                I am 18+ and agree to the{" "}
                 <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
                   Disclaimer &amp; Terms of Use
                 </Link>

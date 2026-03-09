@@ -249,8 +249,8 @@ const Onboarding = () => {
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
         age--;
       }
-      if (age < 10) {
-        toast.error("You must be at least 10 years old to use Aligned.");
+      if (age < 18) {
+        toast.error("You must be at least 18 years old to use Aligned.");
         return;
       }
     }

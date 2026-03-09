@@ -34,6 +34,7 @@ interface Message {
   content: string;
   message_type: string;
   created_at: string;
+  read_at: string | null;
 }
 
 interface ConversationData {

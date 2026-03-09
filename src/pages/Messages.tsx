@@ -149,9 +149,12 @@ const Messages = () => {
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => {
-            // Avoid duplicates from optimistic update
+            // Remove optimistic message and avoid duplicates
             if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
+            const withoutOptimistic = prev.filter(
+              (m) => !(m.id.startsWith("temp-") && m.sender_id === newMsg.sender_id && m.content === newMsg.content)
+            );
+            return [...withoutOptimistic, newMsg];
           });
           // Update conversation list last message
           setConversations((prev) =>

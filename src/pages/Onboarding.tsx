@@ -750,7 +750,7 @@ const Onboarding = () => {
               {/* Continue Button */}
               <motion.div {...staggerCard(0.6)}>
                 <Button 
-                  onClick={handleContinueToLifestyle} 
+                  onClick={handleContinueToIdentity} 
                   className="w-full h-12 text-base font-semibold group relative overflow-hidden" 
                   style={{ background: "var(--gradient-aurora)" }}
                 >

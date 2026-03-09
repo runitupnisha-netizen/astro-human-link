@@ -234,6 +234,8 @@ const Onboarding = () => {
 
   // Interests
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [customInterestInputs, setCustomInterestInputs] = useState<Record<string, string>>({});
+  const [expandedTag, setExpandedTag] = useState<string | null>(null);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();

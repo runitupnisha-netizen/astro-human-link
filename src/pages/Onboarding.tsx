@@ -929,7 +929,7 @@ const Onboarding = () => {
               </motion.div>
 
               <motion.div {...staggerCard(0.5)} className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
+                <Button variant="outline" onClick={() => setStep("identity")} className="h-12 px-6 group">
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>

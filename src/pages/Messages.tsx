@@ -193,6 +193,7 @@ const Messages = () => {
       content,
       message_type: "text",
       created_at: new Date().toISOString(),
+      read_at: null,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 

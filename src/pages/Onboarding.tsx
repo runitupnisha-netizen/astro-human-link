@@ -328,83 +328,151 @@ const Onboarding = () => {
   );
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 pt-20 pb-10">
+    <div className="min-h-screen relative flex items-center justify-center px-4 pt-16 pb-10 overflow-hidden">
       <CosmicBackground />
 
       <div className="w-full max-w-2xl relative z-10">
+        {/* Progress Indicator - hide during generating */}
+        {step !== "generating" && <ProgressIndicator currentStep={step} />}
+        
         <AnimatePresence mode="wait">
           {/* STEP 1: Birth Data Input */}
           {step === "input" && (
             <motion.div
               key="input"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
               <motion.div
                 className="text-center mb-8"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <div className="relative w-56 h-56 mx-auto mb-2">
-                  <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl animate-pulse scale-125" />
-                  <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Unlock Your Aligned Blueprint</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                  Enter your birth details and our AI will decode your astrology, Human Design, and Gene Keys
-                </p>
+                <motion.div 
+                  className="relative w-44 h-44 mx-auto mb-4"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <motion.div 
+                    className="absolute inset-0 bg-accent/20 rounded-full blur-3xl"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <img src={alignedLogo} alt="Aligned" className="relative w-44 h-44 object-contain mix-blend-screen drop-shadow-[0_0_30px_rgba(200,180,130,0.3)]" />
+                </motion.div>
+                <motion.h1 
+                  className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Unlock Your Blueprint
+                </motion.h1>
+                <motion.p 
+                  className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Enter your birth details and AI will decode your astrology, Human Design & Gene Keys
+                </motion.p>
               </motion.div>
 
               <motion.form
                 onSubmit={handleGenerate}
-                className="glass-card glow-border p-6 space-y-5"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                className="glass-card glow-border p-6 md:p-8 space-y-5"
+                initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
               >
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 }}
+                >
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
+                  <div className="relative group">
+                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-sm font-medium text-foreground">Birth Time</label>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer group">
                       <Checkbox checked={!knowsBirthTime} onCheckedChange={(checked) => { setKnowsBirthTime(!checked); if (checked) setBirthTime(""); }} />
-                      <span className="text-xs text-muted-foreground">I don't know my birth time</span>
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">I don't know my birth time</span>
                     </label>
                   </div>
-                  {knowsBirthTime ? (
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                      <Input type="time" value={birthTime} onChange={(e) => setBirthTime(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-                      No worries! We'll use noon as a standard reference point — this gives the most statistically accurate results for your rising sign and Human Design.
-                    </p>
-                  )}
-                </div>
+                  <AnimatePresence mode="wait">
+                    {knowsBirthTime ? (
+                      <motion.div 
+                        key="time-input"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="relative group"
+                      >
+                        <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Input type="time" value={birthTime} onChange={(e) => setBirthTime(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="time-info"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-start gap-3 bg-muted/30 rounded-xl p-3 border border-border/50"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                          <Clock className="w-4 h-4 text-accent" />
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          No worries! We'll use noon as a reference — this gives statistically accurate results for your rising sign and Human Design.
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45 }}
+                >
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Place</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <Input type="text" placeholder="e.g. Los Angeles, California" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
+                  <div className="relative group">
+                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input type="text" placeholder="e.g. Los Angeles, California" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
                   </div>
-                </div>
+                </motion.div>
 
-                <Button type="submit" className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Generate My Aligned Blueprint
-                </Button>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Button type="submit" className="w-full h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                      Generate My Blueprint
+                    </span>
+                    <motion.div
+                      className="absolute inset-0 bg-white/10"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </Button>
+                </motion.div>
               </motion.form>
             </motion.div>
           )}

@@ -568,95 +568,158 @@ const Onboarding = () => {
           {step === "reveal" && profile && (
             <motion.div
               key="reveal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-6"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Your Cosmic Blueprint</h1>
-                <p className="text-muted-foreground mt-1">
+                <motion.div
+                  className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-golden flex items-center justify-center shadow-golden"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.2 }}
+                >
+                  <Sparkles className="w-10 h-10 text-background" />
+                </motion.div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">Your Cosmic Blueprint</h1>
+                <p className="text-muted-foreground mt-2 text-sm">
                   Born {birthDate}{knowsBirthTime && birthTime ? ` at ${birthTime}` : ""} in {birthPlace}
                 </p>
               </motion.div>
 
               {/* Life Path Number */}
-              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"><Hash className="w-5 h-5 text-accent" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Life Path Number</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Hash className="w-5 h-5 text-accent" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Life Path Number</h2>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" style={{ background: "var(--gradient-mystical)" }}>{profile.life_path_number}</div>
+                  <motion.div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" 
+                    style={{ background: "var(--gradient-mystical)" }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {profile.life_path_number}
+                  </motion.div>
                   <p className="text-sm text-muted-foreground flex-1">{lifePathMeaning(profile.life_path_number)}</p>
                 </div>
               </motion.div>
 
               {/* Astrology */}
-              <motion.div {...staggerCard(0.25)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"><Star className="w-5 h-5 text-primary" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Astrology</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Star className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Astrology</h2>
                 </div>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {[{ label: "Sun", value: profile.sun_sign }, { label: "Moon", value: profile.moon_sign }, { label: "Rising", value: profile.rising_sign }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[{ label: "Sun", value: profile.sun_sign, emoji: "☀️" }, { label: "Moon", value: profile.moon_sign, emoji: "🌙" }, { label: "Rising", value: profile.rising_sign, emoji: "⬆️" }].map((item, i) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.astro_summary}</p>
               </motion.div>
 
               {/* Human Design */}
-              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.3)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"><Zap className="w-5 h-5 text-accent" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Human Design</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Zap className="w-5 h-5 text-accent" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Human Design</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
                   {[{ label: "Type", value: profile.human_design_type }, { label: "Strategy", value: profile.human_design_strategy }, { label: "Authority", value: profile.human_design_authority }, { label: "Profile", value: profile.human_design_profile }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3">
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
                       <p className="text-xs text-muted-foreground">{item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.human_design_summary}</p>
               </motion.div>
 
               {/* Gene Keys */}
-              <motion.div {...staggerCard(0.55)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center"><Dna className="w-5 h-5 text-primary" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Gene Keys</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Dna className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Gene Keys</h2>
                 </div>
-                <div className="space-y-3 mb-4">
-                  {[{ label: "Life Purpose", value: profile.gene_keys_life_purpose }, { label: "Evolution", value: profile.gene_keys_evolution }, { label: "Radiance", value: profile.gene_keys_radiance }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3">
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                <div className="space-y-2 mb-4">
+                  {[{ label: "Life Purpose", value: profile.gene_keys_life_purpose, emoji: "🎯" }, { label: "Evolution", value: profile.gene_keys_evolution, emoji: "🌱" }, { label: "Radiance", value: profile.gene_keys_radiance, emoji: "✨" }].map((item) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 hover:bg-muted/70 transition-colors"
+                      whileHover={{ x: 4 }}
+                    >
+                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.gene_keys_summary}</p>
               </motion.div>
 
               {/* Compatibility Tags */}
-              <motion.div {...staggerCard(0.7)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.5)} className="glass-card glow-border p-5 md:p-6">
                 <h3 className="text-lg font-bold text-foreground mb-3">Your Cosmic Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {profile.compatibility_tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30">{tag}</span>
+                  {profile.compatibility_tags.map((tag, i) => (
+                    <motion.span 
+                      key={tag} 
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 + i * 0.05 }}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      {tag}
+                    </motion.span>
                   ))}
                 </div>
               </motion.div>
 
               {/* Continue Button */}
-              <motion.div {...staggerCard(0.85)}>
-                <Button onClick={handleContinueToLifestyle} className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  Continue — Tell Us About You
-                  <ChevronRight className="w-5 h-5 ml-2" />
+              <motion.div {...staggerCard(0.6)}>
+                <Button 
+                  onClick={handleContinueToLifestyle} 
+                  className="w-full h-12 text-base font-semibold group relative overflow-hidden" 
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Continue — Tell Us About You
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>

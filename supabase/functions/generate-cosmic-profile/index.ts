@@ -346,8 +346,11 @@ Provide:
                   gene_keys_summary: { type: "string", description: "Rich paragraph about their Gene Keys Golden Path (3-5 sentences)" },
                   compatibility_tags: {
                     type: "array",
-                    items: { type: "string" },
-                    description: "5-8 personality/compatibility tags derived from the cosmic blueprint",
+                    items: { 
+                      type: "string",
+                      enum: ["Deep Thinker", "Empath", "Visionary", "Healer", "Old Soul", "Free Spirit", "Mystic", "Warrior", "Nurturer", "Creator", "Seeker", "Leader", "Rebel", "Dreamer", "Philosopher", "Intuitive", "Alchemist", "Adventurer", "Peacemaker", "Teacher", "Lightworker", "Manifester", "Connector", "Sage", "Transformer"]
+                    },
+                    description: "5-8 personality/compatibility tags from the allowed list, derived from the cosmic blueprint",
                   },
                 },
                 required: [

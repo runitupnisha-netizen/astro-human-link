@@ -794,19 +794,42 @@ const Onboarding = () => {
 
               {/* Compatibility Tags */}
               <motion.div {...staggerCard(0.5)} className="glass-card glow-border p-5 md:p-6">
-                <h3 className="text-lg font-bold text-foreground mb-3">Your Cosmic Tags</h3>
+                <h3 className="text-lg font-bold text-foreground mb-2">Your Cosmic Tags</h3>
+                <p className="text-xs text-muted-foreground mb-3">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.compatibility_tags.map((tag, i) => (
-                    <motion.span 
-                      key={tag} 
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.6 + i * 0.05 }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {tag}
-                    </motion.span>
+                    <div key={tag} className="relative">
+                      <motion.button
+                        type="button"
+                        onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          expandedTag === tag
+                            ? "bg-primary/30 text-primary border-primary/50 ring-1 ring-primary/30"
+                            : "bg-primary/20 text-primary border-primary/30"
+                        }`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.6 + i * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {tag}
+                      </motion.button>
+                      <AnimatePresence>
+                        {expandedTag === tag && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                            className="absolute z-20 top-full mt-1 left-0 w-56 bg-card border border-border/50 rounded-lg p-3 shadow-lg"
+                          >
+                            <div className="flex items-start gap-2">
+                              <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
+                              <p className="text-xs text-muted-foreground leading-relaxed">{getTagDescription(tag)}</p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   ))}
                 </div>
               </motion.div>

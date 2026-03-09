@@ -231,6 +231,22 @@ const Onboarding = () => {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Age validation: must be 10+
+    if (birthDate) {
+      const birth = new Date(birthDate + "T12:00:00");
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      if (age < 10) {
+        toast.error("You must be at least 10 years old to use Aligned.");
+        return;
+      }
+    }
+
     setStep("generating");
 
     try {

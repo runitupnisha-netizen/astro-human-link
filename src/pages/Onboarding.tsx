@@ -137,11 +137,54 @@ const INTEREST_CATEGORIES = {
 
 type OnboardingStep = "input" | "generating" | "reveal" | "lifestyle" | "interests";
 
+const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "lifestyle", "interests"];
+const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Lifestyle", "Interests"];
+
 const staggerCard = (delay: number) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+  initial: { opacity: 0, y: 24, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
 });
+
+const ProgressIndicator = ({ currentStep }: { currentStep: OnboardingStep }) => {
+  const visibleSteps = STEPS_ORDER.filter(s => s !== "generating");
+  const currentIndex = visibleSteps.indexOf(currentStep === "generating" ? "input" : currentStep);
+  
+  return (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {visibleSteps.map((step, idx) => {
+        const isActive = idx === currentIndex;
+        const isComplete = idx < currentIndex;
+        return (
+          <motion.div
+            key={step}
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.1 }}
+          >
+            <motion.div
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                isActive 
+                  ? "bg-accent shadow-glow scale-125" 
+                  : isComplete 
+                    ? "bg-primary" 
+                    : "bg-muted-foreground/30"
+              }`}
+              animate={isActive ? { scale: [1, 1.3, 1] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            {idx < visibleSteps.length - 1 && (
+              <div className={`w-8 h-0.5 rounded-full transition-colors duration-300 ${
+                isComplete ? "bg-primary/50" : "bg-muted-foreground/20"
+              }`} />
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
 const Onboarding = () => {
   const { user } = useAuth();
@@ -265,12 +308,14 @@ const Onboarding = () => {
   };
 
   const LifestyleOptionButton = ({ option, selected, onSelect }: { option: LifestyleOption; selected: boolean; onSelect: () => void }) => (
-    <button
+    <motion.button
       type="button"
       onClick={onSelect}
+      whileHover={{ scale: 1.02, y: -2 }}
+      whileTap={{ scale: 0.98 }}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left w-full ${
         selected
-          ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary/30"
+          ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary/30 shadow-mystical"
           : "border-border/50 bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:border-border"
       }`}
     >
@@ -279,87 +324,155 @@ const Onboarding = () => {
       {option.value === "decline" && (
         <ShieldCheck className="w-4 h-4 ml-auto text-muted-foreground" />
       )}
-    </button>
+    </motion.button>
   );
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 pt-20 pb-10">
+    <div className="min-h-screen relative flex items-center justify-center px-4 pt-16 pb-10 overflow-hidden">
       <CosmicBackground />
 
       <div className="w-full max-w-2xl relative z-10">
+        {/* Progress Indicator - hide during generating */}
+        {step !== "generating" && <ProgressIndicator currentStep={step} />}
+        
         <AnimatePresence mode="wait">
           {/* STEP 1: Birth Data Input */}
           {step === "input" && (
             <motion.div
               key="input"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
               <motion.div
                 className="text-center mb-8"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
               >
-                <div className="relative w-56 h-56 mx-auto mb-2">
-                  <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl animate-pulse scale-125" />
-                  <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Unlock Your Aligned Blueprint</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                  Enter your birth details and our AI will decode your astrology, Human Design, and Gene Keys
-                </p>
+                <motion.div 
+                  className="relative w-44 h-44 mx-auto mb-4"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <motion.div 
+                    className="absolute inset-0 bg-accent/20 rounded-full blur-3xl"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <img src={alignedLogo} alt="Aligned" className="relative w-44 h-44 object-contain mix-blend-screen drop-shadow-[0_0_30px_rgba(200,180,130,0.3)]" />
+                </motion.div>
+                <motion.h1 
+                  className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Unlock Your Blueprint
+                </motion.h1>
+                <motion.p 
+                  className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  Enter your birth details and AI will decode your astrology, Human Design & Gene Keys
+                </motion.p>
               </motion.div>
 
               <motion.form
                 onSubmit={handleGenerate}
-                className="glass-card glow-border p-6 space-y-5"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                className="glass-card glow-border p-6 md:p-8 space-y-5"
+                initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
               >
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 }}
+                >
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
+                  <div className="relative group">
+                    <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-sm font-medium text-foreground">Birth Time</label>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer group">
                       <Checkbox checked={!knowsBirthTime} onCheckedChange={(checked) => { setKnowsBirthTime(!checked); if (checked) setBirthTime(""); }} />
-                      <span className="text-xs text-muted-foreground">I don't know my birth time</span>
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">I don't know my birth time</span>
                     </label>
                   </div>
-                  {knowsBirthTime ? (
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                      <Input type="time" value={birthTime} onChange={(e) => setBirthTime(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-                      No worries! We'll use noon as a standard reference point — this gives the most statistically accurate results for your rising sign and Human Design.
-                    </p>
-                  )}
-                </div>
+                  <AnimatePresence mode="wait">
+                    {knowsBirthTime ? (
+                      <motion.div 
+                        key="time-input"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="relative group"
+                      >
+                        <Clock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Input type="time" value={birthTime} onChange={(e) => setBirthTime(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="time-info"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-start gap-3 bg-muted/30 rounded-xl p-3 border border-border/50"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                          <Clock className="w-4 h-4 text-accent" />
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          No worries! We'll use noon as a reference — this gives statistically accurate results for your rising sign and Human Design.
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
 
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45 }}
+                >
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Place</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <Input type="text" placeholder="e.g. Los Angeles, California" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="pl-10 bg-muted/50 border-border" required />
+                  <div className="relative group">
+                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <Input type="text" placeholder="e.g. Los Angeles, California" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
                   </div>
-                </div>
+                </motion.div>
 
-                <Button type="submit" className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Generate My Aligned Blueprint
-                </Button>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Button type="submit" className="w-full h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                      Generate My Blueprint
+                    </span>
+                    <motion.div
+                      className="absolute inset-0 bg-white/10"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </Button>
+                </motion.div>
               </motion.form>
             </motion.div>
           )}
@@ -370,19 +483,84 @@ const Onboarding = () => {
               key="generating"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="text-center py-20"
+              exit={{ opacity: 0, scale: 1.1 }}
+              className="text-center py-16"
             >
-              <div className="relative w-24 h-24 mx-auto mb-8">
-                <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" />
-                <div className="absolute inset-2 rounded-full border-2 border-accent/40 animate-ping" style={{ animationDelay: "0.5s" }} />
-                <div className="absolute inset-4 rounded-full border-2 border-primary/50 animate-ping" style={{ animationDelay: "1s" }} />
-                <div className="absolute inset-0 rounded-full flex items-center justify-center" style={{ background: "var(--gradient-aurora)" }}>
-                  <Loader2 className="w-10 h-10 text-background animate-spin" />
-                </div>
+              <div className="relative w-32 h-32 mx-auto mb-8">
+                {/* Outer rotating ring */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-dashed border-primary/40"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Middle pulsing ring */}
+                <motion.div
+                  className="absolute inset-3 rounded-full border border-accent/50"
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                {/* Inner rotating ring */}
+                <motion.div
+                  className="absolute inset-6 rounded-full border-2 border-dashed border-accent/30"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Center orb */}
+                <motion.div 
+                  className="absolute inset-8 rounded-full flex items-center justify-center shadow-glow"
+                  style={{ background: "var(--gradient-aurora)" }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Loader2 className="w-8 h-8 text-background animate-spin" />
+                </motion.div>
+                {/* Orbiting particles */}
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 rounded-full bg-accent shadow-glow"
+                    style={{ top: "50%", left: "50%", marginTop: -4, marginLeft: -4 }}
+                    animate={{
+                      x: [0, 60 * Math.cos(i * 2.1), 0],
+                      y: [0, 60 * Math.sin(i * 2.1), 0],
+                      opacity: [0.3, 1, 0.3],
+                    }}
+                    transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4, ease: "easeInOut" }}
+                  />
+                ))}
               </div>
-              <h2 className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">Reading the Stars...</h2>
-              <p className="text-muted-foreground">Channeling your cosmic blueprint from the universe</p>
+              <motion.h2 
+                className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-3"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                Reading the Stars...
+              </motion.h2>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <p className="text-muted-foreground text-sm md:text-base">Channeling your cosmic blueprint</p>
+                <motion.div 
+                  className="flex justify-center gap-1 mt-3"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  {["Astrology", "Human Design", "Gene Keys"].map((item, i) => (
+                    <motion.span
+                      key={item}
+                      className="text-xs px-2 py-1 rounded-full bg-muted/50 text-muted-foreground border border-border/50"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 + i * 0.2 }}
+                    >
+                      {item}
+                    </motion.span>
+                  ))}
+                </motion.div>
+              </motion.div>
             </motion.div>
           )}
 
@@ -390,95 +568,158 @@ const Onboarding = () => {
           {step === "reveal" && profile && (
             <motion.div
               key="reveal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-6"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Your Cosmic Blueprint</h1>
-                <p className="text-muted-foreground mt-1">
+                <motion.div
+                  className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-golden flex items-center justify-center shadow-golden"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.2 }}
+                >
+                  <Sparkles className="w-10 h-10 text-background" />
+                </motion.div>
+                <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">Your Cosmic Blueprint</h1>
+                <p className="text-muted-foreground mt-2 text-sm">
                   Born {birthDate}{knowsBirthTime && birthTime ? ` at ${birthTime}` : ""} in {birthPlace}
                 </p>
               </motion.div>
 
               {/* Life Path Number */}
-              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"><Hash className="w-5 h-5 text-accent" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Life Path Number</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Hash className="w-5 h-5 text-accent" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Life Path Number</h2>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" style={{ background: "var(--gradient-mystical)" }}>{profile.life_path_number}</div>
+                  <motion.div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" 
+                    style={{ background: "var(--gradient-mystical)" }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {profile.life_path_number}
+                  </motion.div>
                   <p className="text-sm text-muted-foreground flex-1">{lifePathMeaning(profile.life_path_number)}</p>
                 </div>
               </motion.div>
 
               {/* Astrology */}
-              <motion.div {...staggerCard(0.25)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"><Star className="w-5 h-5 text-primary" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Astrology</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Star className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Astrology</h2>
                 </div>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {[{ label: "Sun", value: profile.sun_sign }, { label: "Moon", value: profile.moon_sign }, { label: "Rising", value: profile.rising_sign }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3 text-center">
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[{ label: "Sun", value: profile.sun_sign, emoji: "☀️" }, { label: "Moon", value: profile.moon_sign, emoji: "🌙" }, { label: "Rising", value: profile.rising_sign, emoji: "⬆️" }].map((item, i) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.astro_summary}</p>
               </motion.div>
 
               {/* Human Design */}
-              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.3)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"><Zap className="w-5 h-5 text-accent" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Human Design</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Zap className="w-5 h-5 text-accent" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Human Design</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
                   {[{ label: "Type", value: profile.human_design_type }, { label: "Strategy", value: profile.human_design_strategy }, { label: "Authority", value: profile.human_design_authority }, { label: "Profile", value: profile.human_design_profile }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3">
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
                       <p className="text-xs text-muted-foreground">{item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.human_design_summary}</p>
               </motion.div>
 
               {/* Gene Keys */}
-              <motion.div {...staggerCard(0.55)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center"><Dna className="w-5 h-5 text-primary" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Gene Keys</h2>
+                  <motion.div 
+                    className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Dna className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Gene Keys</h2>
                 </div>
-                <div className="space-y-3 mb-4">
-                  {[{ label: "Life Purpose", value: profile.gene_keys_life_purpose }, { label: "Evolution", value: profile.gene_keys_evolution }, { label: "Radiance", value: profile.gene_keys_radiance }].map((item) => (
-                    <div key={item.label} className="bg-muted/50 rounded-xl p-3">
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                <div className="space-y-2 mb-4">
+                  {[{ label: "Life Purpose", value: profile.gene_keys_life_purpose, emoji: "🎯" }, { label: "Evolution", value: profile.gene_keys_evolution, emoji: "🌱" }, { label: "Radiance", value: profile.gene_keys_radiance, emoji: "✨" }].map((item) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 hover:bg-muted/70 transition-colors"
+                      whileHover={{ x: 4 }}
+                    >
+                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
                       <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.gene_keys_summary}</p>
               </motion.div>
 
               {/* Compatibility Tags */}
-              <motion.div {...staggerCard(0.7)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.5)} className="glass-card glow-border p-5 md:p-6">
                 <h3 className="text-lg font-bold text-foreground mb-3">Your Cosmic Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {profile.compatibility_tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30">{tag}</span>
+                  {profile.compatibility_tags.map((tag, i) => (
+                    <motion.span 
+                      key={tag} 
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6 + i * 0.05 }}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      {tag}
+                    </motion.span>
                   ))}
                 </div>
               </motion.div>
 
               {/* Continue Button */}
-              <motion.div {...staggerCard(0.85)}>
-                <Button onClick={handleContinueToLifestyle} className="w-full h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  Continue — Tell Us About You
-                  <ChevronRight className="w-5 h-5 ml-2" />
+              <motion.div {...staggerCard(0.6)}>
+                <Button 
+                  onClick={handleContinueToLifestyle} 
+                  className="w-full h-12 text-base font-semibold group relative overflow-hidden" 
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Continue — Tell Us About You
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>
@@ -488,19 +729,24 @@ const Onboarding = () => {
           {step === "lifestyle" && (
             <motion.div
               key="lifestyle"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
               transition={{ duration: 0.5 }}
-              className="space-y-6"
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center shadow-mystical">
+                <motion.div 
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center shadow-mystical"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.1 }}
+                >
                   <ShieldCheck className="w-8 h-8 text-accent" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Lifestyle & Preferences</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                  This is a <span className="text-accent font-semibold">judgment-free zone</span> ✨ Share what you're comfortable with — you can always skip.
+                </motion.div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Lifestyle & Preferences</h1>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
+                  This is a <span className="text-accent font-semibold">judgment-free zone</span> ✨ Share what feels right.
                 </p>
               </motion.div>
 
@@ -558,13 +804,15 @@ const Onboarding = () => {
               </motion.div>
 
               <motion.div {...staggerCard(0.5)} className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6">
-                  <ChevronLeft className="w-5 h-5 mr-1" />
+                <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleContinueToInterests} className="flex-1 h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  Continue — Pick Your Interests
-                  <ChevronRight className="w-5 h-5 ml-2" />
+                <Button onClick={handleContinueToInterests} className="flex-1 h-12 text-base font-semibold group" style={{ background: "var(--gradient-aurora)" }}>
+                  <span className="flex items-center justify-center gap-2">
+                    Continue — Pick Interests
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>
@@ -574,46 +822,65 @@ const Onboarding = () => {
           {step === "interests" && (
             <motion.div
               key="interests"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
               transition={{ duration: 0.5 }}
-              className="space-y-6"
+              className="space-y-5"
             >
               <motion.div className="text-center mb-6" {...staggerCard(0)}>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center shadow-mystical">
+                <motion.div 
+                  className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center shadow-mystical"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 12, delay: 0.1 }}
+                >
                   <Sparkles className="w-8 h-8 text-primary" />
-                </div>
-                <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">What Lights You Up?</h1>
-                <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+                </motion.div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">What Lights You Up?</h1>
+                <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
                   Select the things you love — the more you pick, the better your matches ✨
                 </p>
-                {selectedInterests.length > 0 && (
-                  <Badge className="mt-3 bg-primary/20 text-primary border border-primary/30">
-                    {selectedInterests.length} selected
-                  </Badge>
-                )}
+                <AnimatePresence>
+                  {selectedInterests.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                    >
+                      <Badge className="mt-3 bg-primary/20 text-primary border border-primary/30">
+                        {selectedInterests.length} selected
+                      </Badge>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               {Object.entries(INTEREST_CATEGORIES).map(([category, items], idx) => (
-                <motion.div key={category} {...staggerCard(0.05 * (idx + 1))} className="glass-card glow-border p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-3">{category}</h3>
+                <motion.div 
+                  key={category} 
+                  {...staggerCard(0.03 * (idx + 1))} 
+                  className="glass-card glow-border p-5 md:p-6 hover:shadow-mystical transition-shadow"
+                >
+                  <h3 className="text-base md:text-lg font-semibold text-foreground mb-3">{category}</h3>
                   <div className="flex flex-wrap gap-2">
                     {items.map((interest) => {
                       const isSelected = selectedInterests.includes(interest);
                       return (
-                        <button
+                        <motion.button
                           key={interest}
                           type="button"
                           onClick={() => toggleInterest(interest)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all ${
                             isSelected
-                              ? "bg-primary/20 text-primary border border-primary/40 ring-1 ring-primary/20"
+                              ? "bg-primary/20 text-primary border border-primary/40 ring-1 ring-primary/20 shadow-sm"
                               : "bg-muted/40 text-muted-foreground border border-border/50 hover:bg-muted/60 hover:text-foreground"
                           }`}
                         >
                           {interest}
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </div>
@@ -621,32 +888,37 @@ const Onboarding = () => {
               ))}
 
               {/* Avatar Upload */}
-              <motion.div {...staggerCard(0.6)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6">
                 <div className="text-center space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">Add a Profile Photo</h3>
+                  <h3 className="text-base md:text-lg font-semibold text-foreground">Add a Profile Photo</h3>
                   <p className="text-sm text-muted-foreground">Show the world your cosmic self ✨</p>
                   {user && (
-                    <div className="flex justify-center">
+                    <motion.div 
+                      className="flex justify-center"
+                      whileHover={{ scale: 1.02 }}
+                    >
                       <AvatarUpload
                         userId={user.id}
                         currentUrl={null}
                         onUpload={() => {}}
                         size="lg"
                       />
-                    </div>
+                    </motion.div>
                   )}
                   <p className="text-xs text-muted-foreground">Tap to upload — you can change it anytime</p>
                 </div>
               </motion.div>
 
-              <motion.div {...staggerCard(0.65)} className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("lifestyle")} className="h-12 px-6">
-                  <ChevronLeft className="w-5 h-5 mr-1" />
+              <motion.div {...staggerCard(0.45)} className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep("lifestyle")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold" style={{ background: "var(--gradient-aurora)" }}>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Complete My Profile
+                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    Complete My Profile
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User } from "lucide-react";
+import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User, Plus, Info, X } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,16 +82,19 @@ const INTEREST_CATEGORIES = {
   ],
   "🎬 Movies & TV": [
     "Sci-Fi", "Documentary", "Art House", "Studio Ghibli", "Horror",
-    "Comedy", "Drama", "Anime", "Thriller", "Romance", "Reality TV",
+    "Comedy", "Drama", "Anime", "Thriller", "Romance", "Rom-Com", "Reality TV",
     "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
     "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
     "Satire", "Dystopian", "Noir", "Slasher", "Found Footage",
     "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [
-    "The Power of Now", "Siddhartha", "Dune", "Self-Help", "Philosophy",
-    "Poetry", "Fiction", "Non-Fiction", "Astrology Books", "Tarot",
-    "Psychology", "History", "Biographies", "Science", "Spirituality"
+    "Self-Help", "Philosophy", "Poetry", "Fiction", "Non-Fiction",
+    "Astrology Books", "Tarot", "Psychology", "History", "Biographies",
+    "Science", "Spirituality", "Memoir", "Fantasy", "Sci-Fi",
+    "Mystery & Thriller", "Romance", "Horror", "True Crime",
+    "Business & Finance", "Health & Wellness", "Classic Literature",
+    "Graphic Novels", "Young Adult", "Essays", "Mythology"
   ],
   "💪 Sports & Fitness": [
     "Yoga", "Swimming", "Martial Arts", "Running", "Weight Training",
@@ -104,9 +107,12 @@ const INTEREST_CATEGORIES = {
     "Camping", "Scuba Diving", "Paragliding", "Fasting", "Herbalism"
   ],
   "✨ Thought Systems": [
-    "Non-dualism", "Jungian Psychology", "Buddhism", "Stoicism",
-    "Astrology", "Human Design", "Gene Keys", "Kabbalah", "Taoism",
-    "Manifestation", "Quantum Physics", "Sacred Geometry", "Shamanism"
+    "Non-dualism", "Jungian Psychology", "Buddhism", "Christianity", "Judaism",
+    "Islam", "Hinduism", "Sufism", "Stoicism", "Astrology", "Human Design",
+    "Gene Keys", "Kabbalah", "Taoism", "Manifestation", "Quantum Physics",
+    "Sacred Geometry", "Shamanism", "Hermeticism", "Gnosticism",
+    "Existentialism", "Zen", "Advaita Vedanta", "Mysticism",
+    "Indigenous Wisdom", "Paganism", "Animism"
   ],
   "🎨 Creative": [
     "Photography", "Painting", "Writing", "Music Production",
@@ -228,9 +234,27 @@ const Onboarding = () => {
 
   // Interests
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [customInterestInputs, setCustomInterestInputs] = useState<Record<string, string>>({});
+  const [expandedTag, setExpandedTag] = useState<string | null>(null);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Age validation: must be 10+
+    if (birthDate) {
+      const birth = new Date(birthDate + "T12:00:00");
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      if (age < 10) {
+        toast.error("You must be at least 10 years old to use Aligned.");
+        return;
+      }
+    }
+
     setStep("generating");
 
     try {
@@ -297,6 +321,46 @@ const Onboarding = () => {
         ? prev.filter(i => i !== interest)
         : [...prev, interest]
     );
+  };
+
+  const addCustomInterest = (category: string) => {
+    const value = customInterestInputs[category]?.trim();
+    if (value && !selectedInterests.includes(value)) {
+      setSelectedInterests(prev => [...prev, value]);
+      setCustomInterestInputs(prev => ({ ...prev, [category]: "" }));
+    }
+  };
+
+  const COSMIC_TAG_DESCRIPTIONS: Record<string, string> = {
+    "Deep Thinker": "You process life through introspection and philosophical inquiry.",
+    "Empath": "You naturally absorb and feel the emotions of those around you.",
+    "Visionary": "You see possibilities others miss and dream of what could be.",
+    "Healer": "You carry a natural gift for helping others restore balance.",
+    "Old Soul": "You possess wisdom and depth beyond your years.",
+    "Free Spirit": "You thrive on freedom, spontaneity, and authentic expression.",
+    "Mystic": "You're drawn to the unseen realms and hidden truths of existence.",
+    "Warrior": "You face challenges head-on with courage and determination.",
+    "Nurturer": "You instinctively care for and support those in your circle.",
+    "Creator": "You channel life force into art, ideas, and new realities.",
+    "Seeker": "You're on a lifelong quest for truth, meaning, and growth.",
+    "Leader": "You naturally inspire and guide others toward a shared vision.",
+    "Rebel": "You challenge the status quo and forge your own path.",
+    "Dreamer": "You live in the realm of imagination and infinite possibility.",
+    "Philosopher": "You explore the big questions about life, meaning, and existence.",
+    "Intuitive": "You trust your inner knowing and make heart-led decisions.",
+    "Alchemist": "You transform challenges into wisdom and growth.",
+    "Adventurer": "You seek new experiences and thrive on exploration.",
+    "Peacemaker": "You harmonize conflict and create unity wherever you go.",
+    "Teacher": "You share knowledge and uplift others through understanding.",
+    "Lightworker": "You're here to raise the vibration of those around you.",
+    "Manifester": "You bring ideas into reality with focused intention.",
+    "Connector": "You build bridges between people and ideas effortlessly.",
+    "Sage": "You offer grounded wisdom drawn from deep inner knowing.",
+    "Transformer": "You catalyze change and evolution in yourself and others.",
+  };
+
+  const getTagDescription = (tag: string): string => {
+    return COSMIC_TAG_DESCRIPTIONS[tag] || "A unique cosmic quality that shapes your energetic signature.";
   };
 
   const handleFinish = async () => {
@@ -730,19 +794,42 @@ const Onboarding = () => {
 
               {/* Compatibility Tags */}
               <motion.div {...staggerCard(0.5)} className="glass-card glow-border p-5 md:p-6">
-                <h3 className="text-lg font-bold text-foreground mb-3">Your Cosmic Tags</h3>
+                <h3 className="text-lg font-bold text-foreground mb-2">Your Cosmic Tags</h3>
+                <p className="text-xs text-muted-foreground mb-3">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.compatibility_tags.map((tag, i) => (
-                    <motion.span 
-                      key={tag} 
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/30"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.6 + i * 0.05 }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {tag}
-                    </motion.span>
+                    <div key={tag} className="relative">
+                      <motion.button
+                        type="button"
+                        onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          expandedTag === tag
+                            ? "bg-primary/30 text-primary border-primary/50 ring-1 ring-primary/30"
+                            : "bg-primary/20 text-primary border-primary/30"
+                        }`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.6 + i * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {tag}
+                      </motion.button>
+                      <AnimatePresence>
+                        {expandedTag === tag && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                            className="absolute z-20 top-full mt-1 left-0 w-56 bg-card border border-border/50 rounded-lg p-3 shadow-lg"
+                          >
+                            <div className="flex items-start gap-2">
+                              <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
+                              <p className="text-xs text-muted-foreground leading-relaxed">{getTagDescription(tag)}</p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   ))}
                 </div>
               </motion.div>
@@ -1008,6 +1095,28 @@ const Onboarding = () => {
                         </motion.button>
                       );
                     })}
+                    {/* Custom interests for this category */}
+                    {selectedInterests.filter(i => !items.includes(i) && !Object.values(INTEREST_CATEGORIES).flat().includes(i)).length > 0 && null}
+                  </div>
+                  {/* Other / Custom Interest Input */}
+                  <div className="mt-3 flex gap-2">
+                    <Input
+                      type="text"
+                      placeholder="Other — type your own..."
+                      value={customInterestInputs[category] || ""}
+                      onChange={(e) => setCustomInterestInputs(prev => ({ ...prev, [category]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomInterest(category); } }}
+                      className="h-8 text-xs bg-muted/30 border-border/50 flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 border-primary/30 text-primary"
+                      onClick={() => addCustomInterest(category)}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
                 </motion.div>
               ))}

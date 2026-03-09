@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
 import { useToast } from "@/hooks/use-toast";
@@ -45,12 +45,41 @@ const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   },
 };
 
+const COSMIC_TAG_DESCRIPTIONS: Record<string, string> = {
+  "Deep Thinker": "You process life through introspection and philosophical inquiry.",
+  "Empath": "You naturally absorb and feel the emotions of those around you.",
+  "Visionary": "You see possibilities others miss and dream of what could be.",
+  "Healer": "You carry a natural gift for helping others restore balance.",
+  "Old Soul": "You possess wisdom and depth beyond your years.",
+  "Free Spirit": "You thrive on freedom, spontaneity, and authentic expression.",
+  "Mystic": "You're drawn to the unseen realms and hidden truths of existence.",
+  "Warrior": "You face challenges head-on with courage and determination.",
+  "Nurturer": "You instinctively care for and support those in your circle.",
+  "Creator": "You channel life force into art, ideas, and new realities.",
+  "Seeker": "You're on a lifelong quest for truth, meaning, and growth.",
+  "Leader": "You naturally inspire and guide others toward a shared vision.",
+  "Rebel": "You challenge the status quo and forge your own path.",
+  "Dreamer": "You live in the realm of imagination and infinite possibility.",
+  "Philosopher": "You explore the big questions about life, meaning, and existence.",
+  "Intuitive": "You trust your inner knowing and make heart-led decisions.",
+  "Alchemist": "You transform challenges into wisdom and growth.",
+  "Adventurer": "You seek new experiences and thrive on exploration.",
+  "Peacemaker": "You harmonize conflict and create unity wherever you go.",
+  "Teacher": "You share knowledge and uplift others through understanding.",
+  "Lightworker": "You're here to raise the vibration of those around you.",
+  "Manifester": "You bring ideas into reality with focused intention.",
+  "Connector": "You build bridges between people and ideas effortlessly.",
+  "Sage": "You offer grounded wisdom drawn from deep inner knowing.",
+  "Transformer": "You catalyze change and evolution in yourself and others.",
+};
+
 const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const blueprintRef = useRef<HTMLDivElement>(null);
+  const [expandedTag, setExpandedTag] = useState<string | null>(null);
 
   const handleShareBlueprint = async () => {
     if (navigator.share) {
@@ -327,13 +356,35 @@ const Profile = () => {
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-accent" />
                   Cosmic Tags
                 </h2>
+                <p className="text-xs text-muted-foreground mb-4">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
                   {profile.compatibility_tags.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="border-accent/30 text-accent">{tag}</Badge>
+                    <div key={tag} className="relative">
+                      <button
+                        onClick={() => setExpandedTag(expandedTag === tag ? null : tag)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          expandedTag === tag
+                            ? "bg-accent/30 text-accent border-accent/50 ring-1 ring-accent/30"
+                            : "bg-accent/10 text-accent border-accent/30 hover:bg-accent/20"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                      {expandedTag === tag && (
+                        <div className="absolute z-20 top-full mt-1 left-0 w-56 bg-card border border-border/50 rounded-lg p-3 shadow-lg">
+                          <div className="flex items-start gap-2">
+                            <Info className="w-3.5 h-3.5 text-accent mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {COSMIC_TAG_DESCRIPTIONS[tag] || "A unique cosmic quality that shapes your energetic signature."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </CardContent>

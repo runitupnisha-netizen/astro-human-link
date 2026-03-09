@@ -216,6 +216,10 @@ const Onboarding = () => {
   const [profile, setProfile] = useState<CosmicProfile | null>(null);
   const navigate = useNavigate();
 
+  // Identity
+  const [gender, setGender] = useState<string>("");
+  const [preferredGenders, setPreferredGenders] = useState<string[]>([]);
+
   // Lifestyle
   const [kidsPreference, setKidsPreference] = useState<string>("");
   const [drinking, setDrinking] = useState<string>("");

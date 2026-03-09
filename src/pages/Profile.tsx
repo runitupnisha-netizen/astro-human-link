@@ -135,7 +135,7 @@ const Profile = () => {
                     {profile.birth_date && (
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(profile.birth_date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
+                        <span>{new Date(profile.birth_date + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
                       </div>
                     )}
                   </div>

@@ -137,7 +137,7 @@ const Profile = () => {
           {/* Profile Header */}
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="flex flex-col items-center md:flex-row md:items-center gap-6">
                 <AvatarUpload
                   userId={user!.id}
                   currentUrl={profile.avatar_url}
@@ -145,8 +145,8 @@ const Profile = () => {
                   size="lg"
                 />
                 
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Cosmic Blueprint"}</h1>
                     <Button variant="outline" size="sm" className="border-accent/30">
                       <Edit className="w-4 h-4 mr-2" />
@@ -154,7 +154,7 @@ const Profile = () => {
                     </Button>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-muted-foreground mb-4">
+                  <div className="flex items-center justify-center md:justify-start gap-4 text-muted-foreground mb-4">
                     {profile.birth_place && (
                       <div className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
@@ -169,7 +169,7 @@ const Profile = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap justify-center md:justify-start gap-2">
                     {profile.sun_sign && (
                       <Badge variant="outline" className="border-primary/30 text-primary">
                         ☉ {profile.sun_sign}

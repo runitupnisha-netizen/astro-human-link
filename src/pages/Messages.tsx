@@ -246,6 +246,7 @@ const Messages = () => {
       content: text,
       message_type: "icebreaker",
       created_at: new Date().toISOString(),
+      read_at: null,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 

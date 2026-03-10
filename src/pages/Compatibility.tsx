@@ -68,6 +68,10 @@ interface CompatibilityData {
   numerology: {
     score: number;
     life_path_dynamic: string;
+    birthday_synergy: string;
+    personal_year_alignment: string;
+    karmic_connection: string;
+    numerology_advice: string;
   };
   strengths: string[];
   growth_areas: string[];

@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import numerologyMandala from "@/assets/numerology-mandala.png";
+import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
 
@@ -731,7 +733,10 @@ const Onboarding = () => {
               </motion.div>
 
               {/* Numerology */}
-              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
+                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
+                  <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
+                </div>
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
                     className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
@@ -772,7 +777,10 @@ const Onboarding = () => {
               </motion.div>
 
               {/* Astrology */}
-              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
+                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
+                  <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
+                </div>
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
                     className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"

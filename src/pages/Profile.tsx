@@ -6,6 +6,10 @@ import { Separator } from "@/components/ui/separator";
 import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
+import zodiacWheel from "@/assets/zodiac-wheel.png";
+import numerologyMandala from "@/assets/numerology-mandala.png";
+import humanDesignBody from "@/assets/human-design-body.png";
+import geneKeysHelix from "@/assets/gene-keys-helix.png";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -198,7 +202,10 @@ const Profile = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Astrological Profile */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+              <div className="absolute top-3 right-3 w-16 h-16 opacity-15">
+                <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
+              </div>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-accent" />
@@ -229,7 +236,10 @@ const Profile = () => {
             </Card>
 
             {/* Human Design & Gene Keys */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+              <div className="absolute top-3 right-3 w-14 h-20 opacity-10">
+                <img src={humanDesignBody} alt="" className="w-full h-full object-contain" />
+              </div>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Zap className="w-5 h-5 text-primary" />
@@ -292,11 +302,14 @@ const Profile = () => {
                       <h3 className="font-medium mb-3 flex items-center gap-2">
                         <Dna className="w-4 h-4 text-accent" /> Gene Keys
                       </h3>
-                      <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm">
-                        <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
-                        {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
-                        {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
-                        {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
+                      <div className="flex gap-3 mb-3">
+                        <img src={geneKeysHelix} alt="" className="w-10 h-16 object-contain opacity-60 flex-shrink-0" />
+                        <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm flex-1">
+                          <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
+                          {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
+                          {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
+                          {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -306,7 +319,10 @@ const Profile = () => {
           </div>
           {/* Numerology Section */}
           {profile.life_path_number && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+              <div className="absolute top-3 right-3 w-16 h-16 opacity-10">
+                <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
+              </div>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Hash className="w-5 h-5 text-accent" />

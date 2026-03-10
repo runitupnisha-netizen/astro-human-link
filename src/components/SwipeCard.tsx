@@ -174,10 +174,20 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-xl font-bold text-foreground truncate">
-                {profile.display_name || "Cosmic Soul"}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-baseline gap-2">
+                <h2 className="font-display text-xl font-bold text-foreground truncate">
+                  {profile.display_name || "Cosmic Soul"}
+                </h2>
+                {getAge(profile.birth_date) && (
+                  <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                {getCity(profile.birth_place) && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                    <MapPin className="w-3 h-3" /> {getCity(profile.birth_place)}
+                  </span>
+                )}
                 <span className="text-xs text-accent font-semibold tracking-wide">{profile.connection_type}</span>
               </div>
             </div>

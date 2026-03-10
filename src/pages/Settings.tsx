@@ -317,7 +317,6 @@ const Settings = () => {
           </div>
         </div>
       </div>
-    </div>
 
       {/* Delete Account Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

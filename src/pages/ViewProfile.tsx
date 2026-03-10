@@ -181,6 +181,13 @@ const ViewProfile = () => {
             </motion.div>
           )}
 
+          {/* Bio Prompts */}
+          {userId && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
+              <BioPrompts userId={userId} editable={false} />
+            </motion.div>
+          )}
+
           {/* Quick Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <div className="flex flex-wrap gap-2 justify-center mb-6">

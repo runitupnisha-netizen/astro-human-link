@@ -271,7 +271,12 @@ const Settings = () => {
                 <Separator />
                 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10">
+                  <Button
+                    variant="outline"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Delete Account
                   </Button>
                   <Button variant="outline">Export Data</Button>

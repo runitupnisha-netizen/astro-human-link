@@ -216,10 +216,13 @@ const Connections = () => {
                           )}
                         </div>
 
-                        {/* Info */}
+                         {/* Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-semibold text-foreground truncate">
+                            <h3
+                              className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
+                            >
                               {match.otherProfile.display_name || "Cosmic Soul"}
                             </h3>
                             {match.compatibility_score != null && (
@@ -273,6 +276,15 @@ const Connections = () => {
                             <Clock className="w-3 h-3" />
                             {formatTime(match.lastMessageAt || match.created_at)}
                           </span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-3 text-foreground hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
+                          >
+                            <User className="w-4 h-4 mr-1" />
+                            Profile
+                          </Button>
                           <Button
                             size="sm"
                             variant="ghost"

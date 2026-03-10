@@ -423,7 +423,13 @@ const Messages = () => {
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-display font-bold text-foreground">
+                          <h3
+                            className="font-display font-bold text-foreground cursor-pointer hover:text-primary transition-colors"
+                            onClick={() => {
+                              const otherId = selectedConvo.match.user_a === user?.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+                              navigate(`/profile/${otherId}`);
+                            }}
+                          >
                             {selectedConvo.otherProfile.display_name || "Cosmic Soul"}
                           </h3>
                           <div className="flex items-center gap-2">

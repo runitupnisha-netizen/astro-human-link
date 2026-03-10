@@ -13,6 +13,7 @@ import alignedLogo from "@/assets/aligned-hero-logo.png";
 import numerologyMandala from "@/assets/numerology-mandala.png";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import AvatarUpload from "@/components/AvatarUpload";
 
 type CosmicProfile = {

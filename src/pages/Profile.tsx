@@ -3,7 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
@@ -85,6 +88,52 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const blueprintRef = useRef<HTMLDivElement>(null);
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editBirthDate, setEditBirthDate] = useState("");
+  const [editBirthTime, setEditBirthTime] = useState("");
+  const [editBirthPlace, setEditBirthPlace] = useState("");
+  const [regenerating, setRegenerating] = useState(false);
+
+  const openEditDialog = () => {
+    setEditBirthDate(profile?.birth_date || "");
+    setEditBirthTime(profile?.birth_time?.slice(0, 5) || "");
+    setEditBirthPlace(profile?.birth_place || "");
+    setEditOpen(true);
+  };
+
+  const handleRegenerate = async () => {
+    if (!editBirthDate || !editBirthPlace) {
+      toast({ title: "Missing info", description: "Birth date and place are required.", variant: "destructive" });
+      return;
+    }
+    setRegenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-cosmic-profile", {
+        body: {
+          birthDate: editBirthDate,
+          birthTime: editBirthTime || null,
+          birthPlace: editBirthPlace,
+        },
+      });
+      if (error) throw error;
+
+      // Refresh profile from DB
+      const { data: refreshed } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user!.id)
+        .single();
+      if (refreshed) setProfile(refreshed);
+
+      setEditOpen(false);
+      toast({ title: "Blueprint regenerated ✨", description: "Your cosmic profile has been updated with new birth details." });
+    } catch (err: any) {
+      console.error("Regeneration error:", err);
+      toast({ title: "Regeneration failed", description: err.message || "Something went wrong", variant: "destructive" });
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   const handleShareBlueprint = async () => {
     if (navigator.share) {
@@ -153,9 +202,9 @@ const Profile = () => {
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Cosmic Blueprint"}</h1>
-                    <Button variant="outline" size="sm" className="border-accent/30">
+                    <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
                       <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      Edit Birth Details
                     </Button>
                   </div>
                   
@@ -499,6 +548,77 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      {/* Edit Birth Details Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="bg-card border-border/50 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Update Birth Details</DialogTitle>
+            <DialogDescription>
+              Changing your birth info will regenerate your entire cosmic profile — astrology, human design, gene keys, and numerology.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-date">Birth Date *</Label>
+              <Input
+                id="edit-birth-date"
+                type="date"
+                value={editBirthDate}
+                onChange={(e) => setEditBirthDate(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-time">Birth Time <span className="text-muted-foreground text-xs">(optional, improves accuracy)</span></Label>
+              <Input
+                id="edit-birth-time"
+                type="time"
+                value={editBirthTime}
+                onChange={(e) => setEditBirthTime(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-place">Birth Place *</Label>
+              <Input
+                id="edit-birth-place"
+                type="text"
+                placeholder="e.g. Louisville, Kentucky"
+                value={editBirthPlace}
+                onChange={(e) => setEditBirthPlace(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={regenerating}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRegenerate}
+              disabled={regenerating || !editBirthDate || !editBirthPlace}
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              {regenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Regenerating…
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Regenerate Blueprint
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

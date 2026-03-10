@@ -10,6 +10,7 @@ import { Edit, Check, X, MessageSquareQuote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PROMPT_OPTIONS = [
+  "About me...",
   "My ideal cosmic date would be...",
   "The universe taught me...",
   "I'm looking for someone who...",
@@ -23,6 +24,8 @@ const PROMPT_OPTIONS = [
   "My spiritual journey has taught me...",
   "On weekends you'll find me...",
 ];
+
+const FREE_TEXT_PROMPT = "About me...";
 
 interface Prompt {
   question: string | null;
@@ -127,7 +130,7 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
                 <CardContent className="p-4 space-y-3">
                   <Select value={tempQuestion} onValueChange={setTempQuestion}>
                     <SelectTrigger className="bg-muted/30 border-border/50">
-                      <SelectValue placeholder="Choose a prompt..." />
+                      <SelectValue placeholder="Choose a prompt or 'About me...' for free text" />
                     </SelectTrigger>
                     <SelectContent>
                       {PROMPT_OPTIONS.map((opt) => (
@@ -138,13 +141,13 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
                   <Textarea
                     value={tempAnswer}
                     onChange={(e) => setTempAnswer(e.target.value)}
-                    placeholder="Write your answer..."
+                    placeholder={tempQuestion === FREE_TEXT_PROMPT ? "Tell others about yourself in your own words..." : "Write your answer..."}
                     className="bg-muted/30 border-border/50 resize-none"
                     rows={3}
-                    maxLength={300}
+                    maxLength={500}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-muted-foreground">{tempAnswer.length}/300</span>
+                    <span className="text-[10px] text-muted-foreground">{tempAnswer.length}/500</span>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm" onClick={cancelEditing}><X className="w-4 h-4" /></Button>
                       <Button size="sm" onClick={() => savePrompt(index)} className="bg-primary/20 text-primary hover:bg-primary/30"><Check className="w-4 h-4" /></Button>

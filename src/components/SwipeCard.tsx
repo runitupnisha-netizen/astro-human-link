@@ -20,6 +20,10 @@ export interface DiscoverProfile {
   connection_type: string;
   compatibility_reason: string;
   shared_aspects: string[];
+  birth_date: string | null;
+  birth_place: string | null;
+  bio_prompt_1: string | null;
+  bio_prompt_1_answer: string | null;
 }
 
 interface SwipeCardProps {

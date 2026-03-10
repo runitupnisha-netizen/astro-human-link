@@ -276,9 +276,13 @@ Provide a comprehensive compatibility analysis.`;
                   type: "object",
                   properties: {
                     score: { type: "number" },
-                    life_path_dynamic: { type: "string", description: "How their Life Path numbers interact (2 sentences)" },
+                    life_path_dynamic: { type: "string", description: "How their Life Path numbers interact — core soul mission compatibility (2-3 sentences)" },
+                    birthday_synergy: { type: "string", description: "How their Birthday Numbers (innate gifts/talents) complement or challenge each other (2 sentences)" },
+                    personal_year_alignment: { type: "string", description: "How their current Personal Year cycles align — are they in sync or offering different lessons? (2 sentences)" },
+                    karmic_connection: { type: "string", description: "Any karmic patterns, master number amplifications, or destiny connections between their numbers (2 sentences)" },
+                    numerology_advice: { type: "string", description: "One sentence of numerological guidance for this pairing" },
                   },
-                  required: ["score", "life_path_dynamic"],
+                  required: ["score", "life_path_dynamic", "birthday_synergy", "personal_year_alignment", "karmic_connection", "numerology_advice"],
                 },
                 strengths: {
                   type: "array",

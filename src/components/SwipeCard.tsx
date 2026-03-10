@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles, MapPin } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {
@@ -20,6 +20,10 @@ export interface DiscoverProfile {
   connection_type: string;
   compatibility_reason: string;
   shared_aspects: string[];
+  birth_date: string | null;
+  birth_place: string | null;
+  bio_prompt_1: string | null;
+  bio_prompt_1_answer: string | null;
 }
 
 interface SwipeCardProps {
@@ -69,6 +73,21 @@ const socialLabel = (e: number | null) => {
   if (e <= 3) return "🌙 Introvert";
   if (e >= 8) return "☀️ Extrovert";
   return "🌗 Ambivert";
+};
+
+const getAge = (birthDate: string | null): number | null => {
+  if (!birthDate) return null;
+  const birth = new Date(birthDate + "T12:00:00");
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+};
+
+const getCity = (place: string | null): string | null => {
+  if (!place) return null;
+  return place.split(",")[0].trim();
 };
 
 const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
@@ -155,10 +174,20 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-xl font-bold text-foreground truncate">
-                {profile.display_name || "Cosmic Soul"}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-baseline gap-2">
+                <h2 className="font-display text-xl font-bold text-foreground truncate">
+                  {profile.display_name || "Cosmic Soul"}
+                </h2>
+                {getAge(profile.birth_date) && (
+                  <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                {getCity(profile.birth_place) && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                    <MapPin className="w-3 h-3" /> {getCity(profile.birth_place)}
+                  </span>
+                )}
                 <span className="text-xs text-accent font-semibold tracking-wide">{profile.connection_type}</span>
               </div>
             </div>
@@ -229,6 +258,14 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             <div className="bg-accent/5 rounded-xl p-3 border border-accent/15">
               <div className="text-xs text-accent font-medium mb-1">Gene Keys Life Purpose</div>
               <div className="text-xs text-muted-foreground font-serif">{profile.gene_keys_life_purpose}</div>
+            </div>
+          )}
+
+          {/* Bio Prompt */}
+          {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
+            <div className="bg-primary/5 rounded-xl p-3 border border-primary/15">
+              <div className="text-xs text-primary font-medium mb-1">{profile.bio_prompt_1}</div>
+              <div className="text-xs text-foreground font-serif leading-relaxed">{profile.bio_prompt_1_answer}</div>
             </div>
           )}
 

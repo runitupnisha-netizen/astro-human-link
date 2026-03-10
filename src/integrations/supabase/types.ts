@@ -41,6 +41,27 @@ export type Database = {
         }
         Relationships: []
       }
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       daily_reveals: {
         Row: {
           created_at: string
@@ -220,6 +241,12 @@ export type Database = {
         Row: {
           astro_summary: string | null
           avatar_url: string | null
+          bio_prompt_1: string | null
+          bio_prompt_1_answer: string | null
+          bio_prompt_2: string | null
+          bio_prompt_2_answer: string | null
+          bio_prompt_3: string | null
+          bio_prompt_3_answer: string | null
           birth_date: string | null
           birth_latitude: number | null
           birth_longitude: number | null
@@ -265,6 +292,12 @@ export type Database = {
         Insert: {
           astro_summary?: string | null
           avatar_url?: string | null
+          bio_prompt_1?: string | null
+          bio_prompt_1_answer?: string | null
+          bio_prompt_2?: string | null
+          bio_prompt_2_answer?: string | null
+          bio_prompt_3?: string | null
+          bio_prompt_3_answer?: string | null
           birth_date?: string | null
           birth_latitude?: number | null
           birth_longitude?: number | null
@@ -310,6 +343,12 @@ export type Database = {
         Update: {
           astro_summary?: string | null
           avatar_url?: string | null
+          bio_prompt_1?: string | null
+          bio_prompt_1_answer?: string | null
+          bio_prompt_2?: string | null
+          bio_prompt_2_answer?: string | null
+          bio_prompt_3?: string | null
+          bio_prompt_3_answer?: string | null
           birth_date?: string | null
           birth_latitude?: number | null
           birth_longitude?: number | null
@@ -381,6 +420,33 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_id?: string
+          reporter_id?: string
+        }
+        Relationships: []
+      }
       swipes: {
         Row: {
           action: string
@@ -410,7 +476,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user_data: { Args: { target_user_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

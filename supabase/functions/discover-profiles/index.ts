@@ -402,6 +402,10 @@ serve(async (req) => {
         connection_type: sc.type,
         compatibility_reason: aiDesc?.reason || `A ${sc.type} connection with ${sc.scores.overall}% cosmic alignment.`,
         shared_aspects: aiDesc?.shared_aspects || [],
+        birth_date: c.birth_date,
+        birth_place: c.birth_place,
+        bio_prompt_1: c.bio_prompt_1,
+        bio_prompt_1_answer: c.bio_prompt_1_answer,
       };
     });
 

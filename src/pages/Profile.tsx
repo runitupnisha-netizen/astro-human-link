@@ -21,6 +21,7 @@ import AvatarUpload from "@/components/AvatarUpload";
 import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
+import BioPrompts from "@/components/BioPrompts";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -262,6 +263,17 @@ const Profile = () => {
                 Photo Gallery
               </h2>
               <PhotoGallery userId={user!.id} editable={true} maxPhotos={9} columns={3} />
+            </CardContent>
+          </Card>
+
+          {/* Bio Prompts */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Heart className="w-5 h-5 text-accent" />
+                About You
+              </h2>
+              <BioPrompts userId={user!.id} editable={true} />
             </CardContent>
           </Card>
 

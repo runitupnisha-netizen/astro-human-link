@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import PhotoGallery from "@/components/PhotoGallery";
 
 interface ProfileData {
   display_name: string | null;

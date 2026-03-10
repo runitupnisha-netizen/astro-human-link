@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles, MapPin } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {
@@ -24,6 +24,7 @@ export interface DiscoverProfile {
   birth_place: string | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
+  photo_urls?: string[];
 }
 
 interface SwipeCardProps {
@@ -99,6 +100,29 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
   const superLikeOpacity = useTransform(y, [-100, 0], [1, 0]);
   const [exiting, setExiting] = useState(false);
   const [exitDir, setExitDir] = useState<"left" | "right" | "up">("right");
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  // Build photo array: avatar + gallery photos (deduplicated)
+  const allPhotos = (() => {
+    const photos: string[] = [];
+    if (profile.avatar_url) photos.push(profile.avatar_url);
+    if (profile.photo_urls) {
+      for (const url of profile.photo_urls) {
+        if (!photos.includes(url)) photos.push(url);
+      }
+    }
+    return photos;
+  })();
+
+  const hasMultiplePhotos = allPhotos.length > 1;
+  const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
+
+  const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (direction === "next") setPhotoIndex((i) => Math.min(i + 1, allPhotos.length - 1));
+    else setPhotoIndex((i) => Math.max(i - 1, 0));
+  };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
@@ -161,15 +185,56 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
       )}
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
+        {/* Photo carousel */}
+        {allPhotos.length > 0 && (
+          <div className="relative w-full h-48 bg-muted shrink-0">
+            <img 
+              src={currentPhoto || ""} 
+              alt={profile.display_name || ""} 
+              className="w-full h-full object-cover"
+            />
+            {/* Photo indicator dots */}
+            {hasMultiplePhotos && (
+              <div className="absolute top-2 left-0 right-0 flex justify-center gap-1 z-10">
+                {allPhotos.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1 rounded-full transition-all ${
+                      i === photoIndex ? "w-6 bg-foreground/90" : "w-2 bg-foreground/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+            {/* Tap zones for navigation */}
+            {hasMultiplePhotos && isTop && (
+              <>
+                <button
+                  className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
+                  onClick={(e) => handlePhotoNav(e, "prev")}
+                  onPointerDown={(e) => e.stopPropagation()}
+                />
+                <button
+                  className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
+                  onClick={(e) => handlePhotoNav(e, "next")}
+                  onPointerDown={(e) => e.stopPropagation()}
+                />
+              </>
+            )}
+            {/* Gradient overlay */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent" />
+          </div>
+        )}
+
         {/* Header */}
-        <div className="relative p-5 pb-3">
+        <div className="relative p-5 pb-3 -mt-8 z-10">
           <div className="flex items-center gap-4 mb-3">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-primary/20 overflow-hidden shadow-mystical">
+              <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-primary/20 overflow-hidden shadow-mystical">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-10 h-10 text-foreground/70" />
+                  <User className="w-8 h-8 text-foreground/70" />
                 )}
               </div>
             </div>

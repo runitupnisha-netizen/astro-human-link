@@ -601,9 +601,41 @@ const Profile = () => {
               Cancel
             </Button>
             <Button
-              onClick={handleRegenerate}
+              onClick={() => setConfirmOpen(true)}
               disabled={regenerating || !editBirthDate || !editBirthPlace}
               style={{ background: "var(--gradient-aurora)" }}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Regenerate Blueprint
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="bg-card border-border/50 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              ⚠️ Overwrite Current Blueprint?
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed pt-2">
+              This will <span className="text-foreground font-medium">permanently replace</span> your current cosmic profile — including your astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
+              <br /><br />
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 pt-2">
+            <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={regenerating}>
+              Go Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setConfirmOpen(false);
+                handleRegenerate();
+              }}
+              disabled={regenerating}
             >
               {regenerating ? (
                 <>
@@ -611,10 +643,7 @@ const Profile = () => {
                   Regenerating…
                 </>
               ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Regenerate Blueprint
-                </>
+                "Yes, Regenerate"
               )}
             </Button>
           </DialogFooter>

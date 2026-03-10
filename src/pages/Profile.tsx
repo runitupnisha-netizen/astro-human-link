@@ -319,7 +319,10 @@ const Profile = () => {
           </div>
           {/* Numerology Section */}
           {profile.life_path_number && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+              <div className="absolute top-3 right-3 w-16 h-16 opacity-10">
+                <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
+              </div>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Hash className="w-5 h-5 text-accent" />

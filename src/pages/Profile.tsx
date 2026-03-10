@@ -304,16 +304,16 @@ const Profile = () => {
                       </h3>
                       <div className="flex gap-3 mb-3">
                         <img src={geneKeysHelix} alt="" className="w-10 h-16 object-contain opacity-60 flex-shrink-0" />
-                      <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm">
-                        <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
-                        {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
-                        {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
-                        {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
+                        <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm flex-1">
+                          <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
+                          {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
+                          {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
+                          {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
+                        </div>
                       </div>
                     </div>
                   )}
-                      </div>
-                    </div>
+                </div>
               </CardContent>
             </Card>
           </div>

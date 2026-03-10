@@ -261,6 +261,14 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             </div>
           )}
 
+          {/* Bio Prompt */}
+          {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
+            <div className="bg-primary/5 rounded-xl p-3 border border-primary/15">
+              <div className="text-xs text-primary font-medium mb-1">{profile.bio_prompt_1}</div>
+              <div className="text-xs text-foreground font-serif leading-relaxed">{profile.bio_prompt_1_answer}</div>
+            </div>
+          )}
+
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <div className="space-y-2">

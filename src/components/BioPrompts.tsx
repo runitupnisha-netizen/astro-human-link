@@ -130,7 +130,7 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
                 <CardContent className="p-4 space-y-3">
                   <Select value={tempQuestion} onValueChange={setTempQuestion}>
                     <SelectTrigger className="bg-muted/30 border-border/50">
-                      <SelectValue placeholder="Choose a prompt..." />
+                      <SelectValue placeholder="Choose a prompt or 'About me...' for free text" />
                     </SelectTrigger>
                     <SelectContent>
                       {PROMPT_OPTIONS.map((opt) => (
@@ -141,10 +141,10 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
                   <Textarea
                     value={tempAnswer}
                     onChange={(e) => setTempAnswer(e.target.value)}
-                    placeholder="Write your answer..."
+                    placeholder={tempQuestion === FREE_TEXT_PROMPT ? "Tell others about yourself in your own words..." : "Write your answer..."}
                     className="bg-muted/30 border-border/50 resize-none"
                     rows={3}
-                    maxLength={300}
+                    maxLength={500}
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">{tempAnswer.length}/300</span>

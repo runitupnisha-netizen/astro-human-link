@@ -271,6 +271,45 @@ const Profile = () => {
                             <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships and how others experience you.</p>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {profile.gene_keys_life_purpose && (
+                    <div>
+                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                        <Dna className="w-4 h-4 text-accent" /> Gene Keys
+                      </h3>
+                      <div className="flex gap-3 mb-3">
+                        <img src={geneKeysHelix} alt="" className="w-10 h-16 object-contain opacity-60 flex-shrink-0" />
+                        <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-3 text-sm flex-1">
+                          <div className="bg-background/30 rounded-lg p-3 border border-border/20">
+                            <span className="text-muted-foreground">Life Purpose:</span>
+                            <div className="font-medium mt-0.5">{profile.gene_keys_life_purpose}</div>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your core creative theme — the shadow you're transforming into a gift, and ultimately into your highest expression (siddhi).</p>
+                          </div>
+                          {profile.gene_keys_evolution && (
+                            <div className="bg-background/30 rounded-lg p-3 border border-border/20">
+                              <span className="text-muted-foreground">Evolution:</span>
+                              <div className="font-medium mt-0.5">{profile.gene_keys_evolution}</div>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your growth edge in relationships — the key that unlocks deeper intimacy and emotional evolution with partners.</p>
+                            </div>
+                          )}
+                          {profile.gene_keys_radiance && (
+                            <div className="bg-background/30 rounded-lg p-3 border border-border/20">
+                              <span className="text-muted-foreground">Radiance:</span>
+                              <div className="font-medium mt-0.5">{profile.gene_keys_radiance}</div>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your outer magnetism — the quality that draws others to you and defines your visible impact in the world.</p>
+                            </div>
+                          )}
+                          {profile.gene_keys_summary && <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{profile.gene_keys_summary}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Soul Blueprint Card */}
@@ -297,30 +336,6 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
-                      </div>
-                    </div>
-                  )}
-
-                  {profile.gene_keys_life_purpose && (
-                    <div>
-                      <h3 className="font-medium mb-3 flex items-center gap-2">
-                        <Dna className="w-4 h-4 text-accent" /> Gene Keys
-                      </h3>
-                      <div className="flex gap-3 mb-3">
-                        <img src={geneKeysHelix} alt="" className="w-10 h-16 object-contain opacity-60 flex-shrink-0" />
-                        <div className="bg-accent/10 rounded-lg p-4 border border-accent/20 space-y-2 text-sm flex-1">
-                          <div><span className="text-muted-foreground">Life Purpose:</span> <span className="ml-1">{profile.gene_keys_life_purpose}</span></div>
-                          {profile.gene_keys_evolution && <div><span className="text-muted-foreground">Evolution:</span> <span className="ml-1">{profile.gene_keys_evolution}</span></div>}
-                          {profile.gene_keys_radiance && <div><span className="text-muted-foreground">Radiance:</span> <span className="ml-1">{profile.gene_keys_radiance}</span></div>}
-                          {profile.gene_keys_summary && <p className="text-muted-foreground mt-2">{profile.gene_keys_summary}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
           {/* Numerology Section */}
           {profile.life_path_number && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">

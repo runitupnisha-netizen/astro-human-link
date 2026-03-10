@@ -318,6 +318,54 @@ const Settings = () => {
         </div>
       </div>
     </div>
+
+      {/* Delete Account Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="w-5 h-5" /> Delete Your Account
+            </DialogTitle>
+            <DialogDescription>
+              This action is permanent and cannot be undone. All your data, matches, messages, and cosmic profile will be permanently deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label className="text-sm">Type <strong>DELETE</strong> to confirm:</Label>
+            <Input
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="DELETE"
+              className="bg-muted/30 border-border/50"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowDeleteDialog(false); setDeleteConfirm(""); }}>Cancel</Button>
+            <Button
+              variant="destructive"
+              disabled={deleteConfirm !== "DELETE" || deleting}
+              onClick={async () => {
+                if (!user) return;
+                setDeleting(true);
+                try {
+                  const { error } = await supabase.rpc("delete_user_data", { target_user_id: user.id });
+                  if (error) throw error;
+                  await signOut();
+                  toast.success("Your account has been deleted. Farewell, cosmic soul. 🌙");
+                  navigate("/auth");
+                } catch (err: any) {
+                  toast.error(err.message || "Failed to delete account");
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+            >
+              {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Deleting...</> : "Permanently Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

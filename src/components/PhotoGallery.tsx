@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Loader2, Plus, X, GripVertical } from "lucide-react";
+import { Camera, Loader2, Plus, X, GripVertical, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PhotoGalleryProps {
@@ -9,6 +9,8 @@ interface PhotoGalleryProps {
   editable?: boolean;
   maxPhotos?: number;
   columns?: number;
+  currentAvatarUrl?: string | null;
+  onAvatarChange?: (url: string) => void;
 }
 
 interface ProfilePhoto {
@@ -17,7 +19,7 @@ interface ProfilePhoto {
   display_order: number;
 }
 
-const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3 }: PhotoGalleryProps) => {
+const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, currentAvatarUrl, onAvatarChange }: PhotoGalleryProps) => {
   const { toast } = useToast();
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -111,7 +113,6 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3 }: P
 
   const handleDelete = async (photo: ProfilePhoto) => {
     try {
-      // Extract storage path from URL
       const url = new URL(photo.photo_url.split("?")[0]);
       const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
       if (pathMatch) {
@@ -124,6 +125,27 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3 }: P
     } catch (err: any) {
       toast({ title: "Failed to remove photo", variant: "destructive" });
     }
+  };
+
+  const handleSetAvatar = async (photo: ProfilePhoto) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: photo.photo_url })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      onAvatarChange?.(photo.photo_url);
+      toast({ title: "Profile photo updated! ✨" });
+    } catch (err: any) {
+      toast({ title: "Failed to set avatar", variant: "destructive" });
+    }
+  };
+
+  const isCurrentAvatar = (url: string) => {
+    if (!currentAvatarUrl) return false;
+    return currentAvatarUrl.split("?")[0] === url.split("?")[0];
   };
 
   if (loading) {
@@ -155,12 +177,30 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3 }: P
                 className="w-full h-full object-cover"
               />
               {editable && (
-                <button
-                  onClick={() => handleDelete(photo)}
-                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                <div className="absolute inset-x-0 top-0 flex justify-between p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleSetAvatar(photo)}
+                    className={`w-6 h-6 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${
+                      isCurrentAvatar(photo.photo_url)
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background/80 text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
+                    }`}
+                    title="Set as profile photo"
+                  >
+                    <Star className="w-3.5 h-3.5" fill={isCurrentAvatar(photo.photo_url) ? "currentColor" : "none"} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(photo)}
+                    className="w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+              {isCurrentAvatar(photo.photo_url) && (
+                <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground text-[9px] font-medium">
+                  Profile Photo
+                </div>
               )}
             </motion.div>
           ))}

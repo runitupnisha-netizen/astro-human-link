@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.push-vapid-key]
 verify_jwt = false
+
+[functions.who-liked-me]
+verify_jwt = false

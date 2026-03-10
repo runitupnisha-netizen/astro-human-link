@@ -15,6 +15,7 @@ const Navigation = () => {
     { path: "/reveal", label: "Reveal", icon: Star },
     { path: "/feed", label: "Feed", icon: BookOpen },
     { path: "/connections", label: "Connections", icon: Heart },
+    { path: "/likes", label: "Likes", icon: Eye },
     { path: "/messages", label: "Messages", icon: MessageCircle },
     { path: "/insights", label: "Insights", icon: TrendingUp },
     { path: "/profile", label: "Blueprint", icon: User },

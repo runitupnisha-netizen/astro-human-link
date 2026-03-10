@@ -250,7 +250,12 @@ const Compatibility = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
       <div className="relative z-10 pt-20 pb-24">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        {/* Hero background image */}
+        <div className="absolute top-0 left-0 right-0 h-80 overflow-hidden opacity-20 pointer-events-none">
+          <img src={soulConnectionImg} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
+        </div>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 relative">
           {/* Back button */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 text-muted-foreground hover:text-foreground">

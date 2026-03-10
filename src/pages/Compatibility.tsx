@@ -24,6 +24,8 @@ interface AnalysisProfile {
   human_design_profile: string | null;
   gene_keys_life_purpose: string | null;
   life_path_number: number | null;
+  birthday_number: number | null;
+  personal_year_number: number | null;
 }
 
 interface KeyAspect {

@@ -37,6 +37,8 @@ interface ProfileData {
   spiritual_practice: string | null;
   growth_commitment: string | null;
   gender: string | null;
+  birth_date: string | null;
+  birth_place: string | null;
 }
 
 const ViewProfile = () => {

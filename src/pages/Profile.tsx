@@ -328,18 +328,37 @@ const Profile = () => {
                   <Hash className="w-5 h-5 text-accent" />
                   Your Numerology Blueprint
                 </h2>
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4">
                   {[
-                    { label: "Life Path", value: profile.life_path_number, color: "accent", desc: "Soul Mission" },
-                    { label: "Birthday", value: profile.birthday_number, color: "primary", desc: "Innate Gift" },
-                    { label: "Personal Year", value: profile.personal_year_number, color: "accent", desc: "Current Cycle" },
+                    {
+                      label: "Life Path",
+                      value: profile.life_path_number,
+                      color: "accent",
+                      desc: "Soul Mission",
+                      detail: "Your life's core purpose and the spiritual lessons you're here to master. This number shapes your deepest drives and destiny.",
+                    },
+                    {
+                      label: "Birthday",
+                      value: profile.birthday_number,
+                      color: "primary",
+                      desc: "Innate Gift",
+                      detail: "A special talent you were born with — your natural edge in relationships and life. This gift supports your Life Path.",
+                    },
+                    {
+                      label: "Personal Year",
+                      value: profile.personal_year_number,
+                      color: "accent",
+                      desc: "Current Cycle",
+                      detail: "The energy theme of your current year cycle (1–9). It reveals what to focus on right now for growth and alignment.",
+                    },
                   ].map((item) => (
-                    <div key={item.label} className="text-center">
+                    <div key={item.label} className="text-center bg-muted/30 rounded-xl p-4 border border-border/40">
                       <div className={`w-14 h-14 mx-auto rounded-full bg-${item.color}/15 border border-${item.color}/30 flex items-center justify-center text-${item.color} font-bold text-xl mb-2`}>
                         {item.value || "—"}
                       </div>
-                      <p className="text-sm font-medium text-foreground">{item.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+                      <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                      <p className="text-[11px] text-accent font-medium mb-1">{item.desc}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{item.detail}</p>
                     </div>
                   ))}
                 </div>

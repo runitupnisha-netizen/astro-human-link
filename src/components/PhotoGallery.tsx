@@ -19,7 +19,7 @@ interface ProfilePhoto {
   display_order: number;
 }
 
-const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3 }: PhotoGalleryProps) => {
+const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, currentAvatarUrl, onAvatarChange }: PhotoGalleryProps) => {
   const { toast } = useToast();
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [uploading, setUploading] = useState(false);

@@ -9,6 +9,8 @@ interface PhotoGalleryProps {
   editable?: boolean;
   maxPhotos?: number;
   columns?: number;
+  currentAvatarUrl?: string | null;
+  onAvatarChange?: (url: string) => void;
 }
 
 interface ProfilePhoto {

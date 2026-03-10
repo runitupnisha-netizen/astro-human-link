@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Loader2, Plus, X, GripVertical } from "lucide-react";
+import { Camera, Loader2, Plus, X, GripVertical, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PhotoGalleryProps {

@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -251,7 +252,31 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {regenerating && (
+            <Card className="mb-8 bg-card/80 backdrop-blur-sm border-primary/30 glow-border animate-fade-in">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">Regenerating Your Cosmic Blueprint…</h3>
+                    <p className="text-sm text-muted-foreground">Aligning the stars with your updated birth details</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="space-y-3">
+                      <Skeleton className="h-6 w-2/3 bg-primary/10" />
+                      <Skeleton className="h-4 w-full bg-muted/50" />
+                      <Skeleton className="h-4 w-5/6 bg-muted/50" />
+                      <Skeleton className="h-20 w-full rounded-lg bg-muted/30" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-300 ${regenerating ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             {/* Astrological Profile */}
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
               <div className="absolute top-3 right-3 w-16 h-16 opacity-15">

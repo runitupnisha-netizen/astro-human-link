@@ -147,7 +147,7 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
                     maxLength={500}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-muted-foreground">{tempAnswer.length}/300</span>
+                    <span className="text-[10px] text-muted-foreground">{tempAnswer.length}/500</span>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm" onClick={cancelEditing}><X className="w-4 h-4" /></Button>
                       <Button size="sm" onClick={() => savePrompt(index)} className="bg-primary/20 text-primary hover:bg-primary/30"><Check className="w-4 h-4" /></Button>

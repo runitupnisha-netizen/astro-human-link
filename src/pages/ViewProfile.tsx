@@ -126,10 +126,15 @@ const ViewProfile = () => {
       <CosmicBackground />
       <div className="relative z-10 pt-20 pb-12">
         <div className="max-w-2xl mx-auto px-6">
-          {/* Back button */}
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 text-muted-foreground">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back
-          </Button>
+          {/* Back + Actions */}
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            </Button>
+            {userId && (
+              <UserActions targetUserId={userId} targetName={profile.display_name || "User"} />
+            )}
+          </div>
 
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
@@ -140,9 +145,28 @@ const ViewProfile = () => {
                 <User className="w-12 h-12 text-foreground" />
               )}
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
-              {profile.display_name || "Cosmic Soul"}
-            </h1>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h1 className="text-3xl font-bold text-foreground">
+                {profile.display_name || "Cosmic Soul"}
+              </h1>
+              {profile.birth_date && (
+                <span className="text-2xl text-muted-foreground font-medium">
+                  {(() => {
+                    const birth = new Date(profile.birth_date + "T12:00:00");
+                    const today = new Date();
+                    let age = today.getFullYear() - birth.getFullYear();
+                    const m = today.getMonth() - birth.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+                    return age;
+                  })()}
+                </span>
+              )}
+            </div>
+            {profile.birth_place && (
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mb-1">
+                <MapPin className="w-3.5 h-3.5" /> {profile.birth_place.split(",")[0]}
+              </p>
+            )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
               {profile.sun_sign && <span>☉ {profile.sun_sign}</span>}
               {profile.moon_sign && <span>☽ {profile.moon_sign}</span>}

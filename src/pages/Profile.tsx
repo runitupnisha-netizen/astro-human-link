@@ -313,6 +313,10 @@ const Profile = () => {
             </Card>
           </div>
 
+          <div className="flex justify-center my-6 opacity-30">
+            <img src={celestialDivider} alt="" className="h-4 w-auto object-contain" />
+          </div>
+
           {/* Soul Blueprint Card */}
           <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">

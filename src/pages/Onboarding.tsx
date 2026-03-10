@@ -730,7 +730,7 @@ const Onboarding = () => {
                 </p>
               </motion.div>
 
-              {/* Life Path Number */}
+              {/* Numerology */}
               <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
@@ -739,18 +739,36 @@ const Onboarding = () => {
                   >
                     <Hash className="w-5 h-5 text-accent" />
                   </motion.div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">Life Path Number</h2>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Numerology</h2>
                 </div>
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" 
-                    style={{ background: "var(--gradient-mystical)" }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {profile.life_path_number}
-                  </motion.div>
-                  <p className="text-sm text-muted-foreground flex-1">{lifePathMeaning(profile.life_path_number)}</p>
+                
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[
+                    { label: "Life Path", value: profile.life_path_number, meaning: lifePathMeaning(profile.life_path_number), emoji: "🔮" },
+                    { label: "Birthday", value: profile.birthday_number, meaning: birthdayNumberMeaning(profile.birthday_number), emoji: "🎂" },
+                    { label: "Personal Year", value: profile.personal_year_number, meaning: personalYearMeaning(profile.personal_year_number), emoji: "🌀" },
+                  ].map((item) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground mb-1">{item.emoji} {item.label}</p>
+                      <motion.div 
+                        className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl font-bold text-accent border-2 border-accent/30 mb-1.5" 
+                        style={{ background: "var(--gradient-mystical)" }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {item.value}
+                      </motion.div>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{item.meaning}</p>
+                    </motion.div>
+                  ))}
                 </div>
+
+                {profile.numerology_summary && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
+                )}
               </motion.div>
 
               {/* Astrology */}

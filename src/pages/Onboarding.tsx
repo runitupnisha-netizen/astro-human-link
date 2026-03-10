@@ -29,6 +29,9 @@ type CosmicProfile = {
   gene_keys_summary: string;
   compatibility_tags: string[];
   life_path_number: number;
+  birthday_number: number;
+  personal_year_number: number;
+  numerology_summary: string;
 };
 
 type LifestyleOption = {

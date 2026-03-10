@@ -150,7 +150,7 @@ const WhoLikedMe = () => {
                         {/* Super like badge */}
                         {liker.action === "super_like" && (
                           <div className="absolute top-2 right-2">
-                            <Badge className="bg-amber-500/90 text-white border-0 text-[10px] px-1.5 py-0.5">
+                            <Badge className="bg-primary/90 text-primary-foreground border-0 text-[10px] px-1.5 py-0.5">
                               <Star className="w-3 h-3 mr-0.5" fill="currentColor" />
                               Super
                             </Badge>

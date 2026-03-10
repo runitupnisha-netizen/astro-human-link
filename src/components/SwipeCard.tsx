@@ -75,6 +75,21 @@ const socialLabel = (e: number | null) => {
   return "🌗 Ambivert";
 };
 
+const getAge = (birthDate: string | null): number | null => {
+  if (!birthDate) return null;
+  const birth = new Date(birthDate + "T12:00:00");
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+};
+
+const getCity = (place: string | null): string | null => {
+  if (!place) return null;
+  return place.split(",")[0].trim();
+};
+
 const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);

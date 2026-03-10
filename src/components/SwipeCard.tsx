@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles, MapPin } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {

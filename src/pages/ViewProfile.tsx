@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import PhotoGallery from "@/components/PhotoGallery";
 
 interface ProfileData {
   display_name: string | null;
@@ -144,6 +145,13 @@ const ViewProfile = () => {
               {profile.rising_sign && <span>↑ {profile.rising_sign}</span>}
             </div>
           </motion.div>
+
+          {/* Photo Gallery */}
+          {userId && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mb-6">
+              <PhotoGallery userId={userId} editable={false} maxPhotos={9} columns={3} />
+            </motion.div>
+          )}
 
           {/* Quick Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>

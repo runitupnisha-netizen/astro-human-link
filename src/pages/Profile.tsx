@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
 import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import PhotoGallery from "@/components/PhotoGallery";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -250,6 +251,17 @@ const Profile = () => {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Photo Gallery */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Star className="w-5 h-5 text-accent" />
+                Photo Gallery
+              </h2>
+              <PhotoGallery userId={user!.id} editable={true} maxPhotos={9} columns={3} />
             </CardContent>
           </Card>
 

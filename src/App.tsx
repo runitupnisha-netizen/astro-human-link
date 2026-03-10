@@ -21,6 +21,7 @@ import AlignmentFeed from "./pages/AlignmentFeed";
 import SacredReveal from "./pages/SacredReveal";
 import WeeklyInsights from "./pages/WeeklyInsights";
 import Disclaimer from "./pages/Disclaimer";
+import ViewProfile from "./pages/ViewProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

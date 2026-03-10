@@ -201,6 +201,7 @@ export type Database = {
           birth_longitude: number | null
           birth_place: string | null
           birth_time: string | null
+          birthday_number: number | null
           compatibility_tags: string[] | null
           created_at: string
           display_name: string | null
@@ -221,7 +222,9 @@ export type Database = {
           kids_preference: string | null
           life_path_number: number | null
           moon_sign: string | null
+          numerology_summary: string | null
           onboarding_complete: boolean | null
+          personal_year_number: number | null
           preferred_elements: string[] | null
           preferred_genders: string[] | null
           preferred_hd_types: string[] | null
@@ -243,6 +246,7 @@ export type Database = {
           birth_longitude?: number | null
           birth_place?: string | null
           birth_time?: string | null
+          birthday_number?: number | null
           compatibility_tags?: string[] | null
           created_at?: string
           display_name?: string | null
@@ -263,7 +267,9 @@ export type Database = {
           kids_preference?: string | null
           life_path_number?: number | null
           moon_sign?: string | null
+          numerology_summary?: string | null
           onboarding_complete?: boolean | null
+          personal_year_number?: number | null
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
@@ -285,6 +291,7 @@ export type Database = {
           birth_longitude?: number | null
           birth_place?: string | null
           birth_time?: string | null
+          birthday_number?: number | null
           compatibility_tags?: string[] | null
           created_at?: string
           display_name?: string | null
@@ -305,7 +312,9 @@ export type Database = {
           kids_preference?: string | null
           life_path_number?: number | null
           moon_sign?: string | null
+          numerology_summary?: string | null
           onboarding_complete?: boolean | null
+          personal_year_number?: number | null
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null

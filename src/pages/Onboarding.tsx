@@ -593,10 +593,12 @@ const Onboarding = () => {
                   transition={{ delay: 0.45 }}
                 >
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Birth Place</label>
-                  <div className="relative group">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                    <Input type="text" placeholder="e.g. Los Angeles, California" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} className="pl-10 bg-muted/50 border-border focus:ring-2 focus:ring-primary/20" required />
-                  </div>
+                  <LocationAutocomplete
+                    value={birthPlace}
+                    onChange={(value) => setBirthPlace(value)}
+                    placeholder="e.g. Los Angeles, California"
+                    className="focus:ring-2 focus:ring-primary/20"
+                  />
                 </motion.div>
 
                 <motion.div

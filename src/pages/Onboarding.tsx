@@ -15,6 +15,7 @@ import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import AvatarUpload from "@/components/AvatarUpload";
+import PhotoGallery from "@/components/PhotoGallery";
 
 type CosmicProfile = {
   sun_sign: string;

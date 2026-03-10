@@ -88,6 +88,52 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const blueprintRef = useRef<HTMLDivElement>(null);
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editBirthDate, setEditBirthDate] = useState("");
+  const [editBirthTime, setEditBirthTime] = useState("");
+  const [editBirthPlace, setEditBirthPlace] = useState("");
+  const [regenerating, setRegenerating] = useState(false);
+
+  const openEditDialog = () => {
+    setEditBirthDate(profile?.birth_date || "");
+    setEditBirthTime(profile?.birth_time?.slice(0, 5) || "");
+    setEditBirthPlace(profile?.birth_place || "");
+    setEditOpen(true);
+  };
+
+  const handleRegenerate = async () => {
+    if (!editBirthDate || !editBirthPlace) {
+      toast({ title: "Missing info", description: "Birth date and place are required.", variant: "destructive" });
+      return;
+    }
+    setRegenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-cosmic-profile", {
+        body: {
+          birthDate: editBirthDate,
+          birthTime: editBirthTime || null,
+          birthPlace: editBirthPlace,
+        },
+      });
+      if (error) throw error;
+
+      // Refresh profile from DB
+      const { data: refreshed } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user!.id)
+        .single();
+      if (refreshed) setProfile(refreshed);
+
+      setEditOpen(false);
+      toast({ title: "Blueprint regenerated ✨", description: "Your cosmic profile has been updated with new birth details." });
+    } catch (err: any) {
+      console.error("Regeneration error:", err);
+      toast({ title: "Regeneration failed", description: err.message || "Something went wrong", variant: "destructive" });
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   const handleShareBlueprint = async () => {
     if (navigator.share) {

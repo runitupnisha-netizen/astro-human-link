@@ -10,6 +10,7 @@ import { Edit, Check, X, MessageSquareQuote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PROMPT_OPTIONS = [
+  "About me...",
   "My ideal cosmic date would be...",
   "The universe taught me...",
   "I'm looking for someone who...",
@@ -23,6 +24,8 @@ const PROMPT_OPTIONS = [
   "My spiritual journey has taught me...",
   "On weekends you'll find me...",
 ];
+
+const FREE_TEXT_PROMPT = "About me...";
 
 interface Prompt {
   question: string | null;

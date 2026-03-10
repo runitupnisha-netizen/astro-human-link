@@ -46,6 +46,7 @@ interface ConversationData {
 
 const Messages = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<ConversationData[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);

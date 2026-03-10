@@ -8,6 +8,7 @@ import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import soulConnection from "@/assets/soul-connection.jpg";
 import { motion } from "framer-motion";
 
 const Auth = () => {

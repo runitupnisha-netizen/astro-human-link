@@ -146,6 +146,13 @@ const ViewProfile = () => {
             </div>
           </motion.div>
 
+          {/* Photo Gallery */}
+          {userId && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mb-6">
+              <PhotoGallery userId={userId} editable={false} maxPhotos={9} columns={3} />
+            </motion.div>
+          )}
+
           {/* Quick Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <div className="flex flex-wrap gap-2 justify-center mb-6">

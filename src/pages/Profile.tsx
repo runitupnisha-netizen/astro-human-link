@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
 import { Skeleton } from "@/components/ui/skeleton";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -610,13 +611,11 @@ const Profile = () => {
 
             <div className="space-y-2">
               <Label htmlFor="edit-birth-place">Birth Place *</Label>
-              <Input
+              <LocationAutocomplete
                 id="edit-birth-place"
-                type="text"
-                placeholder="e.g. Louisville, Kentucky"
                 value={editBirthPlace}
-                onChange={(e) => setEditBirthPlace(e.target.value)}
-                className="bg-muted/50 border-border"
+                onChange={(value) => setEditBirthPlace(value)}
+                placeholder="e.g. Louisville, Kentucky"
               />
             </div>
           </div>

@@ -254,19 +254,23 @@ const Profile = () => {
                         {profile.human_design_summary && (
                           <p className="text-sm text-muted-foreground mb-3">{profile.human_design_summary}</p>
                         )}
-                        <div className="grid grid-cols-3 gap-3 text-xs">
-                          <div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                          <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Strategy:</span>
-                            <div className="font-medium">{profile.human_design_strategy || "—"}</div>
+                            <div className="font-medium mt-0.5">{profile.human_design_strategy || "—"}</div>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">How you're designed to interact with the world and make things happen — your energetic way of moving through life.</p>
                           </div>
-                          <div>
+                          <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Authority:</span>
-                            <div className="font-medium">{profile.human_design_authority || "—"}</div>
+                            <div className="font-medium mt-0.5">{profile.human_design_authority || "—"}</div>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your inner compass for decision-making — the body intelligence you can trust most when choosing your path.</p>
                           </div>
-                          <div>
+                          <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Profile:</span>
-                            <div className="font-medium">{profile.human_design_profile || "—"}</div>
+                            <div className="font-medium mt-0.5">{profile.human_design_profile || "—"}</div>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships and how others experience you.</p>
                           </div>
+                        </div>
           </div>
 
           {/* Soul Blueprint Card */}

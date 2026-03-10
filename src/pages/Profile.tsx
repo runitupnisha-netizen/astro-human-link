@@ -304,7 +304,40 @@ const Profile = () => {
               </CardContent>
             </Card>
           </div>
+          {/* Numerology Section */}
+          {profile.life_path_number && (
+            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Hash className="w-5 h-5 text-accent" />
+                  Your Numerology Blueprint
+                </h2>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[
+                    { label: "Life Path", value: profile.life_path_number, color: "accent", desc: "Soul Mission" },
+                    { label: "Birthday", value: profile.birthday_number, color: "primary", desc: "Innate Gift" },
+                    { label: "Personal Year", value: profile.personal_year_number, color: "accent", desc: "Current Cycle" },
+                  ].map((item) => (
+                    <div key={item.label} className="text-center">
+                      <div className={`w-14 h-14 mx-auto rounded-full bg-${item.color}/15 border border-${item.color}/30 flex items-center justify-center text-${item.color} font-bold text-xl mb-2`}>
+                        {item.value || "—"}
+                      </div>
+                      <p className="text-sm font-medium text-foreground">{item.label}</p>
+                      <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                {profile.numerology_summary && (
+                  <>
+                    <Separator className="my-4" />
+                    <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
+          
           {/* Lifestyle Preferences */}
           {(profile.kids_preference || profile.drinking || profile.smoking || profile.substances) && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">

@@ -1193,8 +1193,8 @@ const Onboarding = () => {
               {/* Avatar Upload */}
               <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6">
                 <div className="text-center space-y-4">
-                  <h3 className="text-base md:text-lg font-semibold text-foreground">Add a Profile Photo</h3>
-                  <p className="text-sm text-muted-foreground">Show the world your cosmic self ✨</p>
+                  <h3 className="text-base md:text-lg font-semibold text-foreground">Add Your Profile Photo</h3>
+                  <p className="text-sm text-muted-foreground">Your main avatar — tap to upload ✨</p>
                   {user && (
                     <motion.div 
                       className="flex justify-center"
@@ -1208,7 +1208,17 @@ const Onboarding = () => {
                       />
                     </motion.div>
                   )}
-                  <p className="text-xs text-muted-foreground">Tap to upload — you can change it anytime</p>
+                </div>
+              </motion.div>
+
+              {/* Photo Gallery */}
+              <motion.div {...staggerCard(0.42)} className="glass-card glow-border p-5 md:p-6">
+                <div className="space-y-3">
+                  <h3 className="text-base md:text-lg font-semibold text-foreground text-center">Add More Photos</h3>
+                  <p className="text-sm text-muted-foreground text-center">Up to 9 photos to show your cosmic self</p>
+                  {user && (
+                    <PhotoGallery userId={user.id} editable={true} maxPhotos={9} columns={3} />
+                  )}
                 </div>
               </motion.div>
 

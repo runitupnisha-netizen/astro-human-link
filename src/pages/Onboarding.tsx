@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import numerologyMandala from "@/assets/numerology-mandala.png";
+import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
 

@@ -8,6 +8,7 @@ import { ArrowLeft, Sparkles, Heart, Zap, Star, Sun, Moon, User, Flame, Droplets
 import SynastryChart from "@/components/SynastryChart";
 import EnergyAttractionMap from "@/components/EnergyAttractionMap";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
+import soulConnectionImg from "@/assets/soul-connection.jpg";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";

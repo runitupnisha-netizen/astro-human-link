@@ -10,6 +10,7 @@ import zodiacWheel from "@/assets/zodiac-wheel.png";
 import numerologyMandala from "@/assets/numerology-mandala.png";
 import humanDesignBody from "@/assets/human-design-body.png";
 import geneKeysHelix from "@/assets/gene-keys-helix.png";
+import celestialDivider from "@/assets/celestial-divider.png";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -312,6 +313,10 @@ const Profile = () => {
             </Card>
           </div>
 
+          <div className="flex justify-center my-6 opacity-30">
+            <img src={celestialDivider} alt="" className="h-4 w-auto object-contain" />
+          </div>
+
           {/* Soul Blueprint Card */}
           <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">
@@ -336,6 +341,11 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-center my-6 opacity-30">
+            <img src={celestialDivider} alt="" className="h-4 w-auto object-contain" />
+          </div>
+
           {/* Numerology Section */}
           {profile.life_path_number && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
@@ -420,6 +430,10 @@ const Profile = () => {
             </Card>
           )}
 
+          <div className="flex justify-center my-6 opacity-30">
+            <img src={celestialDivider} alt="" className="h-4 w-auto object-contain" />
+          </div>
+
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
@@ -438,6 +452,10 @@ const Profile = () => {
               </CardContent>
             </Card>
           )}
+
+          <div className="flex justify-center my-6 opacity-30">
+            <img src={celestialDivider} alt="" className="h-4 w-auto object-contain" />
+          </div>
 
           {/* Compatibility Tags */}
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (

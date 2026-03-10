@@ -29,6 +29,9 @@ type CosmicProfile = {
   gene_keys_summary: string;
   compatibility_tags: string[];
   life_path_number: number;
+  birthday_number: number;
+  personal_year_number: number;
+  numerology_summary: string;
 };
 
 type LifestyleOption = {
@@ -409,6 +412,42 @@ const Onboarding = () => {
     return meanings[num] || "Unique Path";
   };
 
+  const birthdayNumberMeaning = (num: number): string => {
+    const meanings: Record<number, string> = {
+      1: "The Initiator — Born to lead and innovate",
+      2: "The Sensitive — Natural diplomat with deep empathy",
+      3: "The Performer — Creative spark, magnetic presence",
+      4: "The Architect — Grounded builder of lasting foundations",
+      5: "The Explorer — Restless spirit seeking new horizons",
+      6: "The Caretaker — Heart-centered nurturer of love",
+      7: "The Mystic — Deep thinker drawn to inner wisdom",
+      8: "The Powerhouse — Born for abundance and mastery",
+      9: "The Sage — Wise soul with humanitarian vision",
+      11: "The Illuminator — Master intuitive channeling wisdom",
+      22: "The Master Builder — Turns dreams into reality",
+      33: "The Master Healer — Embodiment of unconditional love",
+    };
+    return meanings[num] || "Unique Gift";
+  };
+
+  const personalYearMeaning = (num: number): string => {
+    const meanings: Record<number, string> = {
+      1: "New Beginnings — Fresh starts and planting seeds",
+      2: "Partnership — Patience and deepening connections",
+      3: "Expression — Creativity, joy, and social expansion",
+      4: "Foundation — Building structure for the future",
+      5: "Change — Transformation and breaking free",
+      6: "Love — Family, responsibility, and harmony",
+      7: "Reflection — Spiritual growth and inner discovery",
+      8: "Power — Achievement and karmic rewards",
+      9: "Completion — Letting go and making space",
+      11: "Awakening — Spiritual breakthroughs",
+      22: "Manifestation — Grand visions becoming reality",
+      33: "Service — Selfless love and collective healing",
+    };
+    return meanings[num] || "Transformative Cycle";
+  };
+
   const LifestyleOptionButton = ({ option, selected, onSelect }: { option: LifestyleOption; selected: boolean; onSelect: () => void }) => (
     <motion.button
       type="button"
@@ -650,7 +689,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  {["Astrology", "Human Design", "Gene Keys"].map((item, i) => (
+                  {["Astrology", "Human Design", "Gene Keys", "Numerology"].map((item, i) => (
                     <motion.span
                       key={item}
                       className="text-xs px-2 py-1 rounded-full bg-muted/50 text-muted-foreground border border-border/50"
@@ -691,7 +730,7 @@ const Onboarding = () => {
                 </p>
               </motion.div>
 
-              {/* Life Path Number */}
+              {/* Numerology */}
               <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
@@ -700,18 +739,36 @@ const Onboarding = () => {
                   >
                     <Hash className="w-5 h-5 text-accent" />
                   </motion.div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">Life Path Number</h2>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Numerology</h2>
                 </div>
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-accent border-2 border-accent/30 shadow-mystical" 
-                    style={{ background: "var(--gradient-mystical)" }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {profile.life_path_number}
-                  </motion.div>
-                  <p className="text-sm text-muted-foreground flex-1">{lifePathMeaning(profile.life_path_number)}</p>
+                
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[
+                    { label: "Life Path", value: profile.life_path_number, meaning: lifePathMeaning(profile.life_path_number), emoji: "🔮" },
+                    { label: "Birthday", value: profile.birthday_number, meaning: birthdayNumberMeaning(profile.birthday_number), emoji: "🎂" },
+                    { label: "Personal Year", value: profile.personal_year_number, meaning: personalYearMeaning(profile.personal_year_number), emoji: "🌀" },
+                  ].map((item) => (
+                    <motion.div 
+                      key={item.label} 
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground mb-1">{item.emoji} {item.label}</p>
+                      <motion.div 
+                        className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl font-bold text-accent border-2 border-accent/30 mb-1.5" 
+                        style={{ background: "var(--gradient-mystical)" }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {item.value}
+                      </motion.div>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{item.meaning}</p>
+                    </motion.div>
+                  ))}
                 </div>
+
+                {profile.numerology_summary && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
+                )}
               </motion.div>
 
               {/* Astrology */}

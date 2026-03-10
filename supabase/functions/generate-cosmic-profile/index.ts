@@ -11,68 +11,64 @@ const corsHeaders = {
 // DETERMINISTIC CALCULATIONS — No AI guessing
 // ═══════════════════════════════════════════════════════════════
 
+function reduceToDigit(n: number): number {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+    n = String(n).split("").reduce((sum, d) => sum + Number(d), 0);
+  }
+  return n;
+}
+
 /**
  * Life Path Number — Pythagorean reduction with master numbers preserved.
- * Uses the standard 3-group reduction method (Month + Day + Year reduced separately).
  */
 function calculateLifePathNumber(dateStr: string): number {
   const [year, month, day] = dateStr.split("-").map(Number);
-
-  const reduceToDigit = (n: number): number => {
-    while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
-      n = String(n).split("").reduce((sum, d) => sum + Number(d), 0);
-    }
-    return n;
-  };
-
   const monthReduced = reduceToDigit(month);
   const dayReduced = reduceToDigit(day);
   const yearReduced = reduceToDigit(
     String(year).split("").reduce((sum, d) => sum + Number(d), 0)
   );
-
   return reduceToDigit(monthReduced + dayReduced + yearReduced);
 }
 
 /**
- * Sun Sign — Deterministic from birth date using tropical zodiac boundaries.
- * These are the standard Western astrology date ranges.
+ * Birthday Number — The day of birth reduced (but 11, 22 preserved).
  */
-function calculateSunSign(dateStr: string): string {
-  const [_, month, day] = dateStr.split("-").map(Number);
-
-  // Each entry: [startMonth, startDay, sign]
-  // Standard tropical zodiac boundaries
-  const zodiac: [number, number, string][] = [
-    [1, 20, "Aquarius"],    // Jan 20 – Feb 18
-    [2, 19, "Pisces"],      // Feb 19 – Mar 20
-    [3, 21, "Aries"],       // Mar 21 – Apr 19
-    [4, 20, "Taurus"],      // Apr 20 – May 20
-    [5, 21, "Gemini"],      // May 21 – Jun 20
-    [6, 21, "Cancer"],      // Jun 21 – Jul 22
-    [7, 23, "Leo"],         // Jul 23 – Aug 22
-    [8, 23, "Virgo"],       // Aug 23 – Sep 22
-    [9, 23, "Libra"],       // Sep 23 – Oct 22
-    [10, 23, "Scorpio"],    // Oct 23 – Nov 21
-    [11, 22, "Sagittarius"],// Nov 22 – Dec 21
-    [12, 22, "Capricorn"],  // Dec 22 – Jan 19
-  ];
-
-  // Walk backwards: find the first entry where (month, day) >= (startMonth, startDay)
-  for (let i = zodiac.length - 1; i >= 0; i--) {
-    const [sm, sd] = zodiac[i];
-    if (month > sm || (month === sm && day >= sd)) {
-      return zodiac[i][2];
-    }
-  }
-  // Before Jan 20 = Capricorn (from previous Dec 22)
-  return "Capricorn";
+function calculateBirthdayNumber(dateStr: string): number {
+  const day = Number(dateStr.split("-")[2]);
+  return reduceToDigit(day);
 }
 
 /**
- * Expression Number (Destiny Number) — from full birth date using all digits.
- * This provides an additional numerology data point.
+ * Personal Year Number — Current year cycle.
  */
+function calculatePersonalYearNumber(dateStr: string): number {
+  const [_, month, day] = dateStr.split("-").map(Number);
+  const currentYear = new Date().getFullYear();
+  const sum = reduceToDigit(month) + reduceToDigit(day) + reduceToDigit(
+    String(currentYear).split("").reduce((s, d) => s + Number(d), 0)
+  );
+  return reduceToDigit(sum);
+}
+
+/**
+ * Sun Sign — Deterministic from birth date using tropical zodiac boundaries.
+ */
+function calculateSunSign(dateStr: string): string {
+  const [_, month, day] = dateStr.split("-").map(Number);
+  const zodiac: [number, number, string][] = [
+    [1, 20, "Aquarius"], [2, 19, "Pisces"], [3, 21, "Aries"],
+    [4, 20, "Taurus"], [5, 21, "Gemini"], [6, 21, "Cancer"],
+    [7, 23, "Leo"], [8, 23, "Virgo"], [9, 23, "Libra"],
+    [10, 23, "Scorpio"], [11, 22, "Sagittarius"], [12, 22, "Capricorn"],
+  ];
+  for (let i = zodiac.length - 1; i >= 0; i--) {
+    const [sm, sd] = zodiac[i];
+    if (month > sm || (month === sm && day >= sd)) return zodiac[i][2];
+  }
+  return "Capricorn";
+}
+
 function calculateExpressionContext(lifePathNumber: number): string {
   const meanings: Record<number, string> = {
     1: "Leadership, independence, pioneering spirit. Driven to forge their own path.",
@@ -92,28 +88,58 @@ function calculateExpressionContext(lifePathNumber: number): string {
 }
 
 /**
- * Geocode a place name to latitude/longitude using OpenStreetMap Nominatim.
- * Free, no API key required. Returns [lat, lng] or null.
+ * Birthday Number meaning
  */
+function birthdayNumberMeaning(num: number): string {
+  const meanings: Record<number, string> = {
+    1: "The Initiator — Born to lead, innovate, and pioneer new paths",
+    2: "The Sensitive — Natural diplomat with deep emotional intelligence",
+    3: "The Performer — Creative spark, joyful communicator, magnetic presence",
+    4: "The Architect — Grounded builder who creates lasting foundations",
+    5: "The Explorer — Restless spirit seeking freedom and new horizons",
+    6: "The Caretaker — Heart-centered nurturer devoted to love and beauty",
+    7: "The Mystic — Deep thinker drawn to spiritual mysteries and inner wisdom",
+    8: "The Powerhouse — Born for abundance, authority, and material mastery",
+    9: "The Sage — Wise soul with a humanitarian mission and universal love",
+    11: "The Illuminator — Master intuitive channeling higher wisdom",
+    22: "The Master Builder — Visionary who turns dreams into reality",
+    33: "The Master Healer — Embodiment of unconditional love and service",
+  };
+  return meanings[num] || "Unique vibrational essence";
+}
+
+/**
+ * Personal Year meaning
+ */
+function personalYearMeaning(num: number): string {
+  const meanings: Record<number, string> = {
+    1: "Year of New Beginnings — Fresh starts, independence, planting seeds",
+    2: "Year of Partnership — Patience, cooperation, deepening connections",
+    3: "Year of Expression — Creativity, social expansion, joy and play",
+    4: "Year of Foundation — Hard work, structure, building for the future",
+    5: "Year of Change — Transformation, adventure, breaking free",
+    6: "Year of Love — Family, responsibility, domestic harmony",
+    7: "Year of Reflection — Spiritual growth, solitude, inner discovery",
+    8: "Year of Power — Achievement, financial growth, karmic rewards",
+    9: "Year of Completion — Letting go, wisdom, endings that make space",
+    11: "Master Year of Awakening — Spiritual breakthroughs and illumination",
+    22: "Master Year of Manifestation — Grand visions becoming reality",
+    33: "Master Year of Service — Selfless love and collective healing",
+  };
+  return meanings[num] || "A transformative cycle";
+}
+
 async function geocodeBirthPlace(place: string): Promise<{ lat: number; lng: number } | null> {
   try {
     const encoded = encodeURIComponent(place);
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,
-      {
-        headers: {
-          "User-Agent": "AlignedApp/1.0 (cosmic-dating-app)",
-        },
-      }
+      { headers: { "User-Agent": "AlignedApp/1.0 (cosmic-dating-app)" } }
     );
     if (!response.ok) return null;
-
     const results = await response.json();
     if (results.length > 0) {
-      return {
-        lat: parseFloat(results[0].lat),
-        lng: parseFloat(results[0].lon),
-      };
+      return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
     }
     return null;
   } catch (e) {
@@ -123,7 +149,7 @@ async function geocodeBirthPlace(place: string): Promise<{ lat: number; lng: num
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ZODIAC & SCIENCE REFERENCE DATA — For the AI prompt
+// REFERENCE DATA
 // ═══════════════════════════════════════════════════════════════
 
 const MOON_SIGN_REFERENCE = `
@@ -224,6 +250,35 @@ ALWAYS format Gene Keys as: "Gene Key [number]: [Shadow] → [Gift] → [Siddhi]
 Example: "Gene Key 25: Constriction → Acceptance → Universal Love"
 `;
 
+const NUMEROLOGY_REFERENCE = `
+NUMEROLOGY SYSTEM — Pythagorean Numerology:
+Numerology is an ancient divination system that reveals personality traits, life cycles, and soul purpose through the vibrational frequencies of numbers.
+
+CORE NUMBERS:
+1. LIFE PATH NUMBER — The most important number. Calculated from the full birth date. Reveals your soul's mission and the lessons you're here to learn.
+2. BIRTHDAY NUMBER — The day of birth (reduced). Reveals your special gift or talent — the unique ability you bring to the world.
+3. PERSONAL YEAR NUMBER — Current annual cycle. Calculated from birth month + birth day + current year. Reveals the theme and energy of your current year.
+
+KARMIC DEBT NUMBERS (13, 14, 16, 19):
+These appear before reduction and indicate karmic lessons from past lives:
+- 13/4: Karmic debt of laziness → lesson of hard work and discipline
+- 14/5: Karmic debt of control → lesson of freedom through responsibility
+- 16/7: Karmic debt of ego → lesson of spiritual humility
+- 19/1: Karmic debt of selfishness → lesson of compassionate independence
+
+MASTER NUMBERS (11, 22, 33):
+These are NOT reduced further. They carry higher spiritual vibrations:
+- 11: Master Intuitive — Channel between physical and spiritual
+- 22: Master Builder — Ability to manifest grand visions
+- 33: Master Teacher — Embodiment of unconditional love
+
+NUMBER COMPATIBILITY IN RELATIONSHIPS:
+- Same numbers: Deep understanding but can amplify shadows
+- Numbers that add to 10 (1+9, 2+8, 3+7, 4+6): Natural completion energy
+- Adjacent numbers (1-2, 2-3, etc.): Growth through slight contrast
+- Master numbers with any: Intensified spiritual connection
+`;
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN HANDLER
 // ═══════════════════════════════════════════════════════════════
@@ -251,8 +306,17 @@ serve(async (req) => {
 
     // ── Deterministic calculations ──
     const lifePathNumber = calculateLifePathNumber(birthDate);
+    const birthdayNumber = calculateBirthdayNumber(birthDate);
+    const personalYearNumber = calculatePersonalYearNumber(birthDate);
     const sunSign = calculateSunSign(birthDate);
     const lifePathContext = calculateExpressionContext(lifePathNumber);
+    const birthdayContext = birthdayNumberMeaning(birthdayNumber);
+    const personalYearContext = personalYearMeaning(personalYearNumber);
+
+    // Check for karmic debt
+    const rawDay = Number(birthDate.split("-")[2]);
+    const karmicDebtNumbers = [13, 14, 16, 19];
+    const hasKarmicDebt = karmicDebtNumbers.includes(rawDay);
 
     // ── Geocode birth place ──
     const coords = await geocodeBirthPlace(birthPlace);
@@ -261,7 +325,7 @@ serve(async (req) => {
       : "Coordinates unavailable";
 
     console.log(`Birth data: ${birthDate} ${birthTime || "no time"} in ${birthPlace} (${latLng})`);
-    console.log(`Deterministic: Sun=${sunSign}, LifePath=${lifePathNumber}`);
+    console.log(`Deterministic: Sun=${sunSign}, LifePath=${lifePathNumber}, Birthday=${birthdayNumber}, PersonalYear=${personalYearNumber}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -272,7 +336,7 @@ serve(async (req) => {
       ? `at exactly ${birthTime} local time`
       : "(birth time UNKNOWN — use noon/12:00 PM as default, and clearly note all time-dependent calculations are approximate)";
 
-    const systemPrompt = `You are an expert astrologer, Human Design analyst, and Gene Keys guide with deep knowledge of ephemeris-based calculations.
+    const systemPrompt = `You are an expert astrologer, Human Design analyst, Gene Keys guide, and Pythagorean numerologist with deep knowledge of ephemeris-based calculations.
 
 CRITICAL RULES:
 1. The Sun Sign has ALREADY been calculated deterministically and is: ${sunSign}. You MUST use this exact value. Do NOT recalculate it.
@@ -280,8 +344,9 @@ CRITICAL RULES:
 3. For Rising sign: ${hasBirthTime ? "Estimate using birth time and location coordinates." : "State that rising sign requires exact birth time. Provide your best estimate using noon but clearly mark it as approximate."}
 4. For Human Design: Follow the type/authority/profile framework strictly. Use statistical distributions and birth data correlations.
 5. For Gene Keys: Map from the Sun's zodiacal position to the appropriate Gene Key number. Use the exact Shadow → Gift → Siddhi format.
-6. Be HONEST about confidence levels. If something requires an ephemeris for precision, say so.
-7. In summaries, distinguish between CALCULATED facts and ESTIMATED positions.
+6. For Numerology: The core numbers have been calculated deterministically. You MUST provide a rich, insightful numerology_summary that weaves together the Life Path, Birthday Number, and Personal Year cycle into a cohesive narrative about the person's numerological blueprint.
+7. Be HONEST about confidence levels. If something requires an ephemeris for precision, say so.
+8. In summaries, distinguish between CALCULATED facts and ESTIMATED positions.
 
 ${MOON_SIGN_REFERENCE}
 
@@ -290,6 +355,8 @@ ${RISING_SIGN_REFERENCE}
 ${HUMAN_DESIGN_REFERENCE}
 
 ${GENE_KEYS_REFERENCE}
+
+${NUMEROLOGY_REFERENCE}
 
 You MUST respond using the provided tool/function call format. Do not respond with plain text.`;
 
@@ -300,6 +367,9 @@ You MUST respond using the provided tool/function call format. Do not respond wi
 - Coordinates: ${latLng}
 - CONFIRMED Sun Sign: ${sunSign} (use this exactly)
 - Life Path Number: ${lifePathNumber} (${lifePathContext})
+- Birthday Number: ${birthdayNumber} (${birthdayContext})
+- Personal Year Number: ${personalYearNumber} (${personalYearContext})
+${hasKarmicDebt ? `- Karmic Debt: Day ${rawDay} carries karmic debt energy (${rawDay}/${reduceToDigit(rawDay)})` : "- No karmic debt detected in birth day"}
 
 Provide:
 1. Moon sign (best estimate with confidence note)
@@ -308,7 +378,8 @@ Provide:
 4. Human Design type, strategy, authority, profile with detailed summary
 5. Gene Keys Life's Work, Evolution, and Radiance paths in "Gene Key [N]: Shadow → Gift → Siddhi" format
 6. Gene Keys summary explaining their Golden Path activation
-7. 5-8 compatibility tags chosen ONLY from this list: Deep Thinker, Empath, Visionary, Healer, Old Soul, Free Spirit, Mystic, Warrior, Nurturer, Creator, Seeker, Leader, Rebel, Dreamer, Philosopher, Intuitive, Alchemist, Adventurer, Peacemaker, Teacher, Lightworker, Manifester, Connector, Sage, Transformer`;
+7. A rich numerology_summary (4-6 sentences) that weaves together the Life Path ${lifePathNumber}, Birthday Number ${birthdayNumber}, and Personal Year ${personalYearNumber} into a cohesive narrative about their numerological blueprint, soul gifts, current cycle, and ${hasKarmicDebt ? "karmic debt lessons" : "growth opportunities"}
+8. 5-8 compatibility tags chosen ONLY from this list: Deep Thinker, Empath, Visionary, Healer, Old Soul, Free Spirit, Mystic, Warrior, Nurturer, Creator, Seeker, Leader, Rebel, Dreamer, Philosopher, Intuitive, Alchemist, Adventurer, Peacemaker, Teacher, Lightworker, Manifester, Connector, Sage, Transformer`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -344,6 +415,7 @@ Provide:
                   gene_keys_evolution: { type: "string", description: "Evolution Gene Key in format: 'Gene Key N: Shadow → Gift → Siddhi'" },
                   gene_keys_radiance: { type: "string", description: "Radiance Gene Key in format: 'Gene Key N: Shadow → Gift → Siddhi'" },
                   gene_keys_summary: { type: "string", description: "Rich paragraph about their Gene Keys Golden Path (3-5 sentences)" },
+                  numerology_summary: { type: "string", description: "Rich paragraph (4-6 sentences) weaving together Life Path, Birthday Number, Personal Year, and any karmic debt into a cohesive numerological narrative about soul mission, innate gifts, and current cycle." },
                   compatibility_tags: {
                     type: "array",
                     items: { 
@@ -358,7 +430,7 @@ Provide:
                   "human_design_type", "human_design_strategy", "human_design_authority",
                   "human_design_profile", "human_design_summary",
                   "gene_keys_life_purpose", "gene_keys_evolution", "gene_keys_radiance",
-                  "gene_keys_summary", "compatibility_tags",
+                  "gene_keys_summary", "numerology_summary", "compatibility_tags",
                 ],
                 additionalProperties: false,
               },
@@ -404,6 +476,9 @@ Provide:
         birth_latitude: coords?.lat ?? null,
         birth_longitude: coords?.lng ?? null,
         life_path_number: lifePathNumber,
+        birthday_number: birthdayNumber,
+        personal_year_number: personalYearNumber,
+        numerology_summary: cosmicData.numerology_summary,
         sun_sign: sunSign,
         moon_sign: cosmicData.moon_sign,
         rising_sign: cosmicData.rising_sign,
@@ -434,6 +509,8 @@ Provide:
         ...cosmicData,
         sun_sign: sunSign,
         life_path_number: lifePathNumber,
+        birthday_number: birthdayNumber,
+        personal_year_number: personalYearNumber,
         birth_latitude: coords?.lat ?? null,
         birth_longitude: coords?.lng ?? null,
       },

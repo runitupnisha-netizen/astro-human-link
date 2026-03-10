@@ -24,6 +24,8 @@ interface AnalysisProfile {
   human_design_profile: string | null;
   gene_keys_life_purpose: string | null;
   life_path_number: number | null;
+  birthday_number: number | null;
+  personal_year_number: number | null;
 }
 
 interface KeyAspect {
@@ -66,6 +68,10 @@ interface CompatibilityData {
   numerology: {
     score: number;
     life_path_dynamic: string;
+    birthday_synergy: string;
+    personal_year_alignment: string;
+    karmic_connection: string;
+    numerology_advice: string;
   };
   strengths: string[];
   growth_areas: string[];
@@ -504,23 +510,62 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Numerology */}
-            <SectionCard title="Life Path Numerology" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
-              <div className="flex items-center gap-6 justify-center mb-3">
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg">
+            <SectionCard title="Numerology Connection" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
+              <div className="space-y-4">
+                {/* Number comparison grid */}
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="text-muted-foreground font-semibold">You</div>
+                  <div className="text-accent font-semibold">Number</div>
+                  <div className="text-muted-foreground font-semibold">Match</div>
+                  
+                  <div className="w-10 h-10 mx-auto rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-base">
                     {profiles.mine.life_path_number || "?"}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">You</p>
-                </div>
-                <span className="text-accent">+</span>
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg">
+                  <div className="flex items-center justify-center text-muted-foreground text-[10px]">Life Path</div>
+                  <div className="w-10 h-10 mx-auto rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-base">
                     {profiles.theirs.life_path_number || "?"}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">Match</p>
+
+                  <div className="w-10 h-10 mx-auto rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-primary font-bold text-base">
+                    {profiles.mine.birthday_number || "?"}
+                  </div>
+                  <div className="flex items-center justify-center text-muted-foreground text-[10px]">Birthday</div>
+                  <div className="w-10 h-10 mx-auto rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-primary font-bold text-base">
+                    {profiles.theirs.birthday_number || "?"}
+                  </div>
+
+                  <div className="w-10 h-10 mx-auto rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-base">
+                    {profiles.mine.personal_year_number || "?"}
+                  </div>
+                  <div className="flex items-center justify-center text-muted-foreground text-[10px]">Year Cycle</div>
+                  <div className="w-10 h-10 mx-auto rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent font-bold text-base">
+                    {profiles.theirs.personal_year_number || "?"}
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-accent mb-1">🔮 Life Path Dynamic</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{numerology.life_path_dynamic}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-accent mb-1">🎂 Birthday Synergy</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{numerology.birthday_synergy}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-accent mb-1">🌀 Year Cycle Alignment</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{numerology.personal_year_alignment}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-accent mb-1">✨ Karmic Connection</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{numerology.karmic_connection}</p>
+                  </div>
+                  <div className="bg-accent/8 rounded-lg p-3 border border-accent/15">
+                    <h4 className="text-xs font-semibold text-accent mb-1">💫 Numerological Guidance</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed italic">{numerology.numerology_advice}</p>
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{numerology.life_path_dynamic}</p>
             </SectionCard>
 
             {/* Strengths & Growth */}

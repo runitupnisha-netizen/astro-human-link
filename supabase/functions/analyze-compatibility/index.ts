@@ -162,7 +162,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const prompt = `You are a master astrologer and Human Design analyst. Analyze the deep compatibility between these two people.
+    const prompt = `You are a master astrologer, Human Design analyst, and Pythagorean numerologist. Analyze the deep compatibility between these two people.
 
 PERSON A (${myProfile.display_name || "User A"}):
 - Sun: ${myProfile.sun_sign || "?"} (${myElement}, ${myModality})
@@ -174,6 +174,8 @@ PERSON A (${myProfile.display_name || "User A"}):
 - Gene Keys Evolution: ${myProfile.gene_keys_evolution || "?"}
 - Gene Keys Radiance: ${myProfile.gene_keys_radiance || "?"}
 - Life Path Number: ${myProfile.life_path_number || "?"}
+- Birthday Number: ${myProfile.birthday_number || "?"}
+- Personal Year Number: ${myProfile.personal_year_number || "?"}
 - Interests: ${(myProfile.interests || []).join(", ")}
 
 PERSON B (${theirProfile.display_name || "User B"}):
@@ -186,6 +188,8 @@ PERSON B (${theirProfile.display_name || "User B"}):
 - Gene Keys Evolution: ${theirProfile.gene_keys_evolution || "?"}
 - Gene Keys Radiance: ${theirProfile.gene_keys_radiance || "?"}
 - Life Path Number: ${theirProfile.life_path_number || "?"}
+- Birthday Number: ${theirProfile.birthday_number || "?"}
+- Personal Year Number: ${theirProfile.personal_year_number || "?"}
 - Interests: ${(theirProfile.interests || []).join(", ")}
 
 PRE-COMPUTED DATA:
@@ -193,7 +197,14 @@ PRE-COMPUTED DATA:
 - Element relationship: ${elemCompat.description}
 - HD Type Pairing: ${hdPairingText}
 
-Provide a comprehensive compatibility analysis.`;
+NUMEROLOGY COMPATIBILITY RULES:
+- Same Life Path: Deep understanding, can amplify both gifts and shadows
+- Numbers that sum to 10 (1+9, 2+8, 3+7, 4+6, 5+5): Natural completion energy
+- Adjacent numbers: Growth through slight contrast
+- Master numbers (11, 22, 33) with any number: Intensified spiritual connection
+- Birthday Numbers reveal innate talents that can complement or clash
+
+Provide a comprehensive compatibility analysis with special attention to the numerological dimensions.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -276,9 +287,13 @@ Provide a comprehensive compatibility analysis.`;
                   type: "object",
                   properties: {
                     score: { type: "number" },
-                    life_path_dynamic: { type: "string", description: "How their Life Path numbers interact (2 sentences)" },
+                    life_path_dynamic: { type: "string", description: "How their Life Path numbers interact — core soul mission compatibility (2-3 sentences)" },
+                    birthday_synergy: { type: "string", description: "How their Birthday Numbers (innate gifts/talents) complement or challenge each other (2 sentences)" },
+                    personal_year_alignment: { type: "string", description: "How their current Personal Year cycles align — are they in sync or offering different lessons? (2 sentences)" },
+                    karmic_connection: { type: "string", description: "Any karmic patterns, master number amplifications, or destiny connections between their numbers (2 sentences)" },
+                    numerology_advice: { type: "string", description: "One sentence of numerological guidance for this pairing" },
                   },
-                  required: ["score", "life_path_dynamic"],
+                  required: ["score", "life_path_dynamic", "birthday_synergy", "personal_year_alignment", "karmic_connection", "numerology_advice"],
                 },
                 strengths: {
                   type: "array",
@@ -328,6 +343,8 @@ Provide a comprehensive compatibility analysis.`;
           human_design_profile: myProfile.human_design_profile,
           gene_keys_life_purpose: myProfile.gene_keys_life_purpose,
           life_path_number: myProfile.life_path_number,
+          birthday_number: myProfile.birthday_number,
+          personal_year_number: myProfile.personal_year_number,
         },
         theirs: {
           display_name: theirProfile.display_name,
@@ -340,6 +357,8 @@ Provide a comprehensive compatibility analysis.`;
           human_design_profile: theirProfile.human_design_profile,
           gene_keys_life_purpose: theirProfile.gene_keys_life_purpose,
           life_path_number: theirProfile.life_path_number,
+          birthday_number: theirProfile.birthday_number,
+          personal_year_number: theirProfile.personal_year_number,
         },
       },
       element_compatibility: elemCompat,

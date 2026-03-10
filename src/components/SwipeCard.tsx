@@ -100,6 +100,29 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
   const superLikeOpacity = useTransform(y, [-100, 0], [1, 0]);
   const [exiting, setExiting] = useState(false);
   const [exitDir, setExitDir] = useState<"left" | "right" | "up">("right");
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  // Build photo array: avatar + gallery photos (deduplicated)
+  const allPhotos = (() => {
+    const photos: string[] = [];
+    if (profile.avatar_url) photos.push(profile.avatar_url);
+    if (profile.photo_urls) {
+      for (const url of profile.photo_urls) {
+        if (!photos.includes(url)) photos.push(url);
+      }
+    }
+    return photos;
+  })();
+
+  const hasMultiplePhotos = allPhotos.length > 1;
+  const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
+
+  const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (direction === "next") setPhotoIndex((i) => Math.min(i + 1, allPhotos.length - 1));
+    else setPhotoIndex((i) => Math.max(i - 1, 0));
+  };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {

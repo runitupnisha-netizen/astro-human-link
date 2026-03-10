@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 import AvatarUpload from "@/components/AvatarUpload";
 import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import PhotoGallery from "@/components/PhotoGallery";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {

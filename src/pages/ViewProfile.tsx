@@ -8,6 +8,8 @@ import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
+import BioPrompts from "@/components/BioPrompts";
+import UserActions from "@/components/UserActions";
 
 interface ProfileData {
   display_name: string | null;

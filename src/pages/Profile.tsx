@@ -328,80 +328,75 @@ const Profile = () => {
                   <Hash className="w-5 h-5 text-accent" />
                   Your Numerology Blueprint
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4">
-                  {[
-                    {
-                      label: "Life Path",
-                      value: profile.life_path_number,
-                      color: "accent",
-                      desc: "Soul Mission",
-                      detail: "Your life's core purpose and the spiritual lessons you're here to master. This number shapes your deepest drives and destiny.",
-                    },
-                    {
-                      label: "Birthday",
-                      value: profile.birthday_number,
-                      color: "primary",
-                      desc: "Innate Gift",
-                      detail: "A special talent you were born with — your natural edge in relationships and life. This gift supports your Life Path.",
-                    },
-                    {
-                      label: "Personal Year",
-                      value: profile.personal_year_number,
-                      color: "accent",
-                      desc: "Current Cycle",
-                      detail: "The energy theme of your current year cycle (1–9). It reveals what to focus on right now for growth and alignment.",
-                    },
-                  ].map((item) => (
-                    <div key={item.label} className="text-center bg-muted/30 rounded-xl p-4 border border-border/40">
-                      <div className={`w-14 h-14 mx-auto rounded-full bg-${item.color}/15 border border-${item.color}/30 flex items-center justify-center text-${item.color} font-bold text-xl mb-2`}>
-                        {item.value || "—"}
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">{item.label}</p>
-                      <p className="text-[11px] text-accent font-medium mb-1">{item.desc}</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{item.detail}</p>
-                    </div>
-                  ))}
-                </div>
-                {profile.numerology_summary && (
-                  <>
-                    <Separator className="my-4" />
-                    <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                {(() => {
+                  const KARMIC_DEBT: Record<number, string> = {
+                    13: "Karmic Debt 13 — You're learning to overcome laziness and build discipline. Past-life shortcuts now demand honest effort and focus.",
+                    14: "Karmic Debt 14 — A lesson in temperance. You're here to master freedom without excess, balancing adventure with responsibility.",
+                    16: "Karmic Debt 16 — The Tower number. Ego dissolution leads to spiritual rebirth. Surrender opens the door to profound wisdom.",
+                    19: "Karmic Debt 19 — A lesson in independence without isolation. Learning to lead with compassion rather than self-interest.",
+                  };
+                  const karmicNumbers = [13, 14, 16, 19];
+                  const detectedKarmic = karmicNumbers.filter((k) =>
+                    [profile.life_path_number, profile.birthday_number, profile.personal_year_number].includes(k)
+                  );
 
-          
-          {/* Lifestyle Preferences */}
-          {(profile.kids_preference || profile.drinking || profile.smoking || profile.substances) && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-accent" />
-                  Lifestyle
-                  <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Judgment-Free Zone 🕊️</Badge>
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[
-                    { icon: Baby, label: "Kids", field: "kids_preference" },
-                    { icon: Wine, label: "Drinking", field: "drinking" },
-                    { icon: Cigarette, label: "Smoking", field: "smoking" },
-                    { icon: Pill, label: "Substances", field: "substances" },
-                  ].map(({ icon: Icon, label, field }) => {
-                    const value = profile[field];
-                    if (!value || value === "decline") return null;
-                    return (
-                      <div key={field} className="bg-muted/30 rounded-xl p-4 text-center">
-                        <Icon className="w-5 h-5 text-primary mx-auto mb-2" />
-                        <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                        <p className="text-sm font-medium text-foreground">
-                          {LIFESTYLE_LABELS[field]?.[value]?.replace(/^[^\s]+\s/, "") || value}
-                        </p>
+                  return (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-4">
+                        {[
+                          {
+                            label: "Life Path",
+                            value: profile.life_path_number,
+                            color: "accent",
+                            desc: "Soul Mission",
+                            detail: "Your life's core purpose and the spiritual lessons you're here to master. This number shapes your deepest drives and destiny.",
+                          },
+                          {
+                            label: "Birthday",
+                            value: profile.birthday_number,
+                            color: "primary",
+                            desc: "Innate Gift",
+                            detail: "A special talent you were born with — your natural edge in relationships and life. This gift supports your Life Path.",
+                          },
+                          {
+                            label: "Personal Year",
+                            value: profile.personal_year_number,
+                            color: "accent",
+                            desc: "Current Cycle",
+                            detail: "The energy theme of your current year cycle (1–9). It reveals what to focus on right now for growth and alignment.",
+                          },
+                        ].map((item) => (
+                          <div key={item.label} className="text-center bg-muted/30 rounded-xl p-4 border border-border/40">
+                            <div className={`w-14 h-14 mx-auto rounded-full bg-${item.color}/15 border border-${item.color}/30 flex items-center justify-center text-${item.color} font-bold text-xl mb-2`}>
+                              {item.value || "—"}
+                            </div>
+                            <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                            <p className="text-[11px] text-accent font-medium mb-1">{item.desc}</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">{item.detail}</p>
+                            {item.value && karmicNumbers.includes(item.value) && (
+                              <span className="inline-block mt-2 text-[10px] font-semibold text-destructive bg-destructive/10 border border-destructive/20 rounded-full px-2.5 py-0.5">
+                                ⚡ Karmic Debt {item.value}
+                              </span>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {detectedKarmic.length > 0 && (
+                        <div className="mb-4 bg-destructive/5 border border-destructive/15 rounded-xl p-4 space-y-3">
+                          <h3 className="text-sm font-semibold text-destructive flex items-center gap-1.5">
+                            ⚡ Karmic Debt Detected
+                          </h3>
+                          {detectedKarmic.map((k) => (
+                            <p key={k} className="text-xs text-muted-foreground leading-relaxed">
+                              {KARMIC_DEBT[k]}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           )}

@@ -177,12 +177,30 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
                 className="w-full h-full object-cover"
               />
               {editable && (
-                <button
-                  onClick={() => handleDelete(photo)}
-                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                <div className="absolute inset-x-0 top-0 flex justify-between p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleSetAvatar(photo)}
+                    className={`w-6 h-6 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${
+                      isCurrentAvatar(photo.photo_url)
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background/80 text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
+                    }`}
+                    title="Set as profile photo"
+                  >
+                    <Star className="w-3.5 h-3.5" fill={isCurrentAvatar(photo.photo_url) ? "currentColor" : "none"} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(photo)}
+                    className="w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+              {isCurrentAvatar(photo.photo_url) && (
+                <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground text-[9px] font-medium">
+                  Profile Photo
+                </div>
               )}
             </motion.div>
           ))}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
 import { motion, AnimatePresence } from "framer-motion";

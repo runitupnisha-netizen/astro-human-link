@@ -420,6 +420,7 @@ serve(async (req) => {
         birth_place: c.birth_place,
         bio_prompt_1: c.bio_prompt_1,
         bio_prompt_1_answer: c.bio_prompt_1_answer,
+        photo_urls: photosByUser.get(c.user_id) || [],
       };
     });
 

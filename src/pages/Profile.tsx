@@ -10,6 +10,7 @@ import zodiacWheel from "@/assets/zodiac-wheel.png";
 import numerologyMandala from "@/assets/numerology-mandala.png";
 import humanDesignBody from "@/assets/human-design-body.png";
 import geneKeysHelix from "@/assets/gene-keys-helix.png";
+import celestialDivider from "@/assets/celestial-divider.png";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";

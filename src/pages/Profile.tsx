@@ -236,7 +236,10 @@ const Profile = () => {
             </Card>
 
             {/* Human Design & Gene Keys */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+              <div className="absolute top-3 right-3 w-14 h-20 opacity-10">
+                <img src={humanDesignBody} alt="" className="w-full h-full object-contain" />
+              </div>
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <Zap className="w-5 h-5 text-primary" />

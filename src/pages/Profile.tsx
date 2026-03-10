@@ -185,6 +185,11 @@ const Profile = () => {
                         Life Path {profile.life_path_number}
                       </Badge>
                     )}
+                    {profile.birthday_number && (
+                      <Badge variant="outline" className="border-primary/30 text-primary">
+                        Birthday #{profile.birthday_number}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>

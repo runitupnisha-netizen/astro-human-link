@@ -548,6 +548,77 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      {/* Edit Birth Details Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="bg-card border-border/50 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Update Birth Details</DialogTitle>
+            <DialogDescription>
+              Changing your birth info will regenerate your entire cosmic profile — astrology, human design, gene keys, and numerology.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-date">Birth Date *</Label>
+              <Input
+                id="edit-birth-date"
+                type="date"
+                value={editBirthDate}
+                onChange={(e) => setEditBirthDate(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-time">Birth Time <span className="text-muted-foreground text-xs">(optional, improves accuracy)</span></Label>
+              <Input
+                id="edit-birth-time"
+                type="time"
+                value={editBirthTime}
+                onChange={(e) => setEditBirthTime(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-birth-place">Birth Place *</Label>
+              <Input
+                id="edit-birth-place"
+                type="text"
+                placeholder="e.g. Louisville, Kentucky"
+                value={editBirthPlace}
+                onChange={(e) => setEditBirthPlace(e.target.value)}
+                className="bg-muted/50 border-border"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={regenerating}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRegenerate}
+              disabled={regenerating || !editBirthDate || !editBirthPlace}
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              {regenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Regenerating…
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Regenerate Blueprint
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

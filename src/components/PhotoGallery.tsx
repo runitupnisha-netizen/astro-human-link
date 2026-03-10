@@ -113,7 +113,6 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
 
   const handleDelete = async (photo: ProfilePhoto) => {
     try {
-      // Extract storage path from URL
       const url = new URL(photo.photo_url.split("?")[0]);
       const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
       if (pathMatch) {
@@ -126,6 +125,27 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
     } catch (err: any) {
       toast({ title: "Failed to remove photo", variant: "destructive" });
     }
+  };
+
+  const handleSetAvatar = async (photo: ProfilePhoto) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: photo.photo_url })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      onAvatarChange?.(photo.photo_url);
+      toast({ title: "Profile photo updated! ✨" });
+    } catch (err: any) {
+      toast({ title: "Failed to set avatar", variant: "destructive" });
+    }
+  };
+
+  const isCurrentAvatar = (url: string) => {
+    if (!currentAvatarUrl) return false;
+    return currentAvatarUrl.split("?")[0] === url.split("?")[0];
   };
 
   if (loading) {

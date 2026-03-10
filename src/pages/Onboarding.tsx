@@ -689,7 +689,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  {["Astrology", "Human Design", "Gene Keys"].map((item, i) => (
+                  {["Astrology", "Human Design", "Gene Keys", "Numerology"].map((item, i) => (
                     <motion.span
                       key={item}
                       className="text-xs px-2 py-1 rounded-full bg-muted/50 text-muted-foreground border border-border/50"

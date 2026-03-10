@@ -733,7 +733,10 @@ const Onboarding = () => {
               </motion.div>
 
               {/* Numerology */}
-              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
+                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
+                  <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
+                </div>
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
                     className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"

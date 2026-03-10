@@ -281,6 +281,20 @@ serve(async (req) => {
       });
     }
 
+    // Fetch gallery photos for all candidates
+    const candidateUserIds = candidates.map((c: any) => c.user_id);
+    const { data: allPhotos } = await supabase
+      .from("profile_photos")
+      .select("user_id, photo_url, display_order")
+      .in("user_id", candidateUserIds)
+      .order("display_order", { ascending: true });
+
+    const photosByUser = new Map<string, string[]>();
+    for (const photo of (allPhotos || [])) {
+      if (!photosByUser.has(photo.user_id)) photosByUser.set(photo.user_id, []);
+      photosByUser.get(photo.user_id)!.push(photo.photo_url);
+    }
+
     // ── Pre-compute deterministic compatibility scores ──
     const scoredCandidates = candidates.map((candidate: any) => {
       const scores = computeCompatibility(myProfile, candidate);

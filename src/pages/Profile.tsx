@@ -93,6 +93,7 @@ const Profile = () => {
   const [editBirthTime, setEditBirthTime] = useState("");
   const [editBirthPlace, setEditBirthPlace] = useState("");
   const [regenerating, setRegenerating] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");

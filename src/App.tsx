@@ -22,6 +22,7 @@ import SacredReveal from "./pages/SacredReveal";
 import WeeklyInsights from "./pages/WeeklyInsights";
 import Disclaimer from "./pages/Disclaimer";
 import ViewProfile from "./pages/ViewProfile";
+import WhoLikedMe from "./pages/WhoLikedMe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

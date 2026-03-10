@@ -412,6 +412,42 @@ const Onboarding = () => {
     return meanings[num] || "Unique Path";
   };
 
+  const birthdayNumberMeaning = (num: number): string => {
+    const meanings: Record<number, string> = {
+      1: "The Initiator — Born to lead and innovate",
+      2: "The Sensitive — Natural diplomat with deep empathy",
+      3: "The Performer — Creative spark, magnetic presence",
+      4: "The Architect — Grounded builder of lasting foundations",
+      5: "The Explorer — Restless spirit seeking new horizons",
+      6: "The Caretaker — Heart-centered nurturer of love",
+      7: "The Mystic — Deep thinker drawn to inner wisdom",
+      8: "The Powerhouse — Born for abundance and mastery",
+      9: "The Sage — Wise soul with humanitarian vision",
+      11: "The Illuminator — Master intuitive channeling wisdom",
+      22: "The Master Builder — Turns dreams into reality",
+      33: "The Master Healer — Embodiment of unconditional love",
+    };
+    return meanings[num] || "Unique Gift";
+  };
+
+  const personalYearMeaning = (num: number): string => {
+    const meanings: Record<number, string> = {
+      1: "New Beginnings — Fresh starts and planting seeds",
+      2: "Partnership — Patience and deepening connections",
+      3: "Expression — Creativity, joy, and social expansion",
+      4: "Foundation — Building structure for the future",
+      5: "Change — Transformation and breaking free",
+      6: "Love — Family, responsibility, and harmony",
+      7: "Reflection — Spiritual growth and inner discovery",
+      8: "Power — Achievement and karmic rewards",
+      9: "Completion — Letting go and making space",
+      11: "Awakening — Spiritual breakthroughs",
+      22: "Manifestation — Grand visions becoming reality",
+      33: "Service — Selfless love and collective healing",
+    };
+    return meanings[num] || "Transformative Cycle";
+  };
+
   const LifestyleOptionButton = ({ option, selected, onSelect }: { option: LifestyleOption; selected: boolean; onSelect: () => void }) => (
     <motion.button
       type="button"

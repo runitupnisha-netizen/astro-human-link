@@ -265,6 +265,7 @@ const Profile = () => {
             </CardContent>
           </Card>
 
+          {regenerating && (
             <Card className="mb-8 bg-card/80 backdrop-blur-sm border-primary/30 glow-border animate-fade-in">
               <CardContent className="p-8">
                 <div className="flex items-center gap-4 mb-6">

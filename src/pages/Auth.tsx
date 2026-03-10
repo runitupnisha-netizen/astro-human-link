@@ -8,6 +8,7 @@ import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
+import soulConnection from "@/assets/soul-connection.jpg";
 import { motion } from "framer-motion";
 
 const Auth = () => {
@@ -47,6 +48,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4">
+      {/* Soul connection hero background */}
+      <div className="absolute inset-0 z-0">
+        <img src={soulConnection} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+      </div>
       <CosmicBackground />
 
       <motion.div

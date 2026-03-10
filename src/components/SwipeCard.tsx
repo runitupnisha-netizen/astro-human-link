@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles, MapPin } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 export interface DiscoverProfile {
@@ -24,6 +24,7 @@ export interface DiscoverProfile {
   birth_place: string | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
+  photo_urls?: string[];
 }
 
 interface SwipeCardProps {

@@ -343,6 +343,8 @@ Provide a comprehensive compatibility analysis with special attention to the num
           human_design_profile: myProfile.human_design_profile,
           gene_keys_life_purpose: myProfile.gene_keys_life_purpose,
           life_path_number: myProfile.life_path_number,
+          birthday_number: myProfile.birthday_number,
+          personal_year_number: myProfile.personal_year_number,
         },
         theirs: {
           display_name: theirProfile.display_name,
@@ -355,6 +357,8 @@ Provide a comprehensive compatibility analysis with special attention to the num
           human_design_profile: theirProfile.human_design_profile,
           gene_keys_life_purpose: theirProfile.gene_keys_life_purpose,
           life_path_number: theirProfile.life_path_number,
+          birthday_number: theirProfile.birthday_number,
+          personal_year_number: theirProfile.personal_year_number,
         },
       },
       element_compatibility: elemCompat,

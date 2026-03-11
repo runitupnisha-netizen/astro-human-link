@@ -367,7 +367,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
                               <h3 className="font-semibold text-foreground text-sm truncate">
-                                {convo.otherProfile.display_name || "Cosmic Soul"}
+                                {convo.otherProfile.display_name || "Someone"}
                               </h3>
                               {convo.lastMessage && (
                                 <span className="text-[10px] text-muted-foreground shrink-0 ml-2">

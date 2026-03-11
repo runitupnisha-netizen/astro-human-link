@@ -248,7 +248,7 @@ const AlignmentFeed = () => {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-foreground text-sm">{post.profile?.display_name || "Cosmic Soul"}</span>
+                                <span className="font-medium text-foreground text-sm">{post.profile?.display_name || "Someone"}</span>
                                 {post.profile?.sun_sign && (
                                   <span className="text-xs text-muted-foreground">☉ {post.profile.sun_sign}</span>
                                 )}

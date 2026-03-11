@@ -359,7 +359,7 @@ const Profile = () => {
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Strategy:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_strategy || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">How you're designed to interact with the world and make things happen — your energetic way of moving through life.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">How you naturally move through the world and make things happen.</p>
                           </div>
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Authority:</span>

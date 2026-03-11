@@ -280,7 +280,7 @@ const SacredReveal = () => {
                     transition={{ delay: 0.4 }}
                     className="font-display text-2xl font-bold text-foreground mb-1"
                   >
-                    {revealProfile.display_name || "Cosmic Soul"}
+                    {revealProfile.display_name || "Someone New"}
                   </motion.h2>
 
                   <motion.div

@@ -309,7 +309,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Shared aspects */}
           {profile.shared_aspects?.length > 0 && (
             <div className="space-y-2">
-              <h3 className="section-heading">Cosmic Resonances</h3>
+              <h3 className="section-heading">Things in Common</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.shared_aspects.map((a, i) => (
                   <Badge key={i} variant="secondary" className="bg-primary/12 text-primary text-xs">{a}</Badge>

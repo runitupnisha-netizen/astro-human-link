@@ -522,7 +522,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Enter your birth details and AI will decode your astrology, Human Design & Gene Keys
+                  Enter your birth details so we can work out your astrology, Human Design & Gene Keys
                 </motion.p>
               </motion.div>
 

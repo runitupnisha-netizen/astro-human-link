@@ -129,7 +129,7 @@ const Discover = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="w-4 h-4 mr-2" />
-            Sacred Filters
+            Filters
             {activeFilters && Object.values(activeFilters).flat().length > 0 && (
               <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
                 {Object.values(activeFilters).flat().length}

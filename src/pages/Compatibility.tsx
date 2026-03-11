@@ -473,7 +473,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.strategy_harmony}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Authority Interplay</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Making Decisions Together</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.authority_interplay}</p>
                   </div>
                   <div className="bg-accent/8 rounded-lg p-3 border border-accent/15">

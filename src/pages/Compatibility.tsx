@@ -329,7 +329,7 @@ const Compatibility = () => {
           </motion.div>
 
           {/* Interactive Synastry Chart */}
-          <SectionCard title="Synastry Wheel" icon={<Star className="w-4 h-4" />} delay={0.28}>
+          <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
             <SynastryChart
               mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
               theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}

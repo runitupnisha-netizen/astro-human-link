@@ -224,8 +224,8 @@ const Compatibility = () => {
             </div>
           </motion.div>
           <div className="text-center">
-            <h2 className="font-display text-xl font-bold text-foreground mb-2">Analyzing Your Cosmic Bond</h2>
-            <p className="text-muted-foreground text-sm font-serif">Reading the stars, charts, and keys...</p>
+            <h2 className="font-display text-xl font-bold text-foreground mb-2">Getting to Know Your Match</h2>
+            <p className="text-muted-foreground text-sm font-serif">Crunching the cosmic numbers…</p>
           </div>
         </div>
       </div>

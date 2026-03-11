@@ -390,7 +390,7 @@ const Messages = () => {
                                 ? convo.lastMessage.message_type === "icebreaker"
                                   ? `✨ ${convo.lastMessage.content}`
                                   : convo.lastMessage.content
-                                : "✨ Start your cosmic conversation!"}
+                                : "👋 Say hi!"}
                             </p>
                           </div>
                         </div>

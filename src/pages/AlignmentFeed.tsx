@@ -151,7 +151,7 @@ const AlignmentFeed = () => {
             <Card className="glass-card mb-6">
               <CardContent className="p-5">
                 <Textarea
-                  placeholder="Share a reflection, insight, or intention..."
+                  placeholder="What's on your mind?"
                   value={newContent}
                   onChange={e => setNewContent(e.target.value)}
                   className="bg-background/30 border-border/30 min-h-[80px] resize-none mb-3 font-serif"

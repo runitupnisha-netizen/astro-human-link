@@ -469,7 +469,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.type_dynamic}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Strategy Harmony</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Working Together</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.strategy_harmony}</p>
                   </div>
                   <div>

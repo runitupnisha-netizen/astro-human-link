@@ -131,7 +131,7 @@ const Profile = () => {
       if (refreshed) setProfile(refreshed);
 
       setEditOpen(false);
-      toast({ title: "Blueprint regenerated ✨", description: "Your cosmic profile has been updated with new birth details." });
+      toast({ title: "Blueprint updated ✨", description: "Your profile has been refreshed with the new birth details." });
     } catch (err: any) {
       console.error("Regeneration error:", err);
       toast({ title: "Regeneration failed", description: err.message || "Something went wrong", variant: "destructive" });

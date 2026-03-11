@@ -224,8 +224,8 @@ const Compatibility = () => {
             </div>
           </motion.div>
           <div className="text-center">
-            <h2 className="font-display text-xl font-bold text-foreground mb-2">Analyzing Your Cosmic Bond</h2>
-            <p className="text-muted-foreground text-sm font-serif">Reading the stars, charts, and keys...</p>
+            <h2 className="font-display text-xl font-bold text-foreground mb-2">Getting to Know Your Match</h2>
+            <p className="text-muted-foreground text-sm font-serif">Crunching the cosmic numbers…</p>
           </div>
         </div>
       </div>
@@ -329,7 +329,7 @@ const Compatibility = () => {
           </motion.div>
 
           {/* Interactive Synastry Chart */}
-          <SectionCard title="Synastry Wheel" icon={<Star className="w-4 h-4" />} delay={0.28}>
+          <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
             <SynastryChart
               mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
               theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
@@ -338,7 +338,7 @@ const Compatibility = () => {
           </SectionCard>
 
           {/* Energy Attraction Map */}
-          <SectionCard title="Energy Attraction Map" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
+          <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
             <EnergyAttractionMap
               myProfile={profiles.mine}
               theirProfile={profiles.theirs}
@@ -348,7 +348,7 @@ const Compatibility = () => {
 
           <div className="space-y-4">
             {/* Synastry Section */}
-            <SectionCard title="Astrological Synastry" icon={<Star className="w-4 h-4" />} delay={0.3}>
+            <SectionCard title="How Your Signs Interact" icon={<Star className="w-4 h-4" />} delay={0.3}>
               <div className="space-y-4">
                 {/* Sign comparison */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
@@ -371,19 +371,19 @@ const Compatibility = () => {
 
                 <div className="space-y-3 pt-2">
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☉ Sun–Sun Dynamic</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☉ How Your Suns Vibe</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.sun_sun}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☽ Moon–Moon Emotional Bond</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☽ Emotional Wavelength</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.moon_moon}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☉↔☽ Sun–Moon Cross Aspects</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☉↔☽ The Sun–Moon Connection</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.sun_moon_cross}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">↗ Rising Sign Dynamic</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">↗ First Impressions & Daily Vibes</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.rising_dynamic}</p>
                   </div>
                 </div>
@@ -391,7 +391,7 @@ const Compatibility = () => {
                 {/* Key Aspects */}
                 {synastry.key_aspects?.length > 0 && (
                   <div className="pt-2">
-                    <h4 className="text-xs font-semibold text-accent mb-2">Key Planetary Aspects</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-2">What the Planets Say</h4>
                     <div className="space-y-2">
                       {synastry.key_aspects.map((asp, i) => (
                         <div key={i} className={`rounded-lg border p-3 ${aspectEnergyColors[asp.energy]}`}>
@@ -411,7 +411,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Elements Section */}
-            <SectionCard title="Elemental Balance" icon={<Flame className="w-4 h-4" />} delay={0.4}>
+            <SectionCard title="Your Elemental Mix" icon={<Flame className="w-4 h-4" />} delay={0.4}>
               <div className="space-y-4">
                 <div className="flex justify-center gap-4">
                   <div className="text-center">
@@ -449,7 +449,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Human Design Section */}
-            <SectionCard title="Human Design Dynamics" icon={<Zap className="w-4 h-4" />} delay={0.5}>
+            <SectionCard title="How You're Designed Together" icon={<Zap className="w-4 h-4" />} delay={0.5}>
               <div className="space-y-4">
                 <div className="flex justify-center gap-6 text-center">
                   <div>
@@ -465,15 +465,15 @@ const Compatibility = () => {
 
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Type Dynamic</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How Your Types Click</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.type_dynamic}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Strategy Harmony</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Working Together</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.strategy_harmony}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Authority Interplay</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Making Decisions Together</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.authority_interplay}</p>
                   </div>
                   <div className="bg-accent/8 rounded-lg p-3 border border-accent/15">
@@ -485,7 +485,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Gene Keys Section */}
-            <SectionCard title="Gene Keys Resonance" icon={<Sparkles className="w-4 h-4" />} delay={0.6}>
+            <SectionCard title="Your Gene Keys Connection" icon={<Sparkles className="w-4 h-4" />} delay={0.6}>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-center">
                   <div className="bg-primary/8 rounded-lg p-3 border border-primary/15">
@@ -500,15 +500,15 @@ const Compatibility = () => {
 
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Purpose Resonance</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How Your Purposes Align</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.resonance_description}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Shadow Alchemy</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Turning Shadows into Strengths</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.shadow_alchemy}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Gift Amplification</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How You Level Each Other Up</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.gift_amplification}</p>
                   </div>
                 </div>
@@ -516,7 +516,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Numerology */}
-            <SectionCard title="Numerology Connection" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
+            <SectionCard title="Your Numbers Story" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
               <div className="space-y-4">
                 {/* Number comparison grid */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
@@ -575,10 +575,10 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Strengths & Growth */}
-            <SectionCard title="Relationship Blueprint" icon={<Heart className="w-4 h-4" />} delay={0.8}>
+            <SectionCard title="What This Means for You Two" icon={<Heart className="w-4 h-4" />} delay={0.8}>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">✦ Core Strengths</h4>
+                  <h4 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">✦ What's Working</h4>
                   <div className="space-y-2">
                     {data.strengths.map((s, i) => (
                       <div key={i} className="flex items-start gap-2">
@@ -589,7 +589,7 @@ const Compatibility = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">🌱 Growth Areas</h4>
+                  <h4 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">🌱 Where You Can Grow</h4>
                   <div className="space-y-2">
                     {data.growth_areas.map((g, i) => (
                       <div key={i} className="flex items-start gap-2">

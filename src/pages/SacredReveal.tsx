@@ -143,11 +143,11 @@ const SacredReveal = () => {
       <CosmicBackground />
       <div className="relative z-10 pt-20 pb-12 flex flex-col items-center">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 px-6">
-          <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">
-            Today's Pick
+           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">
+            Sacred Match Reveal
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-            One hand-picked match revealed to you each day
+            The cosmos has chosen one soul for you today
           </p>
         </motion.div>
 

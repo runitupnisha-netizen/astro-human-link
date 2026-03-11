@@ -55,7 +55,7 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sendingIcebreaker, setSendingIcebreaker] = useState(false);
-  const [icebreakers, setIcebreakers] = useState<string[]>([]);
+  const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
 

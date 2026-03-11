@@ -338,7 +338,7 @@ const Compatibility = () => {
           </SectionCard>
 
           {/* Energy Attraction Map */}
-          <SectionCard title="Energy Attraction Map" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
+          <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
             <EnergyAttractionMap
               myProfile={profiles.mine}
               theirProfile={profiles.theirs}

@@ -69,12 +69,19 @@ VOICE & TONE:
 - Humor is welcome — witty, self-aware, a little cheeky. Never corny, never try-hard
 - Keep it conversational. These should sound like something you'd ACTUALLY send, not a horoscope greeting card
 
+CATEGORIES (generate exactly one per category):
+1. 🎉 LIGHT & FUN — Playful, zero-pressure, makes them smile. Think "would you rather" energy or a funny observation about their chart
+2. 💬 CASUAL & FLIRTY — Warm, a little cheeky, easy to respond to. The kind of opener that just flows
+3. 🔮 CURIOUS & COSMIC — References something specific from their profile (sign, HD type, Gene Keys) in a genuinely intriguing way
+4. 🌊 DEEP & MEANINGFUL — An honest, thoughtful question that invites real conversation. Emotional intelligence on display
+5. 🔥 BOLD — Confident, direct, maybe a little spicy. Shows you know what you want
+
 RULES:
 - Reference 1-2 specific details from their profiles (signs, HD type, Gene Keys, shared interests) but keep it breezy
 - Each icebreaker must be 1-2 sentences MAX
-- One should lean flirty/playful, one curious/deep, one fun/lighthearted, and two should be bold/cheeky-flirty
 - NO jargon dumps. "Your Sacral energy is magnetic" > "As a Generator with Sacral authority you have defined centers that..."
 - Avoid: "the stars aligned", "cosmic connection", "written in the stars", "universe brought us together" — too cliché
+- Range from light banter to deep questions so the sender can pick their vibe
 
 Generate exactly 5 icebreakers that Person A can send to Person B.`,
           },

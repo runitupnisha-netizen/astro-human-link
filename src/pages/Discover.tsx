@@ -62,7 +62,7 @@ const Discover = () => {
               setMatchPopup(matchedProfile);
             } else {
               toast({
-                title: "✨ It's a match!",
+                title: "✨ New Soul Connection!",
                 description: "You both liked each other — go say hi!",
               });
             }
@@ -363,7 +363,7 @@ const Discover = () => {
                   transition={{ delay: 0.3 }}
                   className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
                 >
-                  It's a Match! 🎉
+                  Soul Connection!
                 </motion.h2>
 
                 <motion.div
@@ -410,7 +410,7 @@ const Discover = () => {
                       >
                         {matchPopup.compatibility_score || "?"}%
                       </motion.span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">compatible</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">aligned</span>
                     </div>
                   </div>
 

@@ -126,22 +126,22 @@ const Settings = () => {
                 </div>
 
                 <div>
-                  <Label className="text-base font-medium">Astrological Preferences</Label>
+                  <Label className="text-base font-medium">Astrology Preferences</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Water Sign Priority</span>
+                      <span className="text-sm">Prefer Water Signs</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Compatible Rising Signs</span>
+                      <span className="text-sm">Match Rising Signs</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Venus Harmony</span>
+                      <span className="text-sm">Venus Compatibility</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Moon Phase Alignment</span>
+                      <span className="text-sm">Moon Sign Alignment</span>
                       <Switch />
                     </div>
                   </div>

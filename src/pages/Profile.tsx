@@ -435,7 +435,7 @@ const Profile = () => {
                   Share
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mb-4 font-serif">Your shareable cosmic identity card</p>
+              <p className="text-xs text-muted-foreground mb-4 font-serif">A snapshot of your profile you can share</p>
               <div ref={blueprintRef}>
                 <SoulBlueprintCard profile={profile} />
               </div>

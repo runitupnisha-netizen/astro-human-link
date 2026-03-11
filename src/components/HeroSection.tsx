@@ -75,8 +75,8 @@ const HeroSection = () => {
             },
             {
               icon: Heart,
-              title: "Gene Keys Wisdom",
-              desc: "Your shadow, gift, and genius pathways guide authentic connections",
+              title: "Personality First",
+              desc: "Prompts, interests, and your unique blueprint make every profile worth reading",
               delay: 0.95,
             },
             {

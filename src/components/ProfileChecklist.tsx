@@ -58,8 +58,36 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
 
   const completedCount = items.filter((i) => i.done).length;
   const percentage = Math.round((completedCount / items.length) * 100);
+  const isComplete = percentage === 100;
+  const hasFiredConfetti = useRef(false);
 
-  if (dismissed || percentage === 100) return null;
+  useEffect(() => {
+    if (isComplete && !hasFiredConfetti.current) {
+      hasFiredConfetti.current = true;
+      const duration = 2000;
+      const end = Date.now() + duration;
+      const fire = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ["#d4a843", "#9b87f5", "#e0c97f", "#7E69AB"],
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ["#d4a843", "#9b87f5", "#e0c97f", "#7E69AB"],
+        });
+        if (Date.now() < end) requestAnimationFrame(fire);
+      };
+      fire();
+    }
+  }, [isComplete]);
+
+  if (dismissed) return null;
 
   return (
     <motion.div

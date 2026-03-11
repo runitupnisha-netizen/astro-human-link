@@ -247,7 +247,7 @@ const Discover = () => {
                 </div>
               </motion.div>
 
-              <div className="flex gap-3 pt-1">
+              <div className="flex flex-wrap gap-3 pt-1 justify-center">
                 <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10 gap-2">
                   <RefreshCw className="w-4 h-4" />
                   Refresh
@@ -262,6 +262,26 @@ const Discover = () => {
                     View Matches
                   </Button>
                 )}
+                {/* TODO: Remove this test button before production */}
+                <Button
+                  variant="outline"
+                  className="border-accent/30 text-accent hover:bg-accent/10 gap-2"
+                  onClick={() => setMatchPopup({
+                    user_id: "test",
+                    display_name: "Luna Starweaver",
+                    sun_sign: "Pisces",
+                    moon_sign: "Scorpio",
+                    rising_sign: "Leo",
+                    avatar_url: null,
+                    compatibility_score: 87,
+                    compatibility_reason: "Your Pisces intuition harmonizes beautifully with their Scorpio depth — a cosmic power duo.",
+                    connection_type: "Twin Flame",
+                    shared_aspects: ["Water Energy", "Moon Trine", "Venus Conjunct"],
+                  } as any)}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Test Match Animation
+                </Button>
               </div>
             </motion.div>
           ) : (

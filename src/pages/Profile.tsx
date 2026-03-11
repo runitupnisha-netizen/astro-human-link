@@ -308,9 +308,9 @@ const Profile = () => {
                 <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-accent" />
-                  Your Celestial Signature
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Star className="w-5 h-5 text-accent" />
+                   Your Star Chart
                 </h2>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">

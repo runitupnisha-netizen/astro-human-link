@@ -153,7 +153,7 @@ const Profile = () => {
       await navigator.clipboard.writeText(
         `✨ My Soul Blueprint ✨\n☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"}\n⚡ ${profile?.human_design_type || ""}\n🧬 ${profile?.gene_keys_life_purpose || ""}\n\n— Aligned`
       );
-      toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
+       toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
     }
   };
 

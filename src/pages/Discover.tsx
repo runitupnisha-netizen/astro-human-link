@@ -363,7 +363,7 @@ const Discover = () => {
                   transition={{ delay: 0.3 }}
                   className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
                 >
-                  It's a Match! 🎉
+                  Soul Connection!
                 </motion.h2>
 
                 <motion.div

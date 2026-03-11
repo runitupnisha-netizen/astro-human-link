@@ -516,7 +516,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Numerology */}
-            <SectionCard title="Numerology Connection" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
+            <SectionCard title="Your Numbers Story" icon={<span className="text-sm font-bold">#</span>} delay={0.7}>
               <div className="space-y-4">
                 {/* Number comparison grid */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">

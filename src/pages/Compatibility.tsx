@@ -391,7 +391,7 @@ const Compatibility = () => {
                 {/* Key Aspects */}
                 {synastry.key_aspects?.length > 0 && (
                   <div className="pt-2">
-                    <h4 className="text-xs font-semibold text-accent mb-2">Key Planetary Aspects</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-2">What the Planets Say</h4>
                     <div className="space-y-2">
                       {synastry.key_aspects.map((asp, i) => (
                         <div key={i} className={`rounded-lg border p-3 ${aspectEnergyColors[asp.energy]}`}>

@@ -113,10 +113,10 @@ const Discover = () => {
           className="text-center mb-6 px-6"
         >
           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
-            Cosmic Discovery
+            Discover
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Swipe through souls aligned with your cosmic blueprint
+            People picked for you based on your profile
           </p>
         </motion.div>
 

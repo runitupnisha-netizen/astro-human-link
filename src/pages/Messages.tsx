@@ -494,7 +494,7 @@ const Messages = () => {
                             className="text-center py-8"
                           >
                             <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                            <p className="text-sm text-muted-foreground font-serif">Channeling the cosmos...</p>
+                            <p className="text-sm text-muted-foreground font-serif">Cooking up something good...</p>
                           </motion.div>
                         )}
 

@@ -43,7 +43,7 @@ const HeroSection = () => {
           {...fadeUp(0.4)}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-serif"
         >
-          Where ancient wisdom meets modern love. Connect with someone who truly sees the real you—through the language of the stars and the blueprint of your soul.
+          Dating that actually gets you. We use astrology, Human Design & Gene Keys to help you find someone who vibes with the real you.
         </motion.p>
 
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">

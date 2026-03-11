@@ -410,7 +410,7 @@ const Discover = () => {
                       >
                         {matchPopup.compatibility_score || "?"}%
                       </motion.span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">compatible</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">aligned</span>
                     </div>
                   </div>
 

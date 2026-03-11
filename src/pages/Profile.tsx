@@ -478,7 +478,7 @@ const Profile = () => {
                             value: profile.life_path_number,
                             color: "accent",
                             desc: "Soul Mission",
-                            detail: "Your life's core purpose and the spiritual lessons you're here to master. This number shapes your deepest drives and destiny.",
+                            detail: "Your life's core purpose and the lessons you're here to learn. This number shapes your deepest drives.",
                           },
                           {
                             label: "Birthday",

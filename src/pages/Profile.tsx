@@ -283,8 +283,8 @@ const Profile = () => {
                 <div className="flex items-center gap-4 mb-6">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Regenerating Your Cosmic Blueprint…</h3>
-                    <p className="text-sm text-muted-foreground">Aligning the stars with your updated birth details</p>
+                     <h3 className="text-lg font-semibold text-foreground">Updating Your Blueprint…</h3>
+                     <p className="text-sm text-muted-foreground">Crunching the numbers with your new birth details</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

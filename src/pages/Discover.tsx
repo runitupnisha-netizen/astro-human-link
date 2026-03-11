@@ -62,8 +62,8 @@ const Discover = () => {
               setMatchPopup(matchedProfile);
             } else {
               toast({
-                title: "✨ New Soul Connection!",
-                description: "You've matched with a cosmic soul!",
+                title: "✨ It's a match!",
+                description: "You both liked each other — go say hi!",
               });
             }
           }

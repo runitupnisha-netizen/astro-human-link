@@ -277,7 +277,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
         <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
           {/* Cosmic signature */}
           <div className="space-y-2">
-            <h3 className="section-heading">Cosmic Signature</h3>
+            <h3 className="section-heading">Their Vibe</h3>
             <div className="flex flex-wrap gap-1.5">
               {profile.sun_sign && (
                 <Badge variant="secondary" className="bg-secondary/40 text-xs">

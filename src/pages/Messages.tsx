@@ -556,7 +556,7 @@ const Messages = () => {
                             className="px-4 pb-2 space-y-2"
                           >
                             <span className="text-[10px] text-accent font-semibold uppercase tracking-wider">
-                              ✨ Tap an icebreaker to send:
+                              ✨ Tap one to send — light, deep, or somewhere in between:
                             </span>
                             {icebreakers.map((ib, i) => (
                               <motion.button

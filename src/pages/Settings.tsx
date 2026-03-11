@@ -326,7 +326,7 @@ const Settings = () => {
               <Trash2 className="w-5 h-5" /> Delete Your Account
             </DialogTitle>
             <DialogDescription>
-              This action is permanent and cannot be undone. All your data, matches, messages, and cosmic profile will be permanently deleted.
+              This is permanent and can't be undone. All your data, matches, messages, and profile will be deleted.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

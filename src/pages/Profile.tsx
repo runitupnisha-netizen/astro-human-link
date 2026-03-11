@@ -342,9 +342,9 @@ const Profile = () => {
                 <img src={humanDesignBody} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-primary" />
-                  Your Energetic Blueprint
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Zap className="w-5 h-5 text-primary" />
+                   Your Energy Profile
                 </h2>
                 <div className="space-y-6">
                   {profile.human_design_type && (

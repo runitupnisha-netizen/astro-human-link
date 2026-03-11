@@ -142,7 +142,7 @@ const AlignmentFeed = () => {
               Alignment Feed
             </h1>
             <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-              Share your cosmic reflections, growth experiences, and sacred intentions
+              Share what you're learning, evolving through, and the intentions you're calling into your life.
             </p>
           </motion.div>
 

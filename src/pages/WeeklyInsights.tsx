@@ -146,7 +146,7 @@ const WeeklyInsights = () => {
               Weekly Alignment
             </h1>
             <p className="text-muted-foreground text-sm font-serif">
-              {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              Your cosmic cheat sheet for {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </motion.div>
 

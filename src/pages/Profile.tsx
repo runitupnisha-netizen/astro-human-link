@@ -387,7 +387,7 @@ const Profile = () => {
                           <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                             <span className="text-muted-foreground">Life Purpose:</span>
                             <div className="font-medium mt-0.5">{profile.gene_keys_life_purpose}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your core creative theme — the shadow you're transforming into a gift, and ultimately into your highest expression (siddhi).</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your core theme — the challenge you're turning into a strength, and ultimately into your superpower.</p>
                           </div>
                           {profile.gene_keys_evolution && (
                             <div className="bg-background/30 rounded-lg p-3 border border-border/20">

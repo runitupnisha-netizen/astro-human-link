@@ -184,7 +184,7 @@ const SacredReveal = () => {
               <Star className="w-10 h-10 text-muted-foreground" />
             </div>
             <h3 className="font-display text-lg font-bold text-foreground mb-2">No Reveals Available</h3>
-            <p className="text-muted-foreground text-sm">Check back as more cosmic souls join the community.</p>
+            <p className="text-muted-foreground text-sm">Check back as more people join!</p>
           </motion.div>
         ) : !revealed ? (
           /* Pre-reveal — mysterious card */

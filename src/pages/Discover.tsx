@@ -62,7 +62,7 @@ const Discover = () => {
               setMatchPopup(matchedProfile);
             } else {
               toast({
-                title: "✨ It's a match!",
+                title: "✨ New Soul Connection!",
                 description: "You both liked each other — go say hi!",
               });
             }

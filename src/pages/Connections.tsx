@@ -159,12 +159,12 @@ const Connections = () => {
             className="text-center mb-10"
           >
             <h1 className="text-4xl font-bold mb-3 bg-gradient-aurora bg-clip-text text-transparent">
-              Soul Connections
+              Your Matches
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0
-                ? `${matches.length} soul${matches.length > 1 ? "s" : ""} resonating with your cosmic energy`
-                : "These are the souls who've resonated with your cosmic signature."}
+                ? `${matches.length} ${matches.length > 1 ? "people" : "person"} you've matched with`
+                : "Your matches will show up here."}
             </p>
           </motion.div>
 

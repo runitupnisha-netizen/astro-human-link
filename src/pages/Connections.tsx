@@ -223,7 +223,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {match.otherProfile.display_name || "Cosmic Soul"}
+                              {match.otherProfile.display_name || "Someone New"}
                             </h3>
                             {match.compatibility_score != null && (
                               <span className={`text-sm font-bold ${getScoreColor(match.compatibility_score)}`}>

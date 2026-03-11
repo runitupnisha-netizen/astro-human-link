@@ -61,7 +61,7 @@ const HeroSection = () => {
             className="border-accent/30 hover:bg-accent/10 px-8 py-5 text-base rounded-2xl"
           >
             <Star className="w-5 h-5 mr-2" />
-            Reveal Your Blueprint
+            See Your Profile
           </Button>
         </motion.div>
 

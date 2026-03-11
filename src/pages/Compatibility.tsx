@@ -578,7 +578,7 @@ const Compatibility = () => {
             <SectionCard title="What This Means for You Two" icon={<Heart className="w-4 h-4" />} delay={0.8}>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">✦ Core Strengths</h4>
+                  <h4 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">✦ What's Working</h4>
                   <div className="space-y-2">
                     {data.strengths.map((s, i) => (
                       <div key={i} className="flex items-start gap-2">

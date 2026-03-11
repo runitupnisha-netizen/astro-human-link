@@ -206,7 +206,7 @@ const Profile = () => {
                 
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-                    <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Cosmic Blueprint"}</h1>
+                    <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
                     <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Birth Details

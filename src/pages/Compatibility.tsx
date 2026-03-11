@@ -465,7 +465,7 @@ const Compatibility = () => {
 
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Type Dynamic</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How Your Types Click</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{human_design.type_dynamic}</p>
                   </div>
                   <div>

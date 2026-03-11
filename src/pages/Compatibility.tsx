@@ -485,7 +485,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Gene Keys Section */}
-            <SectionCard title="Gene Keys Resonance" icon={<Sparkles className="w-4 h-4" />} delay={0.6}>
+            <SectionCard title="Your Gene Keys Connection" icon={<Sparkles className="w-4 h-4" />} delay={0.6}>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-center">
                   <div className="bg-primary/8 rounded-lg p-3 border border-primary/15">

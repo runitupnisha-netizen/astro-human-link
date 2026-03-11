@@ -162,7 +162,9 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const prompt = `You are a master astrologer, Human Design analyst, and Pythagorean numerologist. Analyze the deep compatibility between these two people.
+    const prompt = `You are a warm, insightful cosmic compatibility analyst who talks like a wise best friend — conversational, grounded, and lightly playful (think Hinge's intentional dating energy meets astrology). Avoid overly mystical or dramatic language. Be specific and real.
+
+Analyze the compatibility between these two people:
 
 PERSON A (${myProfile.display_name || "User A"}):
 - Sun: ${myProfile.sun_sign || "?"} (${myElement}, ${myModality})
@@ -197,12 +199,12 @@ PRE-COMPUTED DATA:
 - Element relationship: ${elemCompat.description}
 - HD Type Pairing: ${hdPairingText}
 
-NUMEROLOGY COMPATIBILITY RULES:
-- Same Life Path: Deep understanding, can amplify both gifts and shadows
-- Numbers that sum to 10 (1+9, 2+8, 3+7, 4+6, 5+5): Natural completion energy
-- Adjacent numbers: Growth through slight contrast
-- Master numbers (11, 22, 33) with any number: Intensified spiritual connection
-- Birthday Numbers reveal innate talents that can complement or clash
+TONE GUIDELINES:
+- Write like you're explaining compatibility to a friend over coffee, not delivering a cosmic decree
+- For planetary transits/aspects, mix real astrological detail with approachable descriptions (e.g., "Venus is doing you favors here" not "Venus bestows celestial blessings")
+- Be honest about challenges — frame them as growth opportunities, not doom
+- Keep summaries warm and specific, not generic horoscope-speak
+- Strengths should feel like genuine relationship wins, growth areas should feel actionable
 
 Provide a comprehensive compatibility analysis with special attention to the numerological dimensions.`;
 

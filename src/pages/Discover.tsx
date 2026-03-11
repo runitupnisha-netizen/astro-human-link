@@ -208,12 +208,12 @@ const Discover = () => {
 
               <div className="space-y-2">
                 <h3 className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-                  {swipeCount > 0 ? "You've Explored Every Soul" : "The Stars Are Gathering"}
+                  {swipeCount > 0 ? "You've Seen Everyone!" : "More People Coming Soon"}
                 </h3>
                 <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
                   {swipeCount > 0
-                    ? "You've seen everyone available. New cosmic souls join daily — check back soon for fresh connections."
-                    : "Your cosmic blueprint is ready and waiting. As kindred spirits join, AI-curated matches will appear right here."}
+                    ? "You've been through everyone for now. New people join daily — check back soon!"
+                    : "Your profile is all set. As more people join, curated matches will show up right here."}
                 </p>
               </div>
 

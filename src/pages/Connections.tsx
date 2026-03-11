@@ -132,11 +132,11 @@ const Connections = () => {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return "Twin Flame";
-    if (score >= 80) return "Soul Match";
-    if (score >= 70) return "Deep Resonance";
-    if (score >= 60) return "Strong Connection";
-    return "Growing Bond";
+    if (score >= 90) return "Amazing Match";
+    if (score >= 80) return "Great Match";
+    if (score >= 70) return "Strong Match";
+    if (score >= 60) return "Good Match";
+    return "New Match";
   };
 
   if (loading) {

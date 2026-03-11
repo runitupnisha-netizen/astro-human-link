@@ -209,7 +209,7 @@ const WeeklyInsights = () => {
                   <CardContent className="p-5">
                     <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
                       <Calendar className="w-5 h-5 text-primary" />
-                      Daily Energy Forecast
+                      Your Week at a Glance
                     </h3>
                     <div className="flex gap-2 justify-between mb-4">
                       {dailyEnergiesWithDates.map((day, i) => (

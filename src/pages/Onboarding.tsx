@@ -514,7 +514,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Unlock Your Blueprint
+                  Let's Build Your Profile
                 </motion.h1>
                 <motion.p 
                   className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base"

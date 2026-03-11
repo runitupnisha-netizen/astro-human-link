@@ -62,8 +62,8 @@ const Discover = () => {
               setMatchPopup(matchedProfile);
             } else {
               toast({
-                title: "✨ New Soul Connection!",
-                description: "You've matched with a cosmic soul!",
+                title: "✨ It's a match!",
+                description: "You both liked each other — go say hi!",
               });
             }
           }
@@ -85,7 +85,7 @@ const Discover = () => {
     if (direction === "super") {
       toast({
         title: "⭐ Super Like Sent!",
-        description: `${topProfile.display_name || "Cosmic Soul"} will see your cosmic enthusiasm`,
+        description: `${topProfile.display_name || "Someone special"} will definitely notice this one`,
       });
     }
 
@@ -161,7 +161,7 @@ const Discover = () => {
                 <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
                 <Loader2 className="relative w-10 h-10 text-primary animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm font-serif">Finding your people...</p>
+              <p className="text-muted-foreground text-sm font-serif">Finding your people…</p>
             </motion.div>
           ) : profiles.length === 0 ? (
             <motion.div
@@ -363,7 +363,7 @@ const Discover = () => {
                   transition={{ delay: 0.3 }}
                   className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
                 >
-                  Soul Connection!
+                  It's a Match! 🎉
                 </motion.h2>
 
                 <motion.div
@@ -372,7 +372,7 @@ const Discover = () => {
                   transition={{ delay: 0.4 }}
                 >
                   <p className="text-muted-foreground text-sm font-serif mb-3">
-                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span>
+                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> are into each other
                   </p>
                 </motion.div>
 
@@ -410,7 +410,7 @@ const Discover = () => {
                       >
                         {matchPopup.compatibility_score || "?"}%
                       </motion.span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">aligned</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">compatible</span>
                     </div>
                   </div>
 

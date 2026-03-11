@@ -167,13 +167,13 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
             style={{ opacity: likeOpacity }}
           >
-            <span className="font-display text-green-400 text-xl font-black tracking-wider">LIKE</span>
+            <span className="font-display text-green-400 text-xl font-black tracking-wider">YES</span>
           </motion.div>
           <motion.div
             className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
             style={{ opacity: passOpacity }}
           >
-            <span className="font-display text-red-400 text-xl font-black tracking-wider">PASS</span>
+            <span className="font-display text-red-400 text-xl font-black tracking-wider">NEXT</span>
           </motion.div>
           <motion.div
             className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm"
@@ -321,7 +321,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Gene Keys */}
           {profile.gene_keys_life_purpose && (
             <div className="bg-accent/5 rounded-xl p-3 border border-accent/15">
-              <div className="text-xs text-accent font-medium mb-1">Gene Keys Life Purpose</div>
+              <div className="text-xs text-accent font-medium mb-1">Their Life Purpose</div>
               <div className="text-xs text-muted-foreground font-serif">{profile.gene_keys_life_purpose}</div>
             </div>
           )}

@@ -5,6 +5,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
 import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter } from "lucide-react";
+import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";

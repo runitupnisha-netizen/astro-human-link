@@ -97,12 +97,12 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium">Seeking Connection Type</Label>
+                  <Label className="text-base font-medium">What are you looking for?</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <Badge className="bg-primary/20 text-primary cursor-pointer">Soul Mate</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Twin Flame</Badge>
+                    <Badge variant="outline" className="cursor-pointer">Deep Partnership</Badge>
                     <Badge variant="outline" className="cursor-pointer">Life Partner</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Spiritual Friend</Badge>
+                    <Badge variant="outline" className="cursor-pointer">Meaningful Friendship</Badge>
                     <Badge className="bg-accent/20 text-accent cursor-pointer">Sacred Union</Badge>
                   </div>
                 </div>

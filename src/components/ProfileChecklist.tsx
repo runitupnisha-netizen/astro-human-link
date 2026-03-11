@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle, X, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle2, Circle, X, ChevronDown, ChevronUp, PartyPopper } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 interface ChecklistItem {
   label: string;

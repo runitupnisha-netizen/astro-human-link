@@ -245,15 +245,41 @@ const WeeklyInsights = () => {
                         </motion.div>
                       ))}
                     </div>
-                    {/* Daily intentions */}
-                    {dailyEnergiesWithDates.map((day, i) => (
-                      day.isToday && day.intention ? (
-                        <div key={i} className="bg-primary/5 rounded-lg p-3 border border-primary/10">
-                          <p className="text-xs text-muted-foreground mb-1 font-medium">Today's Intention</p>
-                          <p className="text-sm text-foreground font-serif">{day.intention}</p>
-                        </div>
-                      ) : null
-                    ))}
+                    {/* All daily intentions */}
+                    <div className="space-y-2 mt-1">
+                      {dailyEnergiesWithDates.map((day, i) => (
+                        day.intention ? (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.35 + i * 0.05 }}
+                            className={`rounded-lg p-3 border ${
+                              day.isToday
+                                ? "bg-primary/10 border-primary/20"
+                                : "bg-muted/20 border-border/20"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-xs font-semibold ${day.isToday ? "text-primary" : "text-muted-foreground"}`}>
+                                {day.day}
+                              </span>
+                              {day.isToday && (
+                                <Badge variant="outline" className="text-[9px] border-primary/30 text-primary px-1.5 py-0">
+                                  Today
+                                </Badge>
+                              )}
+                              <span className={`ml-auto text-[10px] font-medium ${
+                                day.energy === "high" ? "text-green-400" : day.energy === "medium" ? "text-accent" : "text-muted-foreground"
+                              }`}>
+                                {day.energy} energy
+                              </span>
+                            </div>
+                            <p className="text-sm text-foreground/80 font-serif leading-relaxed">{day.intention}</p>
+                          </motion.div>
+                        ) : null
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

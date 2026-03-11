@@ -500,7 +500,7 @@ const Compatibility = () => {
 
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Purpose Resonance</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How Your Purposes Align</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.resonance_description}</p>
                   </div>
                   <div>

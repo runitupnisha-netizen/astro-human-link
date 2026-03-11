@@ -564,10 +564,13 @@ const Messages = () => {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.1 }}
-                                onClick={() => sendIcebreaker(ib)}
+                                onClick={() => sendIcebreaker(ib.text)}
                                 className="w-full text-left text-sm p-3 rounded-xl bg-accent/5 border border-accent/20 hover:bg-accent/15 hover:border-accent/40 transition-all text-foreground leading-relaxed"
                               >
-                                {ib}
+                                <span className="text-[10px] font-semibold uppercase tracking-wider text-accent block mb-1">
+                                  {ib.category}
+                                </span>
+                                {ib.text}
                               </motion.button>
                             ))}
                           </motion.div>

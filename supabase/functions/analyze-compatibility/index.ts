@@ -217,7 +217,7 @@ Provide a comprehensive compatibility analysis with special attention to the num
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a master cosmic compatibility analyst. Always base your analysis on real astrological principles. Be specific and insightful." },
+          { role: "system", content: "You are a warm, conversational cosmic compatibility analyst. Your tone is like a wise friend who reads birth charts — grounded, specific, lightly playful, and always empowering. Avoid overly dramatic or mystical language. Mix real astrological principles with relatable, modern descriptions." },
           { role: "user", content: prompt },
         ],
         tools: [{

@@ -393,7 +393,7 @@ const Profile = () => {
                             <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                               <span className="text-muted-foreground">Evolution:</span>
                               <div className="font-medium mt-0.5">{profile.gene_keys_evolution}</div>
-                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your growth edge in relationships — the key that unlocks deeper intimacy and emotional evolution with partners.</p>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your growth edge in relationships — the key to deeper intimacy and emotional connection.</p>
                             </div>
                           )}
                           {profile.gene_keys_radiance && (

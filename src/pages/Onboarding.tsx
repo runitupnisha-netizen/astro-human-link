@@ -688,7 +688,7 @@ const Onboarding = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <p className="text-muted-foreground text-sm md:text-base">Channeling your cosmic blueprint</p>
+                <p className="text-muted-foreground text-sm md:text-base">Crunching the numbers on your chart</p>
                 <motion.div 
                   className="flex justify-center gap-1 mt-3"
                   initial={{ opacity: 0 }}

@@ -5,6 +5,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
 import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter } from "lucide-react";
+import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -347,15 +348,7 @@ const Discover = () => {
               />
 
               <div className="relative z-10">
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", delay: 0.15, damping: 12 }}
-                  className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center shadow-glow"
-                  style={{ background: "var(--gradient-golden)" }}
-                >
-                  <Heart className="w-10 h-10 text-accent-foreground fill-current" />
-                </motion.div>
+                <YinYangAnimation />
 
                 <motion.h2
                   initial={{ opacity: 0, y: 10 }}

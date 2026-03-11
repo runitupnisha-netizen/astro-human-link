@@ -453,9 +453,9 @@ const Profile = () => {
                 <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Hash className="w-5 h-5 text-accent" />
-                  Your Numerology Blueprint
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Hash className="w-5 h-5 text-accent" />
+                   Your Numbers
                 </h2>
                 {(() => {
                   const KARMIC_DEBT: Record<number, string> = {

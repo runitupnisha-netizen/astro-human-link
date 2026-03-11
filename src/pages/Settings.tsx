@@ -350,7 +350,7 @@ const Settings = () => {
                   const { error } = await supabase.rpc("delete_user_data", { target_user_id: user.id });
                   if (error) throw error;
                   await signOut();
-                  toast.success("Your account has been deleted. Farewell, cosmic soul. 🌙");
+                  toast.success("Your account has been deleted. Take care out there. 🌙");
                   navigate("/auth");
                 } catch (err: any) {
                   toast.error(err.message || "Failed to delete account");

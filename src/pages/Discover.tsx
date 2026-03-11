@@ -85,7 +85,7 @@ const Discover = () => {
     if (direction === "super") {
       toast({
         title: "⭐ Super Like Sent!",
-        description: `${topProfile.display_name || "Cosmic Soul"} will see your cosmic enthusiasm`,
+        description: `${topProfile.display_name || "Someone special"} will definitely notice this one`,
       });
     }
 

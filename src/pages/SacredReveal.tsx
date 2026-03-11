@@ -176,7 +176,7 @@ const SacredReveal = () => {
         {loading ? (
           <div className="flex flex-col items-center gap-4 py-16">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-muted-foreground text-sm font-serif">Consulting the cosmos...</p>
+            <p className="text-muted-foreground text-sm font-serif">Finding someone great for you...</p>
           </div>
         ) : !revealProfile ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-6">

@@ -364,7 +364,7 @@ const Profile = () => {
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Authority:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_authority || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your inner compass for decision-making — the body intelligence you can trust most when choosing your path.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your inner compass for decisions — the gut feeling you can trust most.</p>
                           </div>
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Profile:</span>

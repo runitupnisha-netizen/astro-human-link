@@ -321,7 +321,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Gene Keys */}
           {profile.gene_keys_life_purpose && (
             <div className="bg-accent/5 rounded-xl p-3 border border-accent/15">
-              <div className="text-xs text-accent font-medium mb-1">Gene Keys Life Purpose</div>
+              <div className="text-xs text-accent font-medium mb-1">Their Life Purpose</div>
               <div className="text-xs text-muted-foreground font-serif">{profile.gene_keys_life_purpose}</div>
             </div>
           )}

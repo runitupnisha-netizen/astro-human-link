@@ -411,7 +411,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Elements Section */}
-            <SectionCard title="Elemental Balance" icon={<Flame className="w-4 h-4" />} delay={0.4}>
+            <SectionCard title="Your Elemental Mix" icon={<Flame className="w-4 h-4" />} delay={0.4}>
               <div className="space-y-4">
                 <div className="flex justify-center gap-4">
                   <div className="text-center">

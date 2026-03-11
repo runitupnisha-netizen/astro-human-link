@@ -449,7 +449,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Human Design Section */}
-            <SectionCard title="Human Design Dynamics" icon={<Zap className="w-4 h-4" />} delay={0.5}>
+            <SectionCard title="How You're Designed Together" icon={<Zap className="w-4 h-4" />} delay={0.5}>
               <div className="space-y-4">
                 <div className="flex justify-center gap-6 text-center">
                   <div>

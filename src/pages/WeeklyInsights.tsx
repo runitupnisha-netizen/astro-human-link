@@ -264,7 +264,7 @@ const WeeklyInsights = () => {
                   <CardContent className="p-5">
                     <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
                       <Star className="w-5 h-5 text-accent" />
-                      Planetary Transits
+                      What the Planets Are Up To
                     </h3>
                     <div className="space-y-4">
                       {aiInsights.transits.map((transit, i) => (

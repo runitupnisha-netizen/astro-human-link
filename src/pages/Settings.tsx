@@ -42,10 +42,10 @@ const Settings = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
-              Settings & Preferences
+              Settings
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Customize your cosmic journey and connection preferences
+              Fine-tune how you show up and who you meet
             </p>
           </div>
 

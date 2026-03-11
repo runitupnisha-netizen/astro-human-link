@@ -229,7 +229,7 @@ Provide a comprehensive compatibility analysis with special attention to the num
               type: "object",
               properties: {
                 overall_score: { type: "number", description: "Overall compatibility 0-100" },
-                overall_summary: { type: "string", description: "2-3 sentence poetic summary of the connection" },
+                overall_summary: { type: "string", description: "2-3 sentence warm, conversational summary of the connection — like telling a friend about their match" },
                 connection_archetype: { type: "string", description: "e.g. Twin Flame, Soul Mates, Karmic Teachers, Divine Complements, Cosmic Mirrors" },
                 synastry: {
                   type: "object",

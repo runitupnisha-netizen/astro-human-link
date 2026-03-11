@@ -575,7 +575,7 @@ const Compatibility = () => {
             </SectionCard>
 
             {/* Strengths & Growth */}
-            <SectionCard title="Relationship Blueprint" icon={<Heart className="w-4 h-4" />} delay={0.8}>
+            <SectionCard title="What This Means for You Two" icon={<Heart className="w-4 h-4" />} delay={0.8}>
               <div className="space-y-4">
                 <div>
                   <h4 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">✦ Core Strengths</h4>

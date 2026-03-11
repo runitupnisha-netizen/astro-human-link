@@ -589,7 +589,7 @@ const Compatibility = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">🌱 Growth Areas</h4>
+                  <h4 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">🌱 Where You Can Grow</h4>
                   <div className="space-y-2">
                     {data.growth_areas.map((g, i) => (
                       <div key={i} className="flex items-start gap-2">

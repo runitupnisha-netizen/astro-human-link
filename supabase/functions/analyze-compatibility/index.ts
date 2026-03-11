@@ -307,7 +307,7 @@ Provide a comprehensive compatibility analysis with special attention to the num
                   items: { type: "string" },
                   description: "2-3 areas where this pairing can grow together",
                 },
-                cosmic_advice: { type: "string", description: "One piece of mystical advice for this pairing (1-2 sentences)" },
+                cosmic_advice: { type: "string", description: "One warm, actionable piece of relationship advice for this pairing (1-2 sentences, conversational tone)" },
               },
               required: ["overall_score", "overall_summary", "connection_archetype", "synastry", "elements", "human_design", "gene_keys", "numerology", "strengths", "growth_areas", "cosmic_advice"],
               additionalProperties: false,

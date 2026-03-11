@@ -372,7 +372,7 @@ const Discover = () => {
                   transition={{ delay: 0.4 }}
                 >
                   <p className="text-muted-foreground text-sm font-serif mb-3">
-                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span>
+                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> are into each other
                   </p>
                 </motion.div>
 

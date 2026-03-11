@@ -668,7 +668,7 @@ const Profile = () => {
               ⚠️ Overwrite Current Blueprint?
             </DialogTitle>
             <DialogDescription className="text-sm leading-relaxed pt-2">
-              This will <span className="text-foreground font-medium">permanently replace</span> your current cosmic profile — including your astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
+              This will <span className="text-foreground font-medium">permanently replace</span> your current profile — including your astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
               <br /><br />
               This action cannot be undone.
             </DialogDescription>

@@ -565,9 +565,23 @@ const Messages = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.1 }}
                                 onClick={() => sendIcebreaker(ib.text)}
-                                className="w-full text-left text-sm p-3 rounded-xl bg-accent/5 border border-accent/20 hover:bg-accent/15 hover:border-accent/40 transition-all text-foreground leading-relaxed"
+                                className={`w-full text-left text-sm p-3 rounded-xl border transition-all text-foreground leading-relaxed ${
+                                  ib.category.includes('🎉') ? 'bg-yellow-500/8 border-yellow-500/25 hover:bg-yellow-500/15 hover:border-yellow-500/40' :
+                                  ib.category.includes('💬') ? 'bg-pink-500/8 border-pink-500/25 hover:bg-pink-500/15 hover:border-pink-500/40' :
+                                  ib.category.includes('🔮') ? 'bg-purple-500/8 border-purple-500/25 hover:bg-purple-500/15 hover:border-purple-500/40' :
+                                  ib.category.includes('🌊') ? 'bg-cyan-500/8 border-cyan-500/25 hover:bg-cyan-500/15 hover:border-cyan-500/40' :
+                                  ib.category.includes('🔥') ? 'bg-orange-500/8 border-orange-500/25 hover:bg-orange-500/15 hover:border-orange-500/40' :
+                                  'bg-accent/5 border-accent/20 hover:bg-accent/15 hover:border-accent/40'
+                                }`}
                               >
-                                <span className="text-[10px] font-semibold uppercase tracking-wider text-accent block mb-1">
+                                <span className={`text-[10px] font-semibold uppercase tracking-wider block mb-1 ${
+                                  ib.category.includes('🎉') ? 'text-yellow-500' :
+                                  ib.category.includes('💬') ? 'text-pink-500' :
+                                  ib.category.includes('🔮') ? 'text-purple-400' :
+                                  ib.category.includes('🌊') ? 'text-cyan-400' :
+                                  ib.category.includes('🔥') ? 'text-orange-500' :
+                                  'text-accent'
+                                }`}>
                                   {ib.category}
                                 </span>
                                 {ib.text}

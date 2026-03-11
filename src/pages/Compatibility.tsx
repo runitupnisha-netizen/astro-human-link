@@ -371,7 +371,7 @@ const Compatibility = () => {
 
                 <div className="space-y-3 pt-2">
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☉ Sun–Sun Dynamic</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☉ How Your Suns Vibe</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.sun_sun}</p>
                   </div>
                   <div>

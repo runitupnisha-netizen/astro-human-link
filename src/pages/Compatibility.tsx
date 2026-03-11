@@ -348,7 +348,7 @@ const Compatibility = () => {
 
           <div className="space-y-4">
             {/* Synastry Section */}
-            <SectionCard title="Astrological Synastry" icon={<Star className="w-4 h-4" />} delay={0.3}>
+            <SectionCard title="How Your Signs Interact" icon={<Star className="w-4 h-4" />} delay={0.3}>
               <div className="space-y-4">
                 {/* Sign comparison */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">

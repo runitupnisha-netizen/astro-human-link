@@ -324,7 +324,7 @@ const Messages = () => {
               </div>
               <h2 className="font-display text-2xl font-bold text-foreground mb-2">No Matches Yet</h2>
               <p className="text-muted-foreground max-w-md font-serif">
-                When you and another soul both connect, you'll be able to message each other here. Keep exploring the cosmos!
+                When you and someone both like each other, you can message here. Keep discovering!
               </p>
             </motion.div>
           ) : (

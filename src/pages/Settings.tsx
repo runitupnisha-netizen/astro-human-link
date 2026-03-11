@@ -71,18 +71,38 @@ const Settings = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="birthdate">Birth Date</Label>
-                    <Input id="birthdate" type="date" defaultValue="1995-03-15" className="bg-background/50" />
+                    <div>
+                      <Label htmlFor="birthdate">Birth Date</Label>
+                      <Input id="birthdate" type="date" defaultValue="1995-03-15" className="bg-background/50" />
+                    </div>
+                    <div>
+                      <Label htmlFor="birthtime">Birth Time</Label>
+                      <Input id="birthtime" type="time" defaultValue="14:30" className="bg-background/50" />
+                    </div>
+                    <div>
+                      <Label htmlFor="birthplace">Birth Place</Label>
+                      <Input id="birthplace" defaultValue="San Francisco, CA" className="bg-background/50" />
+                    </div>
                   </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="birthtime">Birth Time</Label>
-                    <Input id="birthtime" type="time" defaultValue="14:30" className="bg-background/50" />
+                    <span className="font-medium">Profile Checklist</span>
+                    <p className="text-sm text-muted-foreground">Show the profile completion checklist on your Blueprint page</p>
                   </div>
-                  <div>
-                    <Label htmlFor="birthplace">Birth Place</Label>
-                    <Input id="birthplace" defaultValue="San Francisco, CA" className="bg-background/50" />
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/30 text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      localStorage.removeItem('profile-checklist-dismissed');
+                      toast.success("Profile checklist will appear on your Blueprint page");
+                    }}
+                  >
+                    Re-show Checklist
+                  </Button>
                 </div>
               </CardContent>
             </Card>

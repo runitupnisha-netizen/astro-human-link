@@ -561,9 +561,9 @@ const Profile = () => {
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent" />
-                  Cosmic Tags
+                 <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                   <Sparkles className="w-5 h-5 text-accent" />
+                   Your Tags
                 </h2>
                 <p className="text-xs text-muted-foreground mb-4">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">

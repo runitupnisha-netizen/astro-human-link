@@ -10,24 +10,38 @@ import { Edit, Check, X, MessageSquareQuote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PROMPT_OPTIONS = [
+  // Free text
   "About me...",
+
+  // Light & fun
   "My simple pleasures are…",
   "A random fact I love is…",
+  "Two truths and a lie…",
+  "My most irrational fear is…",
+  "I geek out about…",
+  "My biggest date fail was…",
+  "I go crazy for…",
+  "On weekends you'll find me…",
+  "A perfect Sunday looks like…",
+
+  // Intentional & deeper
   "The hallmark of a good relationship is…",
   "I'm looking for someone who…",
-  "My love language is…",
-  "A perfect Sunday looks like…",
-  "I'm convinced that…",
   "The way to my heart is…",
-  "I geek out about…",
-  "My most irrational fear is…",
-  "Two truths and a lie…",
+  "Green flags I look for…",
+  "My love language is…",
   "I'll fall for you if…",
   "The best way to ask me out is…",
-  "On weekends you'll find me…",
-  "I go crazy for…",
-  "Green flags I look for…",
-  "My biggest date fail was…",
+  "I'm convinced that…",
+
+  // Soulful & reflective
+  "Something that changed my perspective on life…",
+  "A moment I felt truly aligned was…",
+  "The kind of energy I want to build with someone…",
+  "What I've learned about love so far…",
+  "I feel most like myself when…",
+  "A belief I hold that most people don't…",
+  "The deeper side of me that people don't always see…",
 ];
 
 const FREE_TEXT_PROMPT = "About me...";

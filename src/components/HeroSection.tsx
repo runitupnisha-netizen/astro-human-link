@@ -69,8 +69,8 @@ const HeroSection = () => {
           {[
             {
               icon: Star,
-              title: "Sacred Timing",
-              desc: "Houses, aspects, and planetary placements reveal your deepest compatibility",
+              title: "More Than a Zodiac Sign",
+              desc: "We look at your full chart — houses, aspects, and placements — to find real compatibility",
               delay: 0.8,
             },
             {

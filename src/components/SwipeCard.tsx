@@ -337,7 +337,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <div className="space-y-2">
-              <h3 className="section-heading">Shared Vibes</h3>
+              <h3 className="section-heading">Interests</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.slice(0, 8).map((interest, i) => (
                   <Badge key={i} variant="secondary" className="text-xs bg-secondary/30">{interest}</Badge>

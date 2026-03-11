@@ -430,7 +430,7 @@ const Messages = () => {
                               navigate(`/profile/${otherId}`);
                             }}
                           >
-                            {selectedConvo.otherProfile.display_name || "Cosmic Soul"}
+                            {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
                           <div className="flex items-center gap-2">
                             {selectedConvo.match.compatibility_score && (

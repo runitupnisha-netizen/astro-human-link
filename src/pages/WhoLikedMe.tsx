@@ -161,7 +161,7 @@ const WhoLikedMe = () => {
                       {/* Info Section */}
                       <div className="p-3 space-y-1.5">
                         <p className={`font-medium text-sm text-foreground ${!isPremium ? "blur-sm select-none" : ""}`}>
-                          {isPremium ? (liker.display_name || "Cosmic Soul") : "✦✦✦✦✦✦"}
+                          {isPremium ? (liker.display_name || "Someone") : "✦✦✦✦✦✦"}
                         </p>
                         <div className="flex flex-wrap gap-1">
                           {liker.sun_sign && (

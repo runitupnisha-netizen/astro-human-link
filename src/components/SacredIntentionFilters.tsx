@@ -123,7 +123,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
       {/* Element Preference */}
       <div>
-        <h4 className="section-heading mb-2">Element Affinity</h4>
+        <h4 className="section-heading mb-2">Element Preference</h4>
         <div className="flex gap-2">
           {ELEMENTS.map(el => (
             <button

@@ -132,7 +132,7 @@ const SacredReveal = () => {
         target_user_id: revealProfile.user_id,
         action: "like",
       });
-      toast({ title: "💜 Liked your Sacred Match!" });
+      toast({ title: "💜 You liked them!" });
     } catch (e: any) {
       toast({ title: "Already swiped", variant: "destructive" });
     }

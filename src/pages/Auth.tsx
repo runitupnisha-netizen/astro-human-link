@@ -171,7 +171,7 @@ const Auth = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-primary hover:text-primary/80 transition-colors"
             >
-              {isLogin ? "New soul? Create an account" : "Already have an account? Sign in"}
+              {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
             </button>
           </div>
         </motion.form>

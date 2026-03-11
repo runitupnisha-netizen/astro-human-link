@@ -400,7 +400,7 @@ const Profile = () => {
                             <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                               <span className="text-muted-foreground">Radiance:</span>
                               <div className="font-medium mt-0.5">{profile.gene_keys_radiance}</div>
-                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your outer magnetism — the quality that draws others to you and defines your visible impact in the world.</p>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your natural magnetism — the quality that draws people to you.</p>
                             </div>
                           )}
                           {profile.gene_keys_summary && <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{profile.gene_keys_summary}</p>}

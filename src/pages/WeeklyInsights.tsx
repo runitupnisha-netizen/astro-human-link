@@ -160,8 +160,8 @@ const WeeklyInsights = () => {
               >
                 <Sparkles className="w-16 h-16 text-primary" />
               </motion.div>
-              <p className="text-foreground font-display text-lg mb-2">Putting together your weekly read…</p>
-              <p className="text-muted-foreground text-sm font-serif">This takes just a moment</p>
+              <p className="text-foreground font-display text-lg mb-2">Reading the stars for you…</p>
+              <p className="text-muted-foreground text-sm font-serif">Hang tight, this only takes a moment ✨</p>
             </motion.div>
           )}
 

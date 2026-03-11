@@ -227,9 +227,9 @@ const Discover = () => {
                 <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">While you wait</p>
                 <div className="space-y-2.5">
                   {[
-                    { icon: "✨", text: "Complete your profile to attract better matches", action: () => navigate("/profile") },
-                    { icon: "🔮", text: "Read your weekly cosmic insights", action: () => navigate("/insights") },
-                    { icon: "💫", text: "Share an intention in the Alignment Feed", action: () => navigate("/feed") },
+                    { icon: "✨", text: "Finish your profile to get better matches", action: () => navigate("/profile") },
+                    { icon: "📖", text: "Check out your weekly insights", action: () => navigate("/insights") },
+                    { icon: "💬", text: "Post something in the community feed", action: () => navigate("/feed") },
                   ].map((tip, i) => (
                     <motion.button
                       key={i}

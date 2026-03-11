@@ -92,7 +92,7 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => setDismissed(true)}
+                onClick={() => { localStorage.setItem('profile-checklist-dismissed', 'true'); setDismissed(true); }}
               >
                 <X className="w-4 h-4" />
               </Button>

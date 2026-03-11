@@ -379,7 +379,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.moon_moon}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☉↔☽ Sun–Moon Cross Aspects</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☉↔☽ The Sun–Moon Connection</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.sun_moon_cross}</p>
                   </div>
                   <div>

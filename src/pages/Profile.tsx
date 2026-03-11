@@ -369,7 +369,7 @@ const Profile = () => {
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Profile:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_profile || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships and how others experience you.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships.</p>
                           </div>
                         </div>
                       </div>

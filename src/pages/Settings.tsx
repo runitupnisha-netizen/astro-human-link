@@ -187,7 +187,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium">Cosmic Events</span>
-                    <p className="text-sm text-muted-foreground">New moons, retrogrades, and astrological events</p>
+                    <p className="text-sm text-muted-foreground">New moons, retrogrades, and other sky events</p>
                   </div>
                   <Switch defaultChecked />
                 </div>

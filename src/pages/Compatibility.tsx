@@ -375,7 +375,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.sun_sun}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-accent mb-1">☽ Moon–Moon Emotional Bond</h4>
+                    <h4 className="text-xs font-semibold text-accent mb-1">☽ Emotional Wavelength</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{synastry.moon_moon}</p>
                   </div>
                   <div>

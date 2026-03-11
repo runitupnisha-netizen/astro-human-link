@@ -504,7 +504,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.resonance_description}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Shadow Alchemy</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">Turning Shadows into Strengths</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.shadow_alchemy}</p>
                   </div>
                   <div>

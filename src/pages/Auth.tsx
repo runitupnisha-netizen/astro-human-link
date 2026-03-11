@@ -159,7 +159,7 @@ const Auth = () => {
               <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
             ) : (
               <>
-                {isLogin ? "Enter the Cosmos" : "Create Your Blueprint"}
+                {isLogin ? "Sign In" : "Create Account"}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </>
             )}

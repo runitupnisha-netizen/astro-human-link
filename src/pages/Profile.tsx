@@ -99,6 +99,7 @@ const Profile = () => {
   const [editBirthPlace, setEditBirthPlace] = useState("");
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [photoCount, setPhotoCount] = useState(0);
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");

@@ -52,7 +52,7 @@ const HeroSection = () => {
             className="bg-primary hover:bg-primary/90 shadow-glow px-8 py-5 text-base font-medium rounded-2xl"
           >
             <Heart className="w-5 h-5 mr-2" />
-            Start Your Soul Search
+            Get Started
           </Button>
           
           <Button 

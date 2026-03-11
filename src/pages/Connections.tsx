@@ -89,7 +89,7 @@ const Connections = () => {
           created_at: m.created_at,
           otherUserId: otherId,
           otherProfile: prof || {
-            display_name: "Cosmic Soul",
+            display_name: "New Match",
             sun_sign: null,
             moon_sign: null,
             rising_sign: null,

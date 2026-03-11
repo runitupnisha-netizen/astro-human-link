@@ -28,7 +28,7 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Welcome back, cosmic soul ✨");
+        toast.success("Welcome back! ✌️");
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({

@@ -17,7 +17,9 @@ interface ProfileChecklistProps {
 }
 
 const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    return localStorage.getItem('profile-checklist-dismissed') === 'true';
+  });
   const [expanded, setExpanded] = useState(true);
 
   const items: ChecklistItem[] = [

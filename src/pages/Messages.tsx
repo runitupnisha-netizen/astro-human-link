@@ -335,7 +335,7 @@ const Messages = () => {
                   <div className="p-4 border-b border-border">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
-                      Soul Messages
+                      Messages
                     </h2>
                   </div>
                   <div className="overflow-y-auto flex-1">

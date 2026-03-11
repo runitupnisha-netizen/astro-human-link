@@ -59,12 +59,12 @@ const WhoLikedMe = () => {
             <span className="text-sm font-medium text-primary">Who Liked You</span>
           </div>
           <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-            {count > 0 ? `${count} soul${count !== 1 ? "s" : ""} attracted to your energy` : "Your admirers will appear here"}
+            {count > 0 ? `${count} ${count !== 1 ? "people" : "person"} liked you` : "Your likes will show up here"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {count > 0
-              ? "Unlock premium to see who's aligned with you"
-              : "Keep shining — the cosmos is aligning connections for you"}
+              ? "Upgrade to see who's into you"
+              : "Keep putting yourself out there — likes will come!"}
           </p>
         </motion.div>
 

@@ -285,7 +285,7 @@ const Discover = () => {
             className="flex flex-col items-center gap-2 mt-4"
           >
             <p className="text-muted-foreground text-xs">
-              {profiles.length} soul{profiles.length !== 1 ? "s" : ""} in your queue
+              {profiles.length} {profiles.length !== 1 ? "people" : "person"} in your queue
             </p>
             <p className="text-muted-foreground/50 text-[10px]">
               Swipe up for ⭐ Super Like

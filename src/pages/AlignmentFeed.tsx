@@ -139,10 +139,10 @@ const AlignmentFeed = () => {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
-              Alignment Feed
+              Community
             </h1>
             <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-              Share spiritual reflections, growth experiences, and intentions with the community
+              Share what's on your mind — thoughts, wins, good vibes
             </p>
           </motion.div>
 

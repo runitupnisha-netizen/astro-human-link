@@ -231,8 +231,8 @@ const SacredReveal = () => {
                     transition={{ delay: 0.5 }}
                     className="relative z-10 mt-6 text-center"
                   >
-                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Your Sacred Match Awaits</h3>
-                    <p className="text-muted-foreground text-sm font-serif">A soul the cosmos has chosen for you today</p>
+                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Someone's Waiting for You</h3>
+                    <p className="text-muted-foreground text-sm font-serif">Your daily curated match is ready to reveal</p>
                   </motion.div>
                 </div>
 

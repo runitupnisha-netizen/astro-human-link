@@ -81,8 +81,8 @@ const HeroSection = () => {
             },
             {
               icon: Heart,
-              title: "Beyond Surface",
-              desc: "Real connection that honors your authentic self and growth journey",
+              title: "Intentional Dating",
+              desc: "Less mindless swiping, more meaningful connections with people who get you",
               delay: 1.1,
             },
           ].map(({ icon: Icon, title, desc, delay }) => (

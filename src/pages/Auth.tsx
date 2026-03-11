@@ -73,10 +73,10 @@ const Auth = () => {
             <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-            {isLogin ? "Welcome Back" : "Begin Your Journey"}
+            {isLogin ? "Welcome Back" : "Let's Get Started"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin ? "Your cosmic connections await" : "Discover your soul's blueprint"}
+            {isLogin ? "Good to see you again ✌️" : "Create your profile and start meeting people"}
           </p>
         </motion.div>
 

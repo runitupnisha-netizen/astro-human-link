@@ -179,11 +179,11 @@ const Connections = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">No Connections Yet</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Keep swiping in Discovery to find souls that resonate with your cosmic energy!
+                Keep discovering people — when you both like each other, you'll match!
               </p>
               <Button onClick={() => navigate("/")} style={{ background: "var(--gradient-aurora)" }} className="h-11 px-6 shadow-glow">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Explore Discovery
+                Start Discovering
               </Button>
             </motion.div>
           ) : (

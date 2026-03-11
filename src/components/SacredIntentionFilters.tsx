@@ -73,7 +73,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
           <Filter className="w-5 h-5 text-primary" />
-          Sacred Intention Filters
+          What Are You Looking For?
         </h3>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-5 h-5" />

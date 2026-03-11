@@ -36,14 +36,14 @@ const HeroSection = () => {
           {...fadeUp(0.2)}
           className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 text-gradient-aurora leading-[1.1]"
         >
-          Find Your Person
+          Your Cosmic Connection Awaits
         </motion.h1>
         
         <motion.p
           {...fadeUp(0.4)}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-serif"
         >
-          Dating that actually gets you. We use astrology, Human Design & Gene Keys to help you find someone who vibes with the real you.
+          Discover meaningful connections through the ancient wisdom of Astrology, Human Design & Gene Keys — aligned with who you truly are.
         </motion.p>
 
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">

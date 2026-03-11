@@ -131,7 +131,7 @@ const Profile = () => {
       if (refreshed) setProfile(refreshed);
 
       setEditOpen(false);
-      toast({ title: "Blueprint regenerated ✨", description: "Your cosmic profile has been updated with new birth details." });
+      toast({ title: "Blueprint updated ✨", description: "Your profile has been refreshed with the new birth details." });
     } catch (err: any) {
       console.error("Regeneration error:", err);
       toast({ title: "Regeneration failed", description: err.message || "Something went wrong", variant: "destructive" });
@@ -153,7 +153,7 @@ const Profile = () => {
       await navigator.clipboard.writeText(
         `✨ My Soul Blueprint ✨\n☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"}\n⚡ ${profile?.human_design_type || ""}\n🧬 ${profile?.gene_keys_life_purpose || ""}\n\n— Aligned`
       );
-      toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
+       toast({ title: "Copied to clipboard!", description: "Share your Soul Blueprint with the world ✨" });
     }
   };
 
@@ -206,7 +206,7 @@ const Profile = () => {
                 
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-                    <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Cosmic Blueprint"}</h1>
+                    <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
                     <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Birth Details
@@ -283,8 +283,8 @@ const Profile = () => {
                 <div className="flex items-center gap-4 mb-6">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Regenerating Your Cosmic Blueprint…</h3>
-                    <p className="text-sm text-muted-foreground">Aligning the stars with your updated birth details</p>
+                     <h3 className="text-lg font-semibold text-foreground">Updating Your Blueprint…</h3>
+                     <p className="text-sm text-muted-foreground">Crunching the numbers with your new birth details</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -308,9 +308,9 @@ const Profile = () => {
                 <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-accent" />
-                  Your Celestial Signature
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Star className="w-5 h-5 text-accent" />
+                   Your Star Chart
                 </h2>
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
@@ -342,9 +342,9 @@ const Profile = () => {
                 <img src={humanDesignBody} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-primary" />
-                  Your Energetic Blueprint
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Zap className="w-5 h-5 text-primary" />
+                   Your Energy Profile
                 </h2>
                 <div className="space-y-6">
                   {profile.human_design_type && (
@@ -359,17 +359,17 @@ const Profile = () => {
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Strategy:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_strategy || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">How you're designed to interact with the world and make things happen — your energetic way of moving through life.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">How you naturally move through the world and make things happen.</p>
                           </div>
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Authority:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_authority || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your inner compass for decision-making — the body intelligence you can trust most when choosing your path.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your inner compass for decisions — the gut feeling you can trust most.</p>
                           </div>
                           <div className="bg-background/40 rounded-lg p-3 border border-border/30">
                             <span className="text-muted-foreground">Profile:</span>
                             <div className="font-medium mt-0.5">{profile.human_design_profile || "—"}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships and how others experience you.</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your personality archetype — the role you naturally play in relationships.</p>
                           </div>
                         </div>
                       </div>
@@ -387,20 +387,20 @@ const Profile = () => {
                           <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                             <span className="text-muted-foreground">Life Purpose:</span>
                             <div className="font-medium mt-0.5">{profile.gene_keys_life_purpose}</div>
-                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your core creative theme — the shadow you're transforming into a gift, and ultimately into your highest expression (siddhi).</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your core theme — the challenge you're turning into a strength, and ultimately into your superpower.</p>
                           </div>
                           {profile.gene_keys_evolution && (
                             <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                               <span className="text-muted-foreground">Evolution:</span>
                               <div className="font-medium mt-0.5">{profile.gene_keys_evolution}</div>
-                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your growth edge in relationships — the key that unlocks deeper intimacy and emotional evolution with partners.</p>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your growth edge in relationships — the key to deeper intimacy and emotional connection.</p>
                             </div>
                           )}
                           {profile.gene_keys_radiance && (
                             <div className="bg-background/30 rounded-lg p-3 border border-border/20">
                               <span className="text-muted-foreground">Radiance:</span>
                               <div className="font-medium mt-0.5">{profile.gene_keys_radiance}</div>
-                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your outer magnetism — the quality that draws others to you and defines your visible impact in the world.</p>
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Your natural magnetism — the quality that draws people to you.</p>
                             </div>
                           )}
                           {profile.gene_keys_summary && <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{profile.gene_keys_summary}</p>}
@@ -435,7 +435,7 @@ const Profile = () => {
                   Share
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mb-4 font-serif">Your shareable cosmic identity card</p>
+              <p className="text-xs text-muted-foreground mb-4 font-serif">A snapshot of your profile you can share</p>
               <div ref={blueprintRef}>
                 <SoulBlueprintCard profile={profile} />
               </div>
@@ -453,9 +453,9 @@ const Profile = () => {
                 <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
               </div>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Hash className="w-5 h-5 text-accent" />
-                  Your Numerology Blueprint
+                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                   <Hash className="w-5 h-5 text-accent" />
+                   Your Numbers
                 </h2>
                 {(() => {
                   const KARMIC_DEBT: Record<number, string> = {
@@ -478,21 +478,21 @@ const Profile = () => {
                             value: profile.life_path_number,
                             color: "accent",
                             desc: "Soul Mission",
-                            detail: "Your life's core purpose and the spiritual lessons you're here to master. This number shapes your deepest drives and destiny.",
+                            detail: "Your life's core purpose and the lessons you're here to learn. This number shapes your deepest drives.",
                           },
                           {
                             label: "Birthday",
                             value: profile.birthday_number,
                             color: "primary",
                             desc: "Innate Gift",
-                            detail: "A special talent you were born with — your natural edge in relationships and life. This gift supports your Life Path.",
+                            detail: "A natural talent you were born with — your built-in edge in relationships and life.",
                           },
                           {
                             label: "Personal Year",
                             value: profile.personal_year_number,
                             color: "accent",
                             desc: "Current Cycle",
-                            detail: "The energy theme of your current year cycle (1–9). It reveals what to focus on right now for growth and alignment.",
+                            detail: "The energy of your current year (1–9). It tells you what to focus on right now.",
                           },
                         ].map((item) => (
                           <div key={item.label} className="text-center bg-muted/30 rounded-xl p-4 border border-border/40">
@@ -561,9 +561,9 @@ const Profile = () => {
           {profile.compatibility_tags && profile.compatibility_tags.length > 0 && (
             <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent" />
-                  Cosmic Tags
+                 <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                   <Sparkles className="w-5 h-5 text-accent" />
+                   Your Tags
                 </h2>
                 <p className="text-xs text-muted-foreground mb-4">Tap a tag to learn what it means</p>
                 <div className="flex flex-wrap gap-2">
@@ -606,7 +606,7 @@ const Profile = () => {
           <DialogHeader>
             <DialogTitle className="font-display text-xl">Update Birth Details</DialogTitle>
             <DialogDescription>
-              Changing your birth info will regenerate your entire cosmic profile — astrology, human design, gene keys, and numerology.
+              Changing your birth info will regenerate your entire profile — astrology, human design, gene keys, and numerology.
             </DialogDescription>
           </DialogHeader>
 
@@ -668,7 +668,7 @@ const Profile = () => {
               ⚠️ Overwrite Current Blueprint?
             </DialogTitle>
             <DialogDescription className="text-sm leading-relaxed pt-2">
-              This will <span className="text-foreground font-medium">permanently replace</span> your current cosmic profile — including your astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
+              This will <span className="text-foreground font-medium">permanently replace</span> your current profile — including your astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
               <br /><br />
               This action cannot be undone.
             </DialogDescription>

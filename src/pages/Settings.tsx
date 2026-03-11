@@ -42,10 +42,10 @@ const Settings = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
-              Settings & Preferences
+              Settings
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Customize your cosmic journey and connection preferences
+              Fine-tune how you show up and who you meet
             </p>
           </div>
 
@@ -97,12 +97,12 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium">Seeking Connection Type</Label>
+                  <Label className="text-base font-medium">What are you looking for?</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <Badge className="bg-primary/20 text-primary cursor-pointer">Soul Mate</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Twin Flame</Badge>
+                    <Badge variant="outline" className="cursor-pointer">Deep Partnership</Badge>
                     <Badge variant="outline" className="cursor-pointer">Life Partner</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Spiritual Friend</Badge>
+                    <Badge variant="outline" className="cursor-pointer">Meaningful Friendship</Badge>
                     <Badge className="bg-accent/20 text-accent cursor-pointer">Sacred Union</Badge>
                   </div>
                 </div>
@@ -126,22 +126,22 @@ const Settings = () => {
                 </div>
 
                 <div>
-                  <Label className="text-base font-medium">Astrological Preferences</Label>
+                  <Label className="text-base font-medium">Astrology Preferences</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Water Sign Priority</span>
+                      <span className="text-sm">Prefer Water Signs</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Compatible Rising Signs</span>
+                      <span className="text-sm">Match Rising Signs</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Venus Harmony</span>
+                      <span className="text-sm">Venus Compatibility</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Moon Phase Alignment</span>
+                      <span className="text-sm">Moon Sign Alignment</span>
                       <Switch />
                     </div>
                   </div>
@@ -187,7 +187,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium">Cosmic Events</span>
-                    <p className="text-sm text-muted-foreground">New moons, retrogrades, and astrological events</p>
+                    <p className="text-sm text-muted-foreground">New moons, retrogrades, and other sky events</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -215,7 +215,7 @@ const Settings = () => {
                         ? "Enabled — you'll receive daily cosmic intentions"
                         : permission === "denied"
                         ? "Blocked — update in browser settings"
-                        : "Get daily intentions even when the app is closed"}
+                        : "Get daily insights even when the app is closed"}
                     </p>
                   </div>
                   {isSupported && permission !== "granted" && (
@@ -326,7 +326,7 @@ const Settings = () => {
               <Trash2 className="w-5 h-5" /> Delete Your Account
             </DialogTitle>
             <DialogDescription>
-              This action is permanent and cannot be undone. All your data, matches, messages, and cosmic profile will be permanently deleted.
+              This is permanent and can't be undone. All your data, matches, messages, and profile will be deleted.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -350,7 +350,7 @@ const Settings = () => {
                   const { error } = await supabase.rpc("delete_user_data", { target_user_id: user.id });
                   if (error) throw error;
                   await signOut();
-                  toast.success("Your account has been deleted. Farewell, cosmic soul. 🌙");
+                  toast.success("Your account has been deleted. Take care out there. 🌙");
                   navigate("/auth");
                 } catch (err: any) {
                   toast.error(err.message || "Failed to delete account");

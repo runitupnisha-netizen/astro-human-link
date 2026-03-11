@@ -161,7 +161,7 @@ const Discover = () => {
                 <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
                 <Loader2 className="relative w-10 h-10 text-primary animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm font-serif">Reading the stars...</p>
+              <p className="text-muted-foreground text-sm font-serif">Finding your people...</p>
             </motion.div>
           ) : profiles.length === 0 ? (
             <motion.div

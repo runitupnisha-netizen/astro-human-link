@@ -452,7 +452,7 @@ const Messages = () => {
                           disabled={sendingIcebreaker}
                           className="text-accent hover:text-accent hover:bg-accent/10"
                         >
-                          <Wand2 className="w-4 h-4" />
+                          <Wand2 className={`w-4 h-4 ${messages.length === 0 ? 'animate-pulse' : ''}`} />
                         </Button>
                       </div>
 

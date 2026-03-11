@@ -606,7 +606,7 @@ const Profile = () => {
           <DialogHeader>
             <DialogTitle className="font-display text-xl">Update Birth Details</DialogTitle>
             <DialogDescription>
-              Changing your birth info will regenerate your entire cosmic profile — astrology, human design, gene keys, and numerology.
+              Changing your birth info will regenerate your entire profile — astrology, human design, gene keys, and numerology.
             </DialogDescription>
           </DialogHeader>
 

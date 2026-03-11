@@ -132,7 +132,7 @@ const SacredReveal = () => {
         target_user_id: revealProfile.user_id,
         action: "like",
       });
-      toast({ title: "💜 Liked your Sacred Match!" });
+      toast({ title: "💜 You liked them!" });
     } catch (e: any) {
       toast({ title: "Already swiped", variant: "destructive" });
     }
@@ -144,10 +144,10 @@ const SacredReveal = () => {
       <div className="relative z-10 pt-20 pb-12 flex flex-col items-center">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 px-6">
           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">
-            Sacred Match Reveal
+            Today's Pick
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-            One curated cosmic match revealed to you each day
+            One hand-picked match revealed to you each day
           </p>
         </motion.div>
 
@@ -176,7 +176,7 @@ const SacredReveal = () => {
         {loading ? (
           <div className="flex flex-col items-center gap-4 py-16">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-muted-foreground text-sm font-serif">Consulting the cosmos...</p>
+            <p className="text-muted-foreground text-sm font-serif">Finding someone great for you...</p>
           </div>
         ) : !revealProfile ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-6">
@@ -184,7 +184,7 @@ const SacredReveal = () => {
               <Star className="w-10 h-10 text-muted-foreground" />
             </div>
             <h3 className="font-display text-lg font-bold text-foreground mb-2">No Reveals Available</h3>
-            <p className="text-muted-foreground text-sm">Check back as more cosmic souls join the community.</p>
+            <p className="text-muted-foreground text-sm">Check back as more people join!</p>
           </motion.div>
         ) : !revealed ? (
           /* Pre-reveal — mysterious card */
@@ -231,8 +231,8 @@ const SacredReveal = () => {
                     transition={{ delay: 0.5 }}
                     className="relative z-10 mt-6 text-center"
                   >
-                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Your Sacred Match Awaits</h3>
-                    <p className="text-muted-foreground text-sm font-serif">A soul the cosmos has chosen for you today</p>
+                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Someone's Waiting for You</h3>
+                    <p className="text-muted-foreground text-sm font-serif">Your daily curated match is ready to reveal</p>
                   </motion.div>
                 </div>
 
@@ -280,7 +280,7 @@ const SacredReveal = () => {
                     transition={{ delay: 0.4 }}
                     className="font-display text-2xl font-bold text-foreground mb-1"
                   >
-                    {revealProfile.display_name || "Cosmic Soul"}
+                    {revealProfile.display_name || "Someone New"}
                   </motion.h2>
 
                   <motion.div

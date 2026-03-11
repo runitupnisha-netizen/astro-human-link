@@ -167,7 +167,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
             style={{ opacity: likeOpacity }}
           >
-            <span className="font-display text-green-400 text-xl font-black tracking-wider">SOUL YES</span>
+            <span className="font-display text-green-400 text-xl font-black tracking-wider">LIKE</span>
           </motion.div>
           <motion.div
             className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
@@ -241,7 +241,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2">
                 <h2 className="font-display text-xl font-bold text-foreground truncate">
-                  {profile.display_name || "Cosmic Soul"}
+                  {profile.display_name || "New Here"}
                 </h2>
                 {getAge(profile.birth_date) && (
                   <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
@@ -277,7 +277,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
         <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
           {/* Cosmic signature */}
           <div className="space-y-2">
-            <h3 className="section-heading">Cosmic Signature</h3>
+            <h3 className="section-heading">Their Vibe</h3>
             <div className="flex flex-wrap gap-1.5">
               {profile.sun_sign && (
                 <Badge variant="secondary" className="bg-secondary/40 text-xs">
@@ -309,7 +309,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Shared aspects */}
           {profile.shared_aspects?.length > 0 && (
             <div className="space-y-2">
-              <h3 className="section-heading">Cosmic Resonances</h3>
+              <h3 className="section-heading">Things in Common</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.shared_aspects.map((a, i) => (
                   <Badge key={i} variant="secondary" className="bg-primary/12 text-primary text-xs">{a}</Badge>
@@ -337,7 +337,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <div className="space-y-2">
-              <h3 className="section-heading">Shared Vibes</h3>
+              <h3 className="section-heading">Interests</h3>
               <div className="flex flex-wrap gap-1.5">
                 {profile.interests.slice(0, 8).map((interest, i) => (
                   <Badge key={i} variant="secondary" className="text-xs bg-secondary/30">{interest}</Badge>

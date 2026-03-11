@@ -89,7 +89,7 @@ const Connections = () => {
           created_at: m.created_at,
           otherUserId: otherId,
           otherProfile: prof || {
-            display_name: "Cosmic Soul",
+            display_name: "New Match",
             sun_sign: null,
             moon_sign: null,
             rising_sign: null,
@@ -132,11 +132,11 @@ const Connections = () => {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return "Twin Flame";
-    if (score >= 80) return "Soul Match";
-    if (score >= 70) return "Deep Resonance";
-    if (score >= 60) return "Strong Connection";
-    return "Growing Bond";
+    if (score >= 90) return "Amazing Match";
+    if (score >= 80) return "Great Match";
+    if (score >= 70) return "Strong Match";
+    if (score >= 60) return "Good Match";
+    return "New Match";
   };
 
   if (loading) {
@@ -159,12 +159,12 @@ const Connections = () => {
             className="text-center mb-10"
           >
             <h1 className="text-4xl font-bold mb-3 bg-gradient-aurora bg-clip-text text-transparent">
-              Soul Connections
+              Your Matches
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0
-                ? `${matches.length} soul${matches.length > 1 ? "s" : ""} resonating with your cosmic energy`
-                : "These are the souls who've resonated with your cosmic signature."}
+                ? `${matches.length} ${matches.length > 1 ? "people" : "person"} you've matched with`
+                : "Your matches will show up here."}
             </p>
           </motion.div>
 
@@ -179,11 +179,11 @@ const Connections = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground">No Connections Yet</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Keep swiping in Discovery to find souls that resonate with your cosmic energy!
+                Keep discovering people — when you both like each other, you'll match!
               </p>
               <Button onClick={() => navigate("/")} style={{ background: "var(--gradient-aurora)" }} className="h-11 px-6 shadow-glow">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Explore Discovery
+                Start Discovering
               </Button>
             </motion.div>
           ) : (
@@ -223,7 +223,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {match.otherProfile.display_name || "Cosmic Soul"}
+                              {match.otherProfile.display_name || "Someone New"}
                             </h3>
                             {match.compatibility_score != null && (
                               <span className={`text-sm font-bold ${getScoreColor(match.compatibility_score)}`}>

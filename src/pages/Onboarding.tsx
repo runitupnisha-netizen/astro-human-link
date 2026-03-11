@@ -514,7 +514,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Unlock Your Blueprint
+                  Let's Build Your Profile
                 </motion.h1>
                 <motion.p 
                   className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base"
@@ -522,7 +522,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Enter your birth details and AI will decode your astrology, Human Design & Gene Keys
+                  Enter your birth details so we can work out your astrology, Human Design & Gene Keys
                 </motion.p>
               </motion.div>
 
@@ -681,14 +681,14 @@ const Onboarding = () => {
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                Reading the Stars...
+                Building Your Profile...
               </motion.h2>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <p className="text-muted-foreground text-sm md:text-base">Channeling your cosmic blueprint</p>
+                <p className="text-muted-foreground text-sm md:text-base">Crunching the numbers on your chart</p>
                 <motion.div 
                   className="flex justify-center gap-1 mt-3"
                   initial={{ opacity: 0 }}

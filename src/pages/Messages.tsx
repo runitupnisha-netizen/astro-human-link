@@ -324,7 +324,7 @@ const Messages = () => {
               </div>
               <h2 className="font-display text-2xl font-bold text-foreground mb-2">No Matches Yet</h2>
               <p className="text-muted-foreground max-w-md font-serif">
-                When you and another soul both connect, you'll be able to message each other here. Keep exploring the cosmos!
+                When you and someone both like each other, you can message here. Keep discovering!
               </p>
             </motion.div>
           ) : (
@@ -335,7 +335,7 @@ const Messages = () => {
                   <div className="p-4 border-b border-border">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
-                      Soul Messages
+                      Messages
                     </h2>
                   </div>
                   <div className="overflow-y-auto flex-1">
@@ -367,7 +367,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
                               <h3 className="font-semibold text-foreground text-sm truncate">
-                                {convo.otherProfile.display_name || "Cosmic Soul"}
+                                {convo.otherProfile.display_name || "Someone"}
                               </h3>
                               {convo.lastMessage && (
                                 <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
@@ -390,7 +390,7 @@ const Messages = () => {
                                 ? convo.lastMessage.message_type === "icebreaker"
                                   ? `✨ ${convo.lastMessage.content}`
                                   : convo.lastMessage.content
-                                : "✨ Start your cosmic conversation!"}
+                                : "👋 Say hi!"}
                             </p>
                           </div>
                         </div>
@@ -430,7 +430,7 @@ const Messages = () => {
                               navigate(`/profile/${otherId}`);
                             }}
                           >
-                            {selectedConvo.otherProfile.display_name || "Cosmic Soul"}
+                            {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
                           <div className="flex items-center gap-2">
                             {selectedConvo.match.compatibility_score && (

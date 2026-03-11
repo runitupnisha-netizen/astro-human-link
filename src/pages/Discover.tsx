@@ -113,10 +113,10 @@ const Discover = () => {
           className="text-center mb-6 px-6"
         >
           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
-            Cosmic Discovery
+            Discover
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Swipe through souls aligned with your cosmic blueprint
+            People picked for you based on your profile
           </p>
         </motion.div>
 
@@ -129,7 +129,7 @@ const Discover = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="w-4 h-4 mr-2" />
-            Sacred Filters
+            Filters
             {activeFilters && Object.values(activeFilters).flat().length > 0 && (
               <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
                 {Object.values(activeFilters).flat().length}
@@ -161,7 +161,7 @@ const Discover = () => {
                 <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
                 <Loader2 className="relative w-10 h-10 text-primary animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm font-serif">Reading the stars...</p>
+              <p className="text-muted-foreground text-sm font-serif">Finding your people...</p>
             </motion.div>
           ) : profiles.length === 0 ? (
             <motion.div
@@ -208,12 +208,12 @@ const Discover = () => {
 
               <div className="space-y-2">
                 <h3 className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-                  {swipeCount > 0 ? "You've Explored Every Soul" : "The Stars Are Gathering"}
+                  {swipeCount > 0 ? "You've Seen Everyone!" : "More People Coming Soon"}
                 </h3>
                 <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
                   {swipeCount > 0
-                    ? "You've seen everyone available. New cosmic souls join daily — check back soon for fresh connections."
-                    : "Your cosmic blueprint is ready and waiting. As kindred spirits join, AI-curated matches will appear right here."}
+                    ? "You've been through everyone for now. New people join daily — check back soon!"
+                    : "Your profile is all set. As more people join, curated matches will show up right here."}
                 </p>
               </div>
 
@@ -227,9 +227,9 @@ const Discover = () => {
                 <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">While you wait</p>
                 <div className="space-y-2.5">
                   {[
-                    { icon: "✨", text: "Complete your profile to attract better matches", action: () => navigate("/profile") },
-                    { icon: "🔮", text: "Read your weekly cosmic insights", action: () => navigate("/insights") },
-                    { icon: "💫", text: "Share an intention in the Alignment Feed", action: () => navigate("/feed") },
+                    { icon: "✨", text: "Finish your profile to get better matches", action: () => navigate("/profile") },
+                    { icon: "📖", text: "Check out your weekly insights", action: () => navigate("/insights") },
+                    { icon: "💬", text: "Post something in the community feed", action: () => navigate("/feed") },
                   ].map((tip, i) => (
                     <motion.button
                       key={i}
@@ -285,7 +285,7 @@ const Discover = () => {
             className="flex flex-col items-center gap-2 mt-4"
           >
             <p className="text-muted-foreground text-xs">
-              {profiles.length} soul{profiles.length !== 1 ? "s" : ""} in your queue
+              {profiles.length} {profiles.length !== 1 ? "people" : "person"} in your queue
             </p>
             <p className="text-muted-foreground/50 text-[10px]">
               Swipe up for ⭐ Super Like

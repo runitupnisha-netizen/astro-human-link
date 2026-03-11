@@ -28,7 +28,7 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Welcome back, cosmic soul ✨");
+        toast.success("Welcome back! ✌️");
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
@@ -73,10 +73,10 @@ const Auth = () => {
             <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-            {isLogin ? "Welcome Back" : "Begin Your Journey"}
+            {isLogin ? "Welcome Back" : "Let's Get Started"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin ? "Your cosmic connections await" : "Discover your soul's blueprint"}
+            {isLogin ? "Good to see you again ✌️" : "Create your profile and start meeting people"}
           </p>
         </motion.div>
 
@@ -159,7 +159,7 @@ const Auth = () => {
               <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
             ) : (
               <>
-                {isLogin ? "Enter the Cosmos" : "Create Your Blueprint"}
+                {isLogin ? "Sign In" : "Create Account"}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </>
             )}
@@ -171,7 +171,7 @@ const Auth = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-primary hover:text-primary/80 transition-colors"
             >
-              {isLogin ? "New soul? Create an account" : "Already have an account? Sign in"}
+              {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
             </button>
           </div>
         </motion.form>

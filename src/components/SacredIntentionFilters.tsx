@@ -17,11 +17,11 @@ interface SacredIntentionFiltersProps {
 }
 
 const RELATIONSHIP_GOALS = [
-  { value: "soul_mate", label: "Soul Mate", icon: Heart },
-  { value: "twin_flame", label: "Twin Flame", icon: Flame },
+  { value: "soul_mate", label: "The One", icon: Heart },
+  { value: "twin_flame", label: "Deep Connection", icon: Flame },
   { value: "life_partner", label: "Life Partner", icon: Sparkles },
-  { value: "spiritual_friend", label: "Spiritual Friend", icon: Leaf },
-  { value: "sacred_union", label: "Sacred Union", icon: Sparkles },
+  { value: "spiritual_friend", label: "Good Vibes", icon: Leaf },
+  { value: "sacred_union", label: "Something Real", icon: Sparkles },
 ];
 
 const SPIRITUAL_LEVELS = [
@@ -73,7 +73,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
           <Filter className="w-5 h-5 text-primary" />
-          Sacred Intention Filters
+          What Are You Looking For?
         </h3>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-5 h-5" />
@@ -103,7 +103,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
       {/* Spiritual Practice Level */}
       <div>
-        <h4 className="section-heading mb-2">Spiritual Practice Level</h4>
+        <h4 className="section-heading mb-2">How Into This Are They?</h4>
         <div className="flex flex-wrap gap-1.5">
           {SPIRITUAL_LEVELS.map(level => (
             <button
@@ -123,7 +123,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
       {/* Element Preference */}
       <div>
-        <h4 className="section-heading mb-2">Element Affinity</h4>
+        <h4 className="section-heading mb-2">Element Preference</h4>
         <div className="flex gap-2">
           {ELEMENTS.map(el => (
             <button

@@ -43,7 +43,7 @@ const HeroSection = () => {
           {...fadeUp(0.4)}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-serif"
         >
-          Where ancient wisdom meets modern love. Connect with someone who truly sees the real you—through the language of the stars and the blueprint of your soul.
+          Dating that actually gets you. We use astrology, Human Design & Gene Keys to help you find someone who vibes with the real you.
         </motion.p>
 
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
@@ -52,7 +52,7 @@ const HeroSection = () => {
             className="bg-primary hover:bg-primary/90 shadow-glow px-8 py-5 text-base font-medium rounded-2xl"
           >
             <Heart className="w-5 h-5 mr-2" />
-            Start Your Soul Search
+            Get Started
           </Button>
           
           <Button 
@@ -61,7 +61,7 @@ const HeroSection = () => {
             className="border-accent/30 hover:bg-accent/10 px-8 py-5 text-base rounded-2xl"
           >
             <Star className="w-5 h-5 mr-2" />
-            Reveal Your Blueprint
+            See Your Profile
           </Button>
         </motion.div>
 
@@ -69,20 +69,20 @@ const HeroSection = () => {
           {[
             {
               icon: Star,
-              title: "Sacred Timing",
-              desc: "Houses, aspects, and planetary placements reveal your deepest compatibility",
+              title: "More Than a Zodiac Sign",
+              desc: "We look at your full chart — houses, aspects, and placements — to find real compatibility",
               delay: 0.8,
             },
             {
               icon: Heart,
-              title: "Gene Keys Wisdom",
-              desc: "Your shadow, gift, and genius pathways guide authentic connections",
+              title: "Personality First",
+              desc: "Prompts, interests, and your unique blueprint make every profile worth reading",
               delay: 0.95,
             },
             {
               icon: Heart,
-              title: "Beyond Surface",
-              desc: "Real connection that honors your authentic self and growth journey",
+              title: "Intentional Dating",
+              desc: "Less mindless swiping, more meaningful connections with people who get you",
               delay: 1.1,
             },
           ].map(({ icon: Icon, title, desc, delay }) => (

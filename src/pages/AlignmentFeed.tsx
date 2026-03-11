@@ -139,10 +139,10 @@ const AlignmentFeed = () => {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
-              Alignment Feed
+              Community
             </h1>
             <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-              Share spiritual reflections, growth experiences, and intentions with the community
+              Share what's on your mind — thoughts, wins, good vibes
             </p>
           </motion.div>
 
@@ -151,7 +151,7 @@ const AlignmentFeed = () => {
             <Card className="glass-card mb-6">
               <CardContent className="p-5">
                 <Textarea
-                  placeholder="Share a reflection, insight, or intention..."
+                  placeholder="What's on your mind?"
                   value={newContent}
                   onChange={e => setNewContent(e.target.value)}
                   className="bg-background/30 border-border/30 min-h-[80px] resize-none mb-3 font-serif"
@@ -222,7 +222,7 @@ const AlignmentFeed = () => {
                 <BookOpen className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="font-display text-lg font-bold text-foreground mb-2">No Posts Yet</h3>
-              <p className="text-muted-foreground text-sm">Be the first to share a spiritual reflection!</p>
+              <p className="text-muted-foreground text-sm">Be the first to share something!</p>
             </motion.div>
           ) : (
             <AnimatePresence>
@@ -248,7 +248,7 @@ const AlignmentFeed = () => {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-foreground text-sm">{post.profile?.display_name || "Cosmic Soul"}</span>
+                                <span className="font-medium text-foreground text-sm">{post.profile?.display_name || "Someone"}</span>
                                 {post.profile?.sun_sign && (
                                   <span className="text-xs text-muted-foreground">☉ {post.profile.sun_sign}</span>
                                 )}

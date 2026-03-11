@@ -103,7 +103,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
       {/* Spiritual Practice Level */}
       <div>
-        <h4 className="section-heading mb-2">Spiritual Practice Level</h4>
+        <h4 className="section-heading mb-2">How Into This Are They?</h4>
         <div className="flex flex-wrap gap-1.5">
           {SPIRITUAL_LEVELS.map(level => (
             <button

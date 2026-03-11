@@ -215,7 +215,7 @@ const Settings = () => {
                         ? "Enabled — you'll receive daily cosmic intentions"
                         : permission === "denied"
                         ? "Blocked — update in browser settings"
-                        : "Get daily intentions even when the app is closed"}
+                        : "Get daily insights even when the app is closed"}
                     </p>
                   </div>
                   {isSupported && permission !== "granted" && (

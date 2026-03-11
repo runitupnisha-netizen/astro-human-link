@@ -241,7 +241,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2">
                 <h2 className="font-display text-xl font-bold text-foreground truncate">
-                  {profile.display_name || "Cosmic Soul"}
+                  {profile.display_name || "New Here"}
                 </h2>
                 {getAge(profile.birth_date) && (
                   <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>

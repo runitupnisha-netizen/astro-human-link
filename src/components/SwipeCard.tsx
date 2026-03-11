@@ -167,7 +167,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
             style={{ opacity: likeOpacity }}
           >
-            <span className="font-display text-green-400 text-xl font-black tracking-wider">LIKE</span>
+            <span className="font-display text-green-400 text-xl font-black tracking-wider">YES</span>
           </motion.div>
           <motion.div
             className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"

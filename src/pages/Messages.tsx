@@ -471,10 +471,10 @@ const Messages = () => {
                               </div>
                             </div>
                             <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                              The Stars Have Aligned!
+                              You matched! 🎉
                             </h3>
                             <p className="text-muted-foreground text-sm mb-5 max-w-xs mx-auto font-serif">
-                              You and {selectedConvo.otherProfile.display_name || "your match"} share a cosmic connection. Break the ice!
+                              Don't be shy — {selectedConvo.otherProfile.display_name || "your match"} is waiting to hear from you.
                             </p>
                             <Button
                               onClick={handleGenerateIcebreakers}
@@ -482,7 +482,7 @@ const Messages = () => {
                               style={{ background: "var(--gradient-aurora)" }}
                             >
                               <Wand2 className="w-4 h-4" />
-                              Generate Cosmic Icebreakers
+                              Get Conversation Starters
                             </Button>
                           </motion.div>
                         )}

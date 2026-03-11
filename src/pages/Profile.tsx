@@ -485,7 +485,7 @@ const Profile = () => {
                             value: profile.birthday_number,
                             color: "primary",
                             desc: "Innate Gift",
-                            detail: "A special talent you were born with — your natural edge in relationships and life. This gift supports your Life Path.",
+                            detail: "A natural talent you were born with — your built-in edge in relationships and life.",
                           },
                           {
                             label: "Personal Year",

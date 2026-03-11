@@ -17,11 +17,11 @@ interface SacredIntentionFiltersProps {
 }
 
 const RELATIONSHIP_GOALS = [
-  { value: "soul_mate", label: "Soul Mate", icon: Heart },
-  { value: "twin_flame", label: "Twin Flame", icon: Flame },
+  { value: "soul_mate", label: "The One", icon: Heart },
+  { value: "twin_flame", label: "Deep Connection", icon: Flame },
   { value: "life_partner", label: "Life Partner", icon: Sparkles },
-  { value: "spiritual_friend", label: "Spiritual Friend", icon: Leaf },
-  { value: "sacred_union", label: "Sacred Union", icon: Sparkles },
+  { value: "spiritual_friend", label: "Good Vibes", icon: Leaf },
+  { value: "sacred_union", label: "Something Real", icon: Sparkles },
 ];
 
 const SPIRITUAL_LEVELS = [

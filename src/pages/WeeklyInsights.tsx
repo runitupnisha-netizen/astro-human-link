@@ -146,7 +146,7 @@ const WeeklyInsights = () => {
               Weekly Alignment
             </h1>
             <p className="text-muted-foreground text-sm font-serif">
-              {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              Your cosmic cheat sheet for {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </motion.div>
 
@@ -160,8 +160,8 @@ const WeeklyInsights = () => {
               >
                 <Sparkles className="w-16 h-16 text-primary" />
               </motion.div>
-              <p className="text-foreground font-display text-lg mb-2">Putting together your weekly read…</p>
-              <p className="text-muted-foreground text-sm font-serif">This takes just a moment</p>
+              <p className="text-foreground font-display text-lg mb-2">Reading the stars for you…</p>
+              <p className="text-muted-foreground text-sm font-serif">Hang tight, this only takes a moment ✨</p>
             </motion.div>
           )}
 
@@ -209,7 +209,7 @@ const WeeklyInsights = () => {
                   <CardContent className="p-5">
                     <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
                       <Calendar className="w-5 h-5 text-primary" />
-                      Daily Energy Forecast
+                      Your Week at a Glance
                     </h3>
                     <div className="flex gap-2 justify-between mb-4">
                       {dailyEnergiesWithDates.map((day, i) => (
@@ -264,7 +264,7 @@ const WeeklyInsights = () => {
                   <CardContent className="p-5">
                     <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
                       <Star className="w-5 h-5 text-accent" />
-                      Planetary Transits
+                      What the Planets Are Up To
                     </h3>
                     <div className="space-y-4">
                       {aiInsights.transits.map((transit, i) => (
@@ -309,7 +309,7 @@ const WeeklyInsights = () => {
                   <CardContent className="p-5">
                     <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2 mb-4">
                       <TrendingUp className="w-5 h-5 text-green-400" />
-                      Personal Growth Focus
+                      Your Growth This Week
                     </h3>
                     <div className="space-y-3">
                       {aiInsights.growth_focus.map((focus, i) => (

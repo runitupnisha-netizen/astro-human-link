@@ -508,7 +508,7 @@ const Compatibility = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.shadow_alchemy}</p>
                   </div>
                   <div>
-                    <h4 className="text-xs font-semibold text-primary mb-1">Gift Amplification</h4>
+                    <h4 className="text-xs font-semibold text-primary mb-1">How You Level Each Other Up</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{gene_keys.gift_amplification}</p>
                   </div>
                 </div>

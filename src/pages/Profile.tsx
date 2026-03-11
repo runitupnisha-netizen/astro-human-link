@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
 import BioPrompts from "@/components/BioPrompts";
+import ProfileChecklist from "@/components/ProfileChecklist";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -98,6 +99,7 @@ const Profile = () => {
   const [editBirthPlace, setEditBirthPlace] = useState("");
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [photoCount, setPhotoCount] = useState(0);
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");
@@ -168,6 +170,13 @@ const Profile = () => {
         setProfile(data);
         setLoading(false);
       });
+    supabase
+      .from("profile_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        setPhotoCount(count ?? 0);
+      });
   }, [user]);
 
   if (loading) {
@@ -193,21 +202,7 @@ const Profile = () => {
       
       <div className="relative z-10 pt-20 pb-12">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Welcome tip for first-time / incomplete profiles */}
-          {(!profile.sun_sign && !profile.moon_sign && !profile.rising_sign) && (
-            <Card className="mb-6 bg-accent/10 backdrop-blur-sm border-accent/30">
-              <CardContent className="p-5 flex items-start gap-3">
-                <Sparkles className="w-5 h-5 text-accent mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-foreground font-medium">Welcome to your profile! 👋</p>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Add your birth details to unlock your star chart, energy profile, and personalized compatibility insights. The more you share, the better your matches.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          {/* Profile Header */}
+          <ProfileChecklist profile={profile} photoCount={photoCount} />
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col items-center md:flex-row md:items-center gap-6">

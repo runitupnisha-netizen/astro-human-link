@@ -170,6 +170,13 @@ const Profile = () => {
         setProfile(data);
         setLoading(false);
       });
+    supabase
+      .from("profile_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        setPhotoCount(count ?? 0);
+      });
   }, [user]);
 
   if (loading) {

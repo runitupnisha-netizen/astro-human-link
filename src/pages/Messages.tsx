@@ -471,10 +471,10 @@ const Messages = () => {
                               </div>
                             </div>
                             <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                              The Stars Have Aligned!
+                              You matched! 🎉
                             </h3>
                             <p className="text-muted-foreground text-sm mb-5 max-w-xs mx-auto font-serif">
-                              You and {selectedConvo.otherProfile.display_name || "your match"} share a cosmic connection. Break the ice!
+                              Don't be shy — {selectedConvo.otherProfile.display_name || "your match"} is waiting to hear from you.
                             </p>
                             <Button
                               onClick={handleGenerateIcebreakers}
@@ -482,7 +482,7 @@ const Messages = () => {
                               style={{ background: "var(--gradient-aurora)" }}
                             >
                               <Wand2 className="w-4 h-4" />
-                              Generate Cosmic Icebreakers
+                              Get Conversation Starters
                             </Button>
                           </motion.div>
                         )}
@@ -494,7 +494,7 @@ const Messages = () => {
                             className="text-center py-8"
                           >
                             <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                            <p className="text-sm text-muted-foreground font-serif">Channeling the cosmos...</p>
+                            <p className="text-sm text-muted-foreground font-serif">Cooking up something good...</p>
                           </motion.div>
                         )}
 
@@ -556,7 +556,7 @@ const Messages = () => {
                             className="px-4 pb-2 space-y-2"
                           >
                             <span className="text-[10px] text-accent font-semibold uppercase tracking-wider">
-                              ✨ Tap an icebreaker to send:
+                              ✨ Tap one to send — light, deep, or somewhere in between:
                             </span>
                             {icebreakers.map((ib, i) => (
                               <motion.button
@@ -578,7 +578,7 @@ const Messages = () => {
                       <div className="p-4 border-t border-border">
                         <div className="flex gap-2">
                           <Input
-                            placeholder="Share your cosmic thoughts..."
+                            placeholder="Say something..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}

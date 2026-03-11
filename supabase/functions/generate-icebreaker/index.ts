@@ -101,8 +101,15 @@ Generate exactly 5 icebreakers that Person A can send to Person B.`,
                 properties: {
                   icebreakers: {
                     type: "array",
-                    items: { type: "string" },
-                    description: "Exactly 5 icebreaker messages",
+                    items: {
+                      type: "object",
+                      properties: {
+                        category: { type: "string", enum: ["🎉 Light & Fun", "💬 Casual & Flirty", "🔮 Curious & Cosmic", "🌊 Deep & Meaningful", "🔥 Bold"] },
+                        text: { type: "string" },
+                      },
+                      required: ["category", "text"],
+                    },
+                    description: "Exactly 5 icebreaker messages with their category labels",
                   },
                 },
                 required: ["icebreakers"],

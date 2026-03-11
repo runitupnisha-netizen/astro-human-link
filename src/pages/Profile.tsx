@@ -492,7 +492,7 @@ const Profile = () => {
                             value: profile.personal_year_number,
                             color: "accent",
                             desc: "Current Cycle",
-                            detail: "The energy theme of your current year cycle (1–9). It reveals what to focus on right now for growth and alignment.",
+                            detail: "The energy of your current year (1–9). It tells you what to focus on right now.",
                           },
                         ].map((item) => (
                           <div key={item.label} className="text-center bg-muted/30 rounded-xl p-4 border border-border/40">

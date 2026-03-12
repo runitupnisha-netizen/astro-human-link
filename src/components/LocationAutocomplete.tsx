@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { MapPin, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Loader2, Navigation } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface LocationResult {
@@ -15,12 +17,15 @@ interface LocationAutocompleteProps {
   placeholder?: string;
   className?: string;
   id?: string;
+  showGpsButton?: boolean;
 }
 
-const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a city…", className, id }: LocationAutocompleteProps) => {
+const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a city…", className, id, showGpsButton = true }: LocationAutocompleteProps) => {
+  const { toast } = useToast();
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<LocationResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +69,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
   };
 
   const handleSelect = (result: LocationResult) => {
-    // Clean up display name - take first 2-3 meaningful parts
     const parts = result.display_name.split(", ");
     const clean = parts.slice(0, Math.min(3, parts.length)).join(", ");
     setQuery(clean);
@@ -72,26 +76,84 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
     setOpen(false);
   };
 
+  const handleGps = () => {
+    if (!navigator.geolocation) {
+      toast({ title: "GPS unavailable", description: "Your browser doesn't support geolocation.", variant: "destructive" });
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+          );
+          const data = await res.json();
+          const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "";
+          const state = data.address?.state || "";
+          const country = data.address?.country || "";
+          const label = [city, state, country].filter(Boolean).slice(0, 3).join(", ");
+          setQuery(label);
+          onChange(label, latitude, longitude);
+          toast({ title: "Location detected ✨", description: label });
+        } catch {
+          toast({ title: "Lookup failed", description: "Couldn't resolve your location.", variant: "destructive" });
+        } finally {
+          setGpsLoading(false);
+        }
+      },
+      (err) => {
+        setGpsLoading(false);
+        toast({
+          title: "Location denied",
+          description: err.code === 1 ? "Please allow location access in your browser settings." : "Couldn't get your location.",
+          variant: "destructive",
+        });
+      },
+      { enableHighAccuracy: false, timeout: 10000 }
+    );
+  };
+
   return (
     <div ref={containerRef} className="relative">
-      <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          id={id}
-          type="text"
-          placeholder={placeholder}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            onChange(e.target.value);
-            search(e.target.value);
-          }}
-          onFocus={() => results.length > 0 && setOpen(true)}
-          className={cn("pl-9 bg-muted/50 border-border", className)}
-          autoComplete="off"
-        />
-        {loading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            id={id}
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              onChange(e.target.value);
+              search(e.target.value);
+            }}
+            onFocus={() => results.length > 0 && setOpen(true)}
+            className={cn("pl-9 bg-muted/50 border-border", className)}
+            autoComplete="off"
+          />
+          {loading && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+          )}
+        </div>
+        {showGpsButton && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleGps}
+            disabled={gpsLoading}
+            className="shrink-0 border-border hover:bg-primary/10 hover:border-primary/30"
+            title="Use my current location"
+          >
+            {gpsLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Navigation className="w-4 h-4 text-primary" />
+            )}
+          </Button>
         )}
       </div>
 

@@ -20,10 +20,12 @@ interface LocationAutocompleteProps {
   showGpsButton?: boolean;
 }
 
-const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a city…", className, id }: LocationAutocompleteProps) => {
+const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a city…", className, id, showGpsButton = true }: LocationAutocompleteProps) => {
+  const { toast } = useToast();
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<LocationResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);

@@ -8,6 +8,20 @@ const corsHeaders = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// HAVERSINE DISTANCE (km)
+// ═══════════════════════════════════════════════════════════════
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ═══════════════════════════════════════════════════════════════
 // DETERMINISTIC SCIENCE — Same as analyze-compatibility
 // ═══════════════════════════════════════════════════════════════
 
@@ -235,6 +249,15 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
+    let bodyParams: any = {};
+    try {
+      bodyParams = await req.json();
+    } catch {
+      // No body is fine
+    }
+
+    const maxDistanceKm = bodyParams?.max_distance_km || 0;
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -268,7 +291,7 @@ serve(async (req) => {
       .select("*")
       .eq("onboarding_complete", true)
       .not("user_id", "in", `(${swipedIds.join(",")})`)
-      .limit(20);
+      .limit(50);
 
     if (candErr) {
       console.error("Candidate fetch error:", candErr);
@@ -281,8 +304,27 @@ serve(async (req) => {
       });
     }
 
+    // ── Distance filtering ──
+    const myLat = myProfile.current_latitude;
+    const myLon = myProfile.current_longitude;
+
+    let filteredCandidates = candidates;
+    if (maxDistanceKm > 0 && myLat && myLon) {
+      filteredCandidates = candidates.filter((c: any) => {
+        if (!c.current_latitude || !c.current_longitude) return false;
+        const dist = haversineKm(myLat, myLon, c.current_latitude, c.current_longitude);
+        return dist <= maxDistanceKm;
+      });
+    }
+
+    if (filteredCandidates.length === 0) {
+      return new Response(JSON.stringify({ profiles: [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Fetch gallery photos for all candidates
-    const candidateUserIds = candidates.map((c: any) => c.user_id);
+    const candidateUserIds = filteredCandidates.map((c: any) => c.user_id);
     const { data: allPhotos } = await supabase
       .from("profile_photos")
       .select("user_id, photo_url, display_order")
@@ -296,9 +338,12 @@ serve(async (req) => {
     }
 
     // ── Pre-compute deterministic compatibility scores ──
-    const scoredCandidates = candidates.map((candidate: any) => {
+    const scoredCandidates = filteredCandidates.map((candidate: any) => {
       const scores = computeCompatibility(myProfile, candidate);
-      return { candidate, scores, type: connectionType(scores.overall) };
+      const dist = (myLat && myLon && candidate.current_latitude && candidate.current_longitude)
+        ? Math.round(haversineKm(myLat, myLon, candidate.current_latitude, candidate.current_longitude))
+        : null;
+      return { candidate, scores, type: connectionType(scores.overall), distance_km: dist };
     }).sort((a, b) => b.scores.overall - a.scores.overall);
 
     console.log(`Scored ${scoredCandidates.length} candidates. Top: ${scoredCandidates[0]?.scores.overall} (${scoredCandidates[0]?.scores.breakdown})`);
@@ -418,6 +463,8 @@ serve(async (req) => {
         shared_aspects: aiDesc?.shared_aspects || [],
         birth_date: c.birth_date,
         birth_place: c.birth_place,
+        current_city: c.current_city,
+        distance_km: sc.distance_km,
         bio_prompt_1: c.bio_prompt_1,
         bio_prompt_1_answer: c.bio_prompt_1_answer,
         photo_urls: photosByUser.get(c.user_id) || [],

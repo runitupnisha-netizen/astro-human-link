@@ -233,6 +233,11 @@ const Onboarding = () => {
   const [gender, setGender] = useState<string>("");
   const [preferredGenders, setPreferredGenders] = useState<string[]>([]);
 
+  // Current location
+  const [currentCity, setCurrentCity] = useState("");
+  const [currentLatitude, setCurrentLatitude] = useState<number | undefined>();
+  const [currentLongitude, setCurrentLongitude] = useState<number | undefined>();
+
   // Lifestyle
   const [kidsPreference, setKidsPreference] = useState<string>("");
   const [drinking, setDrinking] = useState<string>("");
@@ -385,6 +390,9 @@ const Onboarding = () => {
           smoking: smoking || null,
           substances: substances || null,
           interests: selectedInterests.length > 0 ? selectedInterests : null,
+          current_city: currentCity || null,
+          current_latitude: currentLatitude || null,
+          current_longitude: currentLongitude || null,
           onboarding_complete: true,
         })
         .eq("user_id", session.user.id);
@@ -962,8 +970,28 @@ const Onboarding = () => {
                 </div>
               </motion.div>
 
+              {/* Current Location */}
+              <motion.div {...staggerCard(0.15)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <MapPin className="w-5 h-5 text-accent" />
+                  <h3 className="text-lg font-semibold text-foreground">Where do you live?</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  This helps us find people near you. Your birth place is used for cosmic calculations — this is your current city.
+                </p>
+                <LocationAutocomplete
+                  value={currentCity}
+                  onChange={(val, lat, lon) => {
+                    setCurrentCity(val);
+                    if (lat !== undefined) setCurrentLatitude(lat);
+                    if (lon !== undefined) setCurrentLongitude(lon);
+                  }}
+                  placeholder="Search your current city…"
+                />
+              </motion.div>
+
               {/* Dating Preferences */}
-              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.25)} className="glass-card glow-border p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Heart className="w-5 h-5 text-primary" />
                   <h3 className="text-lg font-semibold text-foreground">I'm interested in...</h3>

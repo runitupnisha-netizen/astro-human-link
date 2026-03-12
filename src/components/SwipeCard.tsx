@@ -22,6 +22,8 @@ export interface DiscoverProfile {
   shared_aspects: string[];
   birth_date: string | null;
   birth_place: string | null;
+  current_city?: string | null;
+  distance_km?: number | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
   photo_urls?: string[];
@@ -248,9 +250,12 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
                 )}
               </div>
               <div className="flex items-center gap-2 mt-0.5">
-                {getCity(profile.birth_place) && (
+                {(profile.current_city || getCity(profile.birth_place)) && (
                   <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                    <MapPin className="w-3 h-3" /> {getCity(profile.birth_place)}
+                    <MapPin className="w-3 h-3" /> {profile.current_city || getCity(profile.birth_place)}
+                    {profile.distance_km != null && (
+                      <span className="text-muted-foreground/70 ml-0.5">· {profile.distance_km} km</span>
+                    )}
                   </span>
                 )}
                 <span className="text-xs text-accent font-semibold tracking-wide">{profile.connection_type}</span>

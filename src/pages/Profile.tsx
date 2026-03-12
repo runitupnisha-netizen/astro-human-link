@@ -223,7 +223,13 @@ const Profile = () => {
                   </div>
                   
                   <div className="flex items-center justify-center md:justify-start gap-4 text-muted-foreground mb-4">
-                    {profile.birth_place && (
+                    {profile.current_city && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4 text-accent" />
+                        <span>{profile.current_city}</span>
+                      </div>
+                    )}
+                    {!profile.current_city && profile.birth_place && (
                       <div className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
                         <span>{profile.birth_place}</span>
@@ -283,6 +289,34 @@ const Profile = () => {
                 About You
               </h2>
               <BioPrompts userId={user!.id} editable={true} />
+            </CardContent>
+          </Card>
+
+          {/* Current Location */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-accent" />
+                Current Location
+              </h2>
+              <p className="text-sm text-muted-foreground mb-3">Where you live now — helps find people near you.</p>
+              <LocationAutocomplete
+                value={profile.current_city || ""}
+                onChange={async (val, lat, lon) => {
+                  if (lat && lon) {
+                    const { error } = await supabase.from("profiles").update({
+                      current_city: val,
+                      current_latitude: lat,
+                      current_longitude: lon,
+                    }).eq("user_id", user!.id);
+                    if (!error) {
+                      setProfile({ ...profile, current_city: val, current_latitude: lat, current_longitude: lon });
+                      toast({ title: "Location updated ✨" });
+                    }
+                  }
+                }}
+                placeholder="Search your current city…"
+              />
             </CardContent>
           </Card>
 

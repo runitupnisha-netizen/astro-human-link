@@ -2,13 +2,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Filter, X, Heart, Sparkles, Flame, Leaf, Mountain, Droplets, Wind, Zap } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Filter, X, Heart, Sparkles, Flame, Leaf, Mountain, Droplets, Wind, Zap, MapPin } from "lucide-react";
 
 interface FilterState {
   relationship_goals: string[];
   spiritual_levels: string[];
   elements: string[];
   hd_types: string[];
+  max_distance_km: number;
 }
 
 interface SacredIntentionFiltersProps {
@@ -46,22 +48,39 @@ const HD_TYPES = [
   { value: "Reflector", label: "Reflector" },
 ];
 
+const DISTANCE_LABELS: Record<number, string> = {
+  25: "25 km",
+  50: "50 km",
+  100: "100 km",
+  250: "250 km",
+  500: "500 km",
+  0: "Anywhere",
+};
+
 const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProps) => {
   const [filters, setFilters] = useState<FilterState>({
     relationship_goals: [],
     spiritual_levels: [],
     elements: [],
     hd_types: [],
+    max_distance_km: 0,
   });
 
-  const toggle = (key: keyof FilterState, value: string) => {
+  const toggle = (key: keyof Omit<FilterState, 'max_distance_km'>, value: string) => {
     setFilters(prev => ({
       ...prev,
       [key]: prev[key].includes(value) ? prev[key].filter(v => v !== value) : [...prev[key], value],
     }));
   };
 
-  const activeCount = Object.values(filters).flat().length;
+  const distanceSteps = [0, 25, 50, 100, 250, 500];
+  const distanceIndex = distanceSteps.indexOf(filters.max_distance_km);
+  const currentDistanceLabel = filters.max_distance_km === 0 ? "Anywhere" : `${filters.max_distance_km} km`;
+
+  const activeCount = Object.entries(filters).reduce((acc, [key, val]) => {
+    if (key === 'max_distance_km') return acc + (val !== 0 ? 1 : 0);
+    return acc + (val as string[]).length;
+  }, 0);
 
   return (
     <motion.div
@@ -78,6 +97,28 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-5 h-5" />
         </button>
+      </div>
+
+      {/* Distance */}
+      <div>
+        <h4 className="section-heading mb-2 flex items-center gap-1.5">
+          <MapPin className="w-3.5 h-3.5" />
+          Distance
+        </h4>
+        <div className="px-1">
+          <Slider
+            value={[distanceIndex >= 0 ? distanceIndex : 0]}
+            onValueChange={([idx]) => setFilters(prev => ({ ...prev, max_distance_km: distanceSteps[idx] }))}
+            max={distanceSteps.length - 1}
+            step={1}
+            className="mb-2"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>Anywhere</span>
+            <span className="text-foreground font-medium text-xs">{currentDistanceLabel}</span>
+            <span>500 km</span>
+          </div>
+        </div>
       </div>
 
       {/* Relationship Goals */}
@@ -167,7 +208,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
           variant="outline"
           size="sm"
           className="flex-1 border-border/30"
-          onClick={() => setFilters({ relationship_goals: [], spiritual_levels: [], elements: [], hd_types: [] })}
+          onClick={() => setFilters({ relationship_goals: [], spiritual_levels: [], elements: [], hd_types: [], max_distance_km: 0 })}
         >
           Clear All
         </Button>

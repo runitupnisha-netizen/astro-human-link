@@ -87,7 +87,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
         try {
           const { latitude, longitude } = pos.coords;
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
           );
           const data = await res.json();
           const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "";
@@ -119,23 +119,41 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
     <div ref={containerRef} className="relative">
       <div className="flex gap-2">
         <div className="relative flex-1">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          id={id}
-          type="text"
-          placeholder={placeholder}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            onChange(e.target.value);
-            search(e.target.value);
-          }}
-          onFocus={() => results.length > 0 && setOpen(true)}
-          className={cn("pl-9 bg-muted/50 border-border", className)}
-          autoComplete="off"
-        />
-        {loading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            id={id}
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              onChange(e.target.value);
+              search(e.target.value);
+            }}
+            onFocus={() => results.length > 0 && setOpen(true)}
+            className={cn("pl-9 bg-muted/50 border-border", className)}
+            autoComplete="off"
+          />
+          {loading && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
+          )}
+        </div>
+        {showGpsButton && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleGps}
+            disabled={gpsLoading}
+            className="shrink-0 border-border hover:bg-primary/10 hover:border-primary/30"
+            title="Use my current location"
+          >
+            {gpsLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            ) : (
+              <Navigation className="w-4 h-4 text-primary" />
+            )}
+          </Button>
         )}
       </div>
 

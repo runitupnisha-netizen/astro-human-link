@@ -22,6 +22,8 @@ export interface DiscoverProfile {
   shared_aspects: string[];
   birth_date: string | null;
   birth_place: string | null;
+  current_city?: string | null;
+  distance_km?: number | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
   photo_urls?: string[];

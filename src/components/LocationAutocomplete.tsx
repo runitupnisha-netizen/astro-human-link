@@ -17,6 +17,7 @@ interface LocationAutocompleteProps {
   placeholder?: string;
   className?: string;
   id?: string;
+  showGpsButton?: boolean;
 }
 
 const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a city…", className, id }: LocationAutocompleteProps) => {

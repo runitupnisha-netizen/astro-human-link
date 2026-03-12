@@ -233,6 +233,11 @@ const Onboarding = () => {
   const [gender, setGender] = useState<string>("");
   const [preferredGenders, setPreferredGenders] = useState<string[]>([]);
 
+  // Current location
+  const [currentCity, setCurrentCity] = useState("");
+  const [currentLatitude, setCurrentLatitude] = useState<number | undefined>();
+  const [currentLongitude, setCurrentLongitude] = useState<number | undefined>();
+
   // Lifestyle
   const [kidsPreference, setKidsPreference] = useState<string>("");
   const [drinking, setDrinking] = useState<string>("");

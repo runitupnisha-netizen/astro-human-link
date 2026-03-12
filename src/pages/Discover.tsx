@@ -44,7 +44,7 @@ const Discover = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, activeFilters]);
 
   useEffect(() => {
     fetchProfiles();

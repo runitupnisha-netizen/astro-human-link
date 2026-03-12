@@ -390,6 +390,9 @@ const Onboarding = () => {
           smoking: smoking || null,
           substances: substances || null,
           interests: selectedInterests.length > 0 ? selectedInterests : null,
+          current_city: currentCity || null,
+          current_latitude: currentLatitude || null,
+          current_longitude: currentLongitude || null,
           onboarding_complete: true,
         })
         .eq("user_id", session.user.id);

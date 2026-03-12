@@ -255,6 +255,9 @@ export type Database = {
           birthday_number: number | null
           compatibility_tags: string[] | null
           created_at: string
+          current_city: string | null
+          current_latitude: number | null
+          current_longitude: number | null
           display_name: string | null
           drinking: string | null
           gender: string | null
@@ -272,6 +275,7 @@ export type Database = {
           interests: string[] | null
           kids_preference: string | null
           life_path_number: number | null
+          max_distance_km: number | null
           moon_sign: string | null
           numerology_summary: string | null
           onboarding_complete: boolean | null
@@ -306,6 +310,9 @@ export type Database = {
           birthday_number?: number | null
           compatibility_tags?: string[] | null
           created_at?: string
+          current_city?: string | null
+          current_latitude?: number | null
+          current_longitude?: number | null
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -323,6 +330,7 @@ export type Database = {
           interests?: string[] | null
           kids_preference?: string | null
           life_path_number?: number | null
+          max_distance_km?: number | null
           moon_sign?: string | null
           numerology_summary?: string | null
           onboarding_complete?: boolean | null
@@ -357,6 +365,9 @@ export type Database = {
           birthday_number?: number | null
           compatibility_tags?: string[] | null
           created_at?: string
+          current_city?: string | null
+          current_latitude?: number | null
+          current_longitude?: number | null
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -374,6 +385,7 @@ export type Database = {
           interests?: string[] | null
           kids_preference?: string | null
           life_path_number?: number | null
+          max_distance_km?: number | null
           moon_sign?: string | null
           numerology_summary?: string | null
           onboarding_complete?: boolean | null

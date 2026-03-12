@@ -26,7 +26,11 @@ const Discover = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("discover-profiles");
+      const body: any = {};
+      if (activeFilters?.max_distance_km && activeFilters.max_distance_km > 0) {
+        body.max_distance_km = activeFilters.max_distance_km;
+      }
+      const { data, error } = await supabase.functions.invoke("discover-profiles", { body });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setProfiles(data.profiles || []);

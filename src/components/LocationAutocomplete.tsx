@@ -69,7 +69,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
   };
 
   const handleSelect = (result: LocationResult) => {
-    // Clean up display name - take first 2-3 meaningful parts
     const parts = result.display_name.split(", ");
     const clean = parts.slice(0, Math.min(3, parts.length)).join(", ");
     setQuery(clean);
@@ -77,9 +76,49 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
     setOpen(false);
   };
 
+  const handleGps = () => {
+    if (!navigator.geolocation) {
+      toast({ title: "GPS unavailable", description: "Your browser doesn't support geolocation.", variant: "destructive" });
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+          );
+          const data = await res.json();
+          const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "";
+          const state = data.address?.state || "";
+          const country = data.address?.country || "";
+          const label = [city, state, country].filter(Boolean).slice(0, 3).join(", ");
+          setQuery(label);
+          onChange(label, latitude, longitude);
+          toast({ title: "Location detected ✨", description: label });
+        } catch {
+          toast({ title: "Lookup failed", description: "Couldn't resolve your location.", variant: "destructive" });
+        } finally {
+          setGpsLoading(false);
+        }
+      },
+      (err) => {
+        setGpsLoading(false);
+        toast({
+          title: "Location denied",
+          description: err.code === 1 ? "Please allow location access in your browser settings." : "Couldn't get your location.",
+          variant: "destructive",
+        });
+      },
+      { enableHighAccuracy: false, timeout: 10000 }
+    );
+  };
+
   return (
     <div ref={containerRef} className="relative">
-      <div className="relative">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           id={id}

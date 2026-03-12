@@ -463,6 +463,8 @@ serve(async (req) => {
         shared_aspects: aiDesc?.shared_aspects || [],
         birth_date: c.birth_date,
         birth_place: c.birth_place,
+        current_city: c.current_city,
+        distance_km: sc.distance_km,
         bio_prompt_1: c.bio_prompt_1,
         bio_prompt_1_answer: c.bio_prompt_1_answer,
         photo_urls: photosByUser.get(c.user_id) || [],

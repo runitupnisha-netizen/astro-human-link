@@ -165,9 +165,9 @@ const ViewProfile = () => {
                 </span>
               )}
             </div>
-            {profile.birth_place && (
+            {(profile.current_city || profile.birth_place) && (
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                <MapPin className="w-3.5 h-3.5" /> {profile.birth_place.split(",")[0]}
+                <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
               </p>
             )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">

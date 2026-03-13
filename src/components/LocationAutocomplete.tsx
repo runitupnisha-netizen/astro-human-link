@@ -158,7 +158,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = "Search for a cit
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md border border-border bg-popover shadow-lg">
+        <div className="absolute z-50 mt-1 w-full max-h-80 overflow-y-auto rounded-md border border-border bg-popover shadow-lg">
           {results.map((result, i) => (
             <button
               key={`${result.lat}-${result.lon}-${i}`}

@@ -317,6 +317,22 @@ const Profile = () => {
                 }}
                 placeholder="Search your current city…"
               />
+              {profile.current_latitude && profile.current_longitude && (
+                <div className="mt-4 rounded-xl overflow-hidden border border-border/50 shadow-lg">
+                  <iframe
+                    title="Current location map"
+                    width="100%"
+                    height="180"
+                    style={{ border: 0, filter: "hue-rotate(220deg) saturate(0.6) brightness(0.85) contrast(1.1)" }}
+                    loading="lazy"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${profile.current_longitude - 0.05}%2C${profile.current_latitude - 0.03}%2C${profile.current_longitude + 0.05}%2C${profile.current_latitude + 0.03}&layer=mapnik&marker=${profile.current_latitude}%2C${profile.current_longitude}`}
+                  />
+                  <div className="bg-card/90 px-3 py-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <MapPin className="w-3 h-3 text-accent" />
+                    <span>{profile.current_city}</span>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

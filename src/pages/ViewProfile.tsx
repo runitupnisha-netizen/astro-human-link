@@ -177,6 +177,22 @@ const ViewProfile = () => {
             </div>
           </motion.div>
 
+          {/* Map Preview */}
+          {profile.current_latitude && profile.current_longitude && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }} className="mb-6">
+              <div className="rounded-xl overflow-hidden border border-border/40 shadow-mystical">
+                <iframe
+                  title="Location map"
+                  width="100%"
+                  height="160"
+                  style={{ border: 0, filter: "hue-rotate(220deg) saturate(0.6) brightness(0.85) contrast(1.1)" }}
+                  loading="lazy"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${profile.current_longitude - 0.05}%2C${profile.current_latitude - 0.05}%2C${profile.current_longitude + 0.05}%2C${profile.current_latitude + 0.05}&layer=mapnik&marker=${profile.current_latitude}%2C${profile.current_longitude}`}
+                />
+              </div>
+            </motion.div>
+          )}
+
           {/* Photo Gallery */}
           {userId && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mb-6">

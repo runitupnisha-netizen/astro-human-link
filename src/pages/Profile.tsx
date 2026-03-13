@@ -683,6 +683,7 @@ const Profile = () => {
                 value={editBirthPlace}
                 onChange={(value) => setEditBirthPlace(value)}
                 placeholder="e.g. Louisville, Kentucky"
+                showGpsButton={false}
               />
             </div>
           </div>

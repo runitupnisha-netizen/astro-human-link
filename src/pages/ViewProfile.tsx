@@ -39,6 +39,9 @@ interface ProfileData {
   gender: string | null;
   birth_date: string | null;
   birth_place: string | null;
+  current_city: string | null;
+  current_latitude: number | null;
+  current_longitude: number | null;
 }
 
 const ViewProfile = () => {
@@ -52,7 +55,7 @@ const ViewProfile = () => {
     const load = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place")
+        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, current_latitude, current_longitude")
         .eq("user_id", userId)
         .maybeSingle();
       setProfile(data);
@@ -162,9 +165,9 @@ const ViewProfile = () => {
                 </span>
               )}
             </div>
-            {profile.birth_place && (
+            {(profile.current_city || profile.birth_place) && (
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                <MapPin className="w-3.5 h-3.5" /> {profile.birth_place.split(",")[0]}
+                <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
               </p>
             )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
@@ -173,6 +176,22 @@ const ViewProfile = () => {
               {profile.rising_sign && <span>↑ {profile.rising_sign}</span>}
             </div>
           </motion.div>
+
+          {/* Map Preview */}
+          {profile.current_latitude && profile.current_longitude && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }} className="mb-6">
+              <div className="rounded-xl overflow-hidden border border-border/40 shadow-mystical">
+                <iframe
+                  title="Location map"
+                  width="100%"
+                  height="160"
+                  style={{ border: 0, filter: "hue-rotate(220deg) saturate(0.6) brightness(0.85) contrast(1.1)" }}
+                  loading="lazy"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${profile.current_longitude - 0.05}%2C${profile.current_latitude - 0.05}%2C${profile.current_longitude + 0.05}%2C${profile.current_latitude + 0.05}&layer=mapnik&marker=${profile.current_latitude}%2C${profile.current_longitude}`}
+                />
+              </div>
+            </motion.div>
+          )}
 
           {/* Photo Gallery */}
           {userId && (

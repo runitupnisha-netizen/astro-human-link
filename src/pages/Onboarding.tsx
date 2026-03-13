@@ -607,6 +607,7 @@ const Onboarding = () => {
                     onChange={(value) => setBirthPlace(value)}
                     placeholder="e.g. Los Angeles, California"
                     className="focus:ring-2 focus:ring-primary/20"
+                    showGpsButton={false}
                   />
                 </motion.div>
 

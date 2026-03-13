@@ -39,6 +39,9 @@ interface ProfileData {
   gender: string | null;
   birth_date: string | null;
   birth_place: string | null;
+  current_city: string | null;
+  current_latitude: number | null;
+  current_longitude: number | null;
 }
 
 const ViewProfile = () => {

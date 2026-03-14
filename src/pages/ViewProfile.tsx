@@ -204,8 +204,14 @@ const ViewProfile = () => {
                 )}
               </p>
             )}
+            <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
+              {profile.sun_sign && <span>☉ {profile.sun_sign}</span>}
+              {profile.moon_sign && <span>☽ {profile.moon_sign}</span>}
+              {profile.rising_sign && <span>↑ {profile.rising_sign}</span>}
+            </div>
+          </motion.div>
 
-          {/* Photo Gallery */}
+
           {userId && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mb-6">
               <PhotoGallery userId={userId} editable={false} maxPhotos={9} columns={3} />

@@ -48,8 +48,19 @@ interface ProfileData {
 const ViewProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+
+  // Haversine distance calculation
+  const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -60,10 +71,23 @@ const ViewProfile = () => {
         .eq("user_id", userId)
         .maybeSingle();
       setProfile(data);
+
+      // Calculate distance from current user
+      if (user && data?.current_latitude && data?.current_longitude) {
+        const { data: myProfile } = await supabase
+          .from("profiles")
+          .select("current_latitude, current_longitude")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (myProfile?.current_latitude && myProfile?.current_longitude) {
+          const dist = calcDistance(myProfile.current_latitude, myProfile.current_longitude, data.current_latitude, data.current_longitude);
+          setDistanceKm(Math.round(dist));
+        }
+      }
       setLoading(false);
     };
     load();
-  }, [userId]);
+  }, [userId, user]);
 
   if (loading) {
     return (

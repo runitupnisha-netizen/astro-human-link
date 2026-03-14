@@ -49,11 +49,11 @@ const HD_TYPES = [
 ];
 
 const DISTANCE_LABELS: Record<number, string> = {
-  25: "25 km",
-  50: "50 km",
-  100: "100 km",
-  250: "250 km",
-  500: "500 km",
+  25: "15 mi",
+  50: "30 mi",
+  100: "60 mi",
+  250: "155 mi",
+  500: "310 mi",
   0: "Anywhere",
 };
 

@@ -254,7 +254,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
                   <span className="text-xs text-muted-foreground flex items-center gap-0.5">
                     <MapPin className="w-3 h-3" /> {profile.current_city || getCity(profile.birth_place)}
                     {profile.distance_km != null && (
-                      <span className="text-muted-foreground/70 ml-0.5">· {profile.distance_km} km</span>
+                      <span className="text-muted-foreground/70 ml-0.5">· {Math.round(profile.distance_km * 0.621371)} mi</span>
                     )}
                   </span>
                 )}

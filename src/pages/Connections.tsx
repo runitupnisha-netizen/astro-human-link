@@ -271,7 +271,7 @@ const Connections = () => {
                             )}
                             {match.distanceKm != null && (
                               <span className="text-xs text-accent flex items-center gap-0.5">
-                                · <Navigation className="w-3 h-3" /> {match.distanceKm} km
+                                · <Navigation className="w-3 h-3" /> {Math.round(match.distanceKm * 0.621371)} mi
                               </span>
                             )}
                           </div>

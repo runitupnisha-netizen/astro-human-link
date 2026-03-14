@@ -75,7 +75,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
   const distanceSteps = [0, 25, 50, 100, 250, 500];
   const distanceIndex = distanceSteps.indexOf(filters.max_distance_km);
-  const currentDistanceLabel = filters.max_distance_km === 0 ? "Anywhere" : `${filters.max_distance_km} km`;
+  const currentDistanceLabel = filters.max_distance_km === 0 ? "Anywhere" : DISTANCE_LABELS[filters.max_distance_km] || `${Math.round(filters.max_distance_km * 0.621371)} mi`;
 
   const activeCount = Object.entries(filters).reduce((acc, [key, val]) => {
     if (key === 'max_distance_km') return acc + (val !== 0 ? 1 : 0);

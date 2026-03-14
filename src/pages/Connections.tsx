@@ -38,15 +38,26 @@ const Connections = () => {
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
   useEffect(() => {
     if (!user) return;
 
     const load = async () => {
-      const { data: matchRows } = await supabase
-        .from("matches")
-        .select("*")
-        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-        .order("created_at", { ascending: false });
+      // Fetch current user's coordinates + matches in parallel
+      const [matchResult, myProfileResult] = await Promise.all([
+        supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
+        supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
+      ]);
+
+      const matchRows = matchResult.data;
+      const myCoords = myProfileResult.data;
 
       if (!matchRows || matchRows.length === 0) {
         setLoading(false);
@@ -59,7 +70,7 @@ const Connections = () => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number")
+        .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude")
         .in("user_id", otherIds);
 
       // Fetch last message for each match
@@ -85,6 +96,12 @@ const Connections = () => {
         const otherId = m.user_a === user.id ? m.user_b : m.user_a;
         const prof = profileMap.get(otherId);
         const lastMsg = lastMessageMap.get(m.id);
+
+        let distanceKm: number | null = null;
+        if (myCoords?.current_latitude && myCoords?.current_longitude && prof?.current_latitude && prof?.current_longitude) {
+          distanceKm = Math.round(calcDistance(myCoords.current_latitude, myCoords.current_longitude, prof.current_latitude, prof.current_longitude));
+        }
+
         return {
           id: m.id,
           compatibility_score: m.compatibility_score,
@@ -100,9 +117,12 @@ const Connections = () => {
             compatibility_tags: null,
             avatar_url: null,
             life_path_number: null,
+            current_latitude: null,
+            current_longitude: null,
           },
           lastMessage: lastMsg?.content || null,
           lastMessageAt: lastMsg?.created_at || null,
+          distanceKm,
         };
       });
 

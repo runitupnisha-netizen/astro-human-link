@@ -274,6 +274,7 @@ const Connections = () => {
                                 · <Navigation className="w-3 h-3" /> {match.distanceKm} km
                               </span>
                             )}
+                          </div>
 
                           {/* Last message or compatibility summary */}
                           {match.lastMessage ? (

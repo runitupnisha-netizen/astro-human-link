@@ -269,7 +269,11 @@ const Connections = () => {
                             {match.otherProfile.life_path_number && (
                               <span className="text-xs text-muted-foreground">· LP {match.otherProfile.life_path_number}</span>
                             )}
-                          </div>
+                            {match.distanceKm != null && (
+                              <span className="text-xs text-accent flex items-center gap-0.5">
+                                · <Navigation className="w-3 h-3" /> {match.distanceKm} km
+                              </span>
+                            )}
 
                           {/* Last message or compatibility summary */}
                           {match.lastMessage ? (

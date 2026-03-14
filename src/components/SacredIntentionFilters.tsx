@@ -116,7 +116,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
           <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>Anywhere</span>
             <span className="text-foreground font-medium text-xs">{currentDistanceLabel}</span>
-            <span>500 km</span>
+            <span>310 mi</span>
           </div>
         </div>
       </div>

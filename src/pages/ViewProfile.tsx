@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin } from "lucide-react";
+import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,8 +48,19 @@ interface ProfileData {
 const ViewProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+
+  // Haversine distance calculation
+  const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -59,10 +71,23 @@ const ViewProfile = () => {
         .eq("user_id", userId)
         .maybeSingle();
       setProfile(data);
+
+      // Calculate distance from current user
+      if (user && data?.current_latitude && data?.current_longitude) {
+        const { data: myProfile } = await supabase
+          .from("profiles")
+          .select("current_latitude, current_longitude")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (myProfile?.current_latitude && myProfile?.current_longitude) {
+          const dist = calcDistance(myProfile.current_latitude, myProfile.current_longitude, data.current_latitude, data.current_longitude);
+          setDistanceKm(Math.round(dist));
+        }
+      }
       setLoading(false);
     };
     load();
-  }, [userId]);
+  }, [userId, user]);
 
   if (loading) {
     return (
@@ -165,9 +190,18 @@ const ViewProfile = () => {
                 </span>
               )}
             </div>
-            {(profile.current_city || profile.birth_place) && (
-              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
+            {(profile.current_city || profile.birth_place || distanceKm !== null) && (
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mb-1">
+                {(profile.current_city || profile.birth_place) && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
+                  </span>
+                )}
+                {distanceKm !== null && (
+                  <span className="flex items-center gap-1 text-accent">
+                    <Navigation className="w-3.5 h-3.5" /> {distanceKm < 1 ? "< 1" : distanceKm} km away
+                  </span>
+                )}
               </p>
             )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
@@ -177,23 +211,7 @@ const ViewProfile = () => {
             </div>
           </motion.div>
 
-          {/* Map Preview */}
-          {profile.current_latitude && profile.current_longitude && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }} className="mb-6">
-              <div className="rounded-xl overflow-hidden border border-border/40 shadow-mystical">
-                <iframe
-                  title="Location map"
-                  width="100%"
-                  height="160"
-                  style={{ border: 0, filter: "hue-rotate(220deg) saturate(0.6) brightness(0.85) contrast(1.1)" }}
-                  loading="lazy"
-                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${profile.current_longitude - 0.05}%2C${profile.current_latitude - 0.05}%2C${profile.current_longitude + 0.05}%2C${profile.current_latitude + 0.05}&layer=mapnik&marker=${profile.current_latitude}%2C${profile.current_longitude}`}
-                />
-              </div>
-            </motion.div>
-          )}
 
-          {/* Photo Gallery */}
           {userId && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="mb-6">
               <PhotoGallery userId={userId} editable={false} maxPhotos={9} columns={3} />

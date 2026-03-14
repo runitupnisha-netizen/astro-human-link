@@ -24,9 +24,12 @@ interface MatchWithProfile {
     compatibility_tags: string[] | null;
     avatar_url: string | null;
     life_path_number: number | null;
+    current_latitude: number | null;
+    current_longitude: number | null;
   };
   lastMessage: string | null;
   lastMessageAt: string | null;
+  distanceKm: number | null;
 }
 
 const Connections = () => {

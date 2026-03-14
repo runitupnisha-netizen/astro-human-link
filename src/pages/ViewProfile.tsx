@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin } from "lucide-react";
+import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

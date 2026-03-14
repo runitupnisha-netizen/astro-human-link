@@ -49,11 +49,11 @@ const HD_TYPES = [
 ];
 
 const DISTANCE_LABELS: Record<number, string> = {
-  25: "25 km",
-  50: "50 km",
-  100: "100 km",
-  250: "250 km",
-  500: "500 km",
+  25: "15 mi",
+  50: "30 mi",
+  100: "60 mi",
+  250: "155 mi",
+  500: "310 mi",
   0: "Anywhere",
 };
 
@@ -75,7 +75,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
 
   const distanceSteps = [0, 25, 50, 100, 250, 500];
   const distanceIndex = distanceSteps.indexOf(filters.max_distance_km);
-  const currentDistanceLabel = filters.max_distance_km === 0 ? "Anywhere" : `${filters.max_distance_km} km`;
+  const currentDistanceLabel = filters.max_distance_km === 0 ? "Anywhere" : DISTANCE_LABELS[filters.max_distance_km] || `${Math.round(filters.max_distance_km * 0.621371)} mi`;
 
   const activeCount = Object.entries(filters).reduce((acc, [key, val]) => {
     if (key === 'max_distance_km') return acc + (val !== 0 ? 1 : 0);
@@ -116,7 +116,7 @@ const SacredIntentionFilters = ({ onApply, onClose }: SacredIntentionFiltersProp
           <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>Anywhere</span>
             <span className="text-foreground font-medium text-xs">{currentDistanceLabel}</span>
-            <span>500 km</span>
+            <span>310 mi</span>
           </div>
         </div>
       </div>

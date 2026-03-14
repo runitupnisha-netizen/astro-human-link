@@ -199,7 +199,7 @@ const ViewProfile = () => {
                 )}
                 {distanceKm !== null && (
                   <span className="flex items-center gap-1 text-accent">
-                    <Navigation className="w-3.5 h-3.5" /> {distanceKm < 1 ? "< 1" : distanceKm} km away
+                    <Navigation className="w-3.5 h-3.5" /> {(() => { const mi = Math.round(distanceKm * 0.621371); return mi < 1 ? "< 1" : mi; })()} mi away
                   </span>
                 )}
               </p>

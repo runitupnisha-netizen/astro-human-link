@@ -190,33 +190,20 @@ const ViewProfile = () => {
                 </span>
               )}
             </div>
-            {(profile.current_city || profile.birth_place) && (
-              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mb-1">
-                <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
+            {(profile.current_city || profile.birth_place || distanceKm !== null) && (
+              <p className="text-sm text-muted-foreground flex items-center justify-center gap-2 mb-1">
+                {(profile.current_city || profile.birth_place) && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" /> {profile.current_city || profile.birth_place?.split(",")[0]}
+                  </span>
+                )}
+                {distanceKm !== null && (
+                  <span className="flex items-center gap-1 text-accent">
+                    <Navigation className="w-3.5 h-3.5" /> {distanceKm < 1 ? "< 1" : distanceKm} km away
+                  </span>
+                )}
               </p>
             )}
-            <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
-              {profile.sun_sign && <span>☉ {profile.sun_sign}</span>}
-              {profile.moon_sign && <span>☽ {profile.moon_sign}</span>}
-              {profile.rising_sign && <span>↑ {profile.rising_sign}</span>}
-            </div>
-          </motion.div>
-
-          {/* Map Preview */}
-          {profile.current_latitude && profile.current_longitude && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }} className="mb-6">
-              <div className="rounded-xl overflow-hidden border border-border/40 shadow-mystical">
-                <iframe
-                  title="Location map"
-                  width="100%"
-                  height="160"
-                  style={{ border: 0, filter: "hue-rotate(220deg) saturate(0.6) brightness(0.85) contrast(1.1)" }}
-                  loading="lazy"
-                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${profile.current_longitude - 0.05}%2C${profile.current_latitude - 0.05}%2C${profile.current_longitude + 0.05}%2C${profile.current_latitude + 0.05}&layer=mapnik&marker=${profile.current_latitude}%2C${profile.current_longitude}`}
-                />
-              </div>
-            </motion.div>
-          )}
 
           {/* Photo Gallery */}
           {userId && (

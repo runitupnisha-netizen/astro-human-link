@@ -180,7 +180,7 @@ const Settings = () => {
                       min={1}
                       max={20000}
                     />
-                    <span className="text-sm text-muted-foreground">km</span>
+                    <span className="text-sm text-muted-foreground">mi</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-1">How far to search for matches</p>
                 </div>

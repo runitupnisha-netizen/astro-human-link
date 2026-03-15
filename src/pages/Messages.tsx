@@ -47,6 +47,7 @@ interface ConversationData {
 const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<ConversationData[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
@@ -58,6 +59,7 @@ const Messages = () => {
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const [deepLinked, setDeepLinked] = useState(false);
 
   // Load conversations
   useEffect(() => {

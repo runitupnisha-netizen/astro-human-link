@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,7 @@ interface ConversationData {
 const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<ConversationData[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
@@ -58,6 +59,7 @@ const Messages = () => {
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const [deepLinked, setDeepLinked] = useState(false);
 
   // Load conversations
   useEffect(() => {
@@ -118,6 +120,17 @@ const Messages = () => {
 
       setConversations(convos);
       setLoading(false);
+
+      // Deep-link: auto-select match from URL param
+      const matchParam = searchParams.get("match");
+      if (matchParam && !deepLinked) {
+        const found = convos.find((c) => c.match.id === matchParam);
+        if (found) {
+          setSelectedMatchId(matchParam);
+          setShowMobileChat(true);
+          setDeepLinked(true);
+        }
+      }
     };
 
     loadConversations();

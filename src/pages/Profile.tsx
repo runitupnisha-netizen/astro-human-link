@@ -200,7 +200,7 @@ const Profile = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
       
-      <div className="relative z-10 pt-20 pb-12">
+      <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
           <ProfileChecklist profile={profile} photoCount={photoCount} />
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">

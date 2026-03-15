@@ -189,7 +189,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
         {/* Photo carousel */}
         {allPhotos.length > 0 && (
-          <div className="relative w-full h-48 bg-muted shrink-0">
+          <div className="relative w-full h-72 bg-muted shrink-0">
             <img 
               src={currentPhoto || ""} 
               alt={profile.display_name || ""} 

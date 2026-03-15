@@ -50,7 +50,6 @@ const Connections = () => {
     if (!user) return;
 
     const load = async () => {
-      // Fetch current user's coordinates + matches in parallel
       const [matchResult, myProfileResult] = await Promise.all([
         supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
         supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
@@ -73,7 +72,6 @@ const Connections = () => {
         .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude")
         .in("user_id", otherIds);
 
-      // Fetch last message for each match
       const matchIds = matchRows.map((m) => m.id);
       const { data: messages } = await supabase
         .from("messages")
@@ -173,7 +171,7 @@ const Connections = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-12">
+      <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
           <motion.div
@@ -218,11 +216,12 @@ const Connections = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
                 >
-                  <Card className="bg-card/70 backdrop-blur-sm border-border/40 interactive-card group"
-                    onClick={() => navigate("/messages")}
+                  <Card
+                    className="bg-card/70 backdrop-blur-sm border-border/40 interactive-card group"
+                    onClick={() => navigate(`/messages?match=${match.id}`)}
                   >
                     <CardContent className="p-5">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-start gap-4">
                         {/* Avatar */}
                         <div className="relative shrink-0">
                           <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/20 overflow-hidden">
@@ -239,7 +238,7 @@ const Connections = () => {
                           )}
                         </div>
 
-                         {/* Info */}
+                        {/* Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <h3
@@ -291,9 +290,40 @@ const Connections = () => {
                               Tap to send an icebreaker ✨
                             </p>
                           )}
+
+                          {/* Action buttons — always visible on mobile, hover on desktop */}
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 px-3 text-xs border-border/50 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
+                            >
+                              <User className="w-3 h-3 mr-1" />
+                              Profile
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 px-3 text-xs border-accent/30 text-accent md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              Synastry
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 px-3 text-xs border-primary/30 text-primary md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/messages?match=${match.id}`); }}
+                            >
+                              <MessageCircle className="w-3 h-3 mr-1" />
+                              Chat
+                            </Button>
+                          </div>
                         </div>
 
-                        {/* Right side: score label + time + message button */}
+                        {/* Right side: score label + time */}
                         <div className="shrink-0 flex flex-col items-end gap-2">
                           {match.compatibility_score != null && (
                             <Badge variant="outline" className="border-accent/30 text-accent text-xs whitespace-nowrap">
@@ -304,33 +334,6 @@ const Connections = () => {
                             <Clock className="w-3 h-3" />
                             {formatTime(match.lastMessageAt || match.created_at)}
                           </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 px-3 text-foreground hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
-                          >
-                            <User className="w-4 h-4 mr-1" />
-                            Profile
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 px-3 text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            Synastry
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 px-3 text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => { e.stopPropagation(); navigate("/messages"); }}
-                          >
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            Chat
-                          </Button>
                         </div>
                       </div>
 

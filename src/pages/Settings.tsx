@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,6 +22,22 @@ const Settings = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  // Load actual user data
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        setProfile(data);
+        setLoadingProfile(false);
+      });
+  }, [user]);
 
   const handleEnablePush = async () => {
     const success = await subscribe();
@@ -34,11 +50,25 @@ const Settings = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+    toast.success("Signed out. See you next time! 🌙");
+  };
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
       
-      <div className="relative z-10 pt-20 pb-12">
+      <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
@@ -55,35 +85,44 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <SettingsIcon className="w-5 h-5 text-primary" />
-                  Account Settings
+                  Account
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" defaultValue="cosmic.soul@example.com" className="bg-background/50" />
+                    <Input id="email" value={user?.email || ""} disabled className="bg-background/50 opacity-70" />
+                    <p className="text-[10px] text-muted-foreground mt-1">Email can't be changed here</p>
                   </div>
                   <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" defaultValue="San Francisco, CA" className="bg-background/50" />
+                    <Label>Display Name</Label>
+                    <Input value={profile?.display_name || ""} disabled className="bg-background/50 opacity-70" />
+                    <p className="text-[10px] text-muted-foreground mt-1">Edit on your Blueprint page</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="birthdate">Birth Date</Label>
-                      <Input id="birthdate" type="date" defaultValue="1995-03-15" className="bg-background/50" />
-                    </div>
-                    <div>
-                      <Label htmlFor="birthtime">Birth Time</Label>
-                      <Input id="birthtime" type="time" defaultValue="14:30" className="bg-background/50" />
-                    </div>
-                    <div>
-                      <Label htmlFor="birthplace">Birth Place</Label>
-                      <Input id="birthplace" defaultValue="San Francisco, CA" className="bg-background/50" />
-                    </div>
+                  <div>
+                    <Label>Birth Date</Label>
+                    <Input value={profile?.birth_date || "Not set"} disabled className="bg-background/50 opacity-70" />
                   </div>
+                  <div>
+                    <Label>Birth Time</Label>
+                    <Input value={profile?.birth_time?.slice(0, 5) || "Not set"} disabled className="bg-background/50 opacity-70" />
+                  </div>
+                  <div>
+                    <Label>Birth Place</Label>
+                    <Input value={profile?.birth_place || "Not set"} disabled className="bg-background/50 opacity-70" />
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Birth details can be updated on your{" "}
+                  <button onClick={() => navigate("/profile")} className="text-primary hover:underline">
+                    Blueprint page
+                  </button>
+                </p>
 
                 <Separator />
 
@@ -118,63 +157,32 @@ const Settings = () => {
               <CardContent className="space-y-6">
                 <div>
                   <Label className="text-base font-medium">What are you looking for?</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge className="bg-primary/20 text-primary cursor-pointer">Soul Mate</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Deep Partnership</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Life Partner</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Meaningful Friendship</Badge>
-                    <Badge className="bg-accent/20 text-accent cursor-pointer">Sacred Union</Badge>
-                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {profile?.relationship_goal || "Not set"} — update this in your Blueprint
+                  </p>
                 </div>
 
                 <Separator />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label className="text-base font-medium mb-3 block">Age Range</Label>
-                    <div className="flex items-center gap-2">
-                      <Input defaultValue="25" className="bg-background/50" />
-                      <span className="text-muted-foreground">to</span>
-                      <Input defaultValue="35" className="bg-background/50" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-base font-medium mb-3 block">Distance</Label>
-                    <Input defaultValue="50 miles" className="bg-background/50" />
-                  </div>
-                </div>
-
                 <div>
-                  <Label className="text-base font-medium">Astrology Preferences</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Prefer Water Signs</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Match Rising Signs</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Venus Compatibility</span>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Moon Sign Alignment</span>
-                      <Switch />
-                    </div>
+                  <Label className="text-base font-medium mb-3 block">Discovery Distance</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      value={profile?.max_distance_km || 100}
+                      onChange={async (e) => {
+                        const val = parseInt(e.target.value);
+                        if (isNaN(val) || val < 1) return;
+                        setProfile({ ...profile, max_distance_km: val });
+                        await supabase.from("profiles").update({ max_distance_km: val }).eq("user_id", user!.id);
+                      }}
+                      className="bg-background/50 w-24"
+                      min={1}
+                      max={20000}
+                    />
+                    <span className="text-sm text-muted-foreground">km</span>
                   </div>
-                </div>
-
-                <div>
-                  <Label className="text-base font-medium">Human Design Preferences</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge className="bg-primary/20 text-primary cursor-pointer">Generator</Badge>
-                    <Badge className="bg-accent/20 text-accent cursor-pointer">Manifestor</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Projector</Badge>
-                    <Badge variant="outline" className="cursor-pointer">Reflector</Badge>
-                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">How far to search for matches</p>
                 </div>
               </CardContent>
             </Card>
@@ -188,40 +196,6 @@ const Settings = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">New Connections</span>
-                    <p className="text-sm text-muted-foreground">When someone connects with you</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Messages</span>
-                    <p className="text-sm text-muted-foreground">New message notifications</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Cosmic Events</span>
-                    <p className="text-sm text-muted-foreground">New moons, retrogrades, and other sky events</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Profile Views</span>
-                    <p className="text-sm text-muted-foreground">When someone views your profile</p>
-                  </div>
-                  <Switch />
-                </div>
-
-                <Separator />
-
                 {/* Push Notifications */}
                 <div className="flex items-center justify-between">
                   <div>
@@ -264,33 +238,7 @@ const Settings = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Show Birth Chart</span>
-                    <p className="text-sm text-muted-foreground">Allow others to see your detailed birth chart</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Location Visibility</span>
-                    <p className="text-sm text-muted-foreground">Show approximate location</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium">Online Status</span>
-                    <p className="text-sm text-muted-foreground">Show when you're active</p>
-                  </div>
-                  <Switch />
-                </div>
-                
-                <Separator />
-                
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     className="border-destructive/30 text-destructive hover:bg-destructive/10"
@@ -299,39 +247,20 @@ const Settings = () => {
                     <Trash2 className="w-4 h-4 mr-2" />
                     Delete Account
                   </Button>
-                  <Button variant="outline">Export Data</Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Theme Settings */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-accent" />
-                  Theme & Appearance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-base font-medium mb-3 block">Color Theme</Label>
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="border-primary/30">
-                      <Moon className="w-4 h-4 mr-2" />
-                      Dark Mode
-                    </Button>
-                    <Button variant="outline">
-                      <Sun className="w-4 h-4 mr-2" />
-                      Light Mode
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-center pt-6">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-glow btn-shimmer">
-                Save All Changes
+            {/* Sign Out */}
+            <div className="flex justify-center pt-2 pb-4">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleSignOut}
+                className="border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/30 gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
               </Button>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import alignedLogo from "@/assets/aligned-hero-logo.png";
@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -46,6 +47,27 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset link sent! Check your inbox 📧");
+      setShowForgotPassword(false);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4">
       {/* Soul connection hero background */}
@@ -73,108 +95,174 @@ const Auth = () => {
             <img src={alignedLogo} alt="Aligned" className="relative w-56 h-56 object-contain mix-blend-screen" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-            {isLogin ? "Welcome Back" : "Let's Get Started"}
+            {showForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Let's Get Started"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin ? "Good to see you again ✌️" : "Create your profile and start meeting people"}
+            {showForgotPassword
+              ? "Enter your email and we'll send you a reset link"
+              : isLogin
+              ? "Good to see you again ✌️"
+              : "Create your profile and start meeting people"}
           </p>
         </motion.div>
 
-        {/* Form */}
-        <motion.form
-          onSubmit={handleSubmit}
-          className="glass-card glow-border p-6 space-y-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          {!isLogin && (
-            <motion.div
-              className="relative"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="pl-10 bg-muted/50 border-border"
-                required={!isLogin}
-              />
-            </motion.div>
-          )}
-
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 bg-muted/50 border-border"
-              required
-            />
-          </div>
-
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 bg-muted/50 border-border"
-              required
-              minLength={6}
-            />
-          </div>
-
-          {!isLogin && (
-            <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms"
-                checked={agreedToTerms}
-                onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-                className="mt-0.5"
-              />
-              <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
-                I am 18+ and agree to the{" "}
-                <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
-                  Disclaimer &amp; Terms of Use
-                </Link>
-                , including that AI-generated content is for entertainment only and Aligned is not responsible for meetups or shared information.
-              </label>
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            disabled={loading || (!isLogin && !agreedToTerms)}
-            className="w-full h-12 text-base font-semibold"
-            style={{ background: "var(--gradient-aurora)" }}
+        {/* Forgot Password Form */}
+        {showForgotPassword ? (
+          <motion.form
+            onSubmit={handleForgotPassword}
+            className="glass-card glow-border p-6 space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-            ) : (
-              <>
-                {isLogin ? "Sign In" : "Create Account"}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </Button>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+              />
+            </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 text-base font-semibold"
+              style={{ background: "var(--gradient-aurora)" }}
             >
-              {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
-            </button>
-          </div>
-        </motion.form>
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+              ) : (
+                <>
+                  Send Reset Link
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(false)}
+                className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mx-auto"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                Back to sign in
+              </button>
+            </div>
+          </motion.form>
+        ) : (
+          /* Main Auth Form */
+          <motion.form
+            onSubmit={handleSubmit}
+            className="glass-card glow-border p-6 space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {!isLogin && (
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="pl-10 bg-muted/50 border-border"
+                  required={!isLogin}
+                />
+              </motion.div>
+            )}
+
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+                minLength={6}
+              />
+            </div>
+
+            {isLogin && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
+            {!isLogin && (
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={agreedToTerms}
+                  onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
+                  I am 18+ and agree to the{" "}
+                  <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
+                    Disclaimer &amp; Terms of Use
+                  </Link>
+                  , including that AI-generated content is for entertainment only and Aligned is not responsible for meetups or shared information.
+                </label>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading || (!isLogin && !agreedToTerms)}
+              className="w-full h-12 text-base font-semibold"
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+              ) : (
+                <>
+                  {isLogin ? "Sign In" : "Create Account"}
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
+              </button>
+            </div>
+          </motion.form>
+        )}
       </motion.div>
     </div>
   );

@@ -111,7 +111,7 @@ const Discover = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
 
-      <div className="relative z-10 pt-20 pb-12 flex flex-col items-center">
+      <div className="relative z-10 pt-20 pb-24 md:pb-12 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}

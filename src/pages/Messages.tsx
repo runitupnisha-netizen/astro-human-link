@@ -4,12 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import VoiceRecorder from "@/components/VoiceRecorder";
+import AudioPlayer from "@/components/AudioPlayer";
 
 interface Match {
   id: string;
@@ -55,6 +57,7 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploadingVoice, setUploadingVoice] = useState(false);
   const [sendingIcebreaker, setSendingIcebreaker] = useState(false);
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -402,6 +405,54 @@ const Messages = () => {
     });
   };
 
+  const handleVoiceRecording = useCallback(async (blob: Blob) => {
+    if (!selectedMatchId || !user) return;
+    setUploadingVoice(true);
+
+    try {
+      const fileName = `${user.id}/${selectedMatchId}/${Date.now()}.webm`;
+      const { error: uploadError } = await supabase.storage
+        .from("voice-messages")
+        .upload(fileName, blob, { contentType: "audio/webm" });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("voice-messages")
+        .getPublicUrl(fileName);
+
+      const voiceUrl = urlData.publicUrl;
+
+      // Optimistic update
+      const optimisticMsg: Message = {
+        id: `temp-voice-${Date.now()}`,
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: voiceUrl,
+        message_type: "voice",
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      const { error } = await supabase.from("messages").insert({
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: voiceUrl,
+        message_type: "voice",
+      });
+
+      if (error) {
+        toast({ title: "Failed to send voice message", variant: "destructive" });
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      }
+    } catch (e: any) {
+      toast({ title: "Voice upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingVoice(false);
+    }
+  }, [selectedMatchId, user, toast]);
+
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
   const formatTime = (dateStr: string) => {
@@ -516,6 +567,8 @@ const Messages = () => {
                               {convo.lastMessage
                                 ? convo.lastMessage.message_type === "icebreaker"
                                   ? `✨ ${convo.lastMessage.content}`
+                                  : convo.lastMessage.message_type === "voice"
+                                  ? "🎙️ Voice message"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>
@@ -659,7 +712,11 @@ const Messages = () => {
                                       ✨ Cosmic Icebreaker
                                     </span>
                                   )}
-                                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                                  {msg.message_type === "voice" ? (
+                                    <AudioPlayer src={msg.content} isMe={isMe} />
+                                  ) : (
+                                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                                  )}
                                   <div className="flex items-center justify-end gap-1 mt-1">
                                     <span className="text-[10px] opacity-50">
                                       {new Date(msg.created_at).toLocaleTimeString([], {
@@ -753,7 +810,11 @@ const Messages = () => {
 
                       {/* Message Input */}
                       <div className="p-4 border-t border-border">
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                          <VoiceRecorder
+                            onRecordingComplete={handleVoiceRecording}
+                            disabled={sending || uploadingVoice}
+                          />
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
@@ -773,12 +834,15 @@ const Messages = () => {
                           <Button
                             size="icon"
                             onClick={handleSendMessage}
-                            disabled={!newMessage.trim() || sending}
+                            disabled={!newMessage.trim() || sending || uploadingVoice}
                             className="bg-primary hover:bg-primary/90 shadow-glow shrink-0"
                           >
                             <Send className="w-4 h-4" />
                           </Button>
                         </div>
+                        {uploadingVoice && (
+                          <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending voice message…</p>
+                        )}
                       </div>
                     </>
                   ) : (

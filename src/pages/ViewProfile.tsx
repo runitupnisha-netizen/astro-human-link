@@ -181,7 +181,6 @@ const ViewProfile = () => {
                 {profile.display_name || "Cosmic Soul"}
               </h1>
               {isVerified && <VerifiedBadge size="md" />}
-              </h1>
               {profile.birth_date && (
                 <span className="text-2xl text-muted-foreground font-medium">
                   {(() => {

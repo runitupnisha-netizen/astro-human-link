@@ -9,7 +9,7 @@ import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine,
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
-import alignedLogo from "@/assets/aligned-hero-logo.png";
+import stellaraLogo from "@/assets/stellara-logo.png";
 import numerologyMandala from "@/assets/numerology-mandala.png";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";

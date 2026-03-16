@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
-import alignedLogo from "@/assets/aligned-hero-logo.png";
+import stellaraLogo from "@/assets/stellara-logo.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import { motion } from "framer-motion";
 

@@ -294,7 +294,39 @@ const Discover = () => {
                 />
               ))}
             </AnimatePresence>
+        )}
+
+        {/* Premium upsell banner after 5 swipes */}
+        <AnimatePresence>
+          {!isPremium && swipeCount >= 5 && swipeCount < 100 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="w-full max-w-sm mx-auto px-4 mt-4"
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-card/80 backdrop-blur-sm p-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-primary/5 to-accent/5" />
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-golden flex items-center justify-center shrink-0">
+                    <Crown className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-display text-sm font-bold text-foreground">Unlock Stellara Premium</p>
+                    <p className="text-xs text-muted-foreground">Super Likes, see who liked you & full synastry charts</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => navigate("/premium")}
+                    className="shrink-0 bg-gradient-golden text-primary-foreground hover:opacity-90"
+                  >
+                    Upgrade
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           )}
+        </AnimatePresence>
         </div>
 
         {!loading && profiles.length > 0 && (

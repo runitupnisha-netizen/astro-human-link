@@ -33,6 +33,16 @@ interface FeedPost {
   liked_by_me?: boolean;
 }
 
+const SparkleParticle = ({ delay, x, y, size, color }: { delay: number; x: number; y: number; size: number; color: string }) => (
+  <motion.div
+    className="absolute rounded-full pointer-events-none"
+    style={{ width: size, height: size, background: color }}
+    initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+    animate={{ opacity: 0, x, y, scale: 0 }}
+    transition={{ duration: 0.8 + Math.random() * 0.4, delay, ease: "easeOut" }}
+  />
+);
+
 const AlignmentFeed = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -43,6 +53,9 @@ const AlignmentFeed = () => {
   const [newCategory, setNewCategory] = useState("reflection");
   const [posting, setPosting] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
+  const [showSparkles, setShowSparkles] = useState(false);
+  const [hasPostedBefore, setHasPostedBefore] = useState(true);
+  const sparkleAnchorRef = useRef<HTMLDivElement>(null);
 
   const fetchPosts = useCallback(async () => {
     if (!user) return;
@@ -76,7 +89,19 @@ const AlignmentFeed = () => {
     setLoading(false);
   }, [user]);
 
-  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+  // Check if user has posted before
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("alignment_posts")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        setHasPostedBefore((count ?? 0) > 0);
+      });
+  }, [user]);
+
+
 
   // Realtime
   useEffect(() => {
@@ -89,6 +114,7 @@ const AlignmentFeed = () => {
 
   const handlePost = async () => {
     if (!newContent.trim() || !user) return;
+    const isFirstPost = !hasPostedBefore;
     setPosting(true);
     const { error } = await supabase.from("alignment_posts").insert({
       user_id: user.id,
@@ -99,7 +125,14 @@ const AlignmentFeed = () => {
       toast({ title: "Couldn't post", description: error.message, variant: "destructive" });
     } else {
       setNewContent("");
-      toast({ title: "✨ Shared with the community" });
+      if (isFirstPost) {
+        setShowSparkles(true);
+        setHasPostedBefore(true);
+        toast({ title: "🎉 Your first spark! Welcome to the community" });
+        setTimeout(() => setShowSparkles(false), 1500);
+      } else {
+        toast({ title: "✨ Shared with the community" });
+      }
     }
     setPosting(false);
   };
@@ -178,16 +211,44 @@ const AlignmentFeed = () => {
                       </button>
                     ))}
                   </div>
-                  <Button
-                    onClick={handlePost}
-                    disabled={!newContent.trim() || posting}
-                    size="sm"
-                    className="btn-shimmer"
-                    style={{ background: "var(--gradient-aurora)" }}
-                  >
-                    {posting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span className="ml-1.5">Share</span>
-                  </Button>
+                  <div className="relative" ref={sparkleAnchorRef}>
+                    <Button
+                      onClick={handlePost}
+                      disabled={!newContent.trim() || posting}
+                      size="sm"
+                      className="btn-shimmer"
+                      style={{ background: "var(--gradient-aurora)" }}
+                    >
+                      {posting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      <span className="ml-1.5">Share</span>
+                    </Button>
+                    <AnimatePresence>
+                      {showSparkles && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          {[...Array(16)].map((_, i) => {
+                            const angle = (i / 16) * Math.PI * 2;
+                            const dist = 40 + Math.random() * 60;
+                            const colors = [
+                              "hsl(var(--primary))",
+                              "hsl(var(--accent))",
+                              "hsl(45 100% 70%)",
+                              "hsl(280 80% 70%)",
+                            ];
+                            return (
+                              <SparkleParticle
+                                key={i}
+                                delay={Math.random() * 0.15}
+                                x={Math.cos(angle) * dist}
+                                y={Math.sin(angle) * dist}
+                                size={3 + Math.random() * 5}
+                                color={colors[i % colors.length]}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </CardContent>
             </Card>

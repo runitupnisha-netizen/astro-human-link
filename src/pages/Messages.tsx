@@ -405,6 +405,54 @@ const Messages = () => {
     });
   };
 
+  const handleVoiceRecording = useCallback(async (blob: Blob) => {
+    if (!selectedMatchId || !user) return;
+    setUploadingVoice(true);
+
+    try {
+      const fileName = `${user.id}/${selectedMatchId}/${Date.now()}.webm`;
+      const { error: uploadError } = await supabase.storage
+        .from("voice-messages")
+        .upload(fileName, blob, { contentType: "audio/webm" });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("voice-messages")
+        .getPublicUrl(fileName);
+
+      const voiceUrl = urlData.publicUrl;
+
+      // Optimistic update
+      const optimisticMsg: Message = {
+        id: `temp-voice-${Date.now()}`,
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: voiceUrl,
+        message_type: "voice",
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      const { error } = await supabase.from("messages").insert({
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: voiceUrl,
+        message_type: "voice",
+      });
+
+      if (error) {
+        toast({ title: "Failed to send voice message", variant: "destructive" });
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      }
+    } catch (e: any) {
+      toast({ title: "Voice upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingVoice(false);
+    }
+  }, [selectedMatchId, user, toast]);
+
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
   const formatTime = (dateStr: string) => {

@@ -81,10 +81,10 @@ const Navigation = () => {
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-md scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src={alignedLogo} alt="Aligned" className="relative w-8 h-8 object-contain mix-blend-screen" />
+                <img src={alignedLogo} alt="Stellara" className="relative w-8 h-8 object-contain mix-blend-screen" />
               </div>
               <span className="font-display text-lg font-bold text-gradient-aurora">
-                Aligned
+                Stellara
               </span>
             </Link>
 

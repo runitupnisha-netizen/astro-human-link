@@ -43,7 +43,7 @@ const HeroSection = () => {
           {...fadeUp(0.4)}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-serif"
         >
-          Discover meaningful connections through the ancient wisdom of Astrology, Human Design & Gene Keys — aligned with who you truly are.
+          Where love aligns with the stars. Discover meaningful connections through the ancient wisdom of Astrology, Human Design & Gene Keys.
         </motion.p>
 
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">

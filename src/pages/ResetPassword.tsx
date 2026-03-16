@@ -62,7 +62,7 @@ const ResetPassword = () => {
         <div className="text-center mb-8">
           <div className="relative w-24 h-24 mx-auto mb-4">
             <div className="absolute inset-0 bg-white/20 rounded-full blur-2xl animate-pulse scale-125" />
-            <img src={alignedLogo} alt="Aligned" className="relative w-24 h-24 object-contain mix-blend-screen" />
+            <img src={alignedLogo} alt="Stellara" className="relative w-24 h-24 object-contain mix-blend-screen" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
             {success ? "You're All Set" : "Set New Password"}

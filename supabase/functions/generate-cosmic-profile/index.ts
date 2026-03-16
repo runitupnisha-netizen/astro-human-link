@@ -134,7 +134,7 @@ async function geocodeBirthPlace(place: string): Promise<{ lat: number; lng: num
     const encoded = encodeURIComponent(place);
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,
-      { headers: { "User-Agent": "AlignedApp/1.0 (cosmic-dating-app)" } }
+      { headers: { "User-Agent": "StellaraApp/1.0 (cosmic-dating-app)" } }
     );
     if (!response.ok) return null;
     const results = await response.json();

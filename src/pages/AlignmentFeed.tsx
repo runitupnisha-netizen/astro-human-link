@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, Send, Sparkles, BookOpen, Flame, Leaf, Star, User, Loader2, Trash2 } from "lucide-react";
+import { Heart, Send, Sparkles, BookOpen, Flame, Leaf, Star, User, Loader2, Trash2, Feather } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
@@ -302,6 +302,21 @@ const AlignmentFeed = () => {
             </AnimatePresence>
           )}
         </div>
+
+        {/* Mobile FAB */}
+        <motion.button
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            textareaRef.current?.focus();
+            textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+          className="fixed bottom-24 right-5 z-50 md:hidden w-14 h-14 rounded-full bg-gradient-golden shadow-golden flex items-center justify-center text-background active:shadow-cosmic transition-shadow"
+          aria-label="Compose new post"
+        >
+          <Feather className="w-6 h-6" />
+        </motion.button>
       </div>
     </div>
   );

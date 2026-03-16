@@ -61,6 +61,9 @@ const Messages = () => {
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [deepLinked, setDeepLinked] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // Online presence tracking
   useEffect(() => {
@@ -85,6 +88,72 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(presenceChannel);
     };
+  }, [user]);
+
+  // Typing indicator channel per match
+  useEffect(() => {
+    if (!selectedMatchId || !user) return;
+
+    const channel = supabase.channel(`typing:${selectedMatchId}`);
+    typingChannelRef.current = channel;
+
+    channel
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload.user_id !== user.id) {
+          setTypingUsers((prev) => new Set(prev).add(payload.user_id));
+          // Clear typing after 3 seconds of no signal
+          setTimeout(() => {
+            setTypingUsers((prev) => {
+              const next = new Set(prev);
+              next.delete(payload.user_id);
+              return next;
+            });
+          }, 3000);
+        }
+      })
+      .on('broadcast', { event: 'stop_typing' }, ({ payload }) => {
+        if (payload.user_id !== user.id) {
+          setTypingUsers((prev) => {
+            const next = new Set(prev);
+            next.delete(payload.user_id);
+            return next;
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      setTypingUsers(new Set());
+      supabase.removeChannel(channel);
+      typingChannelRef.current = null;
+    };
+  }, [selectedMatchId, user]);
+
+  const broadcastTyping = useCallback(() => {
+    if (!typingChannelRef.current || !user) return;
+    typingChannelRef.current.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { user_id: user.id },
+    });
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      typingChannelRef.current?.send({
+        type: 'broadcast',
+        event: 'stop_typing',
+        payload: { user_id: user.id },
+      });
+    }, 2000);
+  }, [user]);
+
+  const stopTyping = useCallback(() => {
+    if (!typingChannelRef.current || !user) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingChannelRef.current.send({
+      type: 'broadcast',
+      event: 'stop_typing',
+      payload: { user_id: user.id },
+    });
   }, [user]);
 
   // Load conversations

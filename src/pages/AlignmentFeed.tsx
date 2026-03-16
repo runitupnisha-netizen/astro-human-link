@@ -211,16 +211,44 @@ const AlignmentFeed = () => {
                       </button>
                     ))}
                   </div>
-                  <Button
-                    onClick={handlePost}
-                    disabled={!newContent.trim() || posting}
-                    size="sm"
-                    className="btn-shimmer"
-                    style={{ background: "var(--gradient-aurora)" }}
-                  >
-                    {posting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span className="ml-1.5">Share</span>
-                  </Button>
+                  <div className="relative" ref={sparkleAnchorRef}>
+                    <Button
+                      onClick={handlePost}
+                      disabled={!newContent.trim() || posting}
+                      size="sm"
+                      className="btn-shimmer"
+                      style={{ background: "var(--gradient-aurora)" }}
+                    >
+                      {posting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      <span className="ml-1.5">Share</span>
+                    </Button>
+                    <AnimatePresence>
+                      {showSparkles && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          {[...Array(16)].map((_, i) => {
+                            const angle = (i / 16) * Math.PI * 2;
+                            const dist = 40 + Math.random() * 60;
+                            const colors = [
+                              "hsl(var(--primary))",
+                              "hsl(var(--accent))",
+                              "hsl(45 100% 70%)",
+                              "hsl(280 80% 70%)",
+                            ];
+                            return (
+                              <SparkleParticle
+                                key={i}
+                                delay={Math.random() * 0.15}
+                                x={Math.cos(angle) * dist}
+                                y={Math.sin(angle) * dist}
+                                size={3 + Math.random() * 5}
+                                color={colors[i % colors.length]}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </CardContent>
             </Card>

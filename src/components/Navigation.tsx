@@ -118,9 +118,20 @@ const Navigation = () => {
               })}
             </div>
 
-            {/* Notification Bell (desktop + mobile) */}
+            {/* Notification Bell + Sign Out (desktop) */}
             <div className="flex items-center gap-1">
               <NotificationBell />
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = "/auth";
+                }}
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </div>

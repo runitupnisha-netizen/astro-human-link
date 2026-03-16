@@ -60,7 +60,7 @@ const Navigation = () => {
     { path: "/messages", label: "Messages", icon: MessageCircle, badge: unreadCount },
     { path: "/insights", label: "Insights", icon: TrendingUp },
     { path: "/profile", label: "Blueprint", icon: User },
-    { path: "/premium", label: "Premium", icon: Crown },
+    { path: "/premium", label: "Premium", icon: Crown, premium: true },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
 
@@ -101,12 +101,14 @@ const Navigation = () => {
                     to={item.path}
                     className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                       isActive
-                        ? "nav-pill-active"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30 nav-link-hover"
+                        ? item.premium ? "bg-gradient-golden text-background shadow-golden" : "nav-pill-active"
+                        : item.premium
+                          ? "text-amber-400 hover:text-amber-300 hover:bg-amber-400/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/30 nav-link-hover"
                     }`}
                   >
                     <div className="relative">
-                      <Icon className="w-4 h-4 nav-icon" />
+                      <Icon className={`w-4 h-4 ${item.premium && !isActive ? "drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" : ""} nav-icon`} />
                       {item.badge && item.badge > 0 && (
                         <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
                           {item.badge > 99 ? "99+" : item.badge}

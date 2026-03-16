@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -60,6 +60,32 @@ const Messages = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [deepLinked, setDeepLinked] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+
+  // Online presence tracking
+  useEffect(() => {
+    if (!user) return;
+
+    const presenceChannel = supabase.channel('online-users', {
+      config: { presence: { key: user.id } },
+    });
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const online = new Set<string>(Object.keys(state));
+        setOnlineUsers(online);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(presenceChannel);
+    };
+  }, [user]);
 
   // Load conversations
   useEffect(() => {
@@ -164,20 +190,33 @@ const Messages = () => {
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => {
-            // Remove optimistic message and avoid duplicates
             if (prev.some((m) => m.id === newMsg.id)) return prev;
             const withoutOptimistic = prev.filter(
               (m) => !(m.id.startsWith("temp-") && m.sender_id === newMsg.sender_id && m.content === newMsg.content)
             );
             return [...withoutOptimistic, newMsg];
           });
-          // Update conversation list last message
           setConversations((prev) =>
             prev.map((c) =>
               c.match.id === selectedMatchId
                 ? { ...c, lastMessage: newMsg }
                 : c
             )
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `match_id=eq.${selectedMatchId}`,
+        },
+        (payload) => {
+          const updated = payload.new as Message;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === updated.id ? { ...m, read_at: updated.read_at } : m))
           );
         }
       )
@@ -370,11 +409,16 @@ const Messages = () => {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-gradient-mystical flex items-center justify-center shrink-0 ring-2 ring-border/30 overflow-hidden">
-                            {convo.otherProfile.avatar_url ? (
-                              <img src={convo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <User className="w-6 h-6 text-foreground" />
+                          <div className="relative shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
+                              {convo.otherProfile.avatar_url ? (
+                                <img src={convo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <User className="w-6 h-6 text-foreground" />
+                              )}
+                            </div>
+                            {onlineUsers.has(convo.otherProfile.user_id) && (
+                              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-card" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -428,11 +472,16 @@ const Messages = () => {
                         >
                           <ArrowLeft className="w-5 h-5" />
                         </Button>
-                        <div className="w-10 h-10 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
-                          {selectedConvo.otherProfile.avatar_url ? (
-                            <img src={selectedConvo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <User className="w-5 h-5 text-foreground" />
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
+                            {selectedConvo.otherProfile.avatar_url ? (
+                              <img src={selectedConvo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-5 h-5 text-foreground" />
+                            )}
+                          </div>
+                          {onlineUsers.has(selectedConvo.otherProfile.user_id) && (
+                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -446,6 +495,11 @@ const Messages = () => {
                             {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
                           <div className="flex items-center gap-2">
+                            {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
+                              <span className="text-[10px] text-green-500 font-medium">Online</span>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">Offline</span>
+                            )}
                             {selectedConvo.match.compatibility_score && (
                               <Badge variant="outline" className="text-[10px] border-accent/30 text-accent h-5">
                                 {selectedConvo.match.compatibility_score}% Match

@@ -550,8 +550,9 @@ const Messages = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
-                              <h3 className="font-semibold text-foreground text-sm truncate">
+                              <h3 className="font-semibold text-foreground text-sm truncate flex items-center gap-1">
                                 {convo.otherProfile.display_name || "Someone"}
+                                {verifiedUsers.has(convo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                               </h3>
                               {convo.lastMessage && (
                                 <span className="text-[10px] text-muted-foreground shrink-0 ml-2">

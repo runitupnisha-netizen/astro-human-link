@@ -112,6 +112,14 @@ const Discover = () => {
 
     // Gate super likes behind premium
     if (direction === "super" && !isPremium) {
+      setUpsellFeature("super_like");
+      setShowUpsell(true);
+      return;
+    }
+
+    // Daily like limit for free users
+    if ((direction === "right" || direction === "super") && !isPremium && likeLimitReached) {
+      setUpsellFeature("daily_likes");
       setShowUpsell(true);
       return;
     }
@@ -120,6 +128,9 @@ const Discover = () => {
 
     setProfiles((prev) => prev.slice(1));
     setSwipeCount((c) => c + 1);
+    if (action !== "pass") {
+      setDailyLikesUsed((c) => c + 1);
+    }
 
     if (direction === "super") {
       toast({
@@ -129,15 +140,37 @@ const Discover = () => {
     }
 
     try {
-      const { error } = await supabase.from("swipes").insert({
+      const { data, error } = await supabase.from("swipes").insert({
         user_id: user!.id,
         target_user_id: topProfile.user_id,
         action,
-      });
+      }).select("id").single();
       if (error) throw error;
+      // Store for undo
+      setLastSwipe({ profile: topProfile, swipeId: data.id });
     } catch (e: any) {
       console.error("Swipe error:", e);
       toast({ title: "Swipe failed", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!lastSwipe) return;
+    if (!isPremium) {
+      setUpsellFeature("undo");
+      setShowUpsell(true);
+      return;
+    }
+    try {
+      const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
+      if (error) throw error;
+      setProfiles((prev) => [lastSwipe.profile, ...prev]);
+      setSwipeCount((c) => Math.max(0, c - 1));
+      toast({ title: "↩️ Undo successful", description: `${lastSwipe.profile.display_name || "Profile"} is back in your stack` });
+      setLastSwipe(null);
+    } catch (e: any) {
+      console.error("Undo error:", e);
+      toast({ title: "Undo failed", description: e.message, variant: "destructive" });
     }
   };
 

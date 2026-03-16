@@ -23,6 +23,7 @@ const Discover = () => {
   const [swipeCount, setSwipeCount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any>(null);
+  const [showUpsell, setShowUpsell] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

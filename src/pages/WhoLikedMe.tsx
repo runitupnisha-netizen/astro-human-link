@@ -24,10 +24,11 @@ interface Liker {
 
 const WhoLikedMe = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
+  const navigate = useNavigate();
   const [likers, setLikers] = useState<Liker[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const isPremium = false; // Will be connected to Stripe later
 
   useEffect(() => {
     if (user) fetchLikers();

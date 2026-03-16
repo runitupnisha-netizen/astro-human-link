@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Star } from "lucide-react";
 import { motion } from "framer-motion";
-import alignedHeroLogo from "@/assets/aligned-hero-logo.png";
+import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 
 const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
@@ -21,7 +21,7 @@ const HeroSection = () => {
           className="mix-blend-screen"
         >
           <img 
-            src={alignedHeroLogo} 
+            src={stellaraHeroLogo} 
             alt="" 
             className="w-[85vw] md:w-[60vw] lg:w-[50vw] max-w-[800px] object-contain"
           />

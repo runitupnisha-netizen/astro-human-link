@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
-import alignedLogo from "@/assets/aligned-hero-logo.png";
+import stellaraLogo from "@/assets/stellara-logo.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import { motion } from "framer-motion";
 
@@ -109,7 +109,7 @@ const Auth = () => {
         >
           <div className="relative w-56 h-56 mx-auto mb-2">
             <div className="absolute inset-0 bg-white/30 rounded-full blur-3xl animate-pulse scale-125" />
-            <img src={alignedLogo} alt="Stellara" className="relative w-56 h-56 object-contain mix-blend-screen" />
+            <img src={stellaraLogo} alt="Stellara" className="relative w-56 h-56 object-contain mix-blend-screen" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
             {showForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Let's Get Started"}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import alignedLogo from "@/assets/aligned-hero-logo.png";
+import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,7 +81,7 @@ const Navigation = () => {
             <Link to="/" className="flex items-center gap-2.5 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-md scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src={alignedLogo} alt="Stellara" className="relative w-8 h-8 object-contain mix-blend-screen" />
+                <img src={stellaraLogo} alt="Stellara" className="relative w-8 h-8 object-contain mix-blend-screen" />
               </div>
               <span className="font-display text-lg font-bold text-gradient-aurora">
                 Stellara

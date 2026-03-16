@@ -54,6 +54,7 @@ const ViewProfile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const { isVerified } = useVerificationStatus(userId);
 
   // Haversine distance calculation
   const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {

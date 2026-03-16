@@ -60,6 +60,32 @@ const Messages = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [deepLinked, setDeepLinked] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+
+  // Online presence tracking
+  useEffect(() => {
+    if (!user) return;
+
+    const presenceChannel = supabase.channel('online-users', {
+      config: { presence: { key: user.id } },
+    });
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const online = new Set<string>(Object.keys(state));
+        setOnlineUsers(online);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(presenceChannel);
+    };
+  }, [user]);
 
   // Load conversations
   useEffect(() => {

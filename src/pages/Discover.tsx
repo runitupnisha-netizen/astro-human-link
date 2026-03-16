@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 
 const Discover = () => {
   const { user } = useAuth();

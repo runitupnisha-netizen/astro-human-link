@@ -409,11 +409,16 @@ const Messages = () => {
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-gradient-mystical flex items-center justify-center shrink-0 ring-2 ring-border/30 overflow-hidden">
-                            {convo.otherProfile.avatar_url ? (
-                              <img src={convo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <User className="w-6 h-6 text-foreground" />
+                          <div className="relative shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
+                              {convo.otherProfile.avatar_url ? (
+                                <img src={convo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <User className="w-6 h-6 text-foreground" />
+                              )}
+                            </div>
+                            {onlineUsers.has(convo.otherProfile.user_id) && (
+                              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-card" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">

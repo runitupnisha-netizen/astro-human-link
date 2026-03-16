@@ -33,6 +33,16 @@ interface FeedPost {
   liked_by_me?: boolean;
 }
 
+const SparkleParticle = ({ delay, x, y, size, color }: { delay: number; x: number; y: number; size: number; color: string }) => (
+  <motion.div
+    className="absolute rounded-full pointer-events-none"
+    style={{ width: size, height: size, background: color }}
+    initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+    animate={{ opacity: 0, x, y, scale: 0 }}
+    transition={{ duration: 0.8 + Math.random() * 0.4, delay, ease: "easeOut" }}
+  />
+);
+
 const AlignmentFeed = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -43,6 +53,9 @@ const AlignmentFeed = () => {
   const [newCategory, setNewCategory] = useState("reflection");
   const [posting, setPosting] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
+  const [showSparkles, setShowSparkles] = useState(false);
+  const [hasPostedBefore, setHasPostedBefore] = useState(true);
+  const sparkleAnchorRef = useRef<HTMLDivElement>(null);
 
   const fetchPosts = useCallback(async () => {
     if (!user) return;

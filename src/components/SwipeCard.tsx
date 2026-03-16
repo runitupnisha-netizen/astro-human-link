@@ -132,6 +132,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
+      if (!isPremium) return; // Block super like for free users
       setExitDir("up");
       setExiting(true);
       onSwipe("super");

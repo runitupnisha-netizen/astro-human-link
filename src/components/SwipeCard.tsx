@@ -378,11 +378,22 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
             <motion.button
               whileHover={{ scale: 1.15, y: -4 }}
               whileTap={{ scale: 0.85 }}
-              onClick={() => { setExitDir("up"); setExiting(true); onSwipe("super"); }}
-              className="w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center"
+              onClick={() => {
+                if (!isPremium) {
+                  onSwipe("super"); // Will be intercepted by Discover to show toast
+                  return;
+                }
+                setExitDir("up"); setExiting(true); onSwipe("super");
+              }}
+              className={`w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center relative ${!isPremium ? "opacity-60" : ""}`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
               <Star className="w-8 h-8 text-accent-foreground fill-current" />
+              {!isPremium && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                  <Lock className="w-3 h-3 text-primary-foreground" />
+                </div>
+              )}
             </motion.button>
 
             <motion.button

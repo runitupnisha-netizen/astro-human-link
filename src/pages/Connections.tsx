@@ -8,6 +8,8 @@ import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatuses } from "@/hooks/useVerification";
 
 interface MatchWithProfile {
   id: string;

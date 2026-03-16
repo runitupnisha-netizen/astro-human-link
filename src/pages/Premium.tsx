@@ -124,7 +124,8 @@ const Premium = () => {
             Stellara Premium
           </h1>
           <p className="text-muted-foreground font-body text-lg">
-            Unlock the full power of cosmic connection
+            Unlock the full power of{" "}
+            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }} className="text-accent hover:underline underline-offset-2 transition-colors cursor-pointer">cosmic connection ↓</a>
           </p>
 
           {subscribed && currentTier && (

@@ -114,6 +114,7 @@ const AlignmentFeed = () => {
 
   const handlePost = async () => {
     if (!newContent.trim() || !user) return;
+    const isFirstPost = !hasPostedBefore;
     setPosting(true);
     const { error } = await supabase.from("alignment_posts").insert({
       user_id: user.id,
@@ -124,7 +125,14 @@ const AlignmentFeed = () => {
       toast({ title: "Couldn't post", description: error.message, variant: "destructive" });
     } else {
       setNewContent("");
-      toast({ title: "✨ Shared with the community" });
+      if (isFirstPost) {
+        setShowSparkles(true);
+        setHasPostedBefore(true);
+        toast({ title: "🎉 Your first spark! Welcome to the community" });
+        setTimeout(() => setShowSparkles(false), 1500);
+      } else {
+        toast({ title: "✨ Shared with the community" });
+      }
     }
     setPosting(false);
   };

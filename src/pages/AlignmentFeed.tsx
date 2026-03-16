@@ -228,7 +228,12 @@ const AlignmentFeed = () => {
                 <BookOpen className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="font-display text-lg font-bold text-foreground mb-2">No Posts Yet</h3>
-              <p className="text-muted-foreground text-sm">Be the first to share something!</p>
+              <button
+                onClick={() => textareaRef.current?.focus()}
+                className="text-primary hover:underline underline-offset-2 transition-colors text-sm cursor-pointer"
+              >
+                Be the first to share something! ✍️
+              </button>
             </motion.div>
           ) : (
             <AnimatePresence>

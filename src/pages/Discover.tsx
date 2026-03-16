@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<DiscoverProfile[]>([]);

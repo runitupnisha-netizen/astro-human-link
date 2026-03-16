@@ -326,6 +326,7 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedMatchId || !user || sending) return;
     const content = newMessage.trim();
     setNewMessage("");
+    stopTyping();
     setSending(true);
 
     // Optimistic update

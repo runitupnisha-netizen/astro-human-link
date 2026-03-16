@@ -1,7 +1,7 @@
 // Service Worker for push notifications
 self.addEventListener("push", (event) => {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || "Aligned ✨";
+  const title = data.title || "Stellara ✨";
   const options = {
     body: data.body || "Your daily cosmic intention is ready",
     icon: "/aligned-logo.png",

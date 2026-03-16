@@ -262,7 +262,7 @@ const Onboarding = () => {
         age--;
       }
       if (age < 18) {
-        toast.error("You must be at least 18 years old to use Aligned.");
+        toast.error("You must be at least 18 years old to use Stellara.");
         return;
       }
     }
@@ -399,7 +399,7 @@ const Onboarding = () => {
 
       if (error) throw error;
 
-      toast.success("Your Aligned blueprint is complete! ✨");
+      toast.success("Your Stellara blueprint is complete! ✨");
       navigate("/profile");
     } catch (err: any) {
       toast.error("Failed to save preferences");
@@ -514,7 +514,7 @@ const Onboarding = () => {
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                   />
-                  <img src={alignedLogo} alt="Aligned" className="relative w-44 h-44 object-contain mix-blend-screen drop-shadow-[0_0_30px_rgba(200,180,130,0.3)]" />
+                  <img src={alignedLogo} alt="Stellara" className="relative w-44 h-44 object-contain mix-blend-screen drop-shadow-[0_0_30px_rgba(200,180,130,0.3)]" />
                 </motion.div>
                 <motion.h1 
                   className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent"

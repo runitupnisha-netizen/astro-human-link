@@ -262,7 +262,7 @@ const Onboarding = () => {
         age--;
       }
       if (age < 18) {
-        toast.error("You must be at least 18 years old to use Aligned.");
+        toast.error("You must be at least 18 years old to use Stellara.");
         return;
       }
     }

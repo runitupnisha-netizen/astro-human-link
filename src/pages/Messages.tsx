@@ -57,6 +57,7 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploadingVoice, setUploadingVoice] = useState(false);
   const [sendingIcebreaker, setSendingIcebreaker] = useState(false);
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);

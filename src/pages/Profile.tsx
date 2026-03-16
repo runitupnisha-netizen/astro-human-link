@@ -23,6 +23,9 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
 import BioPrompts from "@/components/BioPrompts";
 import ProfileChecklist from "@/components/ProfileChecklist";
+import SelfieVerification from "@/components/SelfieVerification";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {

@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import AudioPlayer from "@/components/AudioPlayer";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatuses } from "@/hooks/useVerification";
 
 interface Match {
   id: string;

@@ -252,6 +252,7 @@ const Connections = () => {
                             >
                               {match.otherProfile.display_name || "Someone New"}
                             </h3>
+                            {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                             {match.compatibility_score != null && (
                               <span className={`text-sm font-bold ${getScoreColor(match.compatibility_score)}`}>
                                 {match.compatibility_score}%

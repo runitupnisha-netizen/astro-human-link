@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Lock, Sparkles, Star, Crown, User, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 

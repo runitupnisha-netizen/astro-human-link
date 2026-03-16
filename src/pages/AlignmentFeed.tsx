@@ -156,6 +156,7 @@ const AlignmentFeed = () => {
             <Card className="glass-card mb-6">
               <CardContent className="p-5">
                 <Textarea
+                  ref={textareaRef}
                   placeholder="What's on your mind?"
                   value={newContent}
                   onChange={e => setNewContent(e.target.value)}

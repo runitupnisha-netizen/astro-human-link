@@ -472,11 +472,16 @@ const Messages = () => {
                         >
                           <ArrowLeft className="w-5 h-5" />
                         </Button>
-                        <div className="w-10 h-10 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
-                          {selectedConvo.otherProfile.avatar_url ? (
-                            <img src={selectedConvo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <User className="w-5 h-5 text-foreground" />
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-border/30 overflow-hidden">
+                            {selectedConvo.otherProfile.avatar_url ? (
+                              <img src={selectedConvo.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-5 h-5 text-foreground" />
+                            )}
+                          </div>
+                          {onlineUsers.has(selectedConvo.otherProfile.user_id) && (
+                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -490,6 +495,11 @@ const Messages = () => {
                             {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
                           <div className="flex items-center gap-2">
+                            {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
+                              <span className="text-[10px] text-green-500 font-medium">Online</span>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">Offline</span>
+                            )}
                             {selectedConvo.match.compatibility_score && (
                               <Badge variant="outline" className="text-[10px] border-accent/30 text-accent h-5">
                                 {selectedConvo.match.compatibility_score}% Match

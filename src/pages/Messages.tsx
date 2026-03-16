@@ -710,7 +710,11 @@ const Messages = () => {
                                       ✨ Cosmic Icebreaker
                                     </span>
                                   )}
-                                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                                  {msg.message_type === "voice" ? (
+                                    <AudioPlayer src={msg.content} isMe={isMe} />
+                                  ) : (
+                                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                                  )}
                                   <div className="flex items-center justify-end gap-1 mt-1">
                                     <span className="text-[10px] opacity-50">
                                       {new Date(msg.created_at).toLocaleTimeString([], {

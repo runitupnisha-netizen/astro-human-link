@@ -190,20 +190,33 @@ const Messages = () => {
         (payload) => {
           const newMsg = payload.new as Message;
           setMessages((prev) => {
-            // Remove optimistic message and avoid duplicates
             if (prev.some((m) => m.id === newMsg.id)) return prev;
             const withoutOptimistic = prev.filter(
               (m) => !(m.id.startsWith("temp-") && m.sender_id === newMsg.sender_id && m.content === newMsg.content)
             );
             return [...withoutOptimistic, newMsg];
           });
-          // Update conversation list last message
           setConversations((prev) =>
             prev.map((c) =>
               c.match.id === selectedMatchId
                 ? { ...c, lastMessage: newMsg }
                 : c
             )
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `match_id=eq.${selectedMatchId}`,
+        },
+        (payload) => {
+          const updated = payload.new as Message;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === updated.id ? { ...m, read_at: updated.read_at } : m))
           );
         }
       )

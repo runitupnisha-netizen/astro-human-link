@@ -526,6 +526,12 @@ const Discover = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature="super_like"
+      />
     </div>
   );
 };

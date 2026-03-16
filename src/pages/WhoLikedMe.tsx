@@ -190,6 +190,12 @@ const WhoLikedMe = () => {
           </>
         )}
       </div>
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature="who_liked_me"
+      />
     </div>
   );
 };

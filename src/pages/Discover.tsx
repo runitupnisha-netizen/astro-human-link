@@ -1,17 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
-import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown, Undo2 } from "lucide-react";
 import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+
+const FREE_DAILY_LIKE_LIMIT = 15;
 
 const Discover = () => {
   const { user } = useAuth();
@@ -25,6 +27,10 @@ const Discover = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any>(null);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
+  const [lastSwipe, setLastSwipe] = useState<{ profile: DiscoverProfile; swipeId: string } | null>(null);
+  const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
+  const [likeLimitReached, setLikeLimitReached] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -53,6 +59,23 @@ const Discover = () => {
   useEffect(() => {
     fetchProfiles();
   }, [fetchProfiles]);
+
+  // Count today's likes for daily limit
+  useEffect(() => {
+    if (!user || isPremium) return;
+    const today = new Date().toISOString().split("T")[0];
+    supabase
+      .from("swipes")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .in("action", ["like", "super_like"])
+      .gte("created_at", `${today}T00:00:00Z`)
+      .then(({ count }) => {
+        const used = count || 0;
+        setDailyLikesUsed(used);
+        setLikeLimitReached(used >= FREE_DAILY_LIKE_LIMIT);
+      });
+  }, [user, isPremium, swipeCount]);
 
   // Listen for new matches in realtime
   useEffect(() => {
@@ -89,6 +112,14 @@ const Discover = () => {
 
     // Gate super likes behind premium
     if (direction === "super" && !isPremium) {
+      setUpsellFeature("super_like");
+      setShowUpsell(true);
+      return;
+    }
+
+    // Daily like limit for free users
+    if ((direction === "right" || direction === "super") && !isPremium && likeLimitReached) {
+      setUpsellFeature("daily_likes");
       setShowUpsell(true);
       return;
     }
@@ -97,6 +128,9 @@ const Discover = () => {
 
     setProfiles((prev) => prev.slice(1));
     setSwipeCount((c) => c + 1);
+    if (action !== "pass") {
+      setDailyLikesUsed((c) => c + 1);
+    }
 
     if (direction === "super") {
       toast({
@@ -106,15 +140,37 @@ const Discover = () => {
     }
 
     try {
-      const { error } = await supabase.from("swipes").insert({
+      const { data, error } = await supabase.from("swipes").insert({
         user_id: user!.id,
         target_user_id: topProfile.user_id,
         action,
-      });
+      }).select("id").single();
       if (error) throw error;
+      // Store for undo
+      setLastSwipe({ profile: topProfile, swipeId: data.id });
     } catch (e: any) {
       console.error("Swipe error:", e);
       toast({ title: "Swipe failed", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!lastSwipe) return;
+    if (!isPremium) {
+      setUpsellFeature("undo");
+      setShowUpsell(true);
+      return;
+    }
+    try {
+      const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
+      if (error) throw error;
+      setProfiles((prev) => [lastSwipe.profile, ...prev]);
+      setSwipeCount((c) => Math.max(0, c - 1));
+      toast({ title: "↩️ Undo successful", description: `${lastSwipe.profile.display_name || "Profile"} is back in your stack` });
+      setLastSwipe(null);
+    } catch (e: any) {
+      console.error("Undo error:", e);
+      toast({ title: "Undo failed", description: e.message, variant: "destructive" });
     }
   };
 
@@ -137,8 +193,8 @@ const Discover = () => {
           </p>
         </motion.div>
 
-        {/* Filter button */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-4">
+        {/* Filter + Undo row */}
+        <div className="w-full max-w-sm mx-auto px-4 mb-4 flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -153,6 +209,26 @@ const Discover = () => {
               </span>
             )}
           </Button>
+
+          {lastSwipe && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-accent/30 hover:bg-accent/10 gap-1.5"
+              onClick={handleUndo}
+            >
+              <Undo2 className="w-4 h-4" />
+              Undo
+              {!isPremium && <Crown className="w-3 h-3 text-accent" />}
+            </Button>
+          )}
+
+          {/* Daily likes counter for free users */}
+          {!isPremium && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              {Math.max(0, FREE_DAILY_LIKE_LIMIT - dailyLikesUsed)}/{FREE_DAILY_LIKE_LIMIT} likes
+            </span>
+          )}
         </div>
 
         {/* Filter Panel */}
@@ -535,7 +611,7 @@ const Discover = () => {
       <PremiumUpsellModal
         open={showUpsell}
         onClose={() => setShowUpsell(false)}
-        feature="super_like"
+        feature={upsellFeature as any}
       />
     </div>
   );

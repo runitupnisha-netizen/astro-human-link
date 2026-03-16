@@ -300,6 +300,7 @@ export type Database = {
           human_design_type: string | null
           id: string
           interests: string[] | null
+          is_paused: boolean
           kids_preference: string | null
           life_path_number: number | null
           max_distance_km: number | null
@@ -355,6 +356,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_paused?: boolean
           kids_preference?: string | null
           life_path_number?: number | null
           max_distance_km?: number | null
@@ -410,6 +412,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_paused?: boolean
           kids_preference?: string | null
           life_path_number?: number | null
           max_distance_km?: number | null

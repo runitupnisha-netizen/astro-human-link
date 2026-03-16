@@ -285,11 +285,12 @@ serve(async (req) => {
     const swipedIds = (swipedRows || []).map((r: any) => r.target_user_id);
     swipedIds.push(user.id); // exclude self
 
-    // Fetch candidate profiles (onboarding complete, not already swiped)
+    // Fetch candidate profiles (onboarding complete, not paused, not already swiped)
     const { data: candidates, error: candErr } = await supabase
       .from("profiles")
       .select("*")
       .eq("onboarding_complete", true)
+      .eq("is_paused", false)
       .not("user_id", "in", `(${swipedIds.join(",")})`)
       .limit(50);
 

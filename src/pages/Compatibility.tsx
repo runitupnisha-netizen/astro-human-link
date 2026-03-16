@@ -331,22 +331,30 @@ const Compatibility = () => {
           </motion.div>
 
           {/* Interactive Synastry Chart */}
-          <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
-            <SynastryChart
-              mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
-              theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
-              score={data.overall_score}
-            />
-          </SectionCard>
+          {isPremium ? (
+            <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
+              <SynastryChart
+                mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
+                theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
+                score={data.overall_score}
+              />
+            </SectionCard>
+          ) : (
+            <PremiumGateCard title="Full Synastry Chart" delay={0.28} navigate={navigate} />
+          )}
 
           {/* Energy Attraction Map */}
-          <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
-            <EnergyAttractionMap
-              myProfile={profiles.mine}
-              theirProfile={profiles.theirs}
-              score={data.overall_score}
-            />
-          </SectionCard>
+          {isPremium ? (
+            <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
+              <EnergyAttractionMap
+                myProfile={profiles.mine}
+                theirProfile={profiles.theirs}
+                score={data.overall_score}
+              />
+            </SectionCard>
+          ) : (
+            <PremiumGateCard title="Energy Attraction Map" delay={0.29} navigate={navigate} />
+          )}
 
           <div className="space-y-4">
             {/* Synastry Section */}

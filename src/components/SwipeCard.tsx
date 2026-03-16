@@ -37,6 +37,7 @@ interface SwipeCardProps {
   isTop: boolean;
   stackIndex?: number;
   onViewProfile?: (profile: DiscoverProfile) => void;
+  isPremium?: boolean;
 }
 
 const CompatibilityRing = ({ score }: { score: number }) => {

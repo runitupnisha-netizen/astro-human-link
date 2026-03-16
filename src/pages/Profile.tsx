@@ -103,6 +103,7 @@ const Profile = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
+  const { isVerified } = useVerificationStatus(user?.id);
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");

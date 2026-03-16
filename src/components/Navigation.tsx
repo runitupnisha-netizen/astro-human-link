@@ -116,6 +116,11 @@ const Navigation = () => {
                       )}
                     </div>
                     <span>{item.label}</span>
+                    {item.premium && !isActive && (
+                      <span className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+                        <span className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite] bg-[linear-gradient(110deg,transparent_25%,rgba(251,191,36,0.15)_50%,transparent_75%)] bg-[length:250%_100%]" />
+                      </span>
+                    )}
                   </Link>
                 );
               })}

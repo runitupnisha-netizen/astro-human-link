@@ -567,6 +567,8 @@ const Messages = () => {
                               {convo.lastMessage
                                 ? convo.lastMessage.message_type === "icebreaker"
                                   ? `✨ ${convo.lastMessage.content}`
+                                  : convo.lastMessage.message_type === "voice"
+                                  ? "🎙️ Voice message"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>

@@ -132,7 +132,8 @@ const Discover = () => {
             Cosmic Discovery
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Souls aligned with your unique cosmic blueprint
+            Souls aligned with your unique{" "}
+            <button onClick={() => navigate("/profile")} className="text-primary hover:underline underline-offset-2 transition-colors">cosmic blueprint</button>
           </p>
         </motion.div>
 

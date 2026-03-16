@@ -1,17 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
-import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown, Undo2 } from "lucide-react";
 import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+
+const FREE_DAILY_LIKE_LIMIT = 15;
 
 const Discover = () => {
   const { user } = useAuth();
@@ -25,6 +27,10 @@ const Discover = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any>(null);
   const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
+  const [lastSwipe, setLastSwipe] = useState<{ profile: DiscoverProfile; swipeId: string } | null>(null);
+  const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
+  const [likeLimitReached, setLikeLimitReached] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

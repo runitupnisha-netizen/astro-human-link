@@ -181,6 +181,7 @@ const Compatibility = () => {
   const { matchId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const { toast } = useToast();
   const [data, setData] = useState<CompatibilityData | null>(null);
   const [loading, setLoading] = useState(true);

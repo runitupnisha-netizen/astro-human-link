@@ -4,8 +4,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "Stellara ✨";
   const options = {
     body: data.body || "Your daily cosmic intention is ready",
-    icon: "/aligned-logo.png",
-    badge: "/aligned-logo.png",
+    icon: "/stellara-logo-192.png",
+    badge: "/stellara-logo-192.png",
     vibrate: [100, 50, 100],
     data: { url: data.url || "/insights" },
     actions: [{ action: "open", title: "View Intention" }],

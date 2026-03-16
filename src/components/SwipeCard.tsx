@@ -248,6 +248,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
                 <h2 className="font-display text-xl font-bold text-foreground truncate">
                   {profile.display_name || "New Here"}
                 </h2>
+                {isVerified && <VerifiedBadge size="sm" />}
                 {getAge(profile.birth_date) && (
                   <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
                 )}

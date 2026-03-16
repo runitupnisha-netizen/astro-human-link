@@ -24,6 +24,7 @@ import Disclaimer from "./pages/Disclaimer";
 import ViewProfile from "./pages/ViewProfile";
 import WhoLikedMe from "./pages/WhoLikedMe";
 import ResetPassword from "./pages/ResetPassword";
+import Premium from "./pages/Premium";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

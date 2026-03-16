@@ -109,7 +109,7 @@ const WhoLikedMe = () => {
                         See full profiles, photos, and cosmic compatibility of everyone who swiped right on you.
                       </p>
                     </div>
-                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => navigate("/premium")}>
+                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => setShowUpsell(true)}>
                       <Lock className="w-3.5 h-3.5 mr-1.5" />
                       Upgrade
                     </Button>

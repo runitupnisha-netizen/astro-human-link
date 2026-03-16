@@ -624,6 +624,7 @@ const Messages = () => {
                           >
                             {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
+                          {verifiedUsers.has(selectedConvo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                           <div className="flex items-center gap-2">
                             {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
                               <span className="text-[10px] text-green-500 font-medium">Online</span>

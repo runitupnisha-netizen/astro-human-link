@@ -399,7 +399,7 @@ const Onboarding = () => {
 
       if (error) throw error;
 
-      toast.success("Your Aligned blueprint is complete! ✨");
+      toast.success("Your Stellara blueprint is complete! ✨");
       navigate("/profile");
     } catch (err: any) {
       toast.error("Failed to save preferences");

@@ -611,7 +611,7 @@ const Discover = () => {
       <PremiumUpsellModal
         open={showUpsell}
         onClose={() => setShowUpsell(false)}
-        feature="super_like"
+        feature={upsellFeature as any}
       />
     </div>
   );

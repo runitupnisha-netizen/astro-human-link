@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Heart, Eye, Sparkles, Shield, Star, X } from "lucide-react";
+import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes";
+type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes";
 
 interface PremiumUpsellModalProps {
   open: boolean;
@@ -35,6 +35,16 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
   unlimited_swipes: {
     title: "Unlimited Matches",
     description: "No daily limits — explore as many connections as the cosmos offer",
+    icon: <Heart className="w-6 h-6" />,
+  },
+  undo: {
+    title: "Undo Last Swipe",
+    description: "Accidentally passed on someone? Go back and give them another chance",
+    icon: <Undo2 className="w-6 h-6" />,
+  },
+  daily_likes: {
+    title: "Unlimited Likes",
+    description: "You've used all your daily likes — upgrade for unlimited cosmic connections",
     icon: <Heart className="w-6 h-6" />,
   },
 };

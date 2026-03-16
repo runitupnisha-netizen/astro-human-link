@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";

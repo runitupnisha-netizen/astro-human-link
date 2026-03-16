@@ -96,6 +96,7 @@ const getCity = (place: string | null): string | null => {
 };
 
 const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
+  const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-18, 18]);

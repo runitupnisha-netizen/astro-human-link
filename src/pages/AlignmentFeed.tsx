@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -38,6 +38,7 @@ const AlignmentFeed = () => {
   const { toast } = useToast();
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("reflection");
   const [posting, setPosting] = useState(false);
@@ -155,6 +156,7 @@ const AlignmentFeed = () => {
             <Card className="glass-card mb-6">
               <CardContent className="p-5">
                 <Textarea
+                  ref={textareaRef}
                   placeholder="What's on your mind?"
                   value={newContent}
                   onChange={e => setNewContent(e.target.value)}
@@ -226,7 +228,12 @@ const AlignmentFeed = () => {
                 <BookOpen className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="font-display text-lg font-bold text-foreground mb-2">No Posts Yet</h3>
-              <p className="text-muted-foreground text-sm">Be the first to share something!</p>
+              <button
+                onClick={() => textareaRef.current?.focus()}
+                className="text-primary hover:underline underline-offset-2 transition-colors text-sm cursor-pointer"
+              >
+                Be the first to share something! ✍️
+              </button>
             </motion.div>
           ) : (
             <AnimatePresence>

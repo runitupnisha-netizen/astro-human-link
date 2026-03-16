@@ -88,11 +88,7 @@ const Discover = () => {
 
     // Gate super likes behind premium
     if (direction === "super" && !isPremium) {
-      toast({
-        title: "⭐ Super Likes are a Premium feature",
-        description: "Upgrade to Stellara Premium to send Super Likes",
-        action: <Button size="sm" variant="outline" onClick={() => navigate("/premium")}>Upgrade</Button>,
-      });
+      setShowUpsell(true);
       return;
     }
 

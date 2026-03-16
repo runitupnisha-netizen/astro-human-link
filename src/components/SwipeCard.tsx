@@ -96,7 +96,7 @@ const getCity = (place: string | null): string | null => {
   return place.split(",")[0].trim();
 };
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false }: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);

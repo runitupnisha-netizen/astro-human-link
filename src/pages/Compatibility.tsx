@@ -177,6 +177,24 @@ const ProfileAvatar = ({ profile, size = "w-16 h-16" }: { profile: AnalysisProfi
   </div>
 );
 
+const PremiumGateCard = ({ title, delay, navigate }: { title: string; delay: number; navigate: (path: string) => void }) => (
+  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
+    <Card className="bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden">
+      <CardContent className="p-6 text-center">
+        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-3">
+          <Lock className="w-6 h-6 text-primary" />
+        </div>
+        <h3 className="font-display text-lg font-bold text-foreground mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground mb-4">Unlock deep cosmic insights with Stellara Premium</p>
+        <Button onClick={() => navigate("/premium")} className="bg-primary hover:bg-primary/90 gap-2">
+          <Crown className="w-4 h-4" />
+          Upgrade to Premium
+        </Button>
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
 const Compatibility = () => {
   const { matchId } = useParams();
   const navigate = useNavigate();

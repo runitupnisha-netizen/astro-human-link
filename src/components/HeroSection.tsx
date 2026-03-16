@@ -21,7 +21,7 @@ const HeroSection = () => {
           className="mix-blend-screen"
         >
           <img 
-            src={alignedHeroLogo} 
+            src={stellaraHeroLogo} 
             alt="" 
             className="w-[85vw] md:w-[60vw] lg:w-[50vw] max-w-[800px] object-contain"
           />

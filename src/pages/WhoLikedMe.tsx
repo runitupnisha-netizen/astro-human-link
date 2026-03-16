@@ -95,7 +95,10 @@ const WhoLikedMe = () => {
               <Heart className="w-10 h-10 text-muted-foreground/50" />
             </div>
             <p className="text-muted-foreground">No pending likes yet</p>
-            <p className="text-sm text-muted-foreground/60 mt-1">New likes will appear as others discover your profile</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">
+              New likes will appear as others{" "}
+              <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">discover your profile</button>
+            </p>
           </motion.div>
         ) : (
           <>

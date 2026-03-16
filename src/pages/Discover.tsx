@@ -84,6 +84,17 @@ const Discover = () => {
   const handleSwipe = async (direction: "left" | "right" | "super") => {
     if (profiles.length === 0) return;
     const topProfile = profiles[0];
+
+    // Gate super likes behind premium
+    if (direction === "super" && !isPremium) {
+      toast({
+        title: "⭐ Super Likes are a Premium feature",
+        description: "Upgrade to Stellara Premium to send Super Likes",
+        action: <Button size="sm" variant="outline" onClick={() => navigate("/premium")}>Upgrade</Button>,
+      });
+      return;
+    }
+
     const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
 
     setProfiles((prev) => prev.slice(1));

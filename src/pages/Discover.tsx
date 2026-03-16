@@ -290,6 +290,7 @@ const Discover = () => {
                   onSwipe={handleSwipe}
                   isTop={index === 0}
                   stackIndex={index}
+                  isPremium={isPremium}
                 />
               ))}
             </AnimatePresence>

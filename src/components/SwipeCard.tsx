@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { useState } from "react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
@@ -37,6 +37,7 @@ interface SwipeCardProps {
   isTop: boolean;
   stackIndex?: number;
   onViewProfile?: (profile: DiscoverProfile) => void;
+  isPremium?: boolean;
 }
 
 const CompatibilityRing = ({ score }: { score: number }) => {
@@ -95,7 +96,7 @@ const getCity = (place: string | null): string | null => {
   return place.split(",")[0].trim();
 };
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false }: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -131,6 +132,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
+      if (!isPremium) return; // Block super like for free users
       setExitDir("up");
       setExiting(true);
       onSwipe("super");
@@ -376,11 +378,22 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
             <motion.button
               whileHover={{ scale: 1.15, y: -4 }}
               whileTap={{ scale: 0.85 }}
-              onClick={() => { setExitDir("up"); setExiting(true); onSwipe("super"); }}
-              className="w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center"
+              onClick={() => {
+                if (!isPremium) {
+                  onSwipe("super"); // Will be intercepted by Discover to show toast
+                  return;
+                }
+                setExitDir("up"); setExiting(true); onSwipe("super");
+              }}
+              className={`w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center relative ${!isPremium ? "opacity-60" : ""}`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
               <Star className="w-8 h-8 text-accent-foreground fill-current" />
+              {!isPremium && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                  <Lock className="w-3 h-3 text-primary-foreground" />
+                </div>
+              )}
             </motion.button>
 
             <motion.button

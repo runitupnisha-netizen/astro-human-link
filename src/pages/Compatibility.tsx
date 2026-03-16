@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Heart, Zap, Star, Sun, Moon, User, Flame, Droplets, Wind, Mountain, ChevronDown, MessageCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Heart, Zap, Star, Sun, Moon, User, Flame, Droplets, Wind, Mountain, ChevronDown, MessageCircle, Loader2, Lock, Crown } from "lucide-react";
 import SynastryChart from "@/components/SynastryChart";
 import EnergyAttractionMap from "@/components/EnergyAttractionMap";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
@@ -176,10 +177,29 @@ const ProfileAvatar = ({ profile, size = "w-16 h-16" }: { profile: AnalysisProfi
   </div>
 );
 
+const PremiumGateCard = ({ title, delay, navigate }: { title: string; delay: number; navigate: (path: string) => void }) => (
+  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
+    <Card className="bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden">
+      <CardContent className="p-6 text-center">
+        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-3">
+          <Lock className="w-6 h-6 text-primary" />
+        </div>
+        <h3 className="font-display text-lg font-bold text-foreground mb-1">{title}</h3>
+        <p className="text-sm text-muted-foreground mb-4">Unlock deep cosmic insights with Stellara Premium</p>
+        <Button onClick={() => navigate("/premium")} className="bg-primary hover:bg-primary/90 gap-2">
+          <Crown className="w-4 h-4" />
+          Upgrade to Premium
+        </Button>
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
 const Compatibility = () => {
   const { matchId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const { toast } = useToast();
   const [data, setData] = useState<CompatibilityData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -329,22 +349,30 @@ const Compatibility = () => {
           </motion.div>
 
           {/* Interactive Synastry Chart */}
-          <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
-            <SynastryChart
-              mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
-              theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
-              score={data.overall_score}
-            />
-          </SectionCard>
+          {isPremium ? (
+            <SectionCard title="Your Star Chart" icon={<Star className="w-4 h-4" />} delay={0.28}>
+              <SynastryChart
+                mySigns={{ sun: profiles.mine.sun_sign, moon: profiles.mine.moon_sign, rising: profiles.mine.rising_sign }}
+                theirSigns={{ sun: profiles.theirs.sun_sign, moon: profiles.theirs.moon_sign, rising: profiles.theirs.rising_sign }}
+                score={data.overall_score}
+              />
+            </SectionCard>
+          ) : (
+            <PremiumGateCard title="Full Synastry Chart" delay={0.28} navigate={navigate} />
+          )}
 
           {/* Energy Attraction Map */}
-          <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
-            <EnergyAttractionMap
-              myProfile={profiles.mine}
-              theirProfile={profiles.theirs}
-              score={data.overall_score}
-            />
-          </SectionCard>
+          {isPremium ? (
+            <SectionCard title="How Your Energies Connect" icon={<Sparkles className="w-4 h-4" />} delay={0.29}>
+              <EnergyAttractionMap
+                myProfile={profiles.mine}
+                theirProfile={profiles.theirs}
+                score={data.overall_score}
+              />
+            </SectionCard>
+          ) : (
+            <PremiumGateCard title="Energy Attraction Map" delay={0.29} navigate={navigate} />
+          )}
 
           <div className="space-y-4">
             {/* Synastry Section */}

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Lock, Sparkles, Star, Crown, User, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 
 interface Liker {
@@ -22,10 +24,11 @@ interface Liker {
 
 const WhoLikedMe = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
+  const navigate = useNavigate();
   const [likers, setLikers] = useState<Liker[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const isPremium = false; // Will be connected to Stripe later
 
   useEffect(() => {
     if (user) fetchLikers();
@@ -104,7 +107,7 @@ const WhoLikedMe = () => {
                         See full profiles, photos, and cosmic compatibility of everyone who swiped right on you.
                       </p>
                     </div>
-                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90">
+                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => navigate("/premium")}>
                       <Lock className="w-3.5 h-3.5 mr-1.5" />
                       Upgrade
                     </Button>

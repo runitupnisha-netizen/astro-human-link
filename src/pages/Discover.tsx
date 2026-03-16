@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
@@ -13,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<DiscoverProfile[]>([]);
@@ -82,6 +84,17 @@ const Discover = () => {
   const handleSwipe = async (direction: "left" | "right" | "super") => {
     if (profiles.length === 0) return;
     const topProfile = profiles[0];
+
+    // Gate super likes behind premium
+    if (direction === "super" && !isPremium) {
+      toast({
+        title: "⭐ Super Likes are a Premium feature",
+        description: "Upgrade to Stellara Premium to send Super Likes",
+        action: <Button size="sm" variant="outline" onClick={() => navigate("/premium")}>Upgrade</Button>,
+      });
+      return;
+    }
+
     const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
 
     setProfiles((prev) => prev.slice(1));
@@ -277,6 +290,7 @@ const Discover = () => {
                   onSwipe={handleSwipe}
                   isTop={index === 0}
                   stackIndex={index}
+                  isPremium={isPremium}
                 />
               ))}
             </AnimatePresence>

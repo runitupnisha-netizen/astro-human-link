@@ -70,6 +70,10 @@ const Messages = () => {
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
+  // Collect other user IDs for batch verification check
+  const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
+  const verifiedUsers = useVerificationStatuses(otherUserIds);
+
   // Online presence tracking
   useEffect(() => {
     if (!user) return;

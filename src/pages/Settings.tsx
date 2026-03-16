@@ -238,6 +238,30 @@ const Settings = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Pause / Snooze Profile */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <PauseCircle className="w-4 h-4" /> Pause Profile
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      {profile?.is_paused
+                        ? "Your profile is hidden from discovery"
+                        : "Temporarily hide your profile from others"}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={profile?.is_paused || false}
+                    onCheckedChange={async (checked) => {
+                      setProfile({ ...profile, is_paused: checked });
+                      await supabase.from("profiles").update({ is_paused: checked }).eq("user_id", user!.id);
+                      toast.success(checked ? "Profile paused — you're hidden from discovery 🌙" : "Profile unpaused — you're back in the cosmos ✨");
+                    }}
+                  />
+                </div>
+
+                <Separator />
+
                 <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"

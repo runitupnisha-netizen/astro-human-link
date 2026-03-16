@@ -1,0 +1,1 @@
+DELETE FROM post_likes; DELETE FROM alignment_posts;

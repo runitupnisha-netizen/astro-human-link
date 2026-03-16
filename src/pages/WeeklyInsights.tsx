@@ -146,7 +146,10 @@ const WeeklyInsights = () => {
               Weekly Alignment
             </h1>
             <p className="text-muted-foreground text-sm font-serif">
-              Your cosmic cheat sheet for {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              Your cosmic cheat sheet for {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.{" "}
+              <button onClick={generateInsights} disabled={generating} className="text-accent hover:underline underline-offset-2 transition-colors disabled:opacity-50">
+                {generating ? "Refreshing…" : "Refresh reading ↻"}
+              </button>
             </p>
           </motion.div>
 

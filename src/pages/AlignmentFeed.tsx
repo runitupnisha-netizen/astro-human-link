@@ -142,7 +142,11 @@ const AlignmentFeed = () => {
               Alignment Feed
             </h1>
             <p className="text-muted-foreground text-sm max-w-md mx-auto font-serif">
-              Share what you're learning, evolving through, and the intentions you're calling into your life.
+              Share what you're{" "}
+              <button onClick={() => setFilter("growth")} className="text-primary hover:underline underline-offset-2 transition-colors">learning</button>,{" "}
+              <button onClick={() => setFilter("reflection")} className="text-primary hover:underline underline-offset-2 transition-colors">evolving through</button>, and the{" "}
+              <button onClick={() => setFilter("intention")} className="text-accent hover:underline underline-offset-2 transition-colors">intentions</button>{" "}
+              you're calling into your life.
             </p>
           </motion.div>
 

@@ -132,7 +132,8 @@ const Discover = () => {
             Cosmic Discovery
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Souls aligned with your unique cosmic blueprint
+            Souls aligned with your unique{" "}
+            <button onClick={() => navigate("/profile")} className="text-primary hover:underline underline-offset-2 transition-colors">cosmic blueprint</button>
           </p>
         </motion.div>
 
@@ -336,9 +337,12 @@ const Discover = () => {
             <p className="text-muted-foreground text-xs">
               {profiles.length} {profiles.length !== 1 ? "people" : "person"} in your queue
             </p>
-            <p className="text-muted-foreground/50 text-[10px]">
+            <button
+              onClick={() => !isPremium ? setShowUpsell(true) : handleSwipe("super")}
+              className="text-muted-foreground/50 text-[10px] hover:text-primary/70 transition-colors"
+            >
               Swipe up for ⭐ Super Like
-            </p>
+            </button>
           </motion.div>
         )}
       </div>

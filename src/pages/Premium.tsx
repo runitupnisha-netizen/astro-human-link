@@ -124,7 +124,8 @@ const Premium = () => {
             Stellara Premium
           </h1>
           <p className="text-muted-foreground font-body text-lg">
-            Unlock the full power of cosmic connection
+            Unlock the full power of{" "}
+            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }} className="text-accent hover:underline underline-offset-2 transition-colors cursor-pointer">cosmic connection ↓</a>
           </p>
 
           {subscribed && currentTier && (
@@ -166,7 +167,7 @@ const Premium = () => {
 
       {/* Tier Cards */}
       <div className="px-4 max-w-lg mx-auto space-y-4">
-        <h2 className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
+        <h2 id="plans" className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
 
         {(Object.keys(STELLARA_TIERS) as TierKey[]).map((tierKey, i) => {
           const tier = STELLARA_TIERS[tierKey];

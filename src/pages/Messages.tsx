@@ -769,8 +769,6 @@ const Messages = () => {
                             }}
                             className="flex-1 bg-background/50 border-border"
                           />
-                            className="flex-1 bg-background/50 border-border"
-                          />
                           <Button
                             size="icon"
                             onClick={handleSendMessage}

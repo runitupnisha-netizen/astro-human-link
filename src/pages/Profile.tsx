@@ -146,7 +146,7 @@ const Profile = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${profile?.display_name || "My"} Soul Blueprint — Aligned`,
+          title: `${profile?.display_name || "My"} Soul Blueprint — Stellara`,
           text: `☉ ${profile?.sun_sign || "?"} · ☽ ${profile?.moon_sign || "?"} · ↗ ${profile?.rising_sign || "?"} | ${profile?.human_design_type || ""}`,
           url: window.location.href,
         });

@@ -756,8 +756,19 @@ const Messages = () => {
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
+                            onChange={(e) => {
+                              setNewMessage(e.target.value);
+                              if (e.target.value.trim()) broadcastTyping();
+                              else stopTyping();
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                stopTyping();
+                                handleSendMessage();
+                              }
+                            }}
+                            className="flex-1 bg-background/50 border-border"
+                          />
                             className="flex-1 bg-background/50 border-border"
                           />
                           <Button

@@ -223,16 +223,79 @@ const AlignmentFeed = () => {
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
           ) : filteredPosts.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-              <div className="w-20 h-20 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-10 h-10 text-muted-foreground" />
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center py-16 relative">
+              {/* Floating orbs background */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute rounded-full bg-primary/10 blur-xl"
+                    style={{
+                      width: 40 + i * 20,
+                      height: 40 + i * 20,
+                      left: `${15 + i * 16}%`,
+                      top: `${20 + (i % 3) * 25}%`,
+                    }}
+                    animate={{
+                      y: [0, -12, 0],
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [1, 1.15, 1],
+                    }}
+                    transition={{
+                      duration: 3 + i * 0.5,
+                      repeat: Infinity,
+                      delay: i * 0.4,
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
               </div>
-              <h3 className="font-display text-lg font-bold text-foreground mb-2">No Posts Yet</h3>
+
+              {/* Animated icon cluster */}
+              <div className="relative w-28 h-28 mx-auto mb-6">
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 blur-md"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <div className="relative w-full h-full rounded-full bg-muted/20 backdrop-blur-sm border border-border/30 flex items-center justify-center">
+                  <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Sparkles className="w-10 h-10 text-primary" />
+                  </motion.div>
+                </div>
+                {/* Orbiting icons */}
+                {[BookOpen, Heart, Flame].map((Icon, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-8 h-8 rounded-full bg-card/80 border border-border/40 flex items-center justify-center shadow-cosmic"
+                    style={{ top: "50%", left: "50%" }}
+                    animate={{
+                      x: [Math.cos((i * 2 * Math.PI) / 3) * 48, Math.cos((i * 2 * Math.PI) / 3 + Math.PI) * 48],
+                      y: [Math.sin((i * 2 * Math.PI) / 3) * 48, Math.sin((i * 2 * Math.PI) / 3 + Math.PI) * 48],
+                    }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+                  >
+                    <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                  </motion.div>
+                ))}
+              </div>
+
+              <h3 className="font-display text-xl font-bold text-foreground mb-2">The Space Awaits</h3>
+              <p className="text-muted-foreground text-sm mb-4 max-w-xs mx-auto">
+                This is a sacred space for reflections, growth, and intentions. Your words plant seeds here.
+              </p>
               <button
-                onClick={() => textareaRef.current?.focus()}
-                className="text-primary hover:underline underline-offset-2 transition-colors text-sm cursor-pointer"
+                onClick={() => {
+                  textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  textareaRef.current?.focus();
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 transition-all text-sm font-medium hover:scale-105"
               >
-                Be the first to share something! ✍️
+                <Feather className="w-4 h-4" />
+                Be the first to share something
               </button>
             </motion.div>
           ) : (

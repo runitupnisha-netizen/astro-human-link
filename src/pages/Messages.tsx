@@ -679,7 +679,30 @@ const Messages = () => {
                             );
                           })}
                         </AnimatePresence>
-                        <div ref={messagesEndRef} />
+                        {/* Typing indicator */}
+                        <AnimatePresence>
+                          {selectedConvo && typingUsers.has(
+                            selectedConvo.match.user_a === user?.id
+                              ? selectedConvo.match.user_b
+                              : selectedConvo.match.user_a
+                          ) && (
+                            <motion.div
+                              key="typing"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className="flex justify-start"
+                            >
+                              <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-muted/60">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       {/* Icebreaker suggestions */}

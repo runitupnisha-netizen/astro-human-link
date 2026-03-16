@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
 import BioPrompts from "@/components/BioPrompts";
 import UserActions from "@/components/UserActions";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 interface ProfileData {
   display_name: string | null;

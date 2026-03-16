@@ -30,7 +30,7 @@ const Settings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types")
+      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {

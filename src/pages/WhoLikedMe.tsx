@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Lock, Sparkles, Star, Crown, User, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 
@@ -29,6 +30,7 @@ const WhoLikedMe = () => {
   const [likers, setLikers] = useState<Liker[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showUpsell, setShowUpsell] = useState(false);
 
   useEffect(() => {
     if (user) fetchLikers();
@@ -107,7 +109,7 @@ const WhoLikedMe = () => {
                         See full profiles, photos, and cosmic compatibility of everyone who swiped right on you.
                       </p>
                     </div>
-                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => navigate("/premium")}>
+                    <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => setShowUpsell(true)}>
                       <Lock className="w-3.5 h-3.5 mr-1.5" />
                       Upgrade
                     </Button>
@@ -188,6 +190,12 @@ const WhoLikedMe = () => {
           </>
         )}
       </div>
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature="who_liked_me"
+      />
     </div>
   );
 };

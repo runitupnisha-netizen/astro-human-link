@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 
 const Discover = () => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const Discover = () => {
   const [swipeCount, setSwipeCount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any>(null);
+  const [showUpsell, setShowUpsell] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -87,11 +89,7 @@ const Discover = () => {
 
     // Gate super likes behind premium
     if (direction === "super" && !isPremium) {
-      toast({
-        title: "⭐ Super Likes are a Premium feature",
-        description: "Upgrade to Stellara Premium to send Super Likes",
-        action: <Button size="sm" variant="outline" onClick={() => navigate("/premium")}>Upgrade</Button>,
-      });
+      setShowUpsell(true);
       return;
     }
 
@@ -529,6 +527,12 @@ const Discover = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature="super_like"
+      />
     </div>
   );
 };

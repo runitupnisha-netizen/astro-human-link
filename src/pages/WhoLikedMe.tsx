@@ -67,9 +67,17 @@ const WhoLikedMe = () => {
             {count > 0 ? `${count} ${count !== 1 ? "people" : "person"} liked you` : "Your likes will show up here"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {count > 0
-              ? "Upgrade to see who's into you"
-              : "Keep putting yourself out there — likes will come!"}
+            {count > 0 ? (
+              <>
+                <button onClick={() => isPremium ? null : setShowUpsell(true)} className="text-primary hover:underline underline-offset-2 transition-colors font-medium">Upgrade</button>{" "}
+                to see who's into you
+              </>
+            ) : (
+              <>
+                Keep putting yourself out there —{" "}
+                <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">discover more people</button>!
+              </>
+            )}
           </p>
         </motion.div>
 

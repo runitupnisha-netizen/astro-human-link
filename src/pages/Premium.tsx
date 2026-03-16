@@ -167,7 +167,7 @@ const Premium = () => {
 
       {/* Tier Cards */}
       <div className="px-4 max-w-lg mx-auto space-y-4">
-        <h2 className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
+        <h2 id="plans" className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
 
         {(Object.keys(STELLARA_TIERS) as TierKey[]).map((tierKey, i) => {
           const tier = STELLARA_TIERS[tierKey];

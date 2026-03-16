@@ -337,9 +337,12 @@ const Discover = () => {
             <p className="text-muted-foreground text-xs">
               {profiles.length} {profiles.length !== 1 ? "people" : "person"} in your queue
             </p>
-            <p className="text-muted-foreground/50 text-[10px]">
+            <button
+              onClick={() => !isPremium ? setShowUpsell(true) : handleSwipe("super")}
+              className="text-muted-foreground/50 text-[10px] hover:text-primary/70 transition-colors"
+            >
               Swipe up for ⭐ Super Like
-            </p>
+            </button>
           </motion.div>
         )}
       </div>

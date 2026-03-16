@@ -188,9 +188,17 @@ const Connections = () => {
               Soul Connections
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              {matches.length > 0
-                ? `You have ${matches.length} cosmic ${matches.length > 1 ? "connections" : "connection"} aligned with your energy`
-                : "Your soul connections will manifest here as the cosmos aligns."}
+              {matches.length > 0 ? (
+                <>
+                  You have {matches.length} cosmic {matches.length > 1 ? "connections" : "connection"} aligned with your energy.{" "}
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">Discover more</button>
+                </>
+              ) : (
+                <>
+                  Your soul connections will manifest here.{" "}
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">Start discovering</button> as the cosmos aligns.
+                </>
+              )}
             </p>
           </motion.div>
 

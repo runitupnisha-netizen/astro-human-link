@@ -38,6 +38,9 @@ const Connections = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
+
+  const otherIds = matches.map((m) => m.otherUserId);
+  const verifiedUsers = useVerificationStatuses(otherIds);
   const [loading, setLoading] = useState(true);
 
   const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {

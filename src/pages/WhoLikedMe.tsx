@@ -30,6 +30,7 @@ const WhoLikedMe = () => {
   const [likers, setLikers] = useState<Liker[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showUpsell, setShowUpsell] = useState(false);
 
   useEffect(() => {
     if (user) fetchLikers();

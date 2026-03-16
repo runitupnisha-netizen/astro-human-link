@@ -184,6 +184,33 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_verifications: {
+        Row: {
+          created_at: string
+          id: string
+          reviewed_at: string | null
+          selfie_url: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          selfie_url: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          selfie_url?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string

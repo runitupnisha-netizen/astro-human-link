@@ -8,6 +8,8 @@ import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatuses } from "@/hooks/useVerification";
 
 interface MatchWithProfile {
   id: string;
@@ -36,6 +38,9 @@ const Connections = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
+
+  const otherIds = matches.map((m) => m.otherUserId);
+  const verifiedUsers = useVerificationStatuses(otherIds);
   const [loading, setLoading] = useState(true);
 
   const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -247,6 +252,7 @@ const Connections = () => {
                             >
                               {match.otherProfile.display_name || "Someone New"}
                             </h3>
+                            {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                             {match.compatibility_score != null && (
                               <span className={`text-sm font-bold ${getScoreColor(match.compatibility_score)}`}>
                                 {match.compatibility_score}%

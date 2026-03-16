@@ -23,6 +23,9 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
 import BioPrompts from "@/components/BioPrompts";
 import ProfileChecklist from "@/components/ProfileChecklist";
+import SelfieVerification from "@/components/SelfieVerification";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -100,6 +103,7 @@ const Profile = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
+  const { isVerified } = useVerificationStatus(user?.id);
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");
@@ -216,6 +220,7 @@ const Profile = () => {
                 <div className="flex-1 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
+                    {isVerified && <VerifiedBadge size="lg" />}
                     <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Birth Details
@@ -280,6 +285,11 @@ const Profile = () => {
               <PhotoGallery userId={user!.id} editable={true} maxPhotos={9} columns={3} currentAvatarUrl={profile?.avatar_url} onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })} />
             </CardContent>
           </Card>
+
+          {/* Photo Verification */}
+          <div className="mb-8">
+            <SelfieVerification />
+          </div>
 
           {/* Bio Prompts */}
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">

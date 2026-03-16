@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 import PhotoGallery from "@/components/PhotoGallery";
 import BioPrompts from "@/components/BioPrompts";
 import UserActions from "@/components/UserActions";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 interface ProfileData {
   display_name: string | null;
@@ -52,6 +54,7 @@ const ViewProfile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const { isVerified } = useVerificationStatus(userId);
 
   // Haversine distance calculation
   const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -177,6 +180,7 @@ const ViewProfile = () => {
               <h1 className="text-3xl font-bold text-foreground">
                 {profile.display_name || "Cosmic Soul"}
               </h1>
+              {isVerified && <VerifiedBadge size="md" />}
               {profile.birth_date && (
                 <span className="text-2xl text-muted-foreground font-medium">
                   {(() => {

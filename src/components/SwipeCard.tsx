@@ -2,6 +2,8 @@ import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -94,6 +96,7 @@ const getCity = (place: string | null): string | null => {
 };
 
 const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) => {
+  const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-18, 18]);
@@ -245,6 +248,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0 }: SwipeCardProps) 
                 <h2 className="font-display text-xl font-bold text-foreground truncate">
                   {profile.display_name || "New Here"}
                 </h2>
+                {isVerified && <VerifiedBadge size="sm" />}
                 {getAge(profile.birth_date) && (
                   <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
                 )}

@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import AudioPlayer from "@/components/AudioPlayer";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatuses } from "@/hooks/useVerification";
 
 interface Match {
   id: string;
@@ -67,6 +69,10 @@ const Messages = () => {
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  // Collect other user IDs for batch verification check
+  const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
+  const verifiedUsers = useVerificationStatuses(otherUserIds);
 
   // Online presence tracking
   useEffect(() => {
@@ -544,8 +550,9 @@ const Messages = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
-                              <h3 className="font-semibold text-foreground text-sm truncate">
+                              <h3 className="font-semibold text-foreground text-sm truncate flex items-center gap-1">
                                 {convo.otherProfile.display_name || "Someone"}
+                                {verifiedUsers.has(convo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                               </h3>
                               {convo.lastMessage && (
                                 <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
@@ -617,6 +624,7 @@ const Messages = () => {
                           >
                             {selectedConvo.otherProfile.display_name || "Someone"}
                           </h3>
+                          {verifiedUsers.has(selectedConvo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                           <div className="flex items-center gap-2">
                             {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
                               <span className="text-[10px] text-green-500 font-medium">Online</span>

@@ -60,6 +60,7 @@ const Navigation = () => {
     { path: "/messages", label: "Messages", icon: MessageCircle, badge: unreadCount },
     { path: "/insights", label: "Insights", icon: TrendingUp },
     { path: "/profile", label: "Blueprint", icon: User },
+    { path: "/premium", label: "Premium", icon: Crown },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
 

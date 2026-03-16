@@ -89,7 +89,19 @@ const AlignmentFeed = () => {
     setLoading(false);
   }, [user]);
 
-  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+  // Check if user has posted before
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("alignment_posts")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count }) => {
+        setHasPostedBefore((count ?? 0) > 0);
+      });
+  }, [user]);
+
+
 
   // Realtime
   useEffect(() => {

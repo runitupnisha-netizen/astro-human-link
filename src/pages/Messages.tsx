@@ -61,6 +61,9 @@ const Messages = () => {
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [deepLinked, setDeepLinked] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   // Online presence tracking
   useEffect(() => {
@@ -85,6 +88,72 @@ const Messages = () => {
     return () => {
       supabase.removeChannel(presenceChannel);
     };
+  }, [user]);
+
+  // Typing indicator channel per match
+  useEffect(() => {
+    if (!selectedMatchId || !user) return;
+
+    const channel = supabase.channel(`typing:${selectedMatchId}`);
+    typingChannelRef.current = channel;
+
+    channel
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload.user_id !== user.id) {
+          setTypingUsers((prev) => new Set(prev).add(payload.user_id));
+          // Clear typing after 3 seconds of no signal
+          setTimeout(() => {
+            setTypingUsers((prev) => {
+              const next = new Set(prev);
+              next.delete(payload.user_id);
+              return next;
+            });
+          }, 3000);
+        }
+      })
+      .on('broadcast', { event: 'stop_typing' }, ({ payload }) => {
+        if (payload.user_id !== user.id) {
+          setTypingUsers((prev) => {
+            const next = new Set(prev);
+            next.delete(payload.user_id);
+            return next;
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      setTypingUsers(new Set());
+      supabase.removeChannel(channel);
+      typingChannelRef.current = null;
+    };
+  }, [selectedMatchId, user]);
+
+  const broadcastTyping = useCallback(() => {
+    if (!typingChannelRef.current || !user) return;
+    typingChannelRef.current.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { user_id: user.id },
+    });
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      typingChannelRef.current?.send({
+        type: 'broadcast',
+        event: 'stop_typing',
+        payload: { user_id: user.id },
+      });
+    }, 2000);
+  }, [user]);
+
+  const stopTyping = useCallback(() => {
+    if (!typingChannelRef.current || !user) return;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingChannelRef.current.send({
+      type: 'broadcast',
+      event: 'stop_typing',
+      payload: { user_id: user.id },
+    });
   }, [user]);
 
   // Load conversations
@@ -257,6 +326,7 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedMatchId || !user || sending) return;
     const content = newMessage.trim();
     setNewMessage("");
+    stopTyping();
     setSending(true);
 
     // Optimistic update
@@ -610,7 +680,30 @@ const Messages = () => {
                             );
                           })}
                         </AnimatePresence>
-                        <div ref={messagesEndRef} />
+                        {/* Typing indicator */}
+                        <AnimatePresence>
+                          {selectedConvo && typingUsers.has(
+                            selectedConvo.match.user_a === user?.id
+                              ? selectedConvo.match.user_b
+                              : selectedConvo.match.user_a
+                          ) && (
+                            <motion.div
+                              key="typing"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className="flex justify-start"
+                            >
+                              <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-muted/60">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+                                  <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       {/* Icebreaker suggestions */}
@@ -664,8 +757,17 @@ const Messages = () => {
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
+                            onChange={(e) => {
+                              setNewMessage(e.target.value);
+                              if (e.target.value.trim()) broadcastTyping();
+                              else stopTyping();
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                stopTyping();
+                                handleSendMessage();
+                              }
+                            }}
                             className="flex-1 bg-background/50 border-border"
                           />
                           <Button

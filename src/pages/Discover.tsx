@@ -60,6 +60,23 @@ const Discover = () => {
     fetchProfiles();
   }, [fetchProfiles]);
 
+  // Count today's likes for daily limit
+  useEffect(() => {
+    if (!user || isPremium) return;
+    const today = new Date().toISOString().split("T")[0];
+    supabase
+      .from("swipes")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .in("action", ["like", "super_like"])
+      .gte("created_at", `${today}T00:00:00Z`)
+      .then(({ count }) => {
+        const used = count || 0;
+        setDailyLikesUsed(used);
+        setLikeLimitReached(used >= FREE_DAILY_LIKE_LIMIT);
+      });
+  }, [user, isPremium, swipeCount]);
+
   // Listen for new matches in realtime
   useEffect(() => {
     if (!user) return;

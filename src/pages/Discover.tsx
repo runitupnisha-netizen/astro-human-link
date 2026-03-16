@@ -193,8 +193,8 @@ const Discover = () => {
           </p>
         </motion.div>
 
-        {/* Filter button */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-4">
+        {/* Filter + Undo row */}
+        <div className="w-full max-w-sm mx-auto px-4 mb-4 flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -209,6 +209,26 @@ const Discover = () => {
               </span>
             )}
           </Button>
+
+          {lastSwipe && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-accent/30 hover:bg-accent/10 gap-1.5"
+              onClick={handleUndo}
+            >
+              <Undo2 className="w-4 h-4" />
+              Undo
+              {!isPremium && <Crown className="w-3 h-3 text-accent" />}
+            </Button>
+          )}
+
+          {/* Daily likes counter for free users */}
+          {!isPremium && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              {Math.max(0, FREE_DAILY_LIKE_LIMIT - dailyLikesUsed)}/{FREE_DAILY_LIKE_LIMIT} likes
+            </span>
+          )}
         </div>
 
         {/* Filter Panel */}

@@ -2,6 +2,8 @@ import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { useVerificationStatus } from "@/hooks/useVerification";
 
 export interface DiscoverProfile {
   user_id: string;

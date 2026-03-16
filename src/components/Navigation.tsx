@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut, Crown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";

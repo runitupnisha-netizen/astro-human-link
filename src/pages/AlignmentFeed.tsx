@@ -38,6 +38,7 @@ const AlignmentFeed = () => {
   const { toast } = useToast();
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState("reflection");
   const [posting, setPosting] = useState(false);

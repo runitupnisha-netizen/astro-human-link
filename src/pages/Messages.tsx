@@ -810,7 +810,11 @@ const Messages = () => {
 
                       {/* Message Input */}
                       <div className="p-4 border-t border-border">
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                          <VoiceRecorder
+                            onRecordingComplete={handleVoiceRecording}
+                            disabled={sending || uploadingVoice}
+                          />
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
@@ -830,12 +834,15 @@ const Messages = () => {
                           <Button
                             size="icon"
                             onClick={handleSendMessage}
-                            disabled={!newMessage.trim() || sending}
+                            disabled={!newMessage.trim() || sending || uploadingVoice}
                             className="bg-primary hover:bg-primary/90 shadow-glow shrink-0"
                           >
                             <Send className="w-4 h-4" />
                           </Button>
                         </div>
+                        {uploadingVoice && (
+                          <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending voice message…</p>
+                        )}
                       </div>
                     </>
                   ) : (

@@ -75,6 +75,17 @@ export const useNotifications = () => {
     fetchNotifications();
   }, [fetchNotifications]);
 
+  // Re-apply filter when localStorage prefs change (e.g. from Settings page)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "stellara-notif-prefs") {
+        applyFilter(allNotifications);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [allNotifications, applyFilter]);
+
   // Realtime subscription
   useEffect(() => {
     if (!user) return;
@@ -90,22 +101,26 @@ export const useNotifications = () => {
         },
         (payload) => {
           const newNotif = payload.new as Notification;
-          setNotifications((prev) => [newNotif, ...prev]);
-          setUnreadCount((prev) => prev + 1);
+          setAllNotifications((prev) => {
+            const updated = [newNotif, ...prev];
+            applyFilter(updated);
+            return updated;
+          });
         }
       )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, applyFilter]);
 
   const markAsRead = async (id: string) => {
     await supabase.from("notifications").update({ read: true }).eq("id", id);
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    setAllNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      applyFilter(updated);
+      return updated;
+    });
   };
 
   const markAllAsRead = async () => {
@@ -115,8 +130,11 @@ export const useNotifications = () => {
       .update({ read: true })
       .eq("user_id", user.id)
       .eq("read", false);
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    setUnreadCount(0);
+    setAllNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      applyFilter(updated);
+      return updated;
+    });
   };
 
   return { notifications, unreadCount, markAsRead, markAllAsRead, refetch: fetchNotifications };

@@ -63,6 +63,18 @@ const Discover = () => {
     }
   }, [user, toast, activeFilters]);
 
+  // Load boost/incognito state
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("boost_until, is_incognito").eq("user_id", user.id).single()
+      .then(({ data }) => {
+        if (data) {
+          setBoostUntil(data.boost_until);
+          setIsIncognito(data.is_incognito || false);
+        }
+      });
+  }, [user]);
+
   useEffect(() => {
     fetchProfiles();
   }, [fetchProfiles]);

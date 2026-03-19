@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +24,21 @@ const Settings = () => {
   const [deleting, setDeleting] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const defaultNotifPrefs = { matches: true, messages: true, insights: true, marketing: false };
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem("stellara-notif-prefs");
+      return stored ? { ...defaultNotifPrefs, ...JSON.parse(stored) } : defaultNotifPrefs;
+    } catch { return defaultNotifPrefs; }
+  });
+
+  const updateNotifPref = (key: string, value: boolean) => {
+    const updated = { ...notifPrefs, [key]: value };
+    setNotifPrefs(updated);
+    localStorage.setItem("stellara-notif-prefs", JSON.stringify(updated));
+    toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} notifications muted`);
+  };
 
   // Load actual user data
   useEffect(() => {
@@ -225,6 +240,72 @@ const Settings = () => {
                   {permission === "granted" && (
                     <Badge className="bg-green-500/20 text-green-400">Active</Badge>
                   )}
+                </div>
+
+                <Separator />
+
+                <p className="text-xs text-muted-foreground">Choose which in-app notifications you'd like to receive</p>
+
+                {/* Matches */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                    </span>
+                    <p className="text-sm text-muted-foreground">When someone likes you back</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.matches}
+                    onCheckedChange={(checked) => updateNotifPref("matches", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Messages */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-primary" /> Messages
+                    </span>
+                    <p className="text-sm text-muted-foreground">New messages from your connections</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.messages}
+                    onCheckedChange={(checked) => updateNotifPref("messages", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Cosmic Insights */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Star className="w-4 h-4 text-primary" /> Cosmic Insights
+                    </span>
+                    <p className="text-sm text-muted-foreground">Daily intentions & weekly readings</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.insights}
+                    onCheckedChange={(checked) => updateNotifPref("insights", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Marketing */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Megaphone className="w-4 h-4 text-muted-foreground" /> Tips & Updates
+                    </span>
+                    <p className="text-sm text-muted-foreground">Feature announcements & cosmic tips</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.marketing}
+                    onCheckedChange={(checked) => updateNotifPref("marketing", checked)}
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
+import { demoProfiles } from "@/data/demoProfiles";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -50,7 +51,8 @@ const Discover = () => {
       const { data, error } = await supabase.functions.invoke("discover-profiles", { body });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setProfiles(data.profiles || []);
+      const fetchedProfiles = data.profiles || [];
+      setProfiles(fetchedProfiles.length > 0 ? fetchedProfiles : demoProfiles);
     } catch (e: any) {
       console.error("Discover error:", e);
       toast({

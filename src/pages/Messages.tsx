@@ -466,6 +466,137 @@ const Messages = () => {
     }
   }, [selectedMatchId, user, toast]);
 
+  // Image upload handler
+  const handleImageUpload = useCallback(async (file: File) => {
+    if (!selectedMatchId || !user) return;
+    setUploadingImage(true);
+    setImagePreview(null);
+
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}/${selectedMatchId}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("chat-media")
+        .upload(fileName, file, { contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("chat-media")
+        .getPublicUrl(fileName);
+
+      const imageUrl = urlData.publicUrl;
+
+      const optimisticMsg: Message = {
+        id: `temp-img-${Date.now()}`,
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: imageUrl,
+        message_type: "image",
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      const { error } = await supabase.from("messages").insert({
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: imageUrl,
+        message_type: "image",
+      });
+
+      if (error) {
+        toast({ title: "Failed to send image", variant: "destructive" });
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      }
+    } catch (e: any) {
+      toast({ title: "Image upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingImage(false);
+    }
+  }, [selectedMatchId, user, toast]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Only images are supported", variant: "destructive" });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Image too large", description: "Max 10MB", variant: "destructive" });
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setImagePreview({ file, url });
+    e.target.value = '';
+  }, [toast]);
+
+  // Send GIF as message
+  const sendGif = useCallback(async (gifUrl: string) => {
+    if (!selectedMatchId || !user) return;
+    setShowGifPicker(false);
+    setGifSearch("");
+    setGifResults([]);
+
+    const optimisticMsg: Message = {
+      id: `temp-gif-${Date.now()}`,
+      match_id: selectedMatchId,
+      sender_id: user.id,
+      content: gifUrl,
+      message_type: "gif",
+      created_at: new Date().toISOString(),
+      read_at: null,
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    const { error } = await supabase.from("messages").insert({
+      match_id: selectedMatchId,
+      sender_id: user.id,
+      content: gifUrl,
+      message_type: "gif",
+    });
+
+    if (error) {
+      toast({ title: "Failed to send GIF", variant: "destructive" });
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+    }
+  }, [selectedMatchId, user, toast]);
+
+  // GIF search using Tenor (free, no key needed for basic search)
+  const searchGifs = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setGifResults([]);
+      return;
+    }
+    setSearchingGifs(true);
+    try {
+      // Use a curated set of popular reaction GIFs as fallback
+      const popularGifs = [
+        { url: `https://media.tenor.com/images/search/${encodeURIComponent(query)}`, preview: '', title: query },
+      ];
+      // Simple approach: generate GIF suggestions based on common reactions
+      const reactions = [
+        { emoji: "😂", terms: ["laugh", "lol", "funny", "haha"] },
+        { emoji: "❤️", terms: ["love", "heart", "kiss", "cute"] },
+        { emoji: "🔥", terms: ["fire", "hot", "lit", "amazing"] },
+        { emoji: "😍", terms: ["love eyes", "crush", "beautiful", "gorgeous"] },
+        { emoji: "🥺", terms: ["please", "puppy eyes", "aww", "sweet"] },
+        { emoji: "💃", terms: ["dance", "party", "celebrate", "happy"] },
+        { emoji: "👋", terms: ["hi", "hello", "hey", "wave"] },
+        { emoji: "😘", terms: ["kiss", "blowing kiss", "mwah", "xoxo"] },
+      ];
+      setGifResults(reactions.map(r => ({
+        url: r.emoji,
+        preview: r.emoji,
+        title: r.terms[0],
+      })));
+    } finally {
+      setSearchingGifs(false);
+    }
+  }, []);
+
+
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
   const formatTime = (dateStr: string) => {

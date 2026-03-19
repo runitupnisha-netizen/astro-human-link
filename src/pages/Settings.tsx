@@ -33,12 +33,27 @@ const Settings = () => {
     } catch { return defaultNotifPrefs; }
   });
 
+  const defaultEmailPrefs = { matches: true, messages: false, insights: true, marketing: false };
+  const [emailPrefs, setEmailPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem("stellara-email-prefs");
+      return stored ? { ...defaultEmailPrefs, ...JSON.parse(stored) } : defaultEmailPrefs;
+    } catch { return defaultEmailPrefs; }
+  });
+
   const updateNotifPref = (key: string, value: boolean) => {
     const updated = { ...notifPrefs, [key]: value };
     setNotifPrefs(updated);
     localStorage.setItem("stellara-notif-prefs", JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("stellara-notif-prefs-changed"));
     toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} notifications muted`);
+  };
+
+  const updateEmailPref = (key: string, value: boolean) => {
+    const updated = { ...emailPrefs, [key]: value };
+    setEmailPrefs(updated);
+    localStorage.setItem("stellara-email-prefs", JSON.stringify(updated));
+    toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} email notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} email notifications muted`);
   };
 
   // Load actual user data

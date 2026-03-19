@@ -188,8 +188,10 @@ const Discover = () => {
       return;
     }
     try {
-      const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
-      if (error) throw error;
+      if (lastSwipe.swipeId !== "demo") {
+        const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
+        if (error) throw error;
+      }
       setProfiles((prev) => [lastSwipe.profile, ...prev]);
       setSwipeCount((c) => Math.max(0, c - 1));
       toast({ title: "↩️ Undo successful", description: `${lastSwipe.profile.display_name || "Profile"} is back in your stack` });

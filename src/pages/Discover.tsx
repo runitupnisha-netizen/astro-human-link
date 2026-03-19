@@ -28,12 +28,16 @@ const Discover = () => {
   const [matchPopup, setMatchPopup] = useState<DiscoverProfile | null>(null);
   const [swipeCount, setSwipeCount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any>(null);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterState | null>(null);
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
   const [lastSwipe, setLastSwipe] = useState<{ profile: DiscoverProfile; swipeId: string } | null>(null);
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
+  const [boostUntil, setBoostUntil] = useState<string | null>(null);
+  const [isIncognito, setIsIncognito] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

@@ -226,6 +226,72 @@ const Settings = () => {
                     <Badge className="bg-green-500/20 text-green-400">Active</Badge>
                   )}
                 </div>
+
+                <Separator />
+
+                <p className="text-xs text-muted-foreground">Choose which in-app notifications you'd like to receive</p>
+
+                {/* Matches */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                    </span>
+                    <p className="text-sm text-muted-foreground">When someone likes you back</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.matches}
+                    onCheckedChange={(checked) => updateNotifPref("matches", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Messages */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-primary" /> Messages
+                    </span>
+                    <p className="text-sm text-muted-foreground">New messages from your connections</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.messages}
+                    onCheckedChange={(checked) => updateNotifPref("messages", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Cosmic Insights */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Star className="w-4 h-4 text-primary" /> Cosmic Insights
+                    </span>
+                    <p className="text-sm text-muted-foreground">Daily intentions & weekly readings</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.insights}
+                    onCheckedChange={(checked) => updateNotifPref("insights", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Marketing */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Megaphone className="w-4 h-4 text-muted-foreground" /> Tips & Updates
+                    </span>
+                    <p className="text-sm text-muted-foreground">Feature announcements & cosmic tips</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.marketing}
+                    onCheckedChange={(checked) => updateNotifPref("marketing", checked)}
+                  />
+                </div>
               </CardContent>
             </Card>
 

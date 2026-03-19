@@ -326,7 +326,81 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            {/* Privacy & Security */}
+            {/* Email Notifications */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-primary" />
+                  Email Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-xs text-muted-foreground">Control which email notifications you'd like to receive</p>
+
+                {/* Email - Matches */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email when someone likes you back</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.matches}
+                    onCheckedChange={(checked) => updateEmailPref("matches", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Messages */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-primary" /> Messages
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email digest of unread messages</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.messages}
+                    onCheckedChange={(checked) => updateEmailPref("messages", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Cosmic Insights */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Star className="w-4 h-4 text-primary" /> Cosmic Insights
+                    </span>
+                    <p className="text-sm text-muted-foreground">Weekly cosmic summary via email</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.insights}
+                    onCheckedChange={(checked) => updateEmailPref("insights", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Marketing */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Megaphone className="w-4 h-4 text-muted-foreground" /> Tips & Updates
+                    </span>
+                    <p className="text-sm text-muted-foreground">Product news & cosmic tips via email</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.marketing}
+                    onCheckedChange={(checked) => updateEmailPref("marketing", checked)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

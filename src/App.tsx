@@ -8,6 +8,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
+import ErrorBoundary from "./components/ErrorBoundary";
+import OfflineIndicator from "./components/OfflineIndicator";
+import EmailVerificationReminder from "./components/EmailVerificationReminder";
+import InAppFeedback from "./components/InAppFeedback";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -21,6 +25,8 @@ import AlignmentFeed from "./pages/AlignmentFeed";
 import SacredReveal from "./pages/SacredReveal";
 import WeeklyInsights from "./pages/WeeklyInsights";
 import Disclaimer from "./pages/Disclaimer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import ViewProfile from "./pages/ViewProfile";
 import WhoLikedMe from "./pages/WhoLikedMe";
 import ResetPassword from "./pages/ResetPassword";
@@ -53,6 +59,8 @@ const AppRoutes = () => {
   return (
     <>
       {user && onboardingComplete && <Navigation />}
+      {user && onboardingComplete && <EmailVerificationReminder />}
+      {user && onboardingComplete && <InAppFeedback />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
@@ -70,6 +78,8 @@ const AppRoutes = () => {
           <Route path="/premium" element={<PageTransition><ProtectedRoute><Premium /></ProtectedRoute></PageTransition>} />
           <Route path="/settings" element={<PageTransition><ProtectedRoute><Settings /></ProtectedRoute></PageTransition>} />
           <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
+          <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
           <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
@@ -79,15 +89,18 @@ const AppRoutes = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <OfflineIndicator />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

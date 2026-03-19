@@ -30,7 +30,7 @@ const Settings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused")
+      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused, is_incognito")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
@@ -256,6 +256,28 @@ const Settings = () => {
                       setProfile({ ...profile, is_paused: checked });
                       await supabase.from("profiles").update({ is_paused: checked }).eq("user_id", user!.id);
                       toast.success(checked ? "Profile paused — you're hidden from discovery 🌙" : "Profile unpaused — you're back in the cosmos ✨");
+                    }}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Incognito Mode */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Shield className="w-4 h-4" /> Incognito Mode
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      {profile?.is_incognito ? "You're invisible in discovery" : "Browse without appearing in others' stacks"}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={profile?.is_incognito || false}
+                    onCheckedChange={async (checked) => {
+                      setProfile({ ...profile, is_incognito: checked });
+                      await supabase.from("profiles").update({ is_incognito: checked }).eq("user_id", user!.id);
+                      toast.success(checked ? "Incognito mode on — you're invisible 👻" : "Incognito off — you're visible again ✨");
                     }}
                   />
                 </div>

@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
@@ -26,6 +26,8 @@ import ProfileChecklist from "@/components/ProfileChecklist";
 import SelfieVerification from "@/components/SelfieVerification";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
+import ProfilePreview from "@/components/ProfilePreview";
+import ProfileCompletionScore from "@/components/ProfileCompletionScore";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -103,6 +105,7 @@ const Profile = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
   const { isVerified } = useVerificationStatus(user?.id);
 
   const openEditDialog = () => {
@@ -206,6 +209,12 @@ const Profile = () => {
       
       <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
+          <div className="flex items-center justify-between mb-4">
+            <ProfileCompletionScore profile={profile} photoCount={photoCount} />
+            <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
+              <Eye className="w-4 h-4" /> Preview Profile
+            </Button>
+          </div>
           <ProfileChecklist profile={profile} photoCount={photoCount} />
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
@@ -767,6 +776,8 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ProfilePreview open={showPreview} onClose={() => setShowPreview(false)} profile={profile} />
     </div>
   );
 };

@@ -105,6 +105,7 @@ const Profile = () => {
   const [regenerating, setRegenerating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
   const { isVerified } = useVerificationStatus(user?.id);
 
   const openEditDialog = () => {

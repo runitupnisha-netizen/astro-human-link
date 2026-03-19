@@ -25,6 +25,21 @@ const Settings = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
+  const defaultNotifPrefs = { matches: true, messages: true, insights: true, marketing: false };
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem("stellara-notif-prefs");
+      return stored ? { ...defaultNotifPrefs, ...JSON.parse(stored) } : defaultNotifPrefs;
+    } catch { return defaultNotifPrefs; }
+  });
+
+  const updateNotifPref = (key: string, value: boolean) => {
+    const updated = { ...notifPrefs, [key]: value };
+    setNotifPrefs(updated);
+    localStorage.setItem("stellara-notif-prefs", JSON.stringify(updated));
+    toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} notifications muted`);
+  };
+
   // Load actual user data
   useEffect(() => {
     if (!user) return;

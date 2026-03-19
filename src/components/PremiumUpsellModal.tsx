@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2 } from "lucide-react";
+import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2, Rocket, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes";
+type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes" | "boost" | "incognito";
 
 interface PremiumUpsellModalProps {
   open: boolean;
@@ -46,6 +46,16 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     title: "Unlimited Likes",
     description: "You've used all your daily likes — upgrade for unlimited cosmic connections",
     icon: <Heart className="w-6 h-6" />,
+  },
+  boost: {
+    title: "Profile Boost",
+    description: "Appear at the top of discovery for 30 minutes — get seen by more people",
+    icon: <Rocket className="w-6 h-6" />,
+  },
+  incognito: {
+    title: "Incognito Mode",
+    description: "Browse profiles invisibly — only appear to people you like",
+    icon: <EyeOff className="w-6 h-6" />,
   },
 };
 

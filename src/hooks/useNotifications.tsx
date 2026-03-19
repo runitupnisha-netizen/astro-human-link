@@ -12,10 +12,49 @@ export interface Notification {
   created_at: string;
 }
 
+// Map notification types to preference keys
+const TYPE_TO_PREF: Record<string, string> = {
+  match: "matches",
+  like: "matches",
+  message: "messages",
+  daily_intention: "insights",
+  weekly_insight: "insights",
+  marketing: "marketing",
+  tip: "marketing",
+};
+
+const getNotifPrefs = (): Record<string, boolean> => {
+  try {
+    const stored = localStorage.getItem("stellara-notif-prefs");
+    return stored
+      ? { matches: true, messages: true, insights: true, marketing: false, ...JSON.parse(stored) }
+      : { matches: true, messages: true, insights: true, marketing: false };
+  } catch {
+    return { matches: true, messages: true, insights: true, marketing: false };
+  }
+};
+
+const filterByPrefs = (items: Notification[]): Notification[] => {
+  const prefs = getNotifPrefs();
+  return items.filter((n) => {
+    const prefKey = TYPE_TO_PREF[n.type];
+    // If no mapping exists, always show
+    return prefKey ? prefs[prefKey] !== false : true;
+  });
+};
+
 export const useNotifications = () => {
   const { user } = useAuth();
+  const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Recompute filtered list whenever allNotifications change
+  const applyFilter = useCallback((items: Notification[]) => {
+    const filtered = filterByPrefs(items);
+    setNotifications(filtered);
+    setUnreadCount(filtered.filter((n) => !n.read).length);
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     if (!user) return;
@@ -26,10 +65,11 @@ export const useNotifications = () => {
       .order("created_at", { ascending: false })
       .limit(20);
     if (data) {
-      setNotifications(data as Notification[]);
-      setUnreadCount((data as Notification[]).filter((n) => !n.read).length);
+      const typed = data as Notification[];
+      setAllNotifications(typed);
+      applyFilter(typed);
     }
-  }, [user]);
+  }, [user, applyFilter]);
 
   useEffect(() => {
     fetchNotifications();

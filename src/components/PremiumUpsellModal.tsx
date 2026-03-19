@@ -47,6 +47,16 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     description: "You've used all your daily likes — upgrade for unlimited cosmic connections",
     icon: <Heart className="w-6 h-6" />,
   },
+  boost: {
+    title: "Profile Boost",
+    description: "Appear at the top of discovery for 30 minutes — get seen by more people",
+    icon: <Rocket className="w-6 h-6" />,
+  },
+  incognito: {
+    title: "Incognito Mode",
+    description: "Browse profiles invisibly — only appear to people you like",
+    icon: <EyeOff className="w-6 h-6" />,
+  },
 };
 
 const allPerks = [

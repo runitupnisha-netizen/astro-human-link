@@ -160,18 +160,23 @@ const Discover = () => {
       });
     }
 
-    try {
-      const { data, error } = await supabase.from("swipes").insert({
-        user_id: user!.id,
-        target_user_id: topProfile.user_id,
-        action,
-      }).select("id").single();
-      if (error) throw error;
-      // Store for undo
-      setLastSwipe({ profile: topProfile, swipeId: data.id });
-    } catch (e: any) {
-      console.error("Swipe error:", e);
-      toast({ title: "Swipe failed", description: e.message, variant: "destructive" });
+    // Skip DB call for demo profiles (non-UUID IDs)
+    const isDemo = topProfile.user_id.startsWith("demo-");
+    if (!isDemo) {
+      try {
+        const { data, error } = await supabase.from("swipes").insert({
+          user_id: user!.id,
+          target_user_id: topProfile.user_id,
+          action,
+        }).select("id").single();
+        if (error) throw error;
+        setLastSwipe({ profile: topProfile, swipeId: data.id });
+      } catch (e: any) {
+        console.error("Swipe error:", e);
+        toast({ title: "Swipe failed", description: e.message, variant: "destructive" });
+      }
+    } else {
+      setLastSwipe({ profile: topProfile, swipeId: "demo" });
     }
   };
 
@@ -183,8 +188,10 @@ const Discover = () => {
       return;
     }
     try {
-      const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
-      if (error) throw error;
+      if (lastSwipe.swipeId !== "demo") {
+        const { error } = await supabase.from("swipes").delete().eq("id", lastSwipe.swipeId);
+        if (error) throw error;
+      }
       setProfiles((prev) => [lastSwipe.profile, ...prev]);
       setSwipeCount((c) => Math.max(0, c - 1));
       toast({ title: "↩️ Undo successful", description: `${lastSwipe.profile.display_name || "Profile"} is back in your stack` });

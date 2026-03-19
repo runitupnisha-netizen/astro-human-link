@@ -967,13 +967,112 @@ const Messages = () => {
                         )}
                       </AnimatePresence>
 
+                      {/* Image Preview */}
+                      <AnimatePresence>
+                        {imagePreview && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="px-4 pb-2"
+                          >
+                            <div className="relative inline-block">
+                              <img src={imagePreview.url} alt="Preview" className="max-h-32 rounded-lg border border-border" />
+                              <Button
+                                size="icon"
+                                variant="destructive"
+                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
+                                onClick={() => { URL.revokeObjectURL(imagePreview.url); setImagePreview(null); }}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="ml-3 bg-primary hover:bg-primary/90"
+                              onClick={() => handleImageUpload(imagePreview.file)}
+                              disabled={uploadingImage}
+                            >
+                              {uploadingImage ? "Sending..." : "Send Image"}
+                            </Button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* GIF Picker */}
+                      <AnimatePresence>
+                        {showGifPicker && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 200 }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="border-t border-border overflow-hidden"
+                          >
+                            <div className="p-3 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Search className="w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="Search reactions..."
+                                  value={gifSearch}
+                                  onChange={(e) => {
+                                    setGifSearch(e.target.value);
+                                    searchGifs(e.target.value);
+                                  }}
+                                  className="flex-1 h-8 text-sm bg-background/50 border-border"
+                                  autoFocus
+                                />
+                                <Button size="icon" variant="ghost" className="w-8 h-8" onClick={() => { setShowGifPicker(false); setGifSearch(""); setGifResults([]); }}>
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2 overflow-y-auto max-h-[140px]">
+                                {/* Quick emoji reactions */}
+                                {["😂", "❤️", "🔥", "😍", "🥺", "💃", "👋", "😘", "🎉", "💀", "😭", "🥰", "✨", "💯", "🙈", "😏"].map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    onClick={() => sendGif(emoji)}
+                                    className="text-2xl p-2 rounded-lg hover:bg-muted/60 transition-colors"
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
                       {/* Message Input */}
                       <div className="p-4 border-t border-border">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
                         <div className="flex items-center gap-2">
                           <VoiceRecorder
                             onRecordingComplete={handleVoiceRecording}
-                            disabled={sending || uploadingVoice}
+                            disabled={sending || uploadingVoice || uploadingImage}
                           />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                          >
+                            <Image className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground text-lg"
+                            onClick={() => setShowGifPicker(!showGifPicker)}
+                          >
+                            GIF
+                          </Button>
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
@@ -993,7 +1092,7 @@ const Messages = () => {
                           <Button
                             size="icon"
                             onClick={handleSendMessage}
-                            disabled={!newMessage.trim() || sending || uploadingVoice}
+                            disabled={!newMessage.trim() || sending || uploadingVoice || uploadingImage}
                             className="bg-primary hover:bg-primary/90 shadow-glow shrink-0"
                           >
                             <Send className="w-4 h-4" />
@@ -1001,6 +1100,9 @@ const Messages = () => {
                         </div>
                         {uploadingVoice && (
                           <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending voice message…</p>
+                        )}
+                        {uploadingImage && (
+                          <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending image…</p>
                         )}
                       </div>
                     </>

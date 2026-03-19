@@ -209,6 +209,12 @@ const Profile = () => {
       
       <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
+          <div className="flex items-center justify-between mb-4">
+            <ProfileCompletionScore profile={profile} photoCount={photoCount} />
+            <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
+              <Eye className="w-4 h-4" /> Preview Profile
+            </Button>
+          </div>
           <ProfileChecklist profile={profile} photoCount={photoCount} />
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">

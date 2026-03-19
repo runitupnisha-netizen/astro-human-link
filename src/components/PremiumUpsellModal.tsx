@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2 } from "lucide-react";
+import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2, Rocket, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes";
+type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes" | "boost" | "incognito";
 
 interface PremiumUpsellModalProps {
   open: boolean;

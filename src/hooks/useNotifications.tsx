@@ -82,8 +82,13 @@ export const useNotifications = () => {
         applyFilter(allNotifications);
       }
     };
+    const onCustom = () => applyFilter(allNotifications);
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("stellara-notif-prefs-changed", onCustom);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("stellara-notif-prefs-changed", onCustom);
+    };
   }, [allNotifications, applyFilter]);
 
   // Realtime subscription

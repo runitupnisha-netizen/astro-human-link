@@ -37,6 +37,7 @@ const Settings = () => {
     const updated = { ...notifPrefs, [key]: value };
     setNotifPrefs(updated);
     localStorage.setItem("stellara-notif-prefs", JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("stellara-notif-prefs-changed"));
     toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} notifications muted`);
   };
 

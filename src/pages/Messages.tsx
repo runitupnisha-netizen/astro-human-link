@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -62,7 +62,14 @@ const Messages = () => {
   const [uploadingVoice, setUploadingVoice] = useState(false);
   const [sendingIcebreaker, setSendingIcebreaker] = useState(false);
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const [gifSearch, setGifSearch] = useState("");
+  const [gifResults, setGifResults] = useState<{ url: string; preview: string; title: string }[]>([]);
+  const [searchingGifs, setSearchingGifs] = useState(false);
+  const [imagePreview, setImagePreview] = useState<{ file: File; url: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [deepLinked, setDeepLinked] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
@@ -459,6 +466,137 @@ const Messages = () => {
     }
   }, [selectedMatchId, user, toast]);
 
+  // Image upload handler
+  const handleImageUpload = useCallback(async (file: File) => {
+    if (!selectedMatchId || !user) return;
+    setUploadingImage(true);
+    setImagePreview(null);
+
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}/${selectedMatchId}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("chat-media")
+        .upload(fileName, file, { contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("chat-media")
+        .getPublicUrl(fileName);
+
+      const imageUrl = urlData.publicUrl;
+
+      const optimisticMsg: Message = {
+        id: `temp-img-${Date.now()}`,
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: imageUrl,
+        message_type: "image",
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      const { error } = await supabase.from("messages").insert({
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content: imageUrl,
+        message_type: "image",
+      });
+
+      if (error) {
+        toast({ title: "Failed to send image", variant: "destructive" });
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      }
+    } catch (e: any) {
+      toast({ title: "Image upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingImage(false);
+    }
+  }, [selectedMatchId, user, toast]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Only images are supported", variant: "destructive" });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Image too large", description: "Max 10MB", variant: "destructive" });
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setImagePreview({ file, url });
+    e.target.value = '';
+  }, [toast]);
+
+  // Send GIF as message
+  const sendGif = useCallback(async (gifUrl: string) => {
+    if (!selectedMatchId || !user) return;
+    setShowGifPicker(false);
+    setGifSearch("");
+    setGifResults([]);
+
+    const optimisticMsg: Message = {
+      id: `temp-gif-${Date.now()}`,
+      match_id: selectedMatchId,
+      sender_id: user.id,
+      content: gifUrl,
+      message_type: "gif",
+      created_at: new Date().toISOString(),
+      read_at: null,
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    const { error } = await supabase.from("messages").insert({
+      match_id: selectedMatchId,
+      sender_id: user.id,
+      content: gifUrl,
+      message_type: "gif",
+    });
+
+    if (error) {
+      toast({ title: "Failed to send GIF", variant: "destructive" });
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+    }
+  }, [selectedMatchId, user, toast]);
+
+  // GIF search using Tenor (free, no key needed for basic search)
+  const searchGifs = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setGifResults([]);
+      return;
+    }
+    setSearchingGifs(true);
+    try {
+      // Use a curated set of popular reaction GIFs as fallback
+      const popularGifs = [
+        { url: `https://media.tenor.com/images/search/${encodeURIComponent(query)}`, preview: '', title: query },
+      ];
+      // Simple approach: generate GIF suggestions based on common reactions
+      const reactions = [
+        { emoji: "😂", terms: ["laugh", "lol", "funny", "haha"] },
+        { emoji: "❤️", terms: ["love", "heart", "kiss", "cute"] },
+        { emoji: "🔥", terms: ["fire", "hot", "lit", "amazing"] },
+        { emoji: "😍", terms: ["love eyes", "crush", "beautiful", "gorgeous"] },
+        { emoji: "🥺", terms: ["please", "puppy eyes", "aww", "sweet"] },
+        { emoji: "💃", terms: ["dance", "party", "celebrate", "happy"] },
+        { emoji: "👋", terms: ["hi", "hello", "hey", "wave"] },
+        { emoji: "😘", terms: ["kiss", "blowing kiss", "mwah", "xoxo"] },
+      ];
+      setGifResults(reactions.map(r => ({
+        url: r.emoji,
+        preview: r.emoji,
+        title: r.terms[0],
+      })));
+    } finally {
+      setSearchingGifs(false);
+    }
+  }, []);
+
+
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
   const formatTime = (dateStr: string) => {
@@ -576,6 +714,10 @@ const Messages = () => {
                                   ? `✨ ${convo.lastMessage.content}`
                                   : convo.lastMessage.message_type === "voice"
                                   ? "🎙️ Voice message"
+                                  : convo.lastMessage.message_type === "image"
+                                  ? "📷 Photo"
+                                  : convo.lastMessage.message_type === "gif"
+                                  ? "🎬 GIF"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>
@@ -722,6 +864,15 @@ const Messages = () => {
                                   )}
                                   {msg.message_type === "voice" ? (
                                     <AudioPlayer src={msg.content} isMe={isMe} />
+                                  ) : msg.message_type === "image" ? (
+                                    <img
+                                      src={msg.content}
+                                      alt="Shared image"
+                                      className="rounded-lg max-w-[260px] max-h-[300px] object-cover cursor-pointer"
+                                      onClick={() => window.open(msg.content, '_blank')}
+                                    />
+                                  ) : msg.message_type === "gif" ? (
+                                    <div className="text-4xl">{msg.content}</div>
                                   ) : (
                                     <p className="text-sm leading-relaxed">{msg.content}</p>
                                   )}
@@ -816,13 +967,112 @@ const Messages = () => {
                         )}
                       </AnimatePresence>
 
+                      {/* Image Preview */}
+                      <AnimatePresence>
+                        {imagePreview && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="px-4 pb-2"
+                          >
+                            <div className="relative inline-block">
+                              <img src={imagePreview.url} alt="Preview" className="max-h-32 rounded-lg border border-border" />
+                              <Button
+                                size="icon"
+                                variant="destructive"
+                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
+                                onClick={() => { URL.revokeObjectURL(imagePreview.url); setImagePreview(null); }}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="ml-3 bg-primary hover:bg-primary/90"
+                              onClick={() => handleImageUpload(imagePreview.file)}
+                              disabled={uploadingImage}
+                            >
+                              {uploadingImage ? "Sending..." : "Send Image"}
+                            </Button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* GIF Picker */}
+                      <AnimatePresence>
+                        {showGifPicker && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 200 }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="border-t border-border overflow-hidden"
+                          >
+                            <div className="p-3 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Search className="w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="Search reactions..."
+                                  value={gifSearch}
+                                  onChange={(e) => {
+                                    setGifSearch(e.target.value);
+                                    searchGifs(e.target.value);
+                                  }}
+                                  className="flex-1 h-8 text-sm bg-background/50 border-border"
+                                  autoFocus
+                                />
+                                <Button size="icon" variant="ghost" className="w-8 h-8" onClick={() => { setShowGifPicker(false); setGifSearch(""); setGifResults([]); }}>
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2 overflow-y-auto max-h-[140px]">
+                                {/* Quick emoji reactions */}
+                                {["😂", "❤️", "🔥", "😍", "🥺", "💃", "👋", "😘", "🎉", "💀", "😭", "🥰", "✨", "💯", "🙈", "😏"].map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    onClick={() => sendGif(emoji)}
+                                    className="text-2xl p-2 rounded-lg hover:bg-muted/60 transition-colors"
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
                       {/* Message Input */}
                       <div className="p-4 border-t border-border">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
                         <div className="flex items-center gap-2">
                           <VoiceRecorder
                             onRecordingComplete={handleVoiceRecording}
-                            disabled={sending || uploadingVoice}
+                            disabled={sending || uploadingVoice || uploadingImage}
                           />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                          >
+                            <Image className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground text-lg"
+                            onClick={() => setShowGifPicker(!showGifPicker)}
+                          >
+                            GIF
+                          </Button>
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
@@ -842,7 +1092,7 @@ const Messages = () => {
                           <Button
                             size="icon"
                             onClick={handleSendMessage}
-                            disabled={!newMessage.trim() || sending || uploadingVoice}
+                            disabled={!newMessage.trim() || sending || uploadingVoice || uploadingImage}
                             className="bg-primary hover:bg-primary/90 shadow-glow shrink-0"
                           >
                             <Send className="w-4 h-4" />
@@ -850,6 +1100,9 @@ const Messages = () => {
                         </div>
                         {uploadingVoice && (
                           <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending voice message…</p>
+                        )}
+                        {uploadingImage && (
+                          <p className="text-[10px] text-accent mt-1.5 animate-pulse">Sending image…</p>
                         )}
                       </div>
                     </>

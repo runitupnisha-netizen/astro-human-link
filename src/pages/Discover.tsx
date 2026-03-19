@@ -6,12 +6,12 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
 import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown, Undo2 } from "lucide-react";
-import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+import MatchCelebration from "@/components/MatchCelebration";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -423,190 +423,14 @@ const Discover = () => {
         )}
       </div>
 
-      {/* Match popup */}
-      <AnimatePresence>
-        {matchPopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-6"
-            onClick={() => setMatchPopup(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.3, opacity: 0, y: 50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
-              className="bg-card border border-border rounded-3xl p-8 max-w-sm w-full text-center shadow-cosmic relative overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Decorative sparkles */}
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(16)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className={`absolute w-1.5 h-1.5 rounded-full ${i % 3 === 0 ? "bg-accent" : i % 3 === 1 ? "bg-primary" : "bg-foreground/50"}`}
-                    initial={{
-                      x: "50%",
-                      y: "40%",
-                      opacity: 0,
-                      scale: 0,
-                    }}
-                    animate={{
-                      x: `${10 + Math.random() * 80}%`,
-                      y: `${5 + Math.random() * 90}%`,
-                      opacity: [0, 1, 0],
-                      scale: [0, 1.5 + Math.random(), 0],
-                    }}
-                    transition={{
-                      duration: 1.8,
-                      delay: 0.1 + i * 0.06,
-                      ease: "easeOut",
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Glowing background pulse */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-accent/5 via-primary/5 to-transparent rounded-3xl"
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              />
-
-              <div className="relative z-10">
-                <YinYangAnimation />
-
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
-                >
-                  Soul Connection!
-                </motion.h2>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <p className="text-muted-foreground text-sm font-serif mb-3">
-                    You and <span className="text-foreground font-semibold">{matchPopup.display_name}</span> are into each other
-                  </p>
-                </motion.div>
-
-                {/* Compatibility Score Ring */}
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.5, type: "spring", damping: 15 }}
-                  className="flex flex-col items-center mb-4"
-                >
-                  <div className="relative w-28 h-28">
-                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" opacity="0.3" />
-                      <motion.circle
-                        cx="50" cy="50" r="42" fill="none"
-                        stroke={
-                          (matchPopup.compatibility_score || 0) >= 80 ? "hsl(var(--accent))"
-                          : (matchPopup.compatibility_score || 0) >= 65 ? "hsl(var(--primary))"
-                          : "hsl(var(--muted-foreground))"
-                        }
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 42}`}
-                        initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
-                        animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - (matchPopup.compatibility_score || 0) / 100) }}
-                        transition={{ delay: 0.7, duration: 1.2, ease: "easeOut" }}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1 }}
-                        className="font-display text-2xl font-bold text-foreground"
-                      >
-                        {matchPopup.compatibility_score || "?"}%
-                      </motion.span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">stellara</span>
-                    </div>
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 }}
-                    className="mt-2"
-                  >
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
-                      (matchPopup.compatibility_score || 0) >= 82 ? "bg-accent/15 text-accent border border-accent/30"
-                      : (matchPopup.compatibility_score || 0) >= 65 ? "bg-primary/15 text-primary border border-primary/30"
-                      : "bg-muted text-muted-foreground border border-border"
-                    }`}>
-                      {matchPopup.connection_type || "Cosmic Connection"}
-                    </span>
-                  </motion.div>
-                </motion.div>
-
-                {/* Shared Aspects Pills */}
-                {matchPopup.shared_aspects && matchPopup.shared_aspects.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.1 }}
-                    className="flex flex-wrap justify-center gap-1.5 mb-3"
-                  >
-                    {matchPopup.shared_aspects.slice(0, 3).map((aspect, i) => (
-                      <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground border border-border/40">
-                        {aspect}
-                      </span>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Reason */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.2 }}
-                  className="text-xs text-muted-foreground mb-5 italic font-serif leading-relaxed px-2"
-                >
-                  "{matchPopup.compatibility_reason}"
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="flex gap-3"
-                >
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-border/50"
-                    onClick={() => setMatchPopup(null)}
-                  >
-                    Keep Exploring
-                  </Button>
-                  <Button
-                    className="flex-1 gap-2"
-                    style={{ background: "var(--gradient-aurora)" }}
-                    onClick={() => {
-                      setMatchPopup(null);
-                      navigate("/messages");
-                    }}
-                  >
-                    <Send className="w-4 h-4" />
-                    Message
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MatchCelebration
+        profile={matchPopup}
+        onClose={() => setMatchPopup(null)}
+        onMessage={() => {
+          setMatchPopup(null);
+          navigate("/messages");
+        }}
+      />
 
       <PremiumUpsellModal
         open={showUpsell}

@@ -864,6 +864,15 @@ const Messages = () => {
                                   )}
                                   {msg.message_type === "voice" ? (
                                     <AudioPlayer src={msg.content} isMe={isMe} />
+                                  ) : msg.message_type === "image" ? (
+                                    <img
+                                      src={msg.content}
+                                      alt="Shared image"
+                                      className="rounded-lg max-w-[260px] max-h-[300px] object-cover cursor-pointer"
+                                      onClick={() => window.open(msg.content, '_blank')}
+                                    />
+                                  ) : msg.message_type === "gif" ? (
+                                    <div className="text-4xl">{msg.content}</div>
                                   ) : (
                                     <p className="text-sm leading-relaxed">{msg.content}</p>
                                   )}

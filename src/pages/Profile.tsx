@@ -776,6 +776,8 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ProfilePreview open={showPreview} onClose={() => setShowPreview(false)} profile={profile} />
     </div>
   );
 };

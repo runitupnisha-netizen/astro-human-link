@@ -262,6 +262,28 @@ const Settings = () => {
 
                 <Separator />
 
+                {/* Incognito Mode */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Shield className="w-4 h-4" /> Incognito Mode
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      {profile?.is_incognito ? "You're invisible in discovery" : "Browse without appearing in others' stacks"}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={profile?.is_incognito || false}
+                    onCheckedChange={async (checked) => {
+                      setProfile({ ...profile, is_incognito: checked });
+                      await supabase.from("profiles").update({ is_incognito: checked }).eq("user_id", user!.id);
+                      toast.success(checked ? "Incognito mode on — you're invisible 👻" : "Incognito off — you're visible again ✨");
+                    }}
+                  />
+                </div>
+
+                <Separator />
+
                 <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"

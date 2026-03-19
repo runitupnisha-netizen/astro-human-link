@@ -6,12 +6,12 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
 import { Sparkles, Loader2, RefreshCw, Heart, Star, MessageCircle, Send, Filter, Crown, Undo2 } from "lucide-react";
-import YinYangAnimation from "@/components/YinYangAnimation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+import MatchCelebration from "@/components/MatchCelebration";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 

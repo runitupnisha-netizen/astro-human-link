@@ -201,32 +201,41 @@ const Discover = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6 px-6"
+          className="text-center mb-4 px-6"
         >
-          <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
+          <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-1">
             Cosmic Discovery
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
             Souls aligned with your unique{" "}
             <button onClick={() => navigate("/profile")} className="text-primary hover:underline underline-offset-2 transition-colors">cosmic blueprint</button>
           </p>
+          {/* Streak badge */}
+          <div className="flex justify-center mt-2">
+            <StreakBadge />
+          </div>
         </motion.div>
 
-        {/* Filter + Undo row */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-4 flex items-center gap-2">
+        {/* Filter + Undo + Boost row */}
+        <div className="w-full max-w-sm mx-auto px-4 mb-4 flex items-center gap-2 flex-wrap">
           <Button
             variant="outline"
             size="sm"
             className="border-primary/30 hover:bg-primary/10"
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => { setShowFilters(!showFilters); setShowAdvancedFilters(false); }}
           >
             <Filter className="w-4 h-4 mr-2" />
             Filters
-            {activeFilters && Object.values(activeFilters).flat().length > 0 && (
-              <span className="ml-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
-                {Object.values(activeFilters).flat().length}
-              </span>
-            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-accent/30 hover:bg-accent/10"
+            onClick={() => { setShowAdvancedFilters(!showAdvancedFilters); setShowFilters(false); }}
+          >
+            <SlidersHorizontal className="w-4 h-4 mr-2" />
+            Advanced
           </Button>
 
           {lastSwipe && (
@@ -242,6 +251,31 @@ const Discover = () => {
             </Button>
           )}
 
+          <BoostButton
+            isPremium={isPremium}
+            boostUntil={boostUntil}
+            onBoostActivated={setBoostUntil}
+            onUpsell={() => { setUpsellFeature("boost"); setShowUpsell(true); }}
+          />
+
+          {/* Incognito toggle (premium) */}
+          <button
+            onClick={async () => {
+              if (!isPremium) { setUpsellFeature("incognito"); setShowUpsell(true); return; }
+              const newVal = !isIncognito;
+              setIsIncognito(newVal);
+              await supabase.from("profiles").update({ is_incognito: newVal }).eq("user_id", user!.id);
+              toast({ title: newVal ? "👻 Incognito On" : "👋 Visible Again", description: newVal ? "You're browsing invisibly" : "You're back in discovery" });
+            }}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+              isIncognito ? "bg-primary/15 text-primary border-primary/30" : "border-border/30 text-muted-foreground hover:border-border"
+            }`}
+          >
+            <EyeOff className="w-3.5 h-3.5" />
+            {isIncognito ? "Incognito" : ""}
+            {!isPremium && <Crown className="w-3 h-3 text-accent" />}
+          </button>
+
           {/* Daily likes counter for free users */}
           {!isPremium && (
             <span className="ml-auto text-xs text-muted-foreground">
@@ -250,13 +284,26 @@ const Discover = () => {
           )}
         </div>
 
-        {/* Filter Panel */}
+        {/* Sacred Intention Filter Panel */}
         <AnimatePresence>
           {showFilters && (
             <div className="w-full max-w-sm mx-auto px-4 mb-4">
               <SacredIntentionFilters
                 onApply={(filters) => setActiveFilters(filters)}
                 onClose={() => setShowFilters(false)}
+              />
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Advanced Filter Panel */}
+        <AnimatePresence>
+          {showAdvancedFilters && (
+            <div className="w-full max-w-sm mx-auto px-4 mb-4">
+              <AdvancedFilters
+                onApply={(filters) => { setAdvancedFilters(filters); fetchProfiles(); }}
+                onClose={() => setShowAdvancedFilters(false)}
+                initialFilters={advancedFilters || undefined}
               />
             </div>
           )}

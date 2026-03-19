@@ -116,6 +116,38 @@ export type Database = {
         }
         Relationships: []
       }
+      message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -266,6 +298,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_max: number | null
+          age_min: number | null
           astro_summary: string | null
           avatar_url: string | null
           bio_prompt_1: string | null
@@ -280,6 +314,7 @@ export type Database = {
           birth_place: string | null
           birth_time: string | null
           birthday_number: number | null
+          boost_until: string | null
           compatibility_tags: string[] | null
           created_at: string
           current_city: string | null
@@ -300,6 +335,7 @@ export type Database = {
           human_design_type: string | null
           id: string
           interests: string[] | null
+          is_incognito: boolean
           is_paused: boolean
           kids_preference: string | null
           life_path_number: number | null
@@ -322,6 +358,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          age_max?: number | null
+          age_min?: number | null
           astro_summary?: string | null
           avatar_url?: string | null
           bio_prompt_1?: string | null
@@ -336,6 +374,7 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
+          boost_until?: string | null
           compatibility_tags?: string[] | null
           created_at?: string
           current_city?: string | null
@@ -356,6 +395,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_incognito?: boolean
           is_paused?: boolean
           kids_preference?: string | null
           life_path_number?: number | null
@@ -378,6 +418,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          age_max?: number | null
+          age_min?: number | null
           astro_summary?: string | null
           avatar_url?: string | null
           bio_prompt_1?: string | null
@@ -392,6 +434,7 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
+          boost_until?: string | null
           compatibility_tags?: string[] | null
           created_at?: string
           current_city?: string | null
@@ -412,6 +455,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_incognito?: boolean
           is_paused?: boolean
           kids_preference?: string | null
           life_path_number?: number | null
@@ -509,6 +553,36 @@ export type Database = {
           created_at?: string
           id?: string
           target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_login_date: string | null
+          longest_streak: number
+          total_logins: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string | null
+          longest_streak?: number
+          total_logins?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string | null
+          longest_streak?: number
+          total_logins?: number
           user_id?: string
         }
         Relationships: []

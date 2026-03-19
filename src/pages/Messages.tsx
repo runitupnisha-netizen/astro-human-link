@@ -714,6 +714,10 @@ const Messages = () => {
                                   ? `✨ ${convo.lastMessage.content}`
                                   : convo.lastMessage.message_type === "voice"
                                   ? "🎙️ Voice message"
+                                  : convo.lastMessage.message_type === "image"
+                                  ? "📷 Photo"
+                                  : convo.lastMessage.message_type === "gif"
+                                  ? "🎬 GIF"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>

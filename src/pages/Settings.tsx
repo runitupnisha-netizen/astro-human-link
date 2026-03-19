@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,12 +33,27 @@ const Settings = () => {
     } catch { return defaultNotifPrefs; }
   });
 
+  const defaultEmailPrefs = { matches: true, messages: false, insights: true, marketing: false };
+  const [emailPrefs, setEmailPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem("stellara-email-prefs");
+      return stored ? { ...defaultEmailPrefs, ...JSON.parse(stored) } : defaultEmailPrefs;
+    } catch { return defaultEmailPrefs; }
+  });
+
   const updateNotifPref = (key: string, value: boolean) => {
     const updated = { ...notifPrefs, [key]: value };
     setNotifPrefs(updated);
     localStorage.setItem("stellara-notif-prefs", JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("stellara-notif-prefs-changed"));
     toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} notifications muted`);
+  };
+
+  const updateEmailPref = (key: string, value: boolean) => {
+    const updated = { ...emailPrefs, [key]: value };
+    setEmailPrefs(updated);
+    localStorage.setItem("stellara-email-prefs", JSON.stringify(updated));
+    toast.success(value ? `${key.charAt(0).toUpperCase() + key.slice(1)} email notifications enabled` : `${key.charAt(0).toUpperCase() + key.slice(1)} email notifications muted`);
   };
 
   // Load actual user data
@@ -311,7 +326,81 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            {/* Privacy & Security */}
+            {/* Email Notifications */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-primary" />
+                  Email Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-xs text-muted-foreground">Control which email notifications you'd like to receive</p>
+
+                {/* Email - Matches */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email when someone likes you back</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.matches}
+                    onCheckedChange={(checked) => updateEmailPref("matches", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Messages */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-primary" /> Messages
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email digest of unread messages</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.messages}
+                    onCheckedChange={(checked) => updateEmailPref("messages", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Cosmic Insights */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Star className="w-4 h-4 text-primary" /> Cosmic Insights
+                    </span>
+                    <p className="text-sm text-muted-foreground">Weekly cosmic summary via email</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.insights}
+                    onCheckedChange={(checked) => updateEmailPref("insights", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Marketing */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Megaphone className="w-4 h-4 text-muted-foreground" /> Tips & Updates
+                    </span>
+                    <p className="text-sm text-muted-foreground">Product news & cosmic tips via email</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.marketing}
+                    onCheckedChange={(checked) => updateEmailPref("marketing", checked)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

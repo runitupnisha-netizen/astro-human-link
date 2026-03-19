@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
+import { demoProfiles } from "@/data/demoProfiles";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 

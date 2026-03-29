@@ -8,12 +8,44 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe } from "lucide-react";
+import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const LanguageCard = () => {
+  const { language, setLanguage, languages } = useTranslation();
+  return (
+    <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Globe className="w-5 h-5 text-primary" />
+          Language
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-2">
+          {(Object.entries(languages) as [Language, string][]).map(([code, label]) => (
+            <button
+              key={code}
+              onClick={() => setLanguage(code)}
+              className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
+                language === code
+                  ? "bg-primary/15 border-primary/40 text-primary"
+                  : "bg-card/50 border-border/50 text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Settings = () => {
   const { user, signOut } = useAuth();
@@ -400,6 +432,8 @@ const Settings = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <LanguageCard />
 
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>

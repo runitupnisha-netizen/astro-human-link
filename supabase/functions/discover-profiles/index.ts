@@ -200,7 +200,13 @@ serve(async (req) => {
     );
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    if (authError || !user) {
+      console.log("[DISCOVER] Auth failed, returning empty profiles -", JSON.stringify(authError));
+      return new Response(JSON.stringify({ profiles: [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     // Get current user's profile
     const { data: myProfile, error: myErr } = await supabase

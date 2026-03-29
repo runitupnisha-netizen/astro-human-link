@@ -16,7 +16,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 0.25, scale: 1 }}
+          animate={{ opacity: 0.4, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="mix-blend-screen"
         >

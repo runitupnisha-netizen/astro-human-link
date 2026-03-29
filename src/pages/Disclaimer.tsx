@@ -1,6 +1,7 @@
 import CosmicBackground from "@/components/CosmicBackground";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShieldAlert } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const Disclaimer = () => {
   return (
@@ -91,6 +92,7 @@ const Disclaimer = () => {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Shield, AlertTriangle, Phone, MapPin, Eye, Ban, Flag, Heart, MessageCir
 import { motion } from "framer-motion";
 import CosmicBackground from "@/components/CosmicBackground";
 import { Link } from "react-router-dom";
+import Footer from "@/components/Footer";
 
 const sections = [
   {
@@ -178,6 +179,7 @@ const SafetyCenter = () => {
           Remember: Your safety is always more important than being polite. Trust your intuition. 💜
         </p>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import CosmicBackground from "@/components/CosmicBackground";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const TermsOfService = () => (
   <div className="min-h-screen bg-background relative">
@@ -73,6 +74,7 @@ const TermsOfService = () => (
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   </div>
 );

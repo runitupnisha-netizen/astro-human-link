@@ -58,7 +58,7 @@ const PrivacyPolicy = () => (
 
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">9. Contact Us</h2>
-              <p>For privacy-related inquiries, contact us at privacy@stellara.app. We aim to respond within 30 days.</p>
+              <p>For privacy-related inquiries, contact us at <a href="mailto:stellaradating@gmail.com" className="text-primary hover:underline">stellaradating@gmail.com</a>. We aim to respond within 30 days.</p>
             </section>
 
             <section className="border-t border-border pt-4 mt-6">

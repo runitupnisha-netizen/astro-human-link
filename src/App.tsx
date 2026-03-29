@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
@@ -53,6 +55,13 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const AnalyticsTracker = () => {
+  const { trackPageView } = useAnalytics();
+  const location = useLocation();
+  useEffect(() => { trackPageView(location.pathname); }, [location.pathname, trackPageView]);
+  return null;
+};
+
 const AppRoutes = () => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const location = useLocation();
@@ -61,6 +70,7 @@ const AppRoutes = () => {
 
   return (
     <>
+      <AnalyticsTracker />
       {user && onboardingComplete && <Navigation />}
       {user && onboardingComplete && <EmailVerificationReminder />}
       {user && onboardingComplete && <InAppFeedback />}

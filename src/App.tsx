@@ -38,6 +38,7 @@ import Referral from "./pages/Referral";
 import SafetyCenter from "./pages/SafetyCenter";
 import Achievements from "./pages/Achievements";
 import AstroEvents from "./pages/AstroEvents";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { TranslationProvider } from "@/hooks/useTranslation";
 
@@ -101,6 +102,7 @@ const AppRoutes = () => {
           <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
+          <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>

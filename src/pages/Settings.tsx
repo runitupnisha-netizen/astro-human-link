@@ -141,8 +141,6 @@ const Settings = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {t("settings.subtitle")}
             </p>
-              Fine-tune how you show up and who you meet
-            </p>
           </div>
 
           <div className="grid gap-6">

@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import soulConnection from "@/assets/soul-connection.jpg";
@@ -328,6 +329,7 @@ const Auth = () => {
           </motion.form>
         )}
       </motion.div>
+      <Footer />
     </div>
   );
 };

@@ -241,7 +241,6 @@ const Discover = () => {
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
             {t("discover.subtitle")}
           </p>
-          </p>
           {/* Streak badge */}
           <div className="flex justify-center mt-2">
             <StreakBadge />

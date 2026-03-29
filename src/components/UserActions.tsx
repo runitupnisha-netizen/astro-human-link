@@ -110,7 +110,7 @@ const UserActions = ({ targetUserId, targetName, matchId, onBlock, onUnmatch }: 
         <DialogContent className="bg-card border-border">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2"><Flag className="w-5 h-5 text-destructive" /> Report {targetName}</DialogTitle>
-            <DialogDescription>Help us keep Aligned safe. Select a reason below.</DialogDescription>
+            <DialogDescription>Help us keep Stellara safe. Select a reason below.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">

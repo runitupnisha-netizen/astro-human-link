@@ -87,13 +87,15 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4">
+    <div className="min-h-screen relative flex flex-col">
       {/* Soul connection hero background */}
       <div className="absolute inset-0 z-0">
         <img src={soulConnection} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>
       <CosmicBackground />
+
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
 
       <motion.div
         className="w-full max-w-md relative z-10"
@@ -329,6 +331,7 @@ const Auth = () => {
           </motion.form>
         )}
       </motion.div>
+      </div>
       <Footer />
     </div>
   );

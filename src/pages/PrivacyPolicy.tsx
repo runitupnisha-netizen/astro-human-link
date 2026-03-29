@@ -1,6 +1,7 @@
 import CosmicBackground from "@/components/CosmicBackground";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const PrivacyPolicy = () => (
   <div className="min-h-screen bg-background relative">
@@ -68,6 +69,7 @@ const PrivacyPolicy = () => (
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   </div>
 );

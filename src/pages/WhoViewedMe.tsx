@@ -179,7 +179,7 @@ const WhoViewedMe = () => {
         )}
       </div>
 
-      <PremiumUpsellModal open={showUpsell} onClose={() => setShowUpsell(false)} feature="who_viewed_me" />
+      <PremiumUpsellModal open={showUpsell} onClose={() => setShowUpsell(false)} feature="who_liked_me" />
     </div>
   );
 };

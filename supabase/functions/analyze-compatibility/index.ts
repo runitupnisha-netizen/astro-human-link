@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,21 +28,16 @@ const signRulers: Record<string, string> = {
   Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Uranus", Pisces: "Neptune",
 };
 
-// Element compatibility matrix (based on traditional elemental polarity)
 function elementCompatibility(e1: string, e2: string): { score: number; description: string } {
   if (e1 === e2) return { score: 90, description: "Same element — instant understanding and natural harmony" };
-  // Complementary (same polarity: masculine Fire↔Air, feminine Earth↔Water)
   const compatible: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
   if (compatible[e1] === e2) return { score: 80, description: `${e1} and ${e2} complement beautifully — one fuels the other` };
-  // Square energy (opposite polarity, 90° apart): Fire↔Water, Earth↔Air — most challenging
   const square = (e1 === "Fire" && e2 === "Water") || (e1 === "Water" && e2 === "Fire") ||
                  (e1 === "Earth" && e2 === "Air") || (e1 === "Air" && e2 === "Earth");
   if (square) return { score: 50, description: `${e1} and ${e2} create intense friction — powerful growth through deep challenge` };
-  // Inconjunct (adjacent, different polarity): Fire↔Earth, Air↔Water — moderate tension
   return { score: 62, description: `${e1} and ${e2} have different rhythms — balance through patience and contrast` };
 }
 
-// HD type pairing dynamics
 const hdPairingInsights: Record<string, Record<string, string>> = {
   Generator: {
     Generator: "Two Generators create a powerhouse of sustainable energy. Both respond to life — potential for a deeply satisfying partnership when each honors the other's sacral authority.",
@@ -70,7 +66,6 @@ const hdPairingInsights: Record<string, Record<string, string>> = {
   },
 };
 
-// Clean rising sign strings like "Aquarius (Approximate)" → "Aquarius"
 function cleanSignName(sign: string | null): string {
   if (!sign) return "";
   return sign.replace(/\s*\(.*\)\s*$/, "").trim();
@@ -83,6 +78,9 @@ function getHDPairing(type1: string, type2: string): string {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rateLimitResponse = checkRateLimit(getIdentifier(req), "analyze-compatibility", corsHeaders);
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const authHeader = req.headers.get("Authorization");

@@ -1,19 +1,17 @@
+import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-function arrayBufferToBase64Url(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const rateLimitResponse = checkRateLimit(getIdentifier(req), "push-vapid-key", corsHeaders);
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const publicKey = Deno.env.get("VAPID_PUBLIC_KEY");

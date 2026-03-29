@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -285,6 +286,9 @@ NUMBER COMPATIBILITY IN RELATIONSHIPS:
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rateLimitResponse = checkRateLimit(getIdentifier(req), "generate-cosmic-profile", corsHeaders);
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const authHeader = req.headers.get("Authorization");

@@ -1,11 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// ... keep existing code (haversine, scoring functions, etc)
 
 // ═══════════════════════════════════════════════════════════════
 // HAVERSINE DISTANCE (km)
@@ -38,89 +41,64 @@ const signModalities: Record<string, string> = {
   Gemini: "Mutable", Virgo: "Mutable", Sagittarius: "Mutable", Pisces: "Mutable",
 };
 
-// Clean rising sign strings like "Aquarius (Approximate)" → "Aquarius"
 function cleanSignName(sign: string | null): string {
   if (!sign) return "";
   return sign.replace(/\s*\(.*\)\s*$/, "").trim();
 }
 
-// Element compatibility (based on traditional elemental polarity)
 function elementScore(e1: string, e2: string): number {
-  if (e1 === e2) return 90; // Same element — natural harmony
+  if (e1 === e2) return 90;
   const compatible: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
-  if (compatible[e1] === e2) return 80; // Complementary (same polarity)
-  // Square energy (opposite polarity, 90° apart): Fire↔Water, Earth↔Air
+  if (compatible[e1] === e2) return 80;
   const square = (e1 === "Fire" && e2 === "Water") || (e1 === "Water" && e2 === "Fire") ||
                  (e1 === "Earth" && e2 === "Air") || (e1 === "Air" && e2 === "Earth");
-  if (square) return 50; // Most challenging
-  return 62; // Inconjunct — moderate tension
+  if (square) return 50;
+  return 62;
 }
 
-// Modality compatibility
 function modalityScore(m1: string, m2: string): number {
-  if (m1 === m2) return 70; // Same modality — understand each other's pace but can clash
-  // Cardinal + Fixed or Mutable + Fixed = moderate
-  // Cardinal + Mutable = complementary (one initiates, other adapts)
+  if (m1 === m2) return 70;
   if ((m1 === "Cardinal" && m2 === "Mutable") || (m1 === "Mutable" && m2 === "Cardinal")) return 85;
   return 65;
 }
 
-// HD Type pairing score
 const hdPairingScores: Record<string, Record<string, number>> = {
-  Generator: {
-    Generator: 75, "Manifesting Generator": 82, Manifestor: 70, Projector: 85, Reflector: 65,
-  },
-  "Manifesting Generator": {
-    "Manifesting Generator": 72, Manifestor: 75, Projector: 80, Reflector: 68,
-  },
-  Manifestor: {
-    Manifestor: 60, Projector: 82, Reflector: 70,
-  },
-  Projector: {
-    Projector: 72, Reflector: 75,
-  },
-  Reflector: {
-    Reflector: 65,
-  },
+  Generator: { Generator: 75, "Manifesting Generator": 82, Manifestor: 70, Projector: 85, Reflector: 65 },
+  "Manifesting Generator": { "Manifesting Generator": 72, Manifestor: 75, Projector: 80, Reflector: 68 },
+  Manifestor: { Manifestor: 60, Projector: 82, Reflector: 70 },
+  Projector: { Projector: 72, Reflector: 75 },
+  Reflector: { Reflector: 65 },
 };
 
 function getHDScore(type1: string, type2: string): number {
   return hdPairingScores[type1]?.[type2] ?? hdPairingScores[type2]?.[type1] ?? 65;
 }
 
-// Life Path compatibility (numerology)
 function lifePathScore(lp1: number | null, lp2: number | null): number {
   if (!lp1 || !lp2) return 60;
-  if (lp1 === lp2) return 85; // Same path — deep understanding
-  // Highly compatible pairs in Pythagorean numerology
+  if (lp1 === lp2) return 85;
   const highCompat: Record<number, number[]> = {
     1: [3, 5, 7], 2: [4, 6, 8], 3: [1, 5, 9], 4: [2, 6, 8],
     5: [1, 3, 7], 6: [2, 4, 9], 7: [1, 5, 9], 8: [2, 4, 6],
     9: [3, 6, 7], 11: [2, 4, 6], 22: [4, 6, 8], 33: [3, 6, 9],
   };
   if (highCompat[lp1]?.includes(lp2) || highCompat[lp2]?.includes(lp1)) return 80;
-  // Challenging pairs
   const challenging: Record<number, number[]> = {
     1: [4, 8], 2: [5, 7], 3: [4, 8], 4: [1, 3, 5],
     5: [2, 4], 6: [7], 7: [2, 6, 8], 8: [1, 3, 7],
     9: [1, 5],
   };
   if (challenging[lp1]?.includes(lp2) || challenging[lp2]?.includes(lp1)) return 50;
-  return 65; // Neutral
+  return 65;
 }
 
-// Gene Keys resonance — check if they share any Gene Key numbers
 function geneKeysScore(gk1: string | null, gk2: string | null): number {
   if (!gk1 || !gk2) return 60;
-  const extractNum = (s: string) => {
-    const m = s.match(/Gene Key (\d+)/);
-    return m ? parseInt(m[1]) : null;
-  };
+  const extractNum = (s: string) => { const m = s.match(/Gene Key (\d+)/); return m ? parseInt(m[1]) : null; };
   const n1 = extractNum(gk1);
   const n2 = extractNum(gk2);
   if (!n1 || !n2) return 60;
-  if (n1 === n2) return 95; // Same Gene Key — extraordinary resonance
-  // Programming partners (opposite hexagram pairs) — high resonance
+  if (n1 === n2) return 95;
   const partners: Record<number, number> = {
     1: 2, 3: 4, 5: 35, 6: 36, 7: 13, 8: 14, 9: 16, 10: 15, 11: 12,
     17: 18, 19: 33, 20: 34, 21: 48, 22: 47, 23: 43, 24: 44, 25: 46,
@@ -131,18 +109,15 @@ function geneKeysScore(gk1: string | null, gk2: string | null): number {
   return 65;
 }
 
-// Shared interests bonus
 function interestsScore(i1: string[] | null, i2: string[] | null): number {
   if (!i1?.length || !i2?.length) return 50;
   const set2 = new Set(i2);
   const shared = i1.filter(i => set2.has(i)).length;
   const maxPossible = Math.min(i1.length, i2.length);
   if (maxPossible === 0) return 50;
-  const ratio = shared / maxPossible;
-  return Math.round(50 + ratio * 45); // 50-95 range
+  return Math.round(50 + (shared / maxPossible) * 45);
 }
 
-// Social energy compatibility (1-10 scale)
 function socialEnergyScore(s1: number | null, s2: number | null): number {
   if (!s1 || !s2) return 60;
   const diff = Math.abs(s1 - s2);
@@ -152,20 +127,9 @@ function socialEnergyScore(s1: number | null, s2: number | null): number {
   return 40;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// COMPOSITE SCORING
-// ═══════════════════════════════════════════════════════════════
-
 interface PreComputedScore {
-  overall: number;
-  element: number;
-  modality: number;
-  hdType: number;
-  lifePath: number;
-  geneKeys: number;
-  interests: number;
-  socialEnergy: number;
-  breakdown: string;
+  overall: number; element: number; modality: number; hdType: number;
+  lifePath: number; geneKeys: number; interests: number; socialEnergy: number; breakdown: string;
 }
 
 function computeCompatibility(myProfile: any, candidate: any): PreComputedScore {
@@ -173,14 +137,9 @@ function computeCompatibility(myProfile: any, candidate: any): PreComputedScore 
   const theirSun = cleanSignName(candidate.sun_sign);
   const myMoon = cleanSignName(myProfile.moon_sign);
   const theirMoon = cleanSignName(candidate.moon_sign);
-
   const myEl = signElements[mySun] || "Unknown";
   const theirEl = signElements[theirSun] || "Unknown";
-
-  // Sun element compatibility
   const element = myEl !== "Unknown" && theirEl !== "Unknown" ? elementScore(myEl, theirEl) : 60;
-
-  // Moon element cross-compatibility (Sun-Moon synastry)
   const myMoonEl = signElements[myMoon] || null;
   const theirMoonEl = signElements[theirMoon] || null;
   let moonCross = 60;
@@ -189,43 +148,16 @@ function computeCompatibility(myProfile: any, candidate: any): PreComputedScore 
     const moonSunScore = elementScore(myMoonEl, signElements[theirSun] || "Fire");
     moonCross = Math.round((sunMoonScore + moonSunScore) / 2);
   }
-
-  // Modality
   const myMod = signModalities[mySun] || "Unknown";
   const theirMod = signModalities[theirSun] || "Unknown";
   const modality = myMod !== "Unknown" && theirMod !== "Unknown" ? modalityScore(myMod, theirMod) : 60;
-
-  // HD Type
-  const hdType = (myProfile.human_design_type && candidate.human_design_type)
-    ? getHDScore(myProfile.human_design_type, candidate.human_design_type)
-    : 60;
-
-  // Life Path
+  const hdType = (myProfile.human_design_type && candidate.human_design_type) ? getHDScore(myProfile.human_design_type, candidate.human_design_type) : 60;
   const lifePath = lifePathScore(myProfile.life_path_number, candidate.life_path_number);
-
-  // Gene Keys
   const geneKeys = geneKeysScore(myProfile.gene_keys_life_purpose, candidate.gene_keys_life_purpose);
-
-  // Interests
   const interests = interestsScore(myProfile.interests, candidate.interests);
-
-  // Social Energy
   const socialEnergy = socialEnergyScore(myProfile.social_energy, candidate.social_energy);
-
-  // Weighted composite (astrological factors weighted heavier for this app's identity)
-  const overall = Math.round(
-    element * 0.20 +       // Sun element compatibility
-    moonCross * 0.12 +     // Sun-Moon cross synastry
-    modality * 0.08 +      // Modality harmony
-    hdType * 0.20 +        // Human Design pairing
-    lifePath * 0.10 +      // Numerology
-    geneKeys * 0.10 +      // Gene Keys resonance
-    interests * 0.12 +     // Shared interests
-    socialEnergy * 0.08    // Social energy match
-  );
-
+  const overall = Math.round(element * 0.20 + moonCross * 0.12 + modality * 0.08 + hdType * 0.20 + lifePath * 0.10 + geneKeys * 0.10 + interests * 0.12 + socialEnergy * 0.08);
   const breakdown = `Element: ${element}, Moon Cross: ${moonCross}, Modality: ${modality}, HD: ${hdType}, LifePath: ${lifePath}, GeneKeys: ${geneKeys}, Interests: ${interests}, Social: ${socialEnergy}`;
-
   return { overall, element, modality, hdType, lifePath, geneKeys, interests, socialEnergy, breakdown };
 }
 
@@ -244,6 +176,9 @@ function connectionType(score: number): string {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rateLimitResponse = checkRateLimit(getIdentifier(req), "discover-profiles", corsHeaders);
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const authHeader = req.headers.get("Authorization");

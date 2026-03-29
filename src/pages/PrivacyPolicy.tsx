@@ -33,7 +33,7 @@ const PrivacyPolicy = () => (
 
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">4. Data Storage & Security</h2>
-              <p>Your data is stored securely using industry-standard encryption. We use Supabase infrastructure with row-level security policies. Despite our best efforts, no method of transmission over the internet is 100% secure.</p>
+              <p>Your data is stored securely using industry-standard encryption and cloud infrastructure with row-level security policies. Despite our best efforts, no method of transmission over the internet is 100% secure.</p>
             </section>
 
             <section>

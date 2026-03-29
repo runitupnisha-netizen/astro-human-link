@@ -49,6 +49,7 @@ const LanguageCard = () => {
 
 const Settings = () => {
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isSupported, permission, subscribe } = usePushNotifications();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -135,7 +136,7 @@ const Settings = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
-              Settings
+              {t("settings.title")}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Fine-tune how you show up and who you meet

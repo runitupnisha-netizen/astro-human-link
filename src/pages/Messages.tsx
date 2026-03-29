@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ const Messages = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [conversations, setConversations] = useState<ConversationData[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -652,7 +654,7 @@ const Messages = () => {
                   <div className="p-4 border-b border-border">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
-                      Messages
+                      {t("messages.title")}
                     </h2>
                   </div>
                   <div className="overflow-y-auto flex-1">

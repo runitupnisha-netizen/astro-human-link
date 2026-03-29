@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ interface MatchWithProfile {
 
 const Connections = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
 
@@ -185,7 +187,7 @@ const Connections = () => {
             className="text-center mb-10"
           >
             <h1 className="text-4xl font-bold mb-3 bg-gradient-aurora bg-clip-text text-transparent">
-              Soul Connections
+              {t("connections.title")}
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0 ? (

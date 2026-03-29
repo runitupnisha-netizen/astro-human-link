@@ -96,6 +96,18 @@ const Auth = () => {
       </div>
       <CosmicBackground />
 
+      {/* Male & female silhouette overlay */}
+      <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none select-none">
+        <motion.img
+          src={stellaraHeroLogo}
+          alt=""
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 0.18, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="w-[90vw] md:w-[55vw] lg:w-[45vw] max-w-[700px] object-contain mix-blend-screen"
+        />
+      </div>
+
       <div className="flex-1 flex items-center justify-center px-4 py-8">
 
       <motion.div

@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+const isValidUuid = (id: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
 export const useVerificationStatus = (userId: string | null | undefined) => {
   const [isVerified, setIsVerified] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !isValidUuid(userId)) {
       setLoading(false);
       return;
     }
@@ -31,12 +34,13 @@ export const useVerificationStatuses = (userIds: string[]) => {
   const [verifiedSet, setVerifiedSet] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (userIds.length === 0) return;
+    const validIds = userIds.filter(isValidUuid);
+    if (validIds.length === 0) return;
     const check = async () => {
       const { data } = await supabase
         .from("photo_verifications")
         .select("user_id")
-        .in("user_id", userIds)
+        .in("user_id", validIds)
         .eq("status", "verified");
       setVerifiedSet(new Set((data || []).map((d) => d.user_id)));
     };

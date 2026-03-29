@@ -331,6 +331,7 @@ const Auth = () => {
           </motion.form>
         )}
       </motion.div>
+      </div>
       <Footer />
     </div>
   );

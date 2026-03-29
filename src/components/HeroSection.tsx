@@ -16,7 +16,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 0.25, scale: 1 }}
+          animate={{ opacity: 0.4, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="mix-blend-screen"
         >
@@ -29,7 +29,7 @@ const HeroSection = () => {
       </div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background pointer-events-none" />
       
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
         <motion.h1

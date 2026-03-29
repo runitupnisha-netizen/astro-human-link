@@ -238,7 +238,6 @@ const Discover = () => {
           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-1">
             {t("discover.title")}
           </h1>
-          </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
             Souls aligned with your unique{" "}
             <button onClick={() => navigate("/profile")} className="text-primary hover:underline underline-offset-2 transition-colors">cosmic blueprint</button>

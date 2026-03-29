@@ -37,7 +37,6 @@ const AstroEventsBanner = () => {
       </div>
       <span className="text-[10px] text-primary/60 shrink-0">{t("astro.view_all")}</span>
     </button>
-    </button>
   );
 };
 

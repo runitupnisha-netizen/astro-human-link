@@ -193,12 +193,12 @@ const Connections = () => {
               {matches.length > 0 ? (
                 <>
                   You have {matches.length} cosmic {matches.length > 1 ? "connections" : "connection"} aligned with your energy.{" "}
-                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">Discover more</button>
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">{t("connections.discover_more")}</button>
                 </>
               ) : (
                 <>
-                  Your soul connections will manifest here.{" "}
-                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">Start discovering</button> as the cosmos aligns.
+                  {t("connections.no_connections")}{" "}
+                  <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">{t("connections.start_discovering")}</button>
                 </>
               )}
             </p>

@@ -1,0 +1,46 @@
+import { Link } from "react-router-dom";
+
+const Footer = () => (
+  <footer className="relative z-10 border-t border-border/30 bg-background/80 backdrop-blur-sm mt-16">
+    <div className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+      <div className="flex flex-wrap justify-center gap-4 text-sm">
+        <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+          Privacy Policy
+        </Link>
+        <span className="text-muted-foreground/40">·</span>
+        <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+          Terms of Service
+        </Link>
+        <span className="text-muted-foreground/40">·</span>
+        <Link to="/disclaimer" className="text-muted-foreground hover:text-primary transition-colors">
+          Disclaimer
+        </Link>
+        <span className="text-muted-foreground/40">·</span>
+        <Link to="/safety" className="text-muted-foreground hover:text-primary transition-colors">
+          Safety Center
+        </Link>
+      </div>
+
+      <div className="text-center space-y-4 text-xs text-muted-foreground/70 leading-relaxed max-w-3xl mx-auto">
+        <p className="font-semibold text-muted-foreground text-sm">
+          © 2026 Stellara. All Rights Reserved.
+        </p>
+        <p>
+          Stellara and all related content, features, functionality, software, algorithms, designs,
+          user interfaces, graphics, text, branding, trademarks, service marks, and intellectual
+          property are the exclusive property of Stellara and are protected by United States and
+          international copyright, trademark, trade secret, and other intellectual property laws.
+        </p>
+        <p>
+          The content, design, software, algorithms, and proprietary systems of this application are
+          confidential and proprietary. Any unauthorized access, reproduction, modification,
+          distribution, reverse engineering, scraping, duplication, or exploitation of any portion of
+          this platform without prior written permission is strictly prohibited and may result in
+          civil and/or criminal penalties under applicable law.
+        </p>
+      </div>
+    </div>
+  </footer>
+);
+
+export default Footer;

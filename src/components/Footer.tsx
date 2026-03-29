@@ -19,6 +19,10 @@ const Footer = () => (
         <Link to="/safety" className="text-muted-foreground hover:text-primary transition-colors">
           Safety Center
         </Link>
+        <span className="text-muted-foreground/40">·</span>
+        <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+          Contact
+        </Link>
       </div>
 
       <div className="text-center space-y-4 text-xs text-muted-foreground/70 leading-relaxed max-w-3xl mx-auto">

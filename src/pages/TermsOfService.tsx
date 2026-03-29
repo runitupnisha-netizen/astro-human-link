@@ -66,6 +66,11 @@ const TermsOfService = () => (
               <p>These terms shall be governed by and construed in accordance with applicable laws, without regard to conflict of law principles.</p>
             </section>
 
+            <section>
+              <h2 className="text-lg font-semibold text-foreground mb-2">11. Contact Us</h2>
+              <p>For questions about these Terms of Service, contact us at <a href="mailto:stellaradating@gmail.com" className="text-primary hover:underline">stellaradating@gmail.com</a>.</p>
+            </section>
+
             <section className="border-t border-border pt-4 mt-6">
               <p className="text-xs text-muted-foreground/70 text-center">
                 By using Stellara, you acknowledge that you have read, understood, and agree to these Terms of Service.

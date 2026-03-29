@@ -718,6 +718,8 @@ const Messages = () => {
                                   ? "📷 Photo"
                                   : convo.lastMessage.message_type === "gif"
                                   ? "🎬 GIF"
+                                  : convo.lastMessage.message_type === "call_request"
+                                  ? "📞 Call Requested"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>

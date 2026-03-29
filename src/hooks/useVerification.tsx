@@ -34,12 +34,13 @@ export const useVerificationStatuses = (userIds: string[]) => {
   const [verifiedSet, setVerifiedSet] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (userIds.length === 0) return;
+    const validIds = userIds.filter(isValidUuid);
+    if (validIds.length === 0) return;
     const check = async () => {
       const { data } = await supabase
         .from("photo_verifications")
         .select("user_id")
-        .in("user_id", userIds)
+        .in("user_id", validIds)
         .eq("status", "verified");
       setVerifiedSet(new Set((data || []).map((d) => d.user_id)));
     };

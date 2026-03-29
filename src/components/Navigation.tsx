@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut, Crown, Shield, Gift } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut, Crown, Shield, Gift, Trophy, Moon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -62,6 +62,8 @@ const Navigation = () => {
     { path: "/insights", label: "Insights", icon: TrendingUp },
     { path: "/profile", label: "Blueprint", icon: User },
     { path: "/referral", label: "Referral", icon: Gift },
+    { path: "/achievements", label: "Badges", icon: Trophy },
+    { path: "/astro-events", label: "Cosmic", icon: Moon },
     { path: "/safety", label: "Safety", icon: Shield },
     { path: "/premium", label: "Premium", icon: Crown, premium: true },
     { path: "/settings", label: "Settings", icon: Settings },

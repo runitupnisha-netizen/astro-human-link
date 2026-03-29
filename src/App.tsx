@@ -36,7 +36,10 @@ import Premium from "./pages/Premium";
 import WhoViewedMe from "./pages/WhoViewedMe";
 import Referral from "./pages/Referral";
 import SafetyCenter from "./pages/SafetyCenter";
+import Achievements from "./pages/Achievements";
+import AstroEvents from "./pages/AstroEvents";
 import NotFound from "./pages/NotFound";
+import { TranslationProvider } from "@/hooks/useTranslation";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +96,8 @@ const AppRoutes = () => {
           <Route path="/views" element={<PageTransition><ProtectedRoute><WhoViewedMe /></ProtectedRoute></PageTransition>} />
           <Route path="/referral" element={<PageTransition><ProtectedRoute><Referral /></ProtectedRoute></PageTransition>} />
           <Route path="/safety" element={<PageTransition><SafetyCenter /></PageTransition>} />
+          <Route path="/achievements" element={<PageTransition><ProtectedRoute><Achievements /></ProtectedRoute></PageTransition>} />
+          <Route path="/astro-events" element={<PageTransition><ProtectedRoute><AstroEvents /></ProtectedRoute></PageTransition>} />
           <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
@@ -106,16 +111,18 @@ const AppRoutes = () => {
 
 const App = () => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <OfflineIndicator />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TranslationProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <OfflineIndicator />
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </TranslationProvider>
   </ErrorBoundary>
 );
 

@@ -97,7 +97,7 @@ const Auth = () => {
       <CosmicBackground />
 
       {/* Male & female silhouette overlay */}
-      <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none select-none">
+      <div className="absolute inset-0 z-[1] flex items-start justify-center pt-16 md:pt-0 md:items-center pointer-events-none select-none">
         <motion.img
           src={stellaraHeroLogo}
           alt=""

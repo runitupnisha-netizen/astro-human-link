@@ -18,6 +18,26 @@ import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
 import { demoProfiles } from "@/data/demoProfiles";
 
+const AstroEventsBanner = () => {
+  const { activeEvents } = useAstroEvents();
+  const navigate = useNavigate();
+  if (activeEvents.length === 0) return null;
+  const event = activeEvents[0];
+  return (
+    <button
+      onClick={() => navigate("/astro-events")}
+      className="w-full mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/30 text-left transition-all hover:bg-primary/15"
+    >
+      <span className="text-xl">{event.icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-primary truncate">{event.title}</p>
+        <p className="text-[10px] text-muted-foreground truncate">{event.advice}</p>
+      </div>
+      <span className="text-[10px] text-primary/60 shrink-0">View all →</span>
+    </button>
+  );
+};
+
 const FREE_DAILY_LIKE_LIMIT = 15;
 
 const Discover = () => {

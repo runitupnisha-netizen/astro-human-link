@@ -890,7 +890,12 @@ const Messages = () => {
                                       ✨ Cosmic Icebreaker
                                     </span>
                                   )}
-                                  {msg.message_type === "voice" ? (
+                                  {msg.message_type === "call_request" ? (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <Phone className="w-4 h-4" />
+                                      <span className="font-medium">Call Requested</span>
+                                    </div>
+                                  ) : msg.message_type === "voice" ? (
                                     <AudioPlayer src={msg.content} isMe={isMe} />
                                   ) : msg.message_type === "image" ? (
                                     <img

@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import soulConnection from "@/assets/soul-connection.jpg";
+import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 import { motion } from "framer-motion";
 
 const Auth = () => {

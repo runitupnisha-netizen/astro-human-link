@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAstroEvents } from "@/hooks/useAstroEvents";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -223,6 +224,7 @@ const Discover = () => {
           <div className="flex justify-center mt-2">
             <StreakBadge />
           </div>
+          <AstroEventsBanner />
         </motion.div>
 
         {/* Filter + Undo + Boost row */}

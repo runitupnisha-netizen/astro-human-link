@@ -47,7 +47,7 @@ const LanguageCard = () => {
   );
 };
 
-
+const Settings = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { isSupported, permission, subscribe } = usePushNotifications();

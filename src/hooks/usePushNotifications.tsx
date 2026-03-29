@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-const VAPID_PUBLIC_KEY_STORAGE = "vapid_public_key";
-
 export const usePushNotifications = () => {
   const { user } = useAuth();
   const [permission, setPermission] = useState<NotificationPermission>(
@@ -23,16 +21,22 @@ export const usePushNotifications = () => {
       setPermission(perm);
       if (perm !== "granted") return false;
 
-      const registration = await navigator.serviceWorker.ready;
+      let registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        registration = await navigator.serviceWorker.register("/sw.js");
+      }
+      registration = await navigator.serviceWorker.ready;
 
-      // Generate VAPID keys on first use via edge function
       const { data: vapidData } = await supabase.functions.invoke("push-vapid-key");
       if (!vapidData?.publicKey) return false;
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidData.publicKey),
-      });
+      const existingSubscription = await registration.pushManager.getSubscription();
+      const subscription =
+        existingSubscription ??
+        (await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidData.publicKey),
+        }));
 
       const keys = subscription.toJSON().keys!;
       await supabase.from("push_subscriptions").upsert(

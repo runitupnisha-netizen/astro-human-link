@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAstroEvents } from "@/hooks/useAstroEvents";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
+import { useTranslation } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import SacredIntentionFilters from "@/components/SacredIntentionFilters";
@@ -43,6 +44,7 @@ const FREE_DAILY_LIKE_LIMIT = 15;
 const Discover = () => {
   const { user } = useAuth();
   const { subscribed: isPremium } = usePremium();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<DiscoverProfile[]>([]);
@@ -234,7 +236,7 @@ const Discover = () => {
           className="text-center mb-4 px-6"
         >
           <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-1">
-            Cosmic Discovery
+            {t("discover.title")}
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
             Souls aligned with your unique{" "}
@@ -351,7 +353,7 @@ const Discover = () => {
                 <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
                 <Loader2 className="relative w-10 h-10 text-primary animate-spin" />
               </div>
-              <p className="text-muted-foreground text-sm font-serif">Finding your people…</p>
+              <p className="text-muted-foreground text-sm font-serif">{t("discover.loading")}</p>
             </motion.div>
           ) : profiles.length === 0 ? (
             <motion.div

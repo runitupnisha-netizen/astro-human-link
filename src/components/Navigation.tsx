@@ -7,11 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Fetch unread message count
@@ -52,30 +54,30 @@ const Navigation = () => {
   }, [user]);
 
   const desktopNavItems = [
-    { path: "/", label: "Discover", icon: Sparkles },
+    { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/reveal", label: "Reveal", icon: Star },
     { path: "/feed", label: "Feed", icon: BookOpen },
-    { path: "/connections", label: "Connections", icon: Heart },
+    { path: "/connections", label: t("nav.connections"), icon: Heart },
     { path: "/likes", label: "Likes", icon: Eye },
     { path: "/views", label: "Views", icon: Eye },
-    { path: "/messages", label: "Messages", icon: MessageCircle, badge: unreadCount },
+    { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/insights", label: "Insights", icon: TrendingUp },
-    { path: "/profile", label: "Blueprint", icon: User },
+    { path: "/profile", label: t("nav.profile"), icon: User },
     { path: "/referral", label: "Referral", icon: Gift },
-    { path: "/achievements", label: "Badges", icon: Trophy },
-    { path: "/astro-events", label: "Cosmic", icon: Moon },
+    { path: "/achievements", label: t("achievements.title"), icon: Trophy },
+    { path: "/astro-events", label: t("astro.title"), icon: Moon },
     { path: "/safety", label: "Safety", icon: Shield },
-    { path: "/premium", label: "Premium", icon: Crown, premium: true },
-    { path: "/settings", label: "Settings", icon: Settings },
+    { path: "/premium", label: t("premium.title"), icon: Crown, premium: true },
+    { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
   // Bottom tab bar items — 5 key tabs for mobile
   const bottomTabs = [
-    { path: "/", label: "Discover", icon: Sparkles },
-    { path: "/connections", label: "Matches", icon: Heart },
-    { path: "/messages", label: "Messages", icon: MessageCircle, badge: unreadCount },
-    { path: "/profile", label: "Profile", icon: User },
-    { path: "/settings", label: "More", icon: Settings },
+    { path: "/", label: t("nav.discover"), icon: Sparkles },
+    { path: "/connections", label: t("connections.matches"), icon: Heart },
+    { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
+    { path: "/profile", label: t("nav.profile"), icon: User },
+    { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
   return (
@@ -143,7 +145,7 @@ const Navigation = () => {
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Sign Out</span>
+                <span>{t("settings.sign_out")}</span>
               </button>
             </div>
           </div>

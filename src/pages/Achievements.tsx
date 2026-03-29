@@ -4,6 +4,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import { useAchievements, Achievement } from "@/hooks/useAchievements";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const AchievementCard = ({ achievement }: { achievement: Achievement }) => {
   const progressPct = (achievement.progress / achievement.target) * 100;
@@ -46,6 +47,7 @@ const AchievementCard = ({ achievement }: { achievement: Achievement }) => {
 
 const Achievements = () => {
   const { achievements, unlockedCount, totalCount } = useAchievements();
+  const { t } = useTranslation();
   const categories = [
     { key: "all", label: "All" },
     { key: "streak", label: "Streaks" },
@@ -66,9 +68,9 @@ const Achievements = () => {
           >
             <Trophy className="w-8 h-8 text-accent" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-foreground">Achievements</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("achievements.title")}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {unlockedCount}/{totalCount} unlocked
+            {unlockedCount}/{totalCount} {t("achievements.unlocked")}
           </p>
           <Progress value={(unlockedCount / totalCount) * 100} className="mt-3 h-2" />
         </div>

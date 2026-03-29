@@ -22,6 +22,7 @@ import { demoProfiles } from "@/data/demoProfiles";
 const AstroEventsBanner = () => {
   const { activeEvents } = useAstroEvents();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   if (activeEvents.length === 0) return null;
   const event = activeEvents[0];
   return (
@@ -34,7 +35,7 @@ const AstroEventsBanner = () => {
         <p className="text-xs font-semibold text-primary truncate">{event.title}</p>
         <p className="text-[10px] text-muted-foreground truncate">{event.advice}</p>
       </div>
-      <span className="text-[10px] text-primary/60 shrink-0">View all →</span>
+      <span className="text-[10px] text-primary/60 shrink-0">{t("astro.view_all")}</span>
     </button>
   );
 };
@@ -239,8 +240,7 @@ const Discover = () => {
             {t("discover.title")}
           </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Souls aligned with your unique{" "}
-            <button onClick={() => navigate("/profile")} className="text-primary hover:underline underline-offset-2 transition-colors">cosmic blueprint</button>
+            {t("discover.subtitle")}
           </p>
           {/* Streak badge */}
           <div className="flex justify-center mt-2">
@@ -258,7 +258,7 @@ const Discover = () => {
             onClick={() => { setShowFilters(!showFilters); setShowAdvancedFilters(false); }}
           >
             <Filter className="w-4 h-4 mr-2" />
-            Filters
+            {t("discover.filters")}
           </Button>
 
           <Button
@@ -268,7 +268,7 @@ const Discover = () => {
             onClick={() => { setShowAdvancedFilters(!showAdvancedFilters); setShowFilters(false); }}
           >
             <SlidersHorizontal className="w-4 h-4 mr-2" />
-            Advanced
+            {t("discover.advanced")}
           </Button>
 
           {lastSwipe && (
@@ -279,7 +279,7 @@ const Discover = () => {
               onClick={handleUndo}
             >
               <Undo2 className="w-4 h-4" />
-              Undo
+              {t("discover.undo")}
               {!isPremium && <Crown className="w-3 h-3 text-accent" />}
             </Button>
           )}
@@ -305,14 +305,14 @@ const Discover = () => {
             }`}
           >
             <EyeOff className="w-3.5 h-3.5" />
-            {isIncognito ? "Incognito" : ""}
+            {isIncognito ? t("discover.incognito") : ""}
             {!isPremium && <Crown className="w-3 h-3 text-accent" />}
           </button>
 
           {/* Daily likes counter for free users */}
           {!isPremium && (
             <span className="ml-auto text-xs text-muted-foreground">
-              {Math.max(0, FREE_DAILY_LIKE_LIMIT - dailyLikesUsed)}/{FREE_DAILY_LIKE_LIMIT} likes
+              {Math.max(0, FREE_DAILY_LIKE_LIMIT - dailyLikesUsed)}/{FREE_DAILY_LIKE_LIMIT} {t("discover.likes_remaining")}
             </span>
           )}
         </div>
@@ -400,12 +400,12 @@ const Discover = () => {
 
               <div className="space-y-2">
                 <h3 className="font-display text-2xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-                  {swipeCount > 0 ? "You've Seen Everyone!" : "More People Coming Soon"}
+                  {swipeCount > 0 ? t("discover.seen_everyone") : t("discover.more_coming")}
                 </h3>
                 <p className="text-muted-foreground text-sm max-w-xs leading-relaxed font-serif">
                   {swipeCount > 0
-                    ? "You've been through everyone for now. New people join daily — check back soon!"
-                    : "Your profile is all set. As more people join, curated matches will show up right here."}
+                    ? t("discover.seen_everyone_desc")
+                    : t("discover.more_coming_desc")}
                 </p>
               </div>
 
@@ -416,12 +416,12 @@ const Discover = () => {
                 transition={{ delay: 0.3 }}
                 className="w-full max-w-xs glass-card rounded-2xl p-4 space-y-3"
               >
-                <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">While you wait</p>
+                <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{t("discover.while_you_wait")}</p>
                 <div className="space-y-2.5">
                   {[
-                    { icon: "✨", text: "Finish your profile to get better matches", action: () => navigate("/profile") },
-                    { icon: "📖", text: "Check out your weekly insights", action: () => navigate("/insights") },
-                    { icon: "💬", text: "Post something in the community feed", action: () => navigate("/feed") },
+                    { icon: "✨", text: t("discover.tip_profile"), action: () => navigate("/profile") },
+                    { icon: "📖", text: t("discover.tip_insights"), action: () => navigate("/insights") },
+                    { icon: "💬", text: t("discover.tip_feed"), action: () => navigate("/feed") },
                   ].map((tip, i) => (
                     <motion.button
                       key={i}
@@ -441,7 +441,7 @@ const Discover = () => {
               <div className="flex gap-3 pt-1">
                 <Button onClick={fetchProfiles} variant="outline" className="border-primary/30 hover:bg-primary/10 gap-2">
                   <RefreshCw className="w-4 h-4" />
-                  Refresh
+                  {t("discover.refresh")}
                 </Button>
                 {swipeCount > 0 && (
                   <Button

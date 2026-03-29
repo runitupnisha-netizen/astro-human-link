@@ -22,6 +22,7 @@ import { demoProfiles } from "@/data/demoProfiles";
 const AstroEventsBanner = () => {
   const { activeEvents } = useAstroEvents();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   if (activeEvents.length === 0) return null;
   const event = activeEvents[0];
   return (
@@ -34,7 +35,8 @@ const AstroEventsBanner = () => {
         <p className="text-xs font-semibold text-primary truncate">{event.title}</p>
         <p className="text-[10px] text-muted-foreground truncate">{event.advice}</p>
       </div>
-      <span className="text-[10px] text-primary/60 shrink-0">View all →</span>
+      <span className="text-[10px] text-primary/60 shrink-0">{t("astro.view_all")}</span>
+    </button>
     </button>
   );
 };

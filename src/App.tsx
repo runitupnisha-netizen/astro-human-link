@@ -31,6 +31,9 @@ import ViewProfile from "./pages/ViewProfile";
 import WhoLikedMe from "./pages/WhoLikedMe";
 import ResetPassword from "./pages/ResetPassword";
 import Premium from "./pages/Premium";
+import WhoViewedMe from "./pages/WhoViewedMe";
+import Referral from "./pages/Referral";
+import SafetyCenter from "./pages/SafetyCenter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +80,9 @@ const AppRoutes = () => {
           <Route path="/likes" element={<PageTransition><ProtectedRoute><WhoLikedMe /></ProtectedRoute></PageTransition>} />
           <Route path="/premium" element={<PageTransition><ProtectedRoute><Premium /></ProtectedRoute></PageTransition>} />
           <Route path="/settings" element={<PageTransition><ProtectedRoute><Settings /></ProtectedRoute></PageTransition>} />
+          <Route path="/views" element={<PageTransition><ProtectedRoute><WhoViewedMe /></ProtectedRoute></PageTransition>} />
+          <Route path="/referral" element={<PageTransition><ProtectedRoute><Referral /></ProtectedRoute></PageTransition>} />
+          <Route path="/safety" element={<PageTransition><SafetyCenter /></PageTransition>} />
           <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />

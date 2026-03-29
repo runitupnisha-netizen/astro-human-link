@@ -87,6 +87,15 @@ const ViewProfile = () => {
           setDistanceKm(Math.round(dist));
         }
       }
+
+      // Record profile view
+      if (user && userId && user.id !== userId) {
+        await supabase.from("profile_views").insert({
+          viewer_id: user.id,
+          viewed_id: userId,
+        }).then(() => {}); // fire and forget
+      }
+
       setLoading(false);
     };
     load();

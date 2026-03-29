@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -718,6 +718,8 @@ const Messages = () => {
                                   ? "📷 Photo"
                                   : convo.lastMessage.message_type === "gif"
                                   ? "🎬 GIF"
+                                  : convo.lastMessage.message_type === "call_request"
+                                  ? "📞 Call Requested"
                                   : convo.lastMessage.content
                                 : "👋 Say hi!"}
                             </p>
@@ -785,6 +787,34 @@ const Messages = () => {
                             )}
                           </div>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            if (!selectedMatchId || !user) return;
+                            const callMsg: Message = {
+                              id: `temp-call-${Date.now()}`,
+                              match_id: selectedMatchId,
+                              sender_id: user.id,
+                              content: "📞 Requested a voice/video call",
+                              message_type: "call_request",
+                              created_at: new Date().toISOString(),
+                              read_at: null,
+                            };
+                            setMessages((prev) => [...prev, callMsg]);
+                            await supabase.from("messages").insert({
+                              match_id: selectedMatchId,
+                              sender_id: user.id,
+                              content: "📞 Requested a voice/video call",
+                              message_type: "call_request",
+                            });
+                            toast({ title: "Call request sent! 📞" });
+                          }}
+                          className="text-primary hover:text-primary hover:bg-primary/10"
+                          title="Request a call"
+                        >
+                          <Phone className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -862,7 +892,12 @@ const Messages = () => {
                                       ✨ Cosmic Icebreaker
                                     </span>
                                   )}
-                                  {msg.message_type === "voice" ? (
+                                  {msg.message_type === "call_request" ? (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <Phone className="w-4 h-4" />
+                                      <span className="font-medium">Call Requested</span>
+                                    </div>
+                                  ) : msg.message_type === "voice" ? (
                                     <AudioPlayer src={msg.content} isMe={isMe} />
                                   ) : msg.message_type === "image" ? (
                                     <img

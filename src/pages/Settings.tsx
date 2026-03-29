@@ -139,6 +139,8 @@ const Settings = () => {
               {t("settings.title")}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              {t("settings.subtitle")}
+            </p>
               Fine-tune how you show up and who you meet
             </p>
           </div>
@@ -149,7 +151,7 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <SettingsIcon className="w-5 h-5 text-primary" />
-                  Account
+                  {t("settings.account")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -215,12 +217,12 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-accent" />
-                  Connection Preferences
+                  {t("settings.connection_prefs")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium">What are you looking for?</Label>
+                  <Label className="text-base font-medium">{t("settings.looking_for")}</Label>
                   <p className="text-xs text-muted-foreground mb-2">
                     {profile?.relationship_goal || "Not set"} — update this in your Blueprint
                   </p>
@@ -229,7 +231,7 @@ const Settings = () => {
                 <Separator />
 
                 <div>
-                  <Label className="text-base font-medium mb-3 block">Discovery Distance</Label>
+                  <Label className="text-base font-medium mb-3 block">{t("settings.discovery_distance")}</Label>
                   <div className="flex items-center gap-3">
                     <Input
                       type="number"
@@ -256,7 +258,7 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="w-5 h-5 text-primary" />
-                  Notifications
+                  {t("settings.notifications")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -264,7 +266,7 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <Smartphone className="w-4 h-4" /> Browser Push Notifications
+                      <Smartphone className="w-4 h-4" /> {t("settings.push_notifications")}
                     </span>
                     <p className="text-sm text-muted-foreground">
                       {!isSupported
@@ -299,9 +301,9 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                      <Heart className="w-4 h-4 text-accent" /> {t("settings.new_matches")}
                     </span>
-                    <p className="text-sm text-muted-foreground">When someone likes you back</p>
+                    <p className="text-sm text-muted-foreground">{t("settings.new_matches_desc")}</p>
                   </div>
                   <Switch
                     checked={notifPrefs.matches}
@@ -315,9 +317,9 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-primary" /> Messages
+                      <MessageSquare className="w-4 h-4 text-primary" /> {t("nav.messages")}
                     </span>
-                    <p className="text-sm text-muted-foreground">New messages from your connections</p>
+                    <p className="text-sm text-muted-foreground">{t("settings.messages_desc")}</p>
                   </div>
                   <Switch
                     checked={notifPrefs.messages}
@@ -331,9 +333,9 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <Star className="w-4 h-4 text-primary" /> Cosmic Insights
+                      <Star className="w-4 h-4 text-primary" /> {t("settings.cosmic_insights")}
                     </span>
-                    <p className="text-sm text-muted-foreground">Daily intentions & weekly readings</p>
+                    <p className="text-sm text-muted-foreground">{t("settings.cosmic_insights_desc")}</p>
                   </div>
                   <Switch
                     checked={notifPrefs.insights}
@@ -347,9 +349,9 @@ const Settings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <Megaphone className="w-4 h-4 text-muted-foreground" /> Tips & Updates
+                      <Megaphone className="w-4 h-4 text-muted-foreground" /> {t("settings.tips_updates")}
                     </span>
-                    <p className="text-sm text-muted-foreground">Feature announcements & cosmic tips</p>
+                    <p className="text-sm text-muted-foreground">{t("settings.tips_updates_desc")}</p>
                   </div>
                   <Switch
                     checked={notifPrefs.marketing}
@@ -364,7 +366,7 @@ const Settings = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="w-5 h-5 text-primary" />
-                  Email Notifications
+                  {t("settings.email_notifications")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">

@@ -29,7 +29,7 @@ const HeroSection = () => {
       </div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background pointer-events-none" />
       
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
         <motion.h1

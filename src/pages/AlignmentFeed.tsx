@@ -100,7 +100,10 @@ const AlignmentFeed = () => {
         setHasPostedBefore((count ?? 0) > 0);
       });
   }, [user]);
-
+  // Initial fetch
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
 
   // Realtime

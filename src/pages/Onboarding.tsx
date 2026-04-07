@@ -460,25 +460,7 @@ const Onboarding = () => {
     return meanings[num] || "Transformative Cycle";
   };
 
-  const LifestyleOptionButton = ({ option, selected, onSelect }: { option: LifestyleOption; selected: boolean; onSelect: () => void }) => (
-    <motion.button
-      type="button"
-      onClick={onSelect}
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left w-full ${
-        selected
-          ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary/30 shadow-mystical"
-          : "border-border/50 bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:border-border"
-      }`}
-    >
-      <span className="text-xl">{option.emoji}</span>
-      <span className="text-sm font-medium">{option.label}</span>
-      {option.value === "decline" && (
-        <ShieldCheck className="w-4 h-4 ml-auto text-muted-foreground" />
-      )}
-    </motion.button>
-  );
+  // LifestyleOptionButton moved outside component (see below)
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 pt-16 pb-10 overflow-hidden">

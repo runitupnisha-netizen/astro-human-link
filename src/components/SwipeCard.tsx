@@ -31,14 +31,7 @@ export interface DiscoverProfile {
   photo_urls?: string[];
 }
 
-interface SwipeCardProps {
-  profile: DiscoverProfile;
-  onSwipe: (direction: "left" | "right" | "super") => void;
-  isTop: boolean;
-  stackIndex?: number;
-  onViewProfile?: (profile: DiscoverProfile) => void;
-  isPremium?: boolean;
-}
+// SwipeCardProps defined below with exitDirection
 
 const getAge = (birthDate: string | null): number | null => {
   if (!birthDate) return null;

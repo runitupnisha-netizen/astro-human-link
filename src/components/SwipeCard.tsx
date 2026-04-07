@@ -127,17 +127,22 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false,
       dragElastic={0.85}
       onDragEnd={isTop ? handleDragEnd : undefined}
       initial={stackStyle}
-      animate={stackStyle}
-      exit={
-        isTop
+      animate={
+        isTop && exitDirection
           ? {
               x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 0,
               y: exitDirection === "super" ? -600 : 0,
               opacity: 0,
-              transition: { duration: 0.2, ease: "easeIn" },
+              rotate: exitDirection === "left" ? -15 : exitDirection === "right" ? 15 : 0,
+              transition: { duration: 0.25, ease: "easeIn" },
             }
-          : undefined
+          : stackStyle
       }
+      exit={{
+        x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 600,
+        opacity: 0,
+        transition: { duration: 0.2 },
+      }}
     >
       {/* Swipe overlays */}
       {isTop && (

@@ -173,7 +173,7 @@ const Discover = () => {
         </motion.div>
 
         {/* Minimal toolbar */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-3 flex items-center justify-between">
+        <div className="w-full max-w-sm mx-auto px-4 mb-2 flex items-center justify-between">
           <Button
             variant="outline"
             size="sm"

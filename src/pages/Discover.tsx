@@ -33,6 +33,7 @@ const Discover = () => {
   const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
+  const [exitDirection, setExitDirection] = useState<"left" | "right" | "super" | null>(null);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -105,10 +106,14 @@ const Discover = () => {
 
     const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
 
-    // Remove card immediately for snappy feel
-    setProfiles((prev) => prev.slice(1));
-    setSwipeCount((c) => c + 1);
-    if (action !== "pass") setDailyLikesUsed((c) => c + 1);
+    // Set exit direction, then remove card after a brief delay so AnimatePresence plays exit
+    setExitDirection(direction);
+    setTimeout(() => {
+      setProfiles((prev) => prev.slice(1));
+      setSwipeCount((c) => c + 1);
+      if (action !== "pass") setDailyLikesUsed((c) => c + 1);
+      setExitDirection(null);
+    }, 250);
 
     if (direction === "super") {
       toast({ title: "⭐ Super Like Sent!", description: `${topProfile.display_name || "Someone special"} will notice this one` });
@@ -224,6 +229,7 @@ const Discover = () => {
                   isTop={index === 0}
                   stackIndex={index}
                   isPremium={isPremium}
+                  exitDirection={index === 0 ? exitDirection : null}
                 />
               ))}
             </AnimatePresence>

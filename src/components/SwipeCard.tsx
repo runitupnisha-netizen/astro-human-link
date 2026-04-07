@@ -31,14 +31,7 @@ export interface DiscoverProfile {
   photo_urls?: string[];
 }
 
-interface SwipeCardProps {
-  profile: DiscoverProfile;
-  onSwipe: (direction: "left" | "right" | "super") => void;
-  isTop: boolean;
-  stackIndex?: number;
-  onViewProfile?: (profile: DiscoverProfile) => void;
-  isPremium?: boolean;
-}
+// SwipeCardProps defined below with exitDirection
 
 const getAge = (birthDate: string | null): number | null => {
   if (!birthDate) return null;
@@ -56,10 +49,18 @@ const getCity = (place: string | null): string | null => {
 };
 
 const SWIPE_THRESHOLD = 100;
-const EXIT_X = 500;
-const EXIT_Y = -500;
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false }: SwipeCardProps) => {
+interface SwipeCardProps {
+  profile: DiscoverProfile;
+  onSwipe: (direction: "left" | "right" | "super") => void;
+  isTop: boolean;
+  stackIndex?: number;
+  onViewProfile?: (profile: DiscoverProfile) => void;
+  isPremium?: boolean;
+  exitDirection?: "left" | "right" | "super" | null;
+}
+
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false, exitDirection = null }: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -121,17 +122,27 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
         rotate: isTop ? rotate : undefined,
         zIndex: 10 - stackIndex,
       }}
-      drag={isTop}
+      drag={isTop && !exitDirection}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.85}
       onDragEnd={isTop ? handleDragEnd : undefined}
       initial={stackStyle}
-      animate={stackStyle}
-      exit={
-        isTop
-          ? { x: EXIT_X, opacity: 0, transition: { duration: 0.3 } }
-          : undefined
+      animate={
+        isTop && exitDirection
+          ? {
+              x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 0,
+              y: exitDirection === "super" ? -600 : 0,
+              opacity: 0,
+              rotate: exitDirection === "left" ? -15 : exitDirection === "right" ? 15 : 0,
+              transition: { duration: 0.25, ease: "easeIn" },
+            }
+          : stackStyle
       }
+      exit={{
+        x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 600,
+        opacity: 0,
+        transition: { duration: 0.2 },
+      }}
     >
       {/* Swipe overlays */}
       {isTop && (

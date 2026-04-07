@@ -229,6 +229,7 @@ const Discover = () => {
                   isTop={index === 0}
                   stackIndex={index}
                   isPremium={isPremium}
+                  exitDirection={index === 0 ? exitDirection : null}
                 />
               ))}
             </AnimatePresence>

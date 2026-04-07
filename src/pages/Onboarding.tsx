@@ -480,7 +480,7 @@ const Onboarding = () => {
     return meanings[num] || "Transformative Cycle";
   };
 
-  // LifestyleOptionButton moved outside component (see below)
+  
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 pt-16 pb-10 overflow-hidden">

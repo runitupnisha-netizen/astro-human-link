@@ -207,92 +207,92 @@ const SwipeCard = ({
             </>
           )}
           {/* Bottom gradient into info */}
-          <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-card via-card/80 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-28 [@media(max-height:700px)]:h-24 bg-gradient-to-t from-card via-card/80 to-transparent" />
 
           {/* Name & basics overlaid on gradient */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-            <div className="flex items-end justify-between">
-              <div>
-                <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">
+          <div className="absolute bottom-0 left-0 right-0 p-5 [@media(max-height:700px)]:p-4 z-10">
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <h2 className="min-w-0 truncate font-display text-xl sm:text-2xl font-bold leading-none text-foreground">
                     {profile.display_name || "New Here"}
                   </h2>
-                  {age && <span className="text-lg sm:text-xl text-foreground/80 shrink-0">{age}</span>}
+                  {age && <span className="shrink-0 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
                   {isVerified && <span className="shrink-0"><VerifiedBadge size="sm" /></span>}
                 </div>
                 {city && (
-                  <span className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3.5 h-3.5" /> {city}
+                  <span className="mt-1 flex items-center gap-1 text-sm text-muted-foreground [@media(max-height:700px)]:text-xs">
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{city}</span>
                     {profile.distance_km != null && (
-                      <span className="text-muted-foreground/60"> · {Math.round(profile.distance_km * 0.621371)} mi</span>
+                      <span className="shrink-0 text-muted-foreground/60">· {Math.round(profile.distance_km * 0.621371)} mi</span>
                     )}
                   </span>
                 )}
               </div>
-              {/* Compatibility score */}
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-accent font-display">{profile.compatibility_score}%</span>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Match</span>
+              <div className="flex shrink-0 flex-col items-center">
+                <span className="font-display text-2xl font-bold text-accent [@media(max-height:700px)]:text-xl">{profile.compatibility_score}%</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Match</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Compact info section */}
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2">
           {/* Astro badges — just the essentials */}
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
             {profile.sun_sign && (
-              <Badge variant="secondary" className="bg-secondary/40 text-xs">☉ {profile.sun_sign}</Badge>
+              <Badge variant="secondary" className="bg-secondary/40 text-xs [@media(max-height:700px)]:text-[11px]">☉ {profile.sun_sign}</Badge>
             )}
             {profile.moon_sign && (
-              <Badge variant="secondary" className="bg-secondary/40 text-xs">☽ {profile.moon_sign}</Badge>
+              <Badge variant="secondary" className="bg-secondary/40 text-xs [@media(max-height:700px)]:text-[11px]">☽ {profile.moon_sign}</Badge>
             )}
             {profile.rising_sign && (
-              <Badge variant="secondary" className="bg-secondary/40 text-xs">↗ {profile.rising_sign}</Badge>
+              <Badge variant="secondary" className="bg-secondary/40 text-xs [@media(max-height:700px)]:text-[11px]">↗ {profile.rising_sign}</Badge>
             )}
             {profile.human_design_type && (
-              <Badge variant="outline" className="border-primary/30 text-primary text-xs">{profile.human_design_type}</Badge>
+              <Badge variant="outline" className="border-primary/30 text-primary text-xs [@media(max-height:700px)]:text-[11px]">{profile.human_design_type}</Badge>
             )}
           </div>
 
           {/* One-liner compatibility reason */}
           {profile.compatibility_reason && (
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{profile.compatibility_reason}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.compatibility_reason}</p>
           )}
 
           {/* Bio prompt — only one, keeps it light */}
           {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
-            <div className="bg-primary/5 rounded-xl p-3">
+            <div className="bg-primary/5 rounded-xl p-3 [@media(max-height:700px)]:p-2.5">
               <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
-              <p className="text-sm text-foreground line-clamp-2">{profile.bio_prompt_1_answer}</p>
+              <p className="text-sm text-foreground line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.bio_prompt_1_answer}</p>
             </div>
           )}
         </div>
 
         {/* Action buttons */}
         {isTop && (
-          <div className="px-5 pb-5 pt-1 flex justify-center items-center gap-5">
+          <div className="flex items-center justify-center gap-5 px-5 pb-5 pt-1 [@media(max-height:700px)]:gap-4 [@media(max-height:700px)]:px-4 [@media(max-height:700px)]:pb-4">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onSwipe("left")}
-              className="w-14 h-14 rounded-full bg-card border border-destructive/20 flex items-center justify-center shadow-sm active:shadow-none transition-shadow"
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-destructive/20 bg-card shadow-sm transition-shadow active:shadow-none [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
-              <X className="w-6 h-6 text-destructive" />
+              <X className="h-6 w-6 text-destructive [@media(max-height:700px)]:h-5 [@media(max-height:700px)]:w-5" />
             </motion.button>
 
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onSwipe("super")}
-              className={`w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center relative ${!isPremium ? "opacity-50" : ""}`}
+              className={`relative flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 ${!isPremium ? "opacity-50" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
-              <Star className="w-7 h-7 text-accent-foreground fill-current" />
+              <Star className="h-7 w-7 fill-current text-accent-foreground [@media(max-height:700px)]:h-6 [@media(max-height:700px)]:w-6" />
               {!isPremium && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                  <Lock className="w-3 h-3 text-primary-foreground" />
+                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary [@media(max-height:700px)]:h-4.5 [@media(max-height:700px)]:w-4.5">
+                  <Lock className="h-3 w-3 text-primary-foreground [@media(max-height:700px)]:h-2.5 [@media(max-height:700px)]:w-2.5" />
                 </div>
               )}
             </motion.button>
@@ -301,9 +301,9 @@ const SwipeCard = ({
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => onSwipe("right")}
-              className="w-14 h-14 rounded-full bg-card border border-green-400/20 flex items-center justify-center shadow-sm active:shadow-none transition-shadow"
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-green-400/20 bg-card shadow-sm transition-shadow active:shadow-none [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
-              <Heart className="w-6 h-6 text-green-400" />
+              <Heart className="h-6 w-6 text-green-400 [@media(max-height:700px)]:h-5 [@media(max-height:700px)]:w-5" />
             </motion.button>
           </div>
         )}

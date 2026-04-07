@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-  import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown } from "lucide-react";
+  import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,6 +66,7 @@ const Navigation = () => {
   const bottomTabs = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
+    { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/profile", label: t("nav.profile"), icon: User },
     { path: "/settings", label: t("nav.settings"), icon: Settings },

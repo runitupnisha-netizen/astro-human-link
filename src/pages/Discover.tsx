@@ -159,21 +159,21 @@ const Discover = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
 
-      <div className="relative z-10 pt-20 pb-24 md:pb-12 flex flex-col items-center">
+      <div className="relative z-10 pt-16 pb-24 md:pt-20 md:pb-12 flex flex-col items-center">
         {/* Clean header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-4 px-6"
+          className="text-center mb-2 px-6"
         >
-          <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
+          <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
             {t("discover.title")}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">{t("discover.subtitle")}</p>
         </motion.div>
 
         {/* Minimal toolbar */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-3 flex items-center justify-between">
+        <div className="w-full max-w-sm mx-auto px-4 mb-2 flex items-center justify-between">
           <Button
             variant="outline"
             size="sm"
@@ -205,7 +205,7 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <div className="relative w-full max-w-sm mx-auto px-4" style={{ height: 580 }}>
+        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100dvh-240px)] md:h-[580px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />

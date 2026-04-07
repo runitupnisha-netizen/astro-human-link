@@ -164,9 +164,9 @@ const Discover = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-4 px-6"
+          className="text-center mb-2 px-6"
         >
-          <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
+          <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
             {t("discover.title")}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">{t("discover.subtitle")}</p>

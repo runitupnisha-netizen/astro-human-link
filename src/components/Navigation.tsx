@@ -146,7 +146,7 @@ const Navigation = () => {
 
       {/* Mobile Bottom Tab Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom">
-        <div className="grid grid-cols-6 h-[72px] px-1">
+        <div className="grid grid-cols-5 h-[72px] px-1">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;

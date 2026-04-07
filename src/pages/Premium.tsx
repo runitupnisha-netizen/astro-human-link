@@ -74,15 +74,19 @@ const Premium = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
-  const success = searchParams.get("success");
-  const canceled = searchParams.get("canceled");
+  const toastShown = useRef(false);
 
-  if (success) {
-    toast({ title: "Welcome to Stellara Premium! ✨", description: "Your cosmic journey has been elevated." });
-  }
-  if (canceled) {
-    toast({ title: "Checkout canceled", description: "You can upgrade anytime.", variant: "destructive" });
-  }
+  useEffect(() => {
+    if (toastShown.current) return;
+    if (success) {
+      toastShown.current = true;
+      toast({ title: "Welcome to Stellara Premium! ✨", description: "Your cosmic journey has been elevated." });
+    }
+    if (canceled) {
+      toastShown.current = true;
+      toast({ title: "Checkout canceled", description: "You can upgrade anytime.", variant: "destructive" });
+    }
+  }, [success, canceled, toast]);
 
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);

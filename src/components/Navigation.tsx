@@ -56,6 +56,7 @@ const Navigation = () => {
   const desktopNavItems = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
+    { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/profile", label: t("nav.profile"), icon: User },
     { path: "/premium", label: t("premium.title"), icon: Crown, premium: true },

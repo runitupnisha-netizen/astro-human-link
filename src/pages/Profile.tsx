@@ -218,6 +218,29 @@ const Profile = () => {
             </Button>
           </div>
           <ProfileChecklist profile={profile} photoCount={photoCount} />
+
+          {/* Explore More */}
+          <div className="mb-8 grid grid-cols-3 sm:grid-cols-6 gap-3">
+            {[
+              { label: "Insights", icon: Star, path: "/insights" },
+              { label: "Reveal", icon: Sparkles, path: "/reveal" },
+              { label: "Achievements", icon: Trophy, path: "/achievements" },
+              { label: "Referrals", icon: Gift, path: "/referral" },
+              { label: "Astro Events", icon: Calendar, path: "/astro-events" },
+              { label: "Safety", icon: ShieldCheck, path: "/safety" },
+            ].map((item) => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className="flex flex-col items-center gap-1.5 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-3 transition-colors hover:bg-primary/10 hover:border-primary/30"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <item.icon className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-xs font-medium text-foreground">{item.label}</span>
+              </button>
+            ))}
+          </div>
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col items-center md:flex-row md:items-center gap-6">

@@ -34,6 +34,10 @@ const Discover = () => {
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | "super" | null>(null);
+  const [pendingSwipe, setPendingSwipe] = useState<{
+    profileId: string;
+    action: "pass" | "like" | "super_like";
+  } | null>(null);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -89,8 +93,28 @@ const Discover = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, profiles, toast]);
 
+  const finalizeSwipe = useCallback(() => {
+    if (!pendingSwipe) return;
+
+    setProfiles((prev) => {
+      if (prev[0]?.user_id === pendingSwipe.profileId) {
+        return prev.slice(1);
+      }
+
+      return prev.filter((profile) => profile.user_id !== pendingSwipe.profileId);
+    });
+    setSwipeCount((count) => count + 1);
+
+    if (pendingSwipe.action !== "pass") {
+      setDailyLikesUsed((count) => count + 1);
+    }
+
+    setExitDirection(null);
+    setPendingSwipe(null);
+  }, [pendingSwipe]);
+
   const handleSwipe = async (direction: "left" | "right" | "super") => {
-    if (profiles.length === 0) return;
+    if (profiles.length === 0 || pendingSwipe) return;
     const topProfile = profiles[0];
 
     if (direction === "super" && !isPremium) {
@@ -106,14 +130,9 @@ const Discover = () => {
 
     const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
 
-    // Set exit direction, then remove card after a brief delay so AnimatePresence plays exit
+    // Start exit animation and only remove the card once it has fully cleared the viewport
+    setPendingSwipe({ profileId: topProfile.user_id, action });
     setExitDirection(direction);
-    setTimeout(() => {
-      setProfiles((prev) => prev.slice(1));
-      setSwipeCount((c) => c + 1);
-      if (action !== "pass") setDailyLikesUsed((c) => c + 1);
-      setExitDirection(null);
-    }, 250);
 
     if (direction === "super") {
       toast({ title: "⭐ Super Like Sent!", description: `${topProfile.display_name || "Someone special"} will notice this one` });
@@ -229,7 +248,8 @@ const Discover = () => {
                   isTop={index === 0}
                   stackIndex={index}
                   isPremium={isPremium}
-                  exitDirection={index === 0 ? exitDirection : null}
+                  exitDirection={index === 0 && pendingSwipe?.profileId === profile.user_id ? exitDirection : null}
+                  onExitComplete={index === 0 && pendingSwipe?.profileId === profile.user_id ? finalizeSwipe : undefined}
                 />
               ))}
             </AnimatePresence>

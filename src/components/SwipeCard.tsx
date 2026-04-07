@@ -58,9 +58,18 @@ interface SwipeCardProps {
   onViewProfile?: (profile: DiscoverProfile) => void;
   isPremium?: boolean;
   exitDirection?: "left" | "right" | "super" | null;
+  onExitComplete?: () => void;
 }
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false, exitDirection = null }: SwipeCardProps) => {
+const SwipeCard = ({
+  profile,
+  onSwipe,
+  isTop,
+  stackIndex = 0,
+  isPremium = false,
+  exitDirection = null,
+  onExitComplete,
+}: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -107,6 +116,8 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false,
 
   const age = getAge(profile.birth_date);
   const city = profile.current_city || getCity(profile.birth_place);
+  const exitDistanceX = typeof window !== "undefined" ? Math.max(window.innerWidth + 320, 900) : 900;
+  const exitDistanceY = typeof window !== "undefined" ? Math.max(window.innerHeight + 240, 900) : 900;
 
   // Stack cards behind
   const stackStyle = !isTop
@@ -130,18 +141,16 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false,
       animate={
         isTop && exitDirection
           ? {
-              x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 0,
-              y: exitDirection === "super" ? -600 : 0,
-              opacity: 0,
+              x: exitDirection === "left" ? -exitDistanceX : exitDirection === "right" ? exitDistanceX : 0,
+              y: exitDirection === "super" ? -exitDistanceY : 0,
+              opacity: 1,
               rotate: exitDirection === "left" ? -15 : exitDirection === "right" ? 15 : 0,
-              transition: { duration: 0.25, ease: "easeIn" },
+              transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
             }
           : stackStyle
       }
-      exit={{
-        x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 600,
-        opacity: 0,
-        transition: { duration: 0.2 },
+      onAnimationComplete={() => {
+        if (isTop && exitDirection) onExitComplete?.();
       }}
     >
       {/* Swipe overlays */}

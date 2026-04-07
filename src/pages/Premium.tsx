@@ -112,7 +112,7 @@ const Premium = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pt-16 pb-24">
       {/* Hero */}
       <div className="relative overflow-hidden pt-8 pb-12 px-4">
         <div className="absolute inset-0 bg-[var(--gradient-cosmic)] opacity-60" />

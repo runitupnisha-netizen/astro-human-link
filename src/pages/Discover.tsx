@@ -104,12 +104,16 @@ const Discover = () => {
       return;
     }
 
-    const action = direction === "left" ? "pass" : direction === "super" ? "super_like" : "like";
-
-    // Remove card immediately for snappy feel
-    setProfiles((prev) => prev.slice(1));
-    setSwipeCount((c) => c + 1);
-    if (action !== "pass") setDailyLikesUsed((c) => c + 1);
+    // Set exit direction first, then remove after a frame so AnimatePresence can animate
+    setExitDirection(direction);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setProfiles((prev) => prev.slice(1));
+        setSwipeCount((c) => c + 1);
+        if (action !== "pass") setDailyLikesUsed((c) => c + 1);
+        setExitDirection(null);
+      }, 20);
+    });
 
     if (direction === "super") {
       toast({ title: "⭐ Super Like Sent!", description: `${topProfile.display_name || "Someone special"} will notice this one` });

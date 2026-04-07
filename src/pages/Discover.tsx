@@ -159,21 +159,23 @@ const Discover = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
 
-      <div className="relative z-10 pt-[60px] pb-[80px] md:pt-20 md:pb-12 flex flex-col items-center">
+      <div className="relative z-10 flex flex-col items-center pt-[56px] pb-[78px] md:pt-20 md:pb-12 [@media(max-height:700px)]:pt-[48px] [@media(max-height:700px)]:pb-[72px]">
         {/* Clean header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-2 px-6"
+          className="text-center mb-2 px-6 [@media(max-height:700px)]:mb-1.5"
         >
-          <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
+          <h1 className="font-display text-[2rem] leading-none md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
             {t("discover.title")}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">{t("discover.subtitle")}</p>
+          <p className="text-muted-foreground text-sm mt-1 [@media(max-height:700px)]:mt-0.5 [@media(max-height:700px)]:text-xs">
+            {t("discover.subtitle")}
+          </p>
         </motion.div>
 
         {/* Minimal toolbar */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-2 flex items-center justify-between">
+        <div className="w-full max-w-sm mx-auto px-4 mb-2 flex items-center justify-between [@media(max-height:700px)]:mb-1.5">
           <Button
             variant="outline"
             size="sm"
@@ -185,7 +187,7 @@ const Discover = () => {
           </Button>
 
           {!isPremium && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
               {likesLeft} likes left today
             </span>
           )}
@@ -205,7 +207,7 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100dvh-260px)] md:h-[580px]">
+        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-220px)] max-h-[580px] [@media(max-height:700px)]:h-[calc(100svh-200px)] md:h-[580px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />

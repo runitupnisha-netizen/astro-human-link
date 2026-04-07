@@ -122,7 +122,7 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false,
         rotate: isTop ? rotate : undefined,
         zIndex: 10 - stackIndex,
       }}
-      drag={isTop}
+      drag={isTop && !exitDirection}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.85}
       onDragEnd={isTop ? handleDragEnd : undefined}

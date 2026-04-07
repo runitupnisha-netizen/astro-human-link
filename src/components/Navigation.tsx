@@ -63,14 +63,13 @@ const Navigation = () => {
     { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
-  // Bottom tab bar items — 5 key tabs for mobile
+  // Bottom tab bar items — 5 key tabs for mobile (Settings accessible from Profile)
   const bottomTabs = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
-    { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
+    { path: "/feed", label: "Community", icon: Users },
     { path: "/profile", label: t("nav.profile"), icon: User },
-    { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
   return (

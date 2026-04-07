@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
@@ -213,21 +213,28 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center justify-between mb-4">
             <ProfileCompletionScore profile={profile} photoCount={photoCount} />
-            <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
-              <Eye className="w-4 h-4" /> Preview Profile
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="border-accent/30 gap-2 md:hidden" onClick={() => navigate("/settings")}>
+                <Settings className="w-4 h-4" /> Settings
+              </Button>
+              <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
+                <Eye className="w-4 h-4" /> Preview
+              </Button>
+            </div>
           </div>
           <ProfileChecklist profile={profile} photoCount={photoCount} />
 
           {/* Explore More */}
-          <div className="mb-8 grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <div className="mb-8 grid grid-cols-4 sm:grid-cols-8 gap-2">
             {[
+              { label: "Premium", icon: Crown, path: "/premium" },
               { label: "Insights", icon: Star, path: "/insights" },
               { label: "Reveal", icon: Sparkles, path: "/reveal" },
               { label: "Achievements", icon: Trophy, path: "/achievements" },
               { label: "Referrals", icon: Gift, path: "/referral" },
               { label: "Astro Events", icon: Calendar, path: "/astro-events" },
               { label: "Safety", icon: ShieldCheck, path: "/safety" },
+              { label: "Settings", icon: Settings, path: "/settings" },
             ].map((item) => (
               <button
                 key={item.path}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2 } from "lucide-react";
@@ -74,15 +74,21 @@ const Premium = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
+  const toastShown = useRef(false);
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
 
-  if (success) {
-    toast({ title: "Welcome to Stellara Premium! ✨", description: "Your cosmic journey has been elevated." });
-  }
-  if (canceled) {
-    toast({ title: "Checkout canceled", description: "You can upgrade anytime.", variant: "destructive" });
-  }
+  useEffect(() => {
+    if (toastShown.current) return;
+    if (success) {
+      toastShown.current = true;
+      toast({ title: "Welcome to Stellara Premium! ✨", description: "Your cosmic journey has been elevated." });
+    }
+    if (canceled) {
+      toastShown.current = true;
+      toast({ title: "Checkout canceled", description: "You can upgrade anytime.", variant: "destructive" });
+    }
+  }, [success, canceled, toast]);
 
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);

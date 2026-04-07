@@ -93,6 +93,7 @@ const COSMIC_TAG_DESCRIPTIONS: Record<string, string> = {
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);

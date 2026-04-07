@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, BookOpen, Star, TrendingUp, Eye, LogOut, Crown, Shield, Gift, Trophy, Moon } from "lucide-react";
+  import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,18 +55,9 @@ const Navigation = () => {
 
   const desktopNavItems = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
-    { path: "/reveal", label: "Reveal", icon: Star },
-    { path: "/feed", label: "Feed", icon: BookOpen },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
-    { path: "/likes", label: "Likes", icon: Eye },
-    { path: "/views", label: "Views", icon: Eye },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
-    { path: "/insights", label: "Insights", icon: TrendingUp },
     { path: "/profile", label: t("nav.profile"), icon: User },
-    { path: "/referral", label: "Referral", icon: Gift },
-    { path: "/achievements", label: t("achievements.title"), icon: Trophy },
-    { path: "/astro-events", label: t("astro.title"), icon: Moon },
-    { path: "/safety", label: "Safety", icon: Shield },
     { path: "/premium", label: t("premium.title"), icon: Crown, premium: true },
     { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];

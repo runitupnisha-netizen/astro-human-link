@@ -121,7 +121,7 @@ const AppRoutes = () => {
             <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>
-        </AnimatePresence>
+
       </Suspense>
     </>
   );

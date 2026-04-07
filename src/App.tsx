@@ -84,8 +84,6 @@ const AnalyticsTracker = () => {
 
 const AppRoutes = () => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const location = useLocation();
-
   if (loading) return <LoadingScreen />;
 
   return (
@@ -95,8 +93,7 @@ const AppRoutes = () => {
       {user && onboardingComplete && <EmailVerificationReminder />}
       {user && onboardingComplete && <InAppFeedback />}
       <Suspense fallback={<LoadingScreen />}>
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+          <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />

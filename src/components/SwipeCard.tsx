@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, Zap, User, Sparkles, MapPin, ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { useState } from "react";
+import { Heart, X, Star, User, MapPin, Lock } from "lucide-react";
+import { useState, useCallback } from "react";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 
@@ -40,47 +40,6 @@ interface SwipeCardProps {
   isPremium?: boolean;
 }
 
-const CompatibilityRing = ({ score }: { score: number }) => {
-  const circumference = 2 * Math.PI * 38;
-  const offset = circumference - (score / 100) * circumference;
-  const color = score >= 80 ? "hsl(var(--accent))" : score >= 60 ? "hsl(var(--primary))" : "hsl(var(--secondary-foreground))";
-
-  return (
-    <div className="relative w-20 h-20 flex items-center justify-center">
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r="38" fill="none" stroke="hsl(var(--border))" strokeWidth="3" opacity={0.3} />
-        <motion.circle
-          cx="40" cy="40" r="38" fill="none"
-          stroke={color}
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
-        />
-      </svg>
-      <div className="text-center">
-        <motion.span
-          className="text-lg font-bold text-foreground font-display"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          {score}%
-        </motion.span>
-      </div>
-    </div>
-  );
-};
-
-const socialLabel = (e: number | null) => {
-  if (!e) return "Balanced";
-  if (e <= 3) return "🌙 Introvert";
-  if (e >= 8) return "☀️ Extrovert";
-  return "🌗 Ambivert";
-};
-
 const getAge = (birthDate: string | null): number | null => {
   if (!birthDate) return null;
   const birth = new Date(birthDate + "T12:00:00");
@@ -96,19 +55,20 @@ const getCity = (place: string | null): string | null => {
   return place.split(",")[0].trim();
 };
 
+const SWIPE_THRESHOLD = 100;
+const EXIT_X = 500;
+const EXIT_Y = -500;
+
 const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false }: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 300], [-18, 18]);
-  const likeOpacity = useTransform(x, [0, 100], [0, 1]);
-  const passOpacity = useTransform(x, [-100, 0], [1, 0]);
-  const superLikeOpacity = useTransform(y, [-100, 0], [1, 0]);
-  const [exiting, setExiting] = useState(false);
-  const [exitDir, setExitDir] = useState<"left" | "right" | "up">("right");
+  const rotate = useTransform(x, [-300, 300], [-15, 15]);
+  const likeOpacity = useTransform(x, [0, SWIPE_THRESHOLD], [0, 1]);
+  const passOpacity = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0]);
+  const superLikeOpacity = useTransform(y, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const [photoIndex, setPhotoIndex] = useState(0);
 
-  // Build photo array: avatar + gallery photos (deduplicated)
   const allPhotos = (() => {
     const photos: string[] = [];
     if (profile.avatar_url) photos.push(profile.avatar_url);
@@ -130,26 +90,27 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
     else setPhotoIndex((i) => Math.max(i - 1, 0));
   };
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.y < -100 && Math.abs(info.offset.x) < 80) {
-      if (!isPremium) return; // Block super like for free users
-      setExitDir("up");
-      setExiting(true);
+  const handleDragEnd = useCallback((_: any, info: PanInfo) => {
+    const { offset, velocity } = info;
+    // Super like: swipe up
+    if (offset.y < -80 && Math.abs(offset.x) < 60) {
+      if (!isPremium) return;
       onSwipe("super");
       return;
     }
-    if (Math.abs(info.offset.x) > 120) {
-      setExitDir(info.offset.x > 0 ? "right" : "left");
-      setExiting(true);
-      onSwipe(info.offset.x > 0 ? "right" : "left");
+    // Left/right threshold: offset OR velocity
+    if (Math.abs(offset.x) > SWIPE_THRESHOLD || Math.abs(velocity.x) > 500) {
+      onSwipe(offset.x > 0 ? "right" : "left");
     }
-  };
+  }, [isPremium, onSwipe]);
 
-  const getExitAnimation = (): Record<string, any> => {
-    if (!exiting) return isTop ? {} : { scale: 1 - stackIndex * 0.04, y: stackIndex * 10, opacity: 1 - stackIndex * 0.15 };
-    if (exitDir === "up") return { y: -600, opacity: 0, scale: 0.8, transition: { duration: 0.4, ease: "easeIn" as const } };
-    return { x: exitDir === "right" ? 500 : -500, opacity: 0, rotate: exitDir === "right" ? 20 : -20, transition: { duration: 0.35 } };
-  };
+  const age = getAge(profile.birth_date);
+  const city = profile.current_city || getCity(profile.birth_place);
+
+  // Stack cards behind
+  const stackStyle = !isTop
+    ? { scale: 1 - stackIndex * 0.04, y: stackIndex * 8, opacity: 1 - stackIndex * 0.2 }
+    : {};
 
   return (
     <motion.div
@@ -160,30 +121,35 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
         rotate: isTop ? rotate : undefined,
         zIndex: 10 - stackIndex,
       }}
-      drag={isTop ? true : false}
+      drag={isTop}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.9}
-      onDragEnd={handleDragEnd}
-      initial={isTop ? { scale: 1 } : { scale: 1 - stackIndex * 0.04, y: stackIndex * 10, opacity: 1 - stackIndex * 0.15 }}
-      animate={getExitAnimation()}
+      dragElastic={0.85}
+      onDragEnd={isTop ? handleDragEnd : undefined}
+      initial={stackStyle}
+      animate={stackStyle}
+      exit={
+        isTop
+          ? { x: EXIT_X, opacity: 0, transition: { duration: 0.3 } }
+          : undefined
+      }
     >
       {/* Swipe overlays */}
       {isTop && (
         <>
           <motion.div
-            className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm"
+            className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm pointer-events-none"
             style={{ opacity: likeOpacity }}
           >
             <span className="font-display text-green-400 text-xl font-black tracking-wider">YES</span>
           </motion.div>
           <motion.div
-            className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm"
+            className="absolute top-8 left-8 z-20 border-2 border-red-400/80 rounded-2xl px-6 py-2 rotate-12 bg-red-400/10 backdrop-blur-sm pointer-events-none"
             style={{ opacity: passOpacity }}
           >
             <span className="font-display text-red-400 text-xl font-black tracking-wider">NEXT</span>
           </motion.div>
           <motion.div
-            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm"
+            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm pointer-events-none"
             style={{ opacity: superLikeOpacity }}
           >
             <span className="font-display text-accent text-xl font-black tracking-wider">⭐ SUPER</span>
@@ -192,203 +158,117 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
       )}
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
-        {/* Photo carousel */}
-        {allPhotos.length > 0 && (
-          <div className="relative w-full h-72 bg-muted shrink-0">
-            <img 
-              src={currentPhoto || ""} 
-              alt={profile.display_name || ""} 
-              className="w-full h-full object-cover"
-            />
-            {/* Photo indicator dots */}
-            {hasMultiplePhotos && (
-              <div className="absolute top-2 left-0 right-0 flex justify-center gap-1 z-10">
-                {allPhotos.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1 rounded-full transition-all ${
-                      i === photoIndex ? "w-6 bg-foreground/90" : "w-2 bg-foreground/40"
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-            {/* Tap zones for navigation */}
-            {hasMultiplePhotos && isTop && (
-              <>
-                <button
-                  className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
-                  onClick={(e) => handlePhotoNav(e, "prev")}
-                  onPointerDown={(e) => e.stopPropagation()}
-                />
-                <button
-                  className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
-                  onClick={(e) => handlePhotoNav(e, "next")}
-                  onPointerDown={(e) => e.stopPropagation()}
-                />
-              </>
-            )}
-            {/* Gradient overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent" />
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="relative p-5 pb-3 -mt-8 z-10">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center ring-2 ring-primary/20 overflow-hidden shadow-mystical">
-                {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-8 h-8 text-foreground/70" />
-                )}
-              </div>
+        {/* Photo — large, immersive */}
+        <div className="relative w-full flex-1 min-h-0 bg-muted">
+          {currentPhoto ? (
+            <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <User className="w-16 h-16 text-muted-foreground/40" />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-2">
-                <h2 className="font-display text-xl font-bold text-foreground truncate">
-                  {profile.display_name || "New Here"}
-                </h2>
-                {isVerified && <VerifiedBadge size="sm" />}
-                {getAge(profile.birth_date) && (
-                  <span className="text-lg text-muted-foreground font-medium">{getAge(profile.birth_date)}</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                {(profile.current_city || getCity(profile.birth_place)) && (
-                  <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                    <MapPin className="w-3 h-3" /> {profile.current_city || getCity(profile.birth_place)}
+          )}
+          {/* Photo dots */}
+          {hasMultiplePhotos && (
+            <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10">
+              {allPhotos.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1 rounded-full transition-all ${i === photoIndex ? "w-6 bg-white/90" : "w-2 bg-white/40"}`}
+                />
+              ))}
+            </div>
+          )}
+          {/* Photo tap zones */}
+          {hasMultiplePhotos && isTop && (
+            <>
+              <button className="absolute left-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "prev")} onPointerDown={(e) => e.stopPropagation()} />
+              <button className="absolute right-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "next")} onPointerDown={(e) => e.stopPropagation()} />
+            </>
+          )}
+          {/* Bottom gradient into info */}
+          <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-card via-card/80 to-transparent" />
+
+          {/* Name & basics overlaid on gradient */}
+          <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-2xl font-bold text-foreground">
+                    {profile.display_name || "New Here"}
+                  </h2>
+                  {age && <span className="text-xl text-foreground/80">{age}</span>}
+                  {isVerified && <VerifiedBadge size="sm" />}
+                </div>
+                {city && (
+                  <span className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5" /> {city}
                     {profile.distance_km != null && (
-                      <span className="text-muted-foreground/70 ml-0.5">· {Math.round(profile.distance_km * 0.621371)} mi</span>
+                      <span className="text-muted-foreground/60"> · {Math.round(profile.distance_km * 0.621371)} mi</span>
                     )}
                   </span>
                 )}
-                <span className="text-xs text-accent font-semibold tracking-wide">{profile.connection_type}</span>
+              </div>
+              {/* Compatibility score */}
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-accent font-display">{profile.compatibility_score}%</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Match</span>
               </div>
             </div>
-            <CompatibilityRing score={profile.compatibility_score} />
           </div>
-
-          {/* Connection reason */}
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-primary/8 border border-primary/15 rounded-xl p-3"
-          >
-            <div className="flex items-start gap-2">
-              <Sparkles className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-              <p className="text-sm text-muted-foreground leading-relaxed font-serif">{profile.compatibility_reason}</p>
-            </div>
-          </motion.div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
-          {/* Cosmic signature */}
-          <div className="space-y-2">
-            <h3 className="section-heading">Their Vibe</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {profile.sun_sign && (
-                <Badge variant="secondary" className="bg-secondary/40 text-xs">
-                  <Star className="w-3 h-3 mr-1" /> ☉ {profile.sun_sign}
-                </Badge>
-              )}
-              {profile.moon_sign && (
-                <Badge variant="secondary" className="bg-secondary/40 text-xs">☽ {profile.moon_sign}</Badge>
-              )}
-              {profile.rising_sign && (
-                <Badge variant="secondary" className="bg-secondary/40 text-xs">↗ {profile.rising_sign}</Badge>
-              )}
-              {profile.human_design_type && (
-                <Badge variant="outline" className="border-primary/30 text-primary text-xs">
-                  <Zap className="w-3 h-3 mr-1" /> {profile.human_design_type}
-                </Badge>
-              )}
-              {profile.life_path_number && (
-                <Badge variant="outline" className="border-accent/30 text-accent text-xs">
-                  Life Path {profile.life_path_number}
-                </Badge>
-              )}
-              <Badge variant="secondary" className="bg-accent/15 text-accent text-xs">
-                {socialLabel(profile.social_energy)}
-              </Badge>
-            </div>
+        {/* Compact info section */}
+        <div className="p-4 space-y-3">
+          {/* Astro badges — just the essentials */}
+          <div className="flex flex-wrap gap-1.5">
+            {profile.sun_sign && (
+              <Badge variant="secondary" className="bg-secondary/40 text-xs">☉ {profile.sun_sign}</Badge>
+            )}
+            {profile.moon_sign && (
+              <Badge variant="secondary" className="bg-secondary/40 text-xs">☽ {profile.moon_sign}</Badge>
+            )}
+            {profile.rising_sign && (
+              <Badge variant="secondary" className="bg-secondary/40 text-xs">↗ {profile.rising_sign}</Badge>
+            )}
+            {profile.human_design_type && (
+              <Badge variant="outline" className="border-primary/30 text-primary text-xs">{profile.human_design_type}</Badge>
+            )}
           </div>
 
-          {/* Shared aspects */}
-          {profile.shared_aspects?.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="section-heading">Things in Common</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {profile.shared_aspects.map((a, i) => (
-                  <Badge key={i} variant="secondary" className="bg-primary/12 text-primary text-xs">{a}</Badge>
-                ))}
-              </div>
-            </div>
+          {/* One-liner compatibility reason */}
+          {profile.compatibility_reason && (
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{profile.compatibility_reason}</p>
           )}
 
-          {/* Gene Keys */}
-          {profile.gene_keys_life_purpose && (
-            <div className="bg-accent/5 rounded-xl p-3 border border-accent/15">
-              <div className="text-xs text-accent font-medium mb-1">Their Life Purpose</div>
-              <div className="text-xs text-muted-foreground font-serif">{profile.gene_keys_life_purpose}</div>
-            </div>
-          )}
-
-          {/* Bio Prompt */}
+          {/* Bio prompt — only one, keeps it light */}
           {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
-            <div className="bg-primary/5 rounded-xl p-3 border border-primary/15">
-              <div className="text-xs text-primary font-medium mb-1">{profile.bio_prompt_1}</div>
-              <div className="text-xs text-foreground font-serif leading-relaxed">{profile.bio_prompt_1_answer}</div>
-            </div>
-          )}
-
-          {/* Interests */}
-          {profile.interests && profile.interests.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="section-heading">Interests</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {profile.interests.slice(0, 8).map((interest, i) => (
-                  <Badge key={i} variant="secondary" className="text-xs bg-secondary/30">{interest}</Badge>
-                ))}
-                {profile.interests.length > 8 && (
-                  <Badge variant="secondary" className="text-xs bg-secondary/20 text-muted-foreground">
-                    +{profile.interests.length - 8} more
-                  </Badge>
-                )}
-              </div>
+            <div className="bg-primary/5 rounded-xl p-3">
+              <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
+              <p className="text-sm text-foreground line-clamp-2">{profile.bio_prompt_1_answer}</p>
             </div>
           )}
         </div>
 
         {/* Action buttons */}
         {isTop && (
-          <div className="p-5 pt-2 flex justify-center items-center gap-5">
+          <div className="px-5 pb-5 pt-1 flex justify-center items-center gap-5">
             <motion.button
-              whileHover={{ scale: 1.12 }}
-              whileTap={{ scale: 0.85 }}
-              onClick={() => { setExitDir("left"); setExiting(true); onSwipe("left"); }}
-              className="w-14 h-14 rounded-full bg-card border border-destructive/20 flex items-center justify-center hover:bg-destructive/10 transition-colors shadow-elevated"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => onSwipe("left")}
+              className="w-14 h-14 rounded-full bg-card border border-destructive/20 flex items-center justify-center shadow-sm active:shadow-none transition-shadow"
             >
               <X className="w-6 h-6 text-destructive" />
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.15, y: -4 }}
-              whileTap={{ scale: 0.85 }}
-              onClick={() => {
-                if (!isPremium) {
-                  onSwipe("super"); // Will be intercepted by Discover to show toast
-                  return;
-                }
-                setExitDir("up"); setExiting(true); onSwipe("super");
-              }}
-              className={`w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center relative ${!isPremium ? "opacity-60" : ""}`}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => onSwipe("super")}
+              className={`w-16 h-16 rounded-full border border-accent/30 flex items-center justify-center relative ${!isPremium ? "opacity-50" : ""}`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
-              <Star className="w-8 h-8 text-accent-foreground fill-current" />
+              <Star className="w-7 h-7 text-accent-foreground fill-current" />
               {!isPremium && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                   <Lock className="w-3 h-3 text-primary-foreground" />
@@ -397,10 +277,10 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false 
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.12 }}
-              whileTap={{ scale: 0.85 }}
-              onClick={() => { setExitDir("right"); setExiting(true); onSwipe("right"); }}
-              className="w-14 h-14 rounded-full bg-card border border-green-400/20 flex items-center justify-center hover:bg-green-400/10 transition-colors shadow-elevated"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => onSwipe("right")}
+              className="w-14 h-14 rounded-full bg-card border border-green-400/20 flex items-center justify-center shadow-sm active:shadow-none transition-shadow"
             >
               <Heart className="w-6 h-6 text-green-400" />
             </motion.button>

@@ -126,12 +126,13 @@ const SwipeCard = ({
 
   return (
     <motion.div
-      className={`absolute inset-0 ${isTop ? "z-10 cursor-grab active:cursor-grabbing" : ""}`}
+      className={`absolute inset-0 transform-gpu [backface-visibility:hidden] ${isTop ? "z-10 cursor-grab active:cursor-grabbing" : ""}`}
       style={{
         x: isTop ? x : undefined,
         y: isTop ? y : undefined,
         rotate: isTop ? rotate : undefined,
         zIndex: 10 - stackIndex,
+        willChange: isTop ? "transform" : undefined,
       }}
       drag={isTop && !exitDirection}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}

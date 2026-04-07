@@ -436,6 +436,41 @@ const Settings = () => {
 
             <LanguageCard />
 
+            {/* Explore More */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Explore More
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                {[
+                  { label: "Weekly Insights", desc: "Your personalized cosmic forecast", icon: Star, path: "/insights" },
+                  { label: "Sacred Reveal", desc: "Daily soul connection reveal", icon: Sparkles, path: "/reveal" },
+                  { label: "Achievements", desc: "Track your cosmic milestones", icon: Trophy, path: "/achievements" },
+                  { label: "Referrals", desc: "Invite friends & earn rewards", icon: Gift, path: "/referral" },
+                  { label: "Astro Events", desc: "Upcoming celestial alignments", icon: Calendar, path: "/astro-events" },
+                  { label: "Safety Center", desc: "Resources & reporting tools", icon: ShieldCheck, path: "/safety" },
+                ].map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted/30"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                      <item.icon className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="block text-sm font-medium text-foreground">{item.label}</span>
+                      <span className="block text-xs text-muted-foreground">{item.desc}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

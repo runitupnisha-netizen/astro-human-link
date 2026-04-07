@@ -75,6 +75,8 @@ const Premium = () => {
   const { toast } = useToast();
 
   const toastShown = useRef(false);
+  const success = searchParams.get("success");
+  const canceled = searchParams.get("canceled");
 
   useEffect(() => {
     if (toastShown.current) return;

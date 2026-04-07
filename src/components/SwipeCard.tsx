@@ -213,12 +213,12 @@ const SwipeCard = ({
           <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
             <div className="flex items-end justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-display text-2xl font-bold text-foreground">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">
                     {profile.display_name || "New Here"}
                   </h2>
-                  {age && <span className="text-xl text-foreground/80">{age}</span>}
-                  {isVerified && <VerifiedBadge size="sm" />}
+                  {age && <span className="text-lg sm:text-xl text-foreground/80 shrink-0">{age}</span>}
+                  {isVerified && <span className="shrink-0"><VerifiedBadge size="sm" /></span>}
                 </div>
                 {city && (
                   <span className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">

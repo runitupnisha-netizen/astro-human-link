@@ -225,14 +225,16 @@ const Profile = () => {
           <ProfileChecklist profile={profile} photoCount={photoCount} />
 
           {/* Explore More */}
-          <div className="mb-8 grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <div className="mb-8 grid grid-cols-4 sm:grid-cols-8 gap-2">
             {[
+              { label: "Premium", icon: Crown, path: "/premium" },
               { label: "Insights", icon: Star, path: "/insights" },
               { label: "Reveal", icon: Sparkles, path: "/reveal" },
               { label: "Achievements", icon: Trophy, path: "/achievements" },
               { label: "Referrals", icon: Gift, path: "/referral" },
               { label: "Astro Events", icon: Calendar, path: "/astro-events" },
               { label: "Safety", icon: ShieldCheck, path: "/safety" },
+              { label: "Settings", icon: Settings, path: "/settings" },
             ].map((item) => (
               <button
                 key={item.path}

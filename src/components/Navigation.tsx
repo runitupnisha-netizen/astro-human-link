@@ -146,7 +146,7 @@ const Navigation = () => {
 
       {/* Mobile Bottom Tab Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom">
-        <div className="flex items-center justify-around h-16 px-2">
+        <div className="grid grid-cols-6 h-[72px] px-1">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -155,25 +155,27 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 min-w-[56px] ${
+                className={`relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center rounded-xl transition-all duration-200 ${
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
+                  <Icon className={`h-[18px] w-[18px] transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
                   {item.badge && item.badge > 0 && (
                     <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] font-medium ${isActive ? "text-primary" : ""}`}>{item.label}</span>
+                <span className={`max-w-full break-words text-[9px] font-medium leading-tight ${isActive ? "text-primary" : ""}`}>
+                  {item.label}
+                </span>
                 {isActive && (
                   <motion.div
                     layoutId="bottomTabIndicator"
-                    className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary"
+                    className="absolute top-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-primary"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}

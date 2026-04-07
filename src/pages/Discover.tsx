@@ -205,7 +205,7 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100dvh-220px)] md:h-[580px]">
+        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100dvh-260px)] md:h-[580px]">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />

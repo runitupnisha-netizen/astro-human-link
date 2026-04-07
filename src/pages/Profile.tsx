@@ -213,9 +213,14 @@ const Profile = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center justify-between mb-4">
             <ProfileCompletionScore profile={profile} photoCount={photoCount} />
-            <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
-              <Eye className="w-4 h-4" /> Preview Profile
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="border-accent/30 gap-2 md:hidden" onClick={() => navigate("/settings")}>
+                <Settings className="w-4 h-4" /> Settings
+              </Button>
+              <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
+                <Eye className="w-4 h-4" /> Preview
+              </Button>
+            </div>
           </div>
           <ProfileChecklist profile={profile} photoCount={photoCount} />
 

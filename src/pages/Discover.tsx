@@ -33,6 +33,7 @@ const Discover = () => {
   const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
+  const [exitDirection, setExitDirection] = useState<"left" | "right" | "super" | null>(null);
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

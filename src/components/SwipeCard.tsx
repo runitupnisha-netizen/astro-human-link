@@ -56,10 +56,18 @@ const getCity = (place: string | null): string | null => {
 };
 
 const SWIPE_THRESHOLD = 100;
-const EXIT_X = 500;
-const EXIT_Y = -500;
 
-const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false }: SwipeCardProps) => {
+interface SwipeCardProps {
+  profile: DiscoverProfile;
+  onSwipe: (direction: "left" | "right" | "super") => void;
+  isTop: boolean;
+  stackIndex?: number;
+  onViewProfile?: (profile: DiscoverProfile) => void;
+  isPremium?: boolean;
+  exitDirection?: "left" | "right" | "super" | null;
+}
+
+const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false, exitDirection = null }: SwipeCardProps) => {
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);

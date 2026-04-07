@@ -153,6 +153,7 @@ const Discover = () => {
   };
 
   const likesLeft = Math.max(0, FREE_DAILY_LIKE_LIMIT - dailyLikesUsed);
+  const visibleProfiles = pendingSwipe ? profiles.slice(0, 1) : profiles.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -239,8 +240,8 @@ const Discover = () => {
               </div>
             </motion.div>
           ) : (
-            <AnimatePresence mode="popLayout">
-              {profiles.slice(0, 3).map((profile, index) => (
+            <AnimatePresence initial={false} mode="sync">
+              {visibleProfiles.map((profile, index) => (
                 <SwipeCard
                   key={profile.user_id}
                   profile={profile}

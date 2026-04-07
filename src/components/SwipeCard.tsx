@@ -130,7 +130,12 @@ const SwipeCard = ({ profile, onSwipe, isTop, stackIndex = 0, isPremium = false,
       animate={stackStyle}
       exit={
         isTop
-          ? { x: EXIT_X, opacity: 0, transition: { duration: 0.3 } }
+          ? {
+              x: exitDirection === "left" ? -600 : exitDirection === "right" ? 600 : 0,
+              y: exitDirection === "super" ? -600 : 0,
+              opacity: 0,
+              transition: { duration: 0.2, ease: "easeIn" },
+            }
           : undefined
       }
     >

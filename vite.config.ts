@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["stellara-logo.png", "stellara-logo-192.png", "stellara-logo-512.png"],
+      includeAssets: ["stellara-app-icon.png", "stellara-app-icon-192.png", "stellara-app-icon-512.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,woff2}"],
@@ -34,17 +34,17 @@ export default defineConfig(({ mode }) => ({
         categories: ["lifestyle", "social"],
         icons: [
           {
-            src: "/stellara-logo-192.png",
+            src: "/stellara-app-icon-192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/stellara-logo-512.png",
+            src: "/stellara-app-icon-512.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "/stellara-logo-512.png",
+            src: "/stellara-app-icon-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import stellaraIcon from "@/assets/stellara-app-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";

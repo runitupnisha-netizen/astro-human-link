@@ -80,13 +80,18 @@ serve(async (req) => {
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
-      const periodEnd = subscription.current_period_end;
+      logStep("Subscription keys", { keys: Object.keys(subscription) });
+      
+      // Try multiple field names for period end
+      const periodEnd = subscription.current_period_end 
+        ?? (subscription as any).currentPeriodEnd
+        ?? (subscription as any).end_date;
+      
       logStep("Raw period end value", { periodEnd, type: typeof periodEnd });
       
       if (typeof periodEnd === 'number') {
         subscriptionEnd = new Date(periodEnd * 1000).toISOString();
       } else if (typeof periodEnd === 'string') {
-        // Newer Stripe API versions may return ISO strings directly
         const parsed = new Date(periodEnd);
         subscriptionEnd = isNaN(parsed.getTime()) ? null : parsed.toISOString();
       }

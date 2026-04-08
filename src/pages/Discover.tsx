@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import stellaraIcon from "@/assets/stellara-app-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -164,8 +165,16 @@ const Discover = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-2 px-6 [@media(max-height:700px)]:mb-1.5"
+          className="flex flex-col items-center text-center mb-2 px-6 [@media(max-height:700px)]:mb-1.5"
         >
+          <div className="relative mb-1.5">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-aurora opacity-30 blur-xl scale-125" />
+            <img
+              src={stellaraIcon}
+              alt="Stellara"
+              className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl drop-shadow-[0_0_12px_hsl(var(--accent)/0.5)]"
+            />
+          </div>
           <h1 className="font-display text-[2rem] leading-none md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
             {t("discover.title")}
           </h1>

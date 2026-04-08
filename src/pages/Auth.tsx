@@ -123,10 +123,11 @@ const Auth = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          <div className="relative w-28 h-28 mx-auto mb-4">
-            <div className="absolute -inset-6 bg-purple-500/40 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute -inset-3 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <img src={stellaraAppIcon} alt="Stellara" className="relative w-28 h-28 object-contain rounded-2xl shadow-2xl shadow-purple-500/50 ring-1 ring-white/10" />
+          <div className="relative w-20 h-20 mx-auto mb-4">
+            <div className="absolute -inset-8 bg-purple-400/50 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute -inset-5 bg-purple-300/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.3s' }} />
+            <div className="absolute -inset-3 bg-white/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.6s' }} />
+            <img src={stellaraAppIcon} alt="Stellara" className="relative w-20 h-20 object-contain rounded-xl shadow-2xl shadow-purple-400/60 ring-1 ring-purple-300/20" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
             {showForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Let's Get Started"}

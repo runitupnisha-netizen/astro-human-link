@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Lock, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
-import stellaraLogo from "@/assets/stellara-logo.png";
+import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import { motion } from "framer-motion";
 
 const ResetPassword = () => {

@@ -691,7 +691,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      verification_status: {
+        Row: {
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_rate_limits: { Args: never; Returns: undefined }

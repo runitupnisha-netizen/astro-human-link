@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import appIcon from "@/assets/stellara-icon-constellation-heart.png";
+import appIcon from "@/assets/stellara-app-icon.png";
 import screenshotDiscover from "@/assets/screenshot-1-discover.jpg";
 import screenshotCompatibility from "@/assets/screenshot-2-compatibility.jpg";
 import screenshotMessages from "@/assets/screenshot-3-messages.jpg";

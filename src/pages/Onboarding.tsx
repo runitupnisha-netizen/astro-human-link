@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User, Plus, Info, X } from "lucide-react";
+import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User, Plus, Info, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";

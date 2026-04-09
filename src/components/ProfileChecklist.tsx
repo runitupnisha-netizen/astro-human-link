@@ -180,7 +180,12 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
                           onClick={() => {
                             if (!item.done && item.scrollTarget) {
                               const el = document.querySelector(item.scrollTarget);
-                              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                              if (el) {
+                                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                                // Brief highlight effect
+                                el.classList.add("ring-2", "ring-primary/50");
+                                setTimeout(() => el.classList.remove("ring-2", "ring-primary/50"), 2000);
+                              }
                             }
                           }}
                         >

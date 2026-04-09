@@ -142,9 +142,14 @@ const INTEREST_CATEGORIES = {
   ],
   "🍜 Food & Drinks": [
     "Coffee Culture", "Wine Tasting", "Craft Beer", "Tea Ceremony",
-    "Vegan Cooking", "Baking", "Street Food", "Fine Dining",
+    "Vegan Cooking", "Street Food", "Fine Dining",
     "Mixology", "Fermentation", "Farm-to-Table", "Food Photography",
     "Ethnic Cuisine", "BBQ & Grilling", "Chocolate", "Smoothies & Juices"
+  ],
+  "🎯 Things I Like to Do": [
+    "Baking", "Board Games", "Volunteering", "Thrifting", "Journaling",
+    "Road Trips", "Stargazing", "Puzzles", "Karaoke", "Shopping",
+    "Brunch", "Movie Nights", "Picnics", "People Watching", "Napping"
   ],
 };
 

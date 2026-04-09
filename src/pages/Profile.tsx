@@ -340,6 +340,29 @@ const Profile = () => {
             <SelfieVerification />
           </div>
 
+          {/* About Me */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Info className="w-5 h-5 text-accent" />
+                About Me
+                <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Optional</Badge>
+              </h2>
+              <textarea
+                value={profile.about_me || ""}
+                onChange={(e) => setProfile({ ...profile, about_me: e.target.value.slice(0, 500) })}
+                onBlur={async () => {
+                  await supabase.from("profiles").update({ about_me: profile.about_me?.trim() || null }).eq("user_id", user!.id);
+                }}
+                placeholder="Tell potential matches a little about yourself…"
+                rows={4}
+                className="flex w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground mt-1 text-right">{(profile.about_me || "").length}/500</p>
+            </CardContent>
+          </Card>
+
           {/* Bio Prompts */}
           <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">

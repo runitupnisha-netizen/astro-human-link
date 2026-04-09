@@ -232,9 +232,22 @@ const SwipeCard = ({
                   </span>
                 )}
               </div>
-              <div className="flex shrink-0 flex-col items-center">
-                <span className="font-display text-2xl font-bold text-accent [@media(max-height:700px)]:text-xl">{profile.compatibility_score}%</span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Match</span>
+              <div className="flex shrink-0 flex-col items-center gap-0.5">
+                <div className="relative w-14 h-14 flex items-center justify-center">
+                  <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.2" />
+                    <circle
+                      cx="28" cy="28" r="24" fill="none"
+                      stroke={profile.compatibility_score >= 80 ? "hsl(142, 71%, 45%)" : profile.compatibility_score >= 60 ? "hsl(var(--accent))" : "hsl(var(--primary))"}
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 24}`}
+                      strokeDashoffset={`${2 * Math.PI * 24 * (1 - profile.compatibility_score / 100)}`}
+                    />
+                  </svg>
+                  <span className="font-display text-base font-bold text-accent">{profile.compatibility_score}%</span>
+                </div>
+                <span className="text-[9px] uppercase tracking-wider text-muted-foreground">Match</span>
               </div>
             </div>
           </div>

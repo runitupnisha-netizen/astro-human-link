@@ -21,8 +21,8 @@ const ProfileCompletionScore = ({ profile, photoCount }: ProfileCompletionScoreP
   const color = score >= 80 ? "hsl(var(--accent))" : score >= 50 ? "hsl(var(--primary))" : "hsl(var(--destructive))";
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="relative w-14 h-14 flex items-center justify-center">
+    <div className="flex items-center gap-3 min-w-0">
+      <div className="relative w-14 h-14 flex-shrink-0 flex items-center justify-center">
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 88 88">
           <circle cx="44" cy="44" r="42" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity={0.2} />
           <motion.circle
@@ -38,9 +38,9 @@ const ProfileCompletionScore = ({ profile, photoCount }: ProfileCompletionScoreP
         </svg>
         <span className="text-sm font-bold text-foreground">{score}%</span>
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-medium text-foreground">Profile Score</p>
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-[10px] text-muted-foreground truncate">
           {score < 50 ? "Add more to stand out" : score < 80 ? "Looking good! Almost there" : "Your profile shines ✨"}
         </p>
       </div>

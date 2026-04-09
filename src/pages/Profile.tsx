@@ -817,6 +817,46 @@ const Profile = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Display Name Dialog */}
+      <Dialog open={editNameOpen} onOpenChange={setEditNameOpen}>
+        <DialogContent className="bg-card border-border/50 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Edit Display Name</DialogTitle>
+            <DialogDescription>Update the name shown on your profile.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-display-name">Display Name</Label>
+              <Input
+                id="edit-display-name"
+                value={editDisplayName}
+                onChange={(e) => setEditDisplayName(e.target.value)}
+                placeholder="Your display name"
+                className="bg-muted/50 border-border"
+                maxLength={50}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditNameOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!editDisplayName.trim()}
+              onClick={async () => {
+                const { error } = await supabase.from("profiles").update({ display_name: editDisplayName.trim() }).eq("user_id", user!.id);
+                if (!error) {
+                  setProfile({ ...profile, display_name: editDisplayName.trim() });
+                  setEditNameOpen(false);
+                  toast({ title: "Name updated ✨" });
+                }
+              }}
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <ProfilePreview open={showPreview} onClose={() => setShowPreview(false)} profile={profile} />
     </div>
   );

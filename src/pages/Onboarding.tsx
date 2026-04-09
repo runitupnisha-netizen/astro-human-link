@@ -164,7 +164,13 @@ const GENDER_OPTIONS: LifestyleOption[] = [
 const DATING_PREFERENCE_OPTIONS: LifestyleOption[] = [
   { value: "men", label: "Men", emoji: "♂️" },
   { value: "women", label: "Women", emoji: "♀️" },
-  { value: "non_binary_people", label: "Non-Binary People", emoji: "⚧️" },
+  { value: "non_binary_people", label: "Non-Binary", emoji: "⚧️" },
+  { value: "trans_male", label: "Trans Male", emoji: "🏳️‍⚧️" },
+  { value: "trans_female", label: "Trans Female", emoji: "🏳️‍⚧️" },
+  { value: "genderqueer", label: "Genderqueer", emoji: "🌈" },
+  { value: "genderfluid", label: "Genderfluid", emoji: "💫" },
+  { value: "two_spirit", label: "Two-Spirit", emoji: "🪶" },
+  { value: "agender", label: "Agender", emoji: "✨" },
   { value: "everyone", label: "Everyone", emoji: "💖" },
 ];
 

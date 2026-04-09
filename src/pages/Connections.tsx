@@ -237,18 +237,46 @@ const Connections = () => {
                   >
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
-                        {/* Avatar */}
+                        {/* Avatar with score ring */}
                         <div className="relative shrink-0">
-                          <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/20 overflow-hidden">
-                            {match.otherProfile.avatar_url ? (
-                              <img src={match.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <User className="w-8 h-8 text-foreground" />
+                          <div className="relative">
+                            <div className="w-16 h-16 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical ring-2 ring-primary/20 overflow-hidden">
+                              {match.otherProfile.avatar_url ? (
+                                <img src={match.otherProfile.avatar_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <User className="w-8 h-8 text-foreground" />
+                              )}
+                            </div>
+                            {/* Score ring overlay */}
+                            {match.compatibility_score != null && (
+                              <svg className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)] -rotate-90" viewBox="0 0 72 72">
+                                <circle cx="36" cy="36" r="34" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" opacity="0.15" />
+                                <circle
+                                  cx="36" cy="36" r="34" fill="none"
+                                  stroke={match.compatibility_score >= 80 ? "hsl(142, 71%, 45%)" : match.compatibility_score >= 60 ? "hsl(var(--accent))" : "hsl(var(--primary))"}
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeDasharray={`${2 * Math.PI * 34}`}
+                                  strokeDashoffset={`${2 * Math.PI * 34 * (1 - match.compatibility_score / 100)}`}
+                                />
+                              </svg>
                             )}
                           </div>
+                          {/* Score badge centered below avatar */}
+                          {match.compatibility_score != null && (
+                            <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10">
+                              <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                match.compatibility_score >= 80 ? "bg-green-500/20 text-green-400 border border-green-500/30" :
+                                match.compatibility_score >= 60 ? "bg-accent/20 text-accent border border-accent/30" :
+                                "bg-primary/20 text-primary border border-primary/30"
+                              }`}>
+                                {match.compatibility_score}%
+                              </span>
+                            </div>
+                          )}
                           {match.compatibility_score && match.compatibility_score >= 80 && (
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-accent flex items-center justify-center ring-2 ring-background">
-                              <Zap className="w-3 h-3 text-background" />
+                            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center ring-2 ring-background">
+                              <Zap className="w-2.5 h-2.5 text-background" />
                             </div>
                           )}
                         </div>
@@ -263,11 +291,6 @@ const Connections = () => {
                               {match.otherProfile.display_name || "Someone New"}
                             </h3>
                             {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
-                            {match.compatibility_score != null && (
-                              <span className={`text-sm font-bold ${getScoreColor(match.compatibility_score)}`}>
-                                {match.compatibility_score}%
-                              </span>
-                            )}
                           </div>
 
                           {/* Cosmic badges row */}

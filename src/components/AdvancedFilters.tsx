@@ -105,7 +105,7 @@ const AdvancedFilters = ({ onApply, onClose, initialFilters }: AdvancedFiltersPr
             className="mb-2"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Anywhere</span>
+            <span>Any Distance</span>
             <span className="text-foreground font-medium">{distLabel}</span>
             <span>310 mi</span>
           </div>

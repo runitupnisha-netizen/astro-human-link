@@ -10,6 +10,7 @@ interface ChecklistItem {
   label: string;
   done: boolean;
   tip: string;
+  scrollTarget?: string;
 }
 
 interface ProfileChecklistProps {

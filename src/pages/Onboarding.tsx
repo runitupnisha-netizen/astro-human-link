@@ -109,7 +109,7 @@ const INTEREST_CATEGORIES = {
     "Cycling", "Basketball", "Tennis", "Skateboarding", "CrossFit"
   ],
   "🏔️ Health & Adventure": [
-    "Plant-based", "Breathwork", "Cold Therapy", "Meditation",
+    "Plant-based", "Breathwork", "Cold Therapy", "Meditation", "Hiking",
     "Skydiving", "Cliff Diving", "Bungee Jumping", "Travel",
     "Camping", "Scuba Diving", "Paragliding", "Fasting", "Herbalism"
   ],

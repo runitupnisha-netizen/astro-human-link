@@ -280,6 +280,7 @@ const Onboarding = () => {
   const [customInterestInputs, setCustomInterestInputs] = useState<Record<string, string>>({});
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
   const [preferredLanguage, setPreferredLanguage] = useState<string>("");
+  const [aboutMe, setAboutMe] = useState<string>("");
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
 
   const handleGenerate = async (e: React.FormEvent) => {

@@ -1304,13 +1304,41 @@ const Onboarding = () => {
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                <Button onClick={() => setShowFinishConfirm(true)} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                     Complete My Profile
                   </span>
                 </Button>
               </motion.div>
+
+              {/* "Are you sure?" Confirmation */}
+              <AnimatePresence>
+                {showFinishConfirm && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-6"
+                  >
+                    <div className="glass-card glow-border p-6 max-w-sm w-full text-center space-y-4">
+                      <Sparkles className="w-10 h-10 text-accent mx-auto" />
+                      <h3 className="text-xl font-bold text-foreground">Are you sure?</h3>
+                      <p className="text-sm text-muted-foreground">
+                        You're about to submit your profile. You can always edit it later from your Profile page.
+                      </p>
+                      <div className="flex gap-3">
+                        <Button variant="outline" onClick={() => setShowFinishConfirm(false)} className="flex-1 h-11">
+                          Go Back & Review
+                        </Button>
+                        <Button onClick={() => { setShowFinishConfirm(false); handleFinish(); }} className="flex-1 h-11" style={{ background: "var(--gradient-aurora)" }}>
+                          Yes, Submit!
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>

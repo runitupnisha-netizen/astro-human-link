@@ -349,6 +349,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          about_me: string | null
           age_max: number | null
           age_min: number | null
           astro_summary: string | null
@@ -398,6 +399,7 @@ export type Database = {
           preferred_elements: string[] | null
           preferred_genders: string[] | null
           preferred_hd_types: string[] | null
+          preferred_language: string | null
           relationship_goal: string | null
           rising_sign: string | null
           smoking: string | null
@@ -407,8 +409,10 @@ export type Database = {
           sun_sign: string | null
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
+          about_me?: string | null
           age_max?: number | null
           age_min?: number | null
           astro_summary?: string | null
@@ -458,6 +462,7 @@ export type Database = {
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
+          preferred_language?: string | null
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
@@ -467,8 +472,10 @@ export type Database = {
           sun_sign?: string | null
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
+          about_me?: string | null
           age_max?: number | null
           age_min?: number | null
           astro_summary?: string | null
@@ -518,6 +525,7 @@ export type Database = {
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
+          preferred_language?: string | null
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
@@ -527,6 +535,7 @@ export type Database = {
           sun_sign?: string | null
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }

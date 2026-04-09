@@ -91,8 +91,8 @@ const INTEREST_CATEGORIES = {
     "Sci-Fi", "Documentary", "Art House", "Studio Ghibli", "Horror",
     "Comedy", "Drama", "Anime", "Thriller", "Romance", "Rom-Com", "Reality TV",
     "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
-    "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
-    "Satire", "Dystopian", "Neo Noir", "Slasher", "Found Footage",
+    "Neo Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
+    "Satire", "Dystopian", "Slasher", "Found Footage",
     "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [

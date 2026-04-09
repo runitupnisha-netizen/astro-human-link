@@ -285,7 +285,7 @@ const SwipeCard = ({
 
           {/* One-liner compatibility reason */}
           {profile.compatibility_reason && (
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.compatibility_reason}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-2">{profile.compatibility_reason}</p>
           )}
 
           {/* Bio prompt — only one, keeps it light */}

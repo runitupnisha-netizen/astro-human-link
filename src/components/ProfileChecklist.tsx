@@ -29,31 +29,37 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
       label: "Add a profile photo",
       done: !!profile.avatar_url,
       tip: "Profiles with photos get 10× more interest.",
+      scrollTarget: "[data-section='avatar']",
     },
     {
       label: "Enter your birth details",
       done: !!(profile.birth_date && profile.birth_place),
       tip: "Unlocks your star chart and compatibility insights.",
+      scrollTarget: "[data-section='birth-details']",
     },
     {
       label: "Fill in your bio prompts",
       done: !!(profile.bio_prompt_1_answer && profile.bio_prompt_2_answer),
       tip: "Help others get to know the real you.",
+      scrollTarget: "[data-section='bio-prompts']",
     },
     {
       label: "Upload gallery photos",
       done: photoCount >= 2,
       tip: "Add at least 2 photos to stand out.",
+      scrollTarget: "[data-section='photo-gallery']",
     },
     {
       label: "Set your lifestyle preferences",
       done: !!(profile.kids_preference && profile.drinking && profile.smoking),
       tip: "Helps match you with compatible people.",
+      scrollTarget: "[data-section='lifestyle']",
     },
     {
       label: "Choose your interests",
       done: !!(profile.interests && profile.interests.length >= 3),
       tip: "Pick 3+ interests for better discovery.",
+      scrollTarget: "[data-section='interests']",
     },
   ];
 

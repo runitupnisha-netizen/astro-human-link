@@ -1040,6 +1040,34 @@ const Onboarding = () => {
                 </div>
               </motion.div>
 
+              {/* Preferred Language */}
+              <motion.div {...staggerCard(0.28)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Globe className="w-5 h-5 text-accent" />
+                  <h3 className="text-lg font-semibold text-foreground">Preferred Language</h3>
+                  <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Optional</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "en", label: "English", emoji: "🇺🇸" },
+                    { value: "es", label: "Español", emoji: "🇪🇸" },
+                    { value: "fr", label: "Français", emoji: "🇫🇷" },
+                    { value: "pt", label: "Português", emoji: "🇧🇷" },
+                    { value: "de", label: "Deutsch", emoji: "🇩🇪" },
+                    { value: "ja", label: "日本語", emoji: "🇯🇵" },
+                    { value: "ko", label: "한국어", emoji: "🇰🇷" },
+                    { value: "zh", label: "中文", emoji: "🇨🇳" },
+                  ].map((lang) => (
+                    <LifestyleOptionButton 
+                      key={lang.value} 
+                      option={lang} 
+                      selected={preferredLanguage === lang.value} 
+                      onSelect={() => setPreferredLanguage(preferredLanguage === lang.value ? "" : lang.value)} 
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
               <motion.div {...staggerCard(0.3)} className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />

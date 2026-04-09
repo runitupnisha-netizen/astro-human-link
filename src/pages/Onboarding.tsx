@@ -92,7 +92,7 @@ const INTEREST_CATEGORIES = {
     "Comedy", "Drama", "Anime", "Thriller", "Romance", "Rom-Com", "Reality TV",
     "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
     "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
-    "Satire", "Dystopian", "Noir", "Slasher", "Found Footage",
+    "Satire", "Dystopian", "Neo Noir", "Slasher", "Found Footage",
     "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [

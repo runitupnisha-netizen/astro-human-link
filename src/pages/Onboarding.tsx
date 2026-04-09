@@ -113,7 +113,7 @@ const INTEREST_CATEGORIES = {
     "Skydiving", "Cliff Diving", "Bungee Jumping", "Travel",
     "Camping", "Scuba Diving", "Paragliding", "Fasting", "Herbalism"
   ],
-  "✨ Thought Systems": [
+  "✨ Religion / Thought Systems": [
     "Non-dualism", "Jungian Psychology", "Buddhism", "Christianity", "Judaism",
     "Islam", "Hinduism", "Sufism", "Stoicism", "Astrology", "Human Design",
     "Gene Keys", "Kabbalah", "Taoism", "Manifestation", "Quantum Physics",

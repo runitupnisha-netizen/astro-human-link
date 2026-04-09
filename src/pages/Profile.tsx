@@ -325,11 +325,7 @@ const Profile = () => {
           </Card>
 
           {/* Photo Gallery */}
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Star className="w-5 h-5 text-accent" />
-                Photo Gallery
+          <Card data-section="photo-gallery" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               </h2>
               <PhotoGallery userId={user!.id} editable={true} maxPhotos={9} columns={3} currentAvatarUrl={profile?.avatar_url} onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })} />
             </CardContent>

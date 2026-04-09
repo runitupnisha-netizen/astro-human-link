@@ -280,6 +280,7 @@ const Onboarding = () => {
   const [customInterestInputs, setCustomInterestInputs] = useState<Record<string, string>>({});
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
   const [preferredLanguage, setPreferredLanguage] = useState<string>("");
+  const [aboutMe, setAboutMe] = useState<string>("");
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -426,6 +427,8 @@ const Onboarding = () => {
           current_city: currentCity || null,
           current_latitude: currentLatitude || null,
           current_longitude: currentLongitude || null,
+          about_me: aboutMe.trim() || null,
+          preferred_language: preferredLanguage || null,
           onboarding_complete: true,
         })
         .eq("user_id", session.user.id);
@@ -991,7 +994,24 @@ const Onboarding = () => {
                 </div>
               </motion.div>
 
-              {/* Current Location */}
+              {/* About Me */}
+              <motion.div {...staggerCard(0.12)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Info className="w-5 h-5 text-accent" />
+                  <h3 className="text-lg font-semibold text-foreground">About Me</h3>
+                  <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Optional</Badge>
+                </div>
+                <textarea
+                  value={aboutMe}
+                  onChange={(e) => setAboutMe(e.target.value.slice(0, 500))}
+                  placeholder="Tell potential matches a little about yourself — what makes you, you?"
+                  rows={4}
+                  className="flex w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                  maxLength={500}
+                />
+                <p className="text-xs text-muted-foreground mt-1 text-right">{aboutMe.length}/500</p>
+              </motion.div>
+
               <motion.div {...staggerCard(0.15)} className="glass-card glow-border p-6 relative z-10" style={{ overflow: 'visible' }}>
                 <div className="flex items-center gap-3 mb-4">
                   <MapPin className="w-5 h-5 text-accent" />

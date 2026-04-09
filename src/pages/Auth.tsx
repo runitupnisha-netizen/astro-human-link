@@ -205,19 +205,30 @@ const Auth = () => {
           >
             {!isLogin && (
               <motion.div
-                className="relative"
+                className="space-y-4"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
               >
-                <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="pl-10 bg-muted/50 border-border"
-                  required={!isLogin}
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Full Name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 bg-muted/50 border-border"
+                    required={!isLogin}
+                  />
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-muted-foreground text-sm font-medium">@</span>
+                  <Input
+                    placeholder="Username (optional)"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30))}
+                    className="pl-10 bg-muted/50 border-border"
+                  />
+                </div>
               </motion.div>
             )}
 

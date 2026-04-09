@@ -276,7 +276,22 @@ const Discover = () => {
       <MatchCelebration
         profile={matchPopup}
         onClose={() => setMatchPopup(null)}
-        onMessage={() => { setMatchPopup(null); navigate("/messages"); }}
+        onMessage={() => {
+          const matchedId = matchPopup?.user_id;
+          setMatchPopup(null);
+          if (matchedId) {
+            // Find the match record to navigate to the right conversation
+            supabase.from("matches").select("id")
+              .or(`and(user_a.eq.${user!.id},user_b.eq.${matchedId}),and(user_a.eq.${matchedId},user_b.eq.${user!.id})`)
+              .maybeSingle()
+              .then(({ data }) => {
+                if (data) navigate(`/messages?match=${data.id}`);
+                else navigate("/connections");
+              });
+          } else {
+            navigate("/connections");
+          }
+        }}
       />
 
       <PremiumUpsellModal

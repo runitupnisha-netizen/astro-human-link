@@ -250,7 +250,7 @@ const Profile = () => {
               </button>
             ))}
           </div>
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+          <Card data-section="avatar" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col items-center md:flex-row md:items-center gap-6">
                 <AvatarUpload
@@ -325,7 +325,7 @@ const Profile = () => {
           </Card>
 
           {/* Photo Gallery */}
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+          <Card data-section="photo-gallery" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-accent" />
@@ -364,7 +364,7 @@ const Profile = () => {
           </Card>
 
           {/* Bio Prompts */}
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+          <Card data-section="bio-prompts" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <Heart className="w-5 h-5 text-accent" />
@@ -444,7 +444,7 @@ const Profile = () => {
 
           <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-300 ${regenerating ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             {/* Astrological Profile */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+            <Card data-section="birth-details" className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
               <div className="absolute top-3 right-3 w-16 h-16 opacity-15">
                 <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
               </div>
@@ -677,7 +677,7 @@ const Profile = () => {
 
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
-            <Card className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <Card data-section="interests" className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />

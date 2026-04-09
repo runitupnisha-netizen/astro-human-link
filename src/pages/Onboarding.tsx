@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User, Plus, Info, X } from "lucide-react";
+import { Sparkles, MapPin, Calendar, Clock, Loader2, Star, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, ShieldCheck, ChevronRight, ChevronLeft, Heart, User, Plus, Info, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import { motion, AnimatePresence } from "framer-motion";
@@ -92,7 +92,7 @@ const INTEREST_CATEGORIES = {
     "Comedy", "Drama", "Anime", "Thriller", "Romance", "Rom-Com", "Reality TV",
     "True Crime", "Fantasy", "Action", "Foreign Films", "Superhero",
     "Film Noir", "Westerns", "Musicals", "Biographical", "Psychological Thriller",
-    "Satire", "Dystopian", "Noir", "Slasher", "Found Footage",
+    "Satire", "Dystopian", "Neo Noir", "Slasher", "Found Footage",
     "Period Drama", "Crime Drama", "Sitcoms", "K-Drama", "Stand-Up Comedy"
   ],
   "📚 Books & Learning": [
@@ -109,11 +109,11 @@ const INTEREST_CATEGORIES = {
     "Cycling", "Basketball", "Tennis", "Skateboarding", "CrossFit"
   ],
   "🏔️ Health & Adventure": [
-    "Plant-based", "Breathwork", "Cold Therapy", "Meditation",
+    "Plant-based", "Breathwork", "Cold Therapy", "Meditation", "Hiking",
     "Skydiving", "Cliff Diving", "Bungee Jumping", "Travel",
     "Camping", "Scuba Diving", "Paragliding", "Fasting", "Herbalism"
   ],
-  "✨ Thought Systems": [
+  "✨ Religion / Thought Systems": [
     "Non-dualism", "Jungian Psychology", "Buddhism", "Christianity", "Judaism",
     "Islam", "Hinduism", "Sufism", "Stoicism", "Astrology", "Human Design",
     "Gene Keys", "Kabbalah", "Taoism", "Manifestation", "Quantum Physics",
@@ -142,9 +142,14 @@ const INTEREST_CATEGORIES = {
   ],
   "🍜 Food & Drinks": [
     "Coffee Culture", "Wine Tasting", "Craft Beer", "Tea Ceremony",
-    "Vegan Cooking", "Baking", "Street Food", "Fine Dining",
+    "Vegan Cooking", "Street Food", "Fine Dining",
     "Mixology", "Fermentation", "Farm-to-Table", "Food Photography",
     "Ethnic Cuisine", "BBQ & Grilling", "Chocolate", "Smoothies & Juices"
+  ],
+  "🎯 Things I Like to Do": [
+    "Baking", "Board Games", "Volunteering", "Thrifting", "Journaling",
+    "Road Trips", "Stargazing", "Puzzles", "Karaoke", "Shopping",
+    "Brunch", "Movie Nights", "Picnics", "People Watching", "Napping"
   ],
 };
 
@@ -164,7 +169,13 @@ const GENDER_OPTIONS: LifestyleOption[] = [
 const DATING_PREFERENCE_OPTIONS: LifestyleOption[] = [
   { value: "men", label: "Men", emoji: "♂️" },
   { value: "women", label: "Women", emoji: "♀️" },
-  { value: "non_binary_people", label: "Non-Binary People", emoji: "⚧️" },
+  { value: "non_binary_people", label: "Non-Binary", emoji: "⚧️" },
+  { value: "trans_male", label: "Trans Male", emoji: "🏳️‍⚧️" },
+  { value: "trans_female", label: "Trans Female", emoji: "🏳️‍⚧️" },
+  { value: "genderqueer", label: "Genderqueer", emoji: "🌈" },
+  { value: "genderfluid", label: "Genderfluid", emoji: "💫" },
+  { value: "two_spirit", label: "Two-Spirit", emoji: "🪶" },
+  { value: "agender", label: "Agender", emoji: "✨" },
   { value: "everyone", label: "Everyone", emoji: "💖" },
 ];
 
@@ -268,6 +279,8 @@ const Onboarding = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [customInterestInputs, setCustomInterestInputs] = useState<Record<string, string>>({});
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
+  const [preferredLanguage, setPreferredLanguage] = useState<string>("");
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -617,8 +630,13 @@ const Onboarding = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
+                  className="flex gap-3"
                 >
-                  <Button type="submit" className="w-full h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                  <Button variant="outline" onClick={() => navigate("/auth")} className="h-12 px-6 group">
+                    <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+                    Go Back
+                  </Button>
+                  <Button type="submit" className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                       Generate My Blueprint
@@ -1022,6 +1040,34 @@ const Onboarding = () => {
                 </div>
               </motion.div>
 
+              {/* Preferred Language */}
+              <motion.div {...staggerCard(0.28)} className="glass-card glow-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Globe className="w-5 h-5 text-accent" />
+                  <h3 className="text-lg font-semibold text-foreground">Preferred Language</h3>
+                  <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">Optional</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "en", label: "English", emoji: "🇺🇸" },
+                    { value: "es", label: "Español", emoji: "🇪🇸" },
+                    { value: "fr", label: "Français", emoji: "🇫🇷" },
+                    { value: "pt", label: "Português", emoji: "🇧🇷" },
+                    { value: "de", label: "Deutsch", emoji: "🇩🇪" },
+                    { value: "ja", label: "日本語", emoji: "🇯🇵" },
+                    { value: "ko", label: "한국어", emoji: "🇰🇷" },
+                    { value: "zh", label: "中文", emoji: "🇨🇳" },
+                  ].map((lang) => (
+                    <LifestyleOptionButton 
+                      key={lang.value} 
+                      option={lang} 
+                      selected={preferredLanguage === lang.value} 
+                      onSelect={() => setPreferredLanguage(preferredLanguage === lang.value ? "" : lang.value)} 
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
               <motion.div {...staggerCard(0.3)} className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep("reveal")} className="h-12 px-6 group">
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
@@ -1258,13 +1304,41 @@ const Onboarding = () => {
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={handleFinish} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                <Button onClick={() => setShowFinishConfirm(true)} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                     Complete My Profile
                   </span>
                 </Button>
               </motion.div>
+
+              {/* "Are you sure?" Confirmation */}
+              <AnimatePresence>
+                {showFinishConfirm && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-6"
+                  >
+                    <div className="glass-card glow-border p-6 max-w-sm w-full text-center space-y-4">
+                      <Sparkles className="w-10 h-10 text-accent mx-auto" />
+                      <h3 className="text-xl font-bold text-foreground">Are you sure?</h3>
+                      <p className="text-sm text-muted-foreground">
+                        You're about to submit your profile. You can always edit it later from your Profile page.
+                      </p>
+                      <div className="flex gap-3">
+                        <Button variant="outline" onClick={() => setShowFinishConfirm(false)} className="flex-1 h-11">
+                          Go Back & Review
+                        </Button>
+                        <Button onClick={() => { setShowFinishConfirm(false); handleFinish(); }} className="flex-1 h-11" style={{ background: "var(--gradient-aurora)" }}>
+                          Yes, Submit!
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>

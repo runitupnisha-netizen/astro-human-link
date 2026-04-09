@@ -10,6 +10,7 @@ interface ChecklistItem {
   label: string;
   done: boolean;
   tip: string;
+  scrollTarget?: string;
 }
 
 interface ProfileChecklistProps {
@@ -168,10 +169,18 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
                         ) : (
                           <Circle className="w-4 h-4 text-muted-foreground/50 mt-0.5 shrink-0" />
                         )}
-                        <div>
+                        <button
+                          className="text-left"
+                          onClick={() => {
+                            if (!item.done && item.scrollTarget) {
+                              const el = document.querySelector(item.scrollTarget);
+                              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }
+                          }}
+                        >
                           <span
                             className={`text-sm font-medium ${
-                              item.done ? "text-muted-foreground line-through" : "text-foreground"
+                              item.done ? "text-muted-foreground line-through" : "text-foreground hover:text-primary cursor-pointer"
                             }`}
                           >
                             {item.label}
@@ -179,7 +188,7 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
                           {!item.done && (
                             <p className="text-xs text-muted-foreground mt-0.5">{item.tip}</p>
                           )}
-                        </div>
+                        </button>
                       </li>
                     ))}
                   </motion.ul>

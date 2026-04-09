@@ -1,7 +1,8 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, User, MapPin, Lock } from "lucide-react";
+import { Heart, X, Star, User, MapPin, Lock, Eye } from "lucide-react";
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 
@@ -70,6 +71,7 @@ const SwipeCard = ({
   exitDirection = null,
   onExitComplete,
 }: SwipeCardProps) => {
+  const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -256,6 +258,18 @@ const SwipeCard = ({
             )}
           </div>
 
+          {/* Shared aspects / what you have in common */}
+          {profile.shared_aspects && profile.shared_aspects.length > 0 && (
+            <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
+              <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
+              {profile.shared_aspects.map((aspect, i) => (
+                <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+                  {aspect}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* One-liner compatibility reason */}
           {profile.compatibility_reason && (
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.compatibility_reason}</p>
@@ -267,6 +281,17 @@ const SwipeCard = ({
               <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
               <p className="text-sm text-foreground line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.bio_prompt_1_answer}</p>
             </div>
+          )}
+
+          {/* View Full Profile */}
+          {isTop && !profile.user_id.startsWith("demo-") && (
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${profile.user_id}`); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-primary hover:text-foreground transition-colors py-1"
+            >
+              <Eye className="w-3.5 h-3.5" /> View Full Profile
+            </button>
           )}
         </div>
 

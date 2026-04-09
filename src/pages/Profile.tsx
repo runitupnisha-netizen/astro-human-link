@@ -109,6 +109,8 @@ const Profile = () => {
   const [photoCount, setPhotoCount] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
   const { isVerified } = useVerificationStatus(user?.id);
+  const [editNameOpen, setEditNameOpen] = useState(false);
+  const [editDisplayName, setEditDisplayName] = useState("");
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");
@@ -262,10 +264,16 @@ const Profile = () => {
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
                     {isVerified && <VerifiedBadge size="lg" />}
-                    <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Birth Details
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="border-primary/30" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditNameOpen(true); }}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Name
+                      </Button>
+                      <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Birth Details
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-center md:justify-start gap-4 text-muted-foreground mb-4">
@@ -804,6 +812,46 @@ const Profile = () => {
               ) : (
                 "Yes, Regenerate"
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Display Name Dialog */}
+      <Dialog open={editNameOpen} onOpenChange={setEditNameOpen}>
+        <DialogContent className="bg-card border-border/50 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Edit Display Name</DialogTitle>
+            <DialogDescription>Update the name shown on your profile.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-display-name">Display Name</Label>
+              <Input
+                id="edit-display-name"
+                value={editDisplayName}
+                onChange={(e) => setEditDisplayName(e.target.value)}
+                placeholder="Your display name"
+                className="bg-muted/50 border-border"
+                maxLength={50}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditNameOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!editDisplayName.trim()}
+              onClick={async () => {
+                const { error } = await supabase.from("profiles").update({ display_name: editDisplayName.trim() }).eq("user_id", user!.id);
+                if (!error) {
+                  setProfile({ ...profile, display_name: editDisplayName.trim() });
+                  setEditNameOpen(false);
+                  toast({ title: "Name updated ✨" });
+                }
+              }}
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

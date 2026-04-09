@@ -46,7 +46,7 @@ const AdvancedFilters = ({ onApply, onClose, initialFilters }: AdvancedFiltersPr
 
   const distanceSteps = [0, 10, 25, 50, 100, 250, 500];
   const distIndex = distanceSteps.indexOf(filters.max_distance_km) >= 0 ? distanceSteps.indexOf(filters.max_distance_km) : 0;
-  const distLabel = filters.max_distance_km === 0 ? "Anywhere" : `${Math.round(filters.max_distance_km * 0.621371)} mi`;
+  const distLabel = filters.max_distance_km === 0 ? "Any Distance" : `${Math.round(filters.max_distance_km * 0.621371)} mi`;
 
   const activeCount = (filters.drinking.length + filters.smoking.length + filters.kids_preference.length + filters.substances.length) +
     (filters.age_min > 18 || filters.age_max < 99 ? 1 : 0) +
@@ -105,7 +105,7 @@ const AdvancedFilters = ({ onApply, onClose, initialFilters }: AdvancedFiltersPr
             className="mb-2"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Anywhere</span>
+            <span>Any Distance</span>
             <span className="text-foreground font-medium">{distLabel}</span>
             <span>310 mi</span>
           </div>

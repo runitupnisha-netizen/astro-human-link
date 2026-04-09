@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Phone } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -15,13 +15,19 @@ import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 import { motion } from "framer-motion";
 
+type AuthMode = "email" | "phone";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -38,6 +44,42 @@ const Auth = () => {
       toast.error(err.message || `Failed to sign in with ${provider}`);
     } finally {
       setSocialLoading(null);
+    }
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    // Strip non-digits except leading +
+    const cleaned = value.startsWith("+") ? "+" + value.slice(1).replace(/\D/g, "") : value.replace(/\D/g, "");
+    return cleaned;
+  };
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (!otpSent) {
+        // Ensure phone has country code
+        const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
+        const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
+        if (error) throw error;
+        setOtpSent(true);
+        toast.success("Verification code sent! 📱");
+      } else {
+        const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
+        const { error } = await supabase.auth.verifyOtp({
+          phone: formattedPhone,
+          token: otp,
+          type: "sms",
+        });
+        if (error) throw error;
+        toast.success("Welcome! ✌️");
+        navigate("/");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -196,112 +238,208 @@ const Auth = () => {
           </motion.form>
         ) : (
           /* Main Auth Form */
-          <motion.form
-            onSubmit={handleSubmit}
+          <motion.div
             className="glass-card glow-border p-6 space-y-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            {!isLogin && (
-              <motion.div
-                className="space-y-4"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <div className="relative">
-                  <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Full Name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 bg-muted/50 border-border"
-                    required={!isLogin}
-                  />
-                </div>
-                <div className="relative">
-                  <span className="absolute left-3 top-3 text-muted-foreground text-sm font-medium">@</span>
-                  <Input
-                    placeholder="Username (optional)"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30))}
-                    className="pl-10 bg-muted/50 border-border"
-                  />
-                </div>
-              </motion.div>
-            )}
-
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-muted/50 border-border"
-                required
-              />
-            </div>
-
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-muted/50 border-border"
-                required
-                minLength={6}
-              />
-            </div>
-
+            {/* Auth mode toggle (login only) */}
             {isLogin && (
-              <div className="text-right">
+              <div className="flex rounded-lg bg-muted/30 p-1 mb-2">
                 <button
                   type="button"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                  onClick={() => { setAuthMode("email"); setOtpSent(false); setOtp(""); }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-all ${
+                    authMode === "email" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
-                  Forgot password?
+                  <Mail className="w-3.5 h-3.5" />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("phone"); setOtpSent(false); setOtp(""); }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-all ${
+                    authMode === "phone" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  Phone
                 </button>
               </div>
             )}
 
-            {!isLogin && (
-              <div className="flex items-start space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-                  className="mt-0.5"
-                />
-                <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
-                  I am 18+ and agree to the{" "}
-                  <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
-                    Disclaimer &amp; Terms of Use
-                  </Link>
-                  , including that AI-generated content is for entertainment only and Stellara is not responsible for meetups or shared information.
-                </label>
-              </div>
-            )}
+            {/* Phone Auth */}
+            {authMode === "phone" && isLogin ? (
+              <form onSubmit={handlePhoneSubmit} className="space-y-4">
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="tel"
+                    placeholder="+1 (555) 123-4567"
+                    value={phone}
+                    onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                    className="pl-10 bg-muted/50 border-border"
+                    required
+                    disabled={otpSent}
+                  />
+                </div>
 
-            <Button
-              type="submit"
-              disabled={loading || (!isLogin && !agreedToTerms)}
-              className="w-full h-12 text-base font-semibold"
-              style={{ background: "var(--gradient-aurora)" }}
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-              ) : (
-                <>
-                  {isLogin ? "Sign In" : "Create Account"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </Button>
+                {otpSent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="space-y-2"
+                  >
+                    <p className="text-xs text-muted-foreground text-center">
+                      Enter the 6-digit code sent to your phone
+                    </p>
+                    <Input
+                      type="text"
+                      placeholder="000000"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      className="text-center text-lg tracking-[0.5em] bg-muted/50 border-border font-mono"
+                      maxLength={6}
+                      required
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading || (otpSent && otp.length < 6)}
+                  className="w-full h-12 text-base font-semibold"
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      {otpSent ? "Verify Code" : "Send Code"}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+
+                {otpSent && (
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => { setOtpSent(false); setOtp(""); }}
+                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Change phone number
+                    </button>
+                  </div>
+                )}
+              </form>
+            ) : (
+              /* Email Auth */
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <motion.div
+                    className="space-y-4"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Full Name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="pl-10 bg-muted/50 border-border"
+                        required={!isLogin}
+                      />
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3 top-3 text-muted-foreground text-sm font-medium">@</span>
+                      <Input
+                        placeholder="Username (optional)"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30))}
+                        className="pl-10 bg-muted/50 border-border"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 bg-muted/50 border-border"
+                    required
+                  />
+                </div>
+
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 bg-muted/50 border-border"
+                    required
+                    minLength={6}
+                  />
+                </div>
+
+                {isLogin && (
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+
+                {!isLogin && (
+                  <div className="flex items-start space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={agreedToTerms}
+                      onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug cursor-pointer">
+                      I am 18+ and agree to the{" "}
+                      <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
+                        Disclaimer &amp; Terms of Use
+                      </Link>
+                      , including that AI-generated content is for entertainment only and Stellara is not responsible for meetups or shared information.
+                    </label>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={loading || (!isLogin && !agreedToTerms)}
+                  className="w-full h-12 text-base font-semibold"
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      {isLogin ? "Sign In" : "Create Account"}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
 
             {/* Social Login Divider */}
             <div className="flex items-center gap-3 my-2">
@@ -353,13 +491,13 @@ const Auth = () => {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => { setIsLogin(!isLogin); setAuthMode("email"); setOtpSent(false); setOtp(""); }}
                 className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
                 {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
               </button>
             </div>
-          </motion.form>
+          </motion.div>
         )}
       </motion.div>
       </div>

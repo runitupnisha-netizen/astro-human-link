@@ -71,6 +71,7 @@ const SwipeCard = ({
   exitDirection = null,
   onExitComplete,
 }: SwipeCardProps) => {
+  const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
   const x = useMotionValue(0);
   const y = useMotionValue(0);

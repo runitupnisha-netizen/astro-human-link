@@ -52,11 +52,15 @@ const Auth = () => {
         toast.success("Welcome back! ✌️");
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error, data } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: fullName } },
+          options: { data: { full_name: fullName, username: username.trim() || undefined } },
         });
+        // Save username to profile if provided
+        if (!error && data.user && username.trim()) {
+          await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
+        }
         if (error) throw error;
         toast.success("Check your email to verify your account 🌟");
       }

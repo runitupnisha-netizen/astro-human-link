@@ -264,10 +264,16 @@ const Profile = () => {
                   <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
                     {isVerified && <VerifiedBadge size="lg" />}
-                    <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Birth Details
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="border-primary/30" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditNameOpen(true); }}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Name
+                      </Button>
+                      <Button variant="outline" size="sm" className="border-accent/30" onClick={openEditDialog}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Birth Details
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-center md:justify-start gap-4 text-muted-foreground mb-4">

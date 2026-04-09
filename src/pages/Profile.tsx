@@ -250,7 +250,7 @@ const Profile = () => {
               </button>
             ))}
           </div>
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+          <Card data-section="avatar" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col items-center md:flex-row md:items-center gap-6">
                 <AvatarUpload

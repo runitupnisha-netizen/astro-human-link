@@ -365,6 +365,10 @@ const Profile = () => {
 
           {/* Bio Prompts */}
           <Card data-section="bio-prompts" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Heart className="w-5 h-5 text-accent" />
+                About You
               </h2>
               <BioPrompts userId={user!.id} editable={true} />
             </CardContent>

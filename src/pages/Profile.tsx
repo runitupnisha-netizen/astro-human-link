@@ -678,6 +678,10 @@ const Profile = () => {
           {/* Interests */}
           {profile.interests && profile.interests.length > 0 && (
             <Card data-section="interests" className="mt-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" />
+                  Interests
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {profile.interests.map((interest: string) => (

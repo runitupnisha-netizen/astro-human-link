@@ -974,7 +974,7 @@ const Onboarding = () => {
               </motion.div>
 
               {/* Current Location */}
-              <motion.div {...staggerCard(0.15)} className="glass-card glow-border p-6">
+              <motion.div {...staggerCard(0.15)} className="glass-card glow-border p-6 overflow-visible" style={{ overflow: 'visible' }}>
                 <div className="flex items-center gap-3 mb-4">
                   <MapPin className="w-5 h-5 text-accent" />
                   <h3 className="text-lg font-semibold text-foreground">Where do you live?</h3>

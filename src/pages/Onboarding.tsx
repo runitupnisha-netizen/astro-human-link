@@ -427,6 +427,8 @@ const Onboarding = () => {
           current_city: currentCity || null,
           current_latitude: currentLatitude || null,
           current_longitude: currentLongitude || null,
+          about_me: aboutMe.trim() || null,
+          preferred_language: preferredLanguage || null,
           onboarding_complete: true,
         })
         .eq("user_id", session.user.id);

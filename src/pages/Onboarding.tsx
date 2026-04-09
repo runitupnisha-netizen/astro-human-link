@@ -630,8 +630,13 @@ const Onboarding = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
+                  className="flex gap-3"
                 >
-                  <Button type="submit" className="w-full h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                  <Button variant="outline" onClick={() => navigate("/auth")} className="h-12 px-6 group">
+                    <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+                    Go Back
+                  </Button>
+                  <Button type="submit" className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                       Generate My Blueprint

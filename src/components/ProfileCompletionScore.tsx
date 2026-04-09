@@ -13,10 +13,6 @@ const ProfileCompletionScore = ({ profile, photoCount }: ProfileCompletionScoreP
     photoCount >= 2,
     !!(profile.kids_preference && profile.drinking && profile.smoking),
     !!(profile.interests?.length >= 3),
-    !!profile.bio_prompt_3_answer,
-    !!profile.current_city,
-    !!profile.gender,
-    !!profile.relationship_goal,
   ];
 
   const score = Math.round((checks.filter(Boolean).length / checks.length) * 100);

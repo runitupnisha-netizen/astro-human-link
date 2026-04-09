@@ -444,7 +444,7 @@ const Profile = () => {
 
           <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-300 ${regenerating ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             {/* Astrological Profile */}
-            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
+            <Card data-section="birth-details" className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden relative">
               <div className="absolute top-3 right-3 w-16 h-16 opacity-15">
                 <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
               </div>

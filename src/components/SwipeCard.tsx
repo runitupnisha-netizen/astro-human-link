@@ -44,6 +44,13 @@ const getAge = (birthDate: string | null): number | null => {
   return age;
 };
 
+const sanitizeDisplayName = (name: string | null): string | null => {
+  if (!name) return null;
+  // Hide email-like or relay names (e.g. "abc123@privaterelay.appleid.com" or "57yd7cq5mn")
+  if (name.includes("@") || /^[a-z0-9]{8,}$/i.test(name.replace(/[^a-z0-9]/gi, ""))) return null;
+  return name;
+};
+
 const getCity = (place: string | null): string | null => {
   if (!place) return null;
   return place.split(",")[0].trim();

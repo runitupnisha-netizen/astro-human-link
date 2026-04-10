@@ -44,6 +44,13 @@ const getAge = (birthDate: string | null): number | null => {
   return age;
 };
 
+const sanitizeDisplayName = (name: string | null): string | null => {
+  if (!name) return null;
+  // Hide email-like or relay names (e.g. "abc123@privaterelay.appleid.com" or "57yd7cq5mn")
+  if (name.includes("@") || /^[a-z0-9]{8,}$/i.test(name.replace(/[^a-z0-9]/gi, ""))) return null;
+  return name;
+};
+
 const getCity = (place: string | null): string | null => {
   if (!place) return null;
   return place.split(",")[0].trim();
@@ -217,7 +224,7 @@ const SwipeCard = ({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <h2 className="min-w-0 truncate font-display text-xl sm:text-2xl font-bold leading-none text-foreground">
-                    {profile.display_name || "New Here"}
+                    {sanitizeDisplayName(profile.display_name) || "New Here"}
                   </h2>
                   {age && <span className="shrink-0 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
                   {isVerified && <span className="shrink-0"><VerifiedBadge size="sm" /></span>}

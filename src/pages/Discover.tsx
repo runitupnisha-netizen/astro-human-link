@@ -135,7 +135,7 @@ const Discover = () => {
     setExitDirection(direction);
 
     if (direction === "super") {
-      toast({ title: "⭐ Super Like Sent!", description: `${topProfile.display_name || "Someone special"} will notice this one` });
+      toast({ title: "⭐ Super Like Sent!", description: `${sanitizeName(topProfile.display_name) || "Someone special"} will notice this one` });
     }
 
     const isDemo = topProfile.user_id.startsWith("demo-");

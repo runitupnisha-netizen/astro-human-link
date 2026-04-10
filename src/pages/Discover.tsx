@@ -17,6 +17,12 @@ import { demoProfiles } from "@/data/demoProfiles";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
+const sanitizeName = (name: string | null): string | null => {
+  if (!name) return null;
+  if (name.includes("@") || /^[a-z0-9]{8,}$/i.test(name.replace(/[^a-z0-9]/gi, ""))) return null;
+  return name;
+};
+
 const Discover = () => {
   const { user } = useAuth();
   const { subscribed: isPremium } = usePremium();

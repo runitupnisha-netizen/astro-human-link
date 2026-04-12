@@ -432,11 +432,12 @@ const Messages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: signError } = await supabase.storage
         .from("voice-messages")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      const voiceUrl = urlData.publicUrl;
+      if (signError || !urlData?.signedUrl) throw signError || new Error("Failed to get signed URL");
+      const voiceUrl = urlData.signedUrl;
 
       // Optimistic update
       const optimisticMsg: Message = {
@@ -483,11 +484,12 @@ const Messages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData, error: signError } = await supabase.storage
         .from("chat-media")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 3600);
 
-      const imageUrl = urlData.publicUrl;
+      if (signError || !urlData?.signedUrl) throw signError || new Error("Failed to get signed URL");
+      const imageUrl = urlData.signedUrl;
 
       const optimisticMsg: Message = {
         id: `temp-img-${Date.now()}`,

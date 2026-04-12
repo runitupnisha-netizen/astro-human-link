@@ -232,6 +232,7 @@ serve(async (req) => {
       .select("*")
       .eq("onboarding_complete", true)
       .eq("is_paused", false)
+      .eq("is_incognito", false)
       .not("user_id", "in", `(${swipedIds.join(",")})`)
       .limit(50);
 

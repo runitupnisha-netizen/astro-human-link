@@ -61,20 +61,36 @@ const Auth = () => {
       if (!otpSent) {
         // Ensure phone has country code
         const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
-        const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
-        if (error) throw error;
+        
+        const res = await supabase.functions.invoke("send-otp", {
+          body: { phone: formattedPhone },
+        });
+        if (res.error) throw new Error(res.error.message || "Failed to send code");
+        if (res.data?.error) throw new Error(res.data.error);
+        
+        setPhone(formattedPhone);
         setOtpSent(true);
         toast.success("Verification code sent! 📱");
       } else {
         const formattedPhone = phone.startsWith("+") ? phone : `+1${phone}`;
-        const { error } = await supabase.auth.verifyOtp({
-          phone: formattedPhone,
-          token: otp,
-          type: "sms",
+        
+        const res = await supabase.functions.invoke("verify-otp", {
+          body: { phone: formattedPhone, code: otp },
         });
-        if (error) throw error;
-        toast.success("Welcome! ✌️");
-        navigate("/");
+        if (res.error) throw new Error(res.error.message || "Verification failed");
+        if (res.data?.error) throw new Error(res.data.error);
+        
+        const session = res.data.session;
+        if (session?.access_token && session?.refresh_token) {
+          await supabase.auth.setSession({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          });
+          toast.success("Welcome! ✌️");
+          navigate("/");
+        } else {
+          throw new Error("Failed to create session");
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");

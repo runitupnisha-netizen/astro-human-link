@@ -29,6 +29,8 @@ export interface DiscoverProfile {
   distance_km?: number | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
+  relationship_goal?: string | null;
+  about_me?: string | null;
   photo_urls?: string[];
 }
 

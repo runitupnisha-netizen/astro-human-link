@@ -998,7 +998,11 @@ const Messages = () => {
                                       onClick={() => window.open(msg.content, '_blank')}
                                     />
                                   ) : msg.message_type === "gif" ? (
-                                    <div className="text-4xl">{msg.content}</div>
+                                    <img
+                                      src={msg.content}
+                                      alt="GIF"
+                                      className="rounded-lg max-w-[220px] max-h-[220px] object-cover"
+                                    />
                                   ) : (
                                     <p className="text-sm leading-relaxed">{msg.content}</p>
                                   )}

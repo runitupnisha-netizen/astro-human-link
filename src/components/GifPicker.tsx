@@ -75,7 +75,7 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "min(60vh, 420px)" }}
+      animate={{ opacity: 1, height: "min(70vh, 500px)" }}
       exit={{ opacity: 0, height: 0 }}
       className="border-t border-border overflow-hidden bg-card/95 backdrop-blur-sm"
     >

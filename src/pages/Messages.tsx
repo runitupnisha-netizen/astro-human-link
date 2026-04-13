@@ -5,7 +5,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone, Ban, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -79,6 +95,7 @@ const Messages = () => {
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
 
   // Collect other user IDs for batch verification check
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
@@ -600,8 +617,26 @@ const Messages = () => {
     }
   }, []);
 
-
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
+
+  const handleBlockUser = useCallback(async () => {
+    if (!user || !selectedConvo) return;
+    const otherId = selectedConvo.match.user_a === user.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+    try {
+      await supabase.from("blocks").insert({ blocker_id: user.id, blocked_id: otherId });
+      toast({ title: "User blocked", description: "They can no longer contact you." });
+      setSelectedMatchId(null);
+      setShowMobileChat(false);
+      setConversations((prev) => prev.filter((c) => c.match.id !== selectedConvo.match.id));
+    } catch {
+      toast({ title: "Failed to block user", variant: "destructive" });
+    }
+    setShowBlockDialog(false);
+  }, [user, selectedConvo, toast]);
+
+  const triggerFileInput = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -819,7 +854,48 @@ const Messages = () => {
                         >
                           <Phone className="w-4 h-4" />
                         </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const otherId = selectedConvo.match.user_a === user?.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+                                navigate(`/profile/${otherId}`);
+                              }}
+                            >
+                              <User className="w-4 h-4 mr-2" /> View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => setShowBlockDialog(true)}
+                            >
+                              <Ban className="w-4 h-4 mr-2" /> Block User
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
+
+                      {/* Block Confirmation Dialog */}
+                      <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Block {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "this user"}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              They won't be able to message you or see your profile. This action can be undone from Settings.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleBlockUser} className="bg-destructive hover:bg-destructive/90">
+                              Block
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
 
                       {/* Messages */}
                       <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -1119,7 +1195,7 @@ const Messages = () => {
                             size="icon"
                             variant="ghost"
                             className="shrink-0 text-muted-foreground hover:text-foreground h-8 w-8"
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={triggerFileInput}
                             disabled={uploadingImage}
                           >
                             <Image className="w-4 h-4" />

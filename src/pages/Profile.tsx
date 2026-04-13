@@ -212,44 +212,69 @@ const Profile = () => {
       <CosmicBackground />
       
       <div className="relative z-10 pt-24 pb-24 md:pb-12">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="max-w-lg mx-auto px-4">
+          {/* Instagram-style header: avatar centered, stats row */}
+          <div className="flex flex-col items-center mb-6">
+            <AvatarUpload
+              userId={user!.id}
+              currentUrl={profile.avatar_url}
+              onUpload={(url) => setProfile({ ...profile, avatar_url: url })}
+              size="lg"
+            />
+            <div className="mt-3 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-foreground">{profile.display_name || "Your Profile"}</h1>
+              {isVerified && <VerifiedBadge size="lg" />}
+            </div>
+            {(profile.current_city || profile.birth_place) && (
+              <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
+                <MapPin className="w-3.5 h-3.5 text-accent" />
+                <span>{profile.current_city || profile.birth_place}</span>
+              </div>
+            )}
+            <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+              {profile.sun_sign && <Badge variant="outline" className="border-primary/30 text-primary text-xs">☉ {profile.sun_sign}</Badge>}
+              {profile.moon_sign && <Badge variant="outline" className="border-primary/30 text-primary text-xs">☽ {profile.moon_sign}</Badge>}
+              {profile.rising_sign && <Badge variant="outline" className="border-primary/30 text-primary text-xs">↗ {profile.rising_sign}</Badge>}
+              {profile.human_design_type && <Badge variant="secondary" className="bg-accent/20 text-accent text-xs">{profile.human_design_type}</Badge>}
+            </div>
+          </div>
+
+          {/* Stats bar — like Instagram */}
+          <div className="flex items-center justify-around mb-6 py-3 border-y border-border/30">
             <ProfileCompletionScore profile={profile} photoCount={photoCount} />
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="border-accent/30 gap-2 md:hidden" onClick={() => navigate("/settings")}>
-                <Settings className="w-4 h-4" /> Settings
+              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-8 text-xs" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditNameOpen(true); }}>
+                <Edit className="w-3.5 h-3.5" /> Edit
               </Button>
-              <Button variant="outline" size="sm" className="border-primary/30 gap-2" onClick={() => setShowPreview(true)}>
-                <Eye className="w-4 h-4" /> Preview
+              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-8 text-xs" onClick={() => setShowPreview(true)}>
+                <Eye className="w-3.5 h-3.5" /> Preview
+              </Button>
+              <Button variant="outline" size="sm" className="border-accent/30 gap-1.5 h-8 text-xs md:hidden" onClick={() => navigate("/settings")}>
+                <Settings className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
-          <ProfileChecklist profile={profile} photoCount={photoCount} />
 
-          {/* Explore More */}
-          <div className="mb-8 grid grid-cols-4 sm:grid-cols-8 gap-2">
+          {/* Quick links grid */}
+          <div className="mb-6 grid grid-cols-4 gap-2">
             {[
               { label: "Premium", icon: Crown, path: "/premium" },
               { label: "Insights", icon: Star, path: "/insights" },
-              { label: "Reveal", icon: Sparkles, path: "/reveal" },
               { label: "Achievements", icon: Trophy, path: "/achievements" },
               { label: "Referrals", icon: Gift, path: "/referral" },
-              { label: "Astro Events", icon: Calendar, path: "/astro-events" },
-              { label: "Safety", icon: ShieldCheck, path: "/safety" },
-              { label: "Settings", icon: Settings, path: "/settings" },
             ].map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex flex-col items-center gap-1.5 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-3 transition-colors hover:bg-primary/10 hover:border-primary/30"
+                className="flex flex-col items-center gap-1 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-2.5 transition-colors hover:bg-primary/10 hover:border-primary/30"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <item.icon className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-xs font-medium text-foreground">{item.label}</span>
+                <item.icon className="h-4 w-4 text-primary" />
+                <span className="text-[10px] font-medium text-foreground">{item.label}</span>
               </button>
             ))}
           </div>
+
+          <ProfileChecklist profile={profile} photoCount={photoCount} />
           <Card data-section="avatar" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-8">
               <div className="flex flex-col items-center md:flex-row md:items-center gap-6">

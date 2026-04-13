@@ -19,7 +19,7 @@ interface ProfilePhoto {
   display_order: number;
 }
 
-const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, currentAvatarUrl, onAvatarChange }: PhotoGalleryProps) => {
+const PhotoGallery = ({ userId, editable = true, maxPhotos = 999, columns = 3, currentAvatarUrl, onAvatarChange }: PhotoGalleryProps) => {
   const { toast } = useToast();
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -47,13 +47,7 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const remaining = maxPhotos - photos.length;
-    if (remaining <= 0) {
-      toast({ title: `Maximum ${maxPhotos} photos allowed`, variant: "destructive" });
-      return;
-    }
-
-    const filesToUpload = Array.from(files).slice(0, remaining);
+    const filesToUpload = Array.from(files);
     setUploading(true);
 
     try {
@@ -206,8 +200,8 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
           ))}
         </AnimatePresence>
 
-        {/* Add photo button */}
-        {editable && photos.length < maxPhotos && (
+        {/* Add photo button — always visible */}
+        {editable && (
           <motion.button
             layout
             onClick={() => fileInputRef.current?.click()}
@@ -219,7 +213,7 @@ const PhotoGallery = ({ userId, editable = true, maxPhotos = 9, columns = 3, cur
             ) : (
               <>
                 <Plus className="w-6 h-6" />
-                <span className="text-[10px]">{photos.length}/{maxPhotos}</span>
+                <span className="text-[10px]">Add Photo</span>
               </>
             )}
           </motion.button>

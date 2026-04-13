@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useVerificationGate } from "@/hooks/useVerificationGate";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -18,6 +19,7 @@ import { TranslationProvider } from "@/hooks/useTranslation";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const VerificationGate = lazy(() => import("./pages/VerificationGate"));
 const Discover = lazy(() => import("./pages/Discover"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Connections = lazy(() => import("./pages/Connections"));
@@ -54,10 +56,13 @@ const LoadingScreen = () => (
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false }: { children: ReactNode; allowDuringOnboarding?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
+  const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  if (loading) return <LoadingScreen />;
+  if (loading || verLoading) return <LoadingScreen />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
+  // After onboarding, require verification before accessing the app
+  if (onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
 
   return <>{children}</>;
 };
@@ -95,6 +100,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding><VerificationGate /></ProtectedRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />
             <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />

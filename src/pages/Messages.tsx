@@ -32,6 +32,8 @@ import AudioPlayer from "@/components/AudioPlayer";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
+import GifPicker from "@/components/GifPicker";
+import CallScreen from "@/components/CallScreen";
 
 interface Match {
   id: string;

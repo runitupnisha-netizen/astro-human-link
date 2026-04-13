@@ -201,11 +201,19 @@ const Discover = () => {
             Filters
           </Button>
 
-          {!isPremium && (
-            <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
-              {likesLeft} likes left today
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <BoostButton
+              isPremium={isPremium}
+              boostUntil={boostUntil}
+              onBoostActivated={(until) => setBoostUntil(until)}
+              onUpsell={() => { setUpsellFeature("boost"); setShowUpsell(true); }}
+            />
+            {!isPremium && (
+              <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
+                {likesLeft} likes left
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Filter panel */}

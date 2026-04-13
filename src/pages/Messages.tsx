@@ -262,6 +262,7 @@ const Messages = () => {
               display_name: "Cosmic Soul",
               sun_sign: null,
               avatar_url: null,
+              last_seen_at: null,
             },
             lastMessage: lastMsgs?.[0],
             unreadCount: 0,

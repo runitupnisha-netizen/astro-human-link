@@ -854,7 +854,48 @@ const Messages = () => {
                         >
                           <Phone className="w-4 h-4" />
                         </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const otherId = selectedConvo.match.user_a === user?.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+                                navigate(`/profile/${otherId}`);
+                              }}
+                            >
+                              <User className="w-4 h-4 mr-2" /> View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => setShowBlockDialog(true)}
+                            >
+                              <Ban className="w-4 h-4 mr-2" /> Block User
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
+
+                      {/* Block Confirmation Dialog */}
+                      <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Block {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "this user"}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              They won't be able to message you or see your profile. This action can be undone from Settings.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleBlockUser} className="bg-destructive hover:bg-destructive/90">
+                              Block
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
 
                       {/* Messages */}
                       <div className="flex-1 overflow-y-auto p-4 space-y-3">

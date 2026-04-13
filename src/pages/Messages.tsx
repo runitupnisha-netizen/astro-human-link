@@ -47,6 +47,7 @@ interface Profile {
   display_name: string | null;
   sun_sign: string | null;
   avatar_url: string | null;
+  last_seen_at: string | null;
 }
 
 interface Message {

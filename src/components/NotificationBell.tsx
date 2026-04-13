@@ -3,8 +3,12 @@ import { Bell, Check, Sparkles, Star } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
+  match: <Bell className="w-4 h-4 text-primary" />,
+  message: <Bell className="w-4 h-4 text-primary" />,
   daily_intention: <Sparkles className="w-4 h-4 text-primary" />,
   weekly_insight: <Star className="w-4 h-4 text-accent" />,
 };
@@ -12,6 +16,49 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 const NotificationBell = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNotificationClick = async (notification: { id: string; type: string; body: string; read: boolean }) => {
+    if (!notification.read) {
+      await markAsRead(notification.id);
+    }
+
+    if (notification.type === "match") {
+      const matchName = notification.body.match(/You matched with\s+(.+?)!/i)?.[1]?.trim();
+
+      if (matchName) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("display_name", matchName)
+          .maybeSingle();
+
+        if (profile?.user_id) {
+          setOpen(false);
+          navigate(`/profile/${profile.user_id}`);
+          return;
+        }
+      }
+
+      setOpen(false);
+      navigate("/connections");
+      return;
+    }
+
+    if (notification.type === "message") {
+      setOpen(false);
+      navigate("/messages");
+      return;
+    }
+
+    if (notification.type === "daily_intention" || notification.type === "weekly_insight") {
+      setOpen(false);
+      navigate("/insights");
+      return;
+    }
+
+    setOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -65,9 +112,7 @@ const NotificationBell = () => {
                   {notifications.map((n) => (
                     <button
                       key={n.id}
-                      onClick={() => {
-                        if (!n.read) markAsRead(n.id);
-                      }}
+                      onClick={() => void handleNotificationClick(n)}
                       className={`w-full text-left p-4 hover:bg-muted/20 transition-colors ${
                         !n.read ? "bg-primary/5" : ""
                       }`}

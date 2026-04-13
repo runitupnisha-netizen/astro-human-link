@@ -46,6 +46,7 @@ interface ProfileData {
   current_city: string | null;
   current_latitude: number | null;
   current_longitude: number | null;
+  last_seen_at: string | null;
 }
 
 const ViewProfile = () => {

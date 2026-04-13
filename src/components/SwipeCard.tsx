@@ -302,6 +302,13 @@ const SwipeCard = ({
             </Badge>
           )}
 
+          {/* About me bio */}
+          {profile.about_me && (
+            <p className="text-sm text-foreground/90 leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">
+              {profile.about_me}
+            </p>
+          )}
+
           {profile.shared_aspects && profile.shared_aspects.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
               <span className="text-[10px] text-muted-foreground mr-1">In common:</span>

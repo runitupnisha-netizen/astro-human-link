@@ -13,6 +13,7 @@ type VerificationStatus = "none" | "pending" | "verified" | "rejected";
 const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);

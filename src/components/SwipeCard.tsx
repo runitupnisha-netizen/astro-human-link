@@ -113,9 +113,8 @@ const SwipeCard = ({
 
   const handleDragEnd = useCallback((_: any, info: PanInfo) => {
     const { offset, velocity } = info;
-    // Super like: swipe up
-    if (offset.y < -80 && Math.abs(offset.x) < 60) {
-      if (!isPremium) return;
+    // Super like: swipe up (only if premium)
+    if (isPremium && offset.y < -80 && Math.abs(offset.x) < 60) {
       onSwipe("super");
       return;
     }
@@ -146,8 +145,8 @@ const SwipeCard = ({
         willChange: isTop ? "transform" : undefined,
       }}
       drag={isTop && !exitDirection}
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.85}
+      dragConstraints={{ left: 0, right: 0, top: isPremium ? 0 : 0, bottom: 0 }}
+      dragElastic={{ left: 0.85, right: 0.85, top: isPremium ? 0.85 : 0.1, bottom: 0.1 }}
       onDragEnd={isTop ? handleDragEnd : undefined}
       initial={stackStyle}
       animate={
@@ -180,12 +179,14 @@ const SwipeCard = ({
           >
             <span className="font-display text-red-400 text-xl font-black tracking-wider">NEXT</span>
           </motion.div>
-          <motion.div
-            className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm pointer-events-none"
-            style={{ opacity: superLikeOpacity }}
-          >
-            <span className="font-display text-accent text-xl font-black tracking-wider">⭐ SUPER</span>
-          </motion.div>
+          {isPremium && (
+            <motion.div
+              className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-2 border-accent/80 rounded-2xl px-6 py-2 bg-accent/10 backdrop-blur-sm pointer-events-none"
+              style={{ opacity: superLikeOpacity }}
+            >
+              <span className="font-display text-accent text-xl font-black tracking-wider">⭐ SUPER</span>
+            </motion.div>
+          )}
         </>
       )}
 
@@ -299,6 +300,13 @@ const SwipeCard = ({
             <Badge variant="outline" className="text-[10px] border-primary/20 text-primary w-fit">
               {profile.relationship_goal}
             </Badge>
+          )}
+
+          {/* About me bio */}
+          {profile.about_me && (
+            <p className="text-sm text-foreground/90 leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">
+              {profile.about_me}
+            </p>
           )}
 
           {profile.shared_aspects && profile.shared_aspects.length > 0 && (

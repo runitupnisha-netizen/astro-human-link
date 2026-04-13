@@ -616,6 +616,9 @@ const Messages = () => {
       setSearchingGifs(false);
     }
   }, []);
+
+  const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
+
   const handleBlockUser = useCallback(async () => {
     if (!user || !selectedConvo) return;
     const otherId = selectedConvo.match.user_a === user.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
@@ -634,8 +637,6 @@ const Messages = () => {
   const triggerFileInput = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-
-  const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);

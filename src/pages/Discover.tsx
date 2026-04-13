@@ -66,6 +66,13 @@ const Discover = () => {
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 
+  // Fetch boost status
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("boost_until").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => { if (data?.boost_until) setBoostUntil(data.boost_until); });
+  }, [user]);
+
   // Count today's likes
   useEffect(() => {
     if (!user || isPremium) return;

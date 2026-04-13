@@ -38,6 +38,12 @@ interface MatchWithProfile {
   distanceKm: number | null;
 }
 
+const sanitizeConnectionName = (name: string | null): string | null => {
+  if (!name) return null;
+  if (name.includes("@") || /^[a-z0-9]{8,}$/i.test(name.replace(/[^a-z0-9]/gi, ""))) return null;
+  return name;
+};
+
 const Connections = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -294,7 +300,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {match.otherProfile.display_name || "Someone New"}
+                              {sanitizeConnectionName(match.otherProfile.display_name) || "Someone New"}
                             </h3>
                             {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                           </div>

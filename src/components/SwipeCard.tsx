@@ -260,7 +260,7 @@ const SwipeCard = ({
           </div>
         </div>
 
-        {/* Compact info section */}
+          {/* Compact info section */}
         <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2">
           {/* Astro badges — just the essentials */}
           <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
@@ -277,6 +277,20 @@ const SwipeCard = ({
               <Badge variant="outline" className="border-primary/30 text-primary text-xs [@media(max-height:700px)]:text-[11px]">{profile.human_design_type}</Badge>
             )}
           </div>
+
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
+              {profile.interests.slice(0, 5).map((interest, i) => (
+                <Badge key={i} variant="secondary" className="text-[10px] bg-accent/10 text-accent border border-accent/20">
+                  {interest}
+                </Badge>
+              ))}
+              {profile.interests.length > 5 && (
+                <span className="text-[10px] text-muted-foreground">+{profile.interests.length - 5} more</span>
+              )}
+            </div>
+          )}
 
           {/* Shared aspects / what you have in common */}
           {profile.shared_aspects && profile.shared_aspects.length > 0 && (

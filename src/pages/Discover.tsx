@@ -6,7 +6,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import AdvancedFilters, { AdvancedFilterState } from "@/components/AdvancedFilters";
-import { Sparkles, Loader2, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
+import { Sparkles, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,6 +15,7 @@ import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
 import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
+import { ProfileCardSkeleton } from "@/components/Skeletons";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 

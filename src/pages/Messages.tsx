@@ -837,9 +837,11 @@ const Messages = () => {
                           {verifiedUsers.has(selectedConvo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                           <div className="flex items-center gap-2">
                             {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
-                              <span className="text-[10px] text-green-500 font-medium">Online</span>
+                              <span className="text-[10px] text-emerald-500 font-medium">● Online</span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground">Offline</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {formatLastSeen(selectedConvo.otherProfile.last_seen_at)}
+                              </span>
                             )}
                             {selectedConvo.match.compatibility_score && (
                               <Badge variant="outline" className="text-[10px] border-accent/30 text-accent h-5">

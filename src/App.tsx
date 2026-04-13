@@ -41,6 +41,7 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const AstroEvents = lazy(() => import("./pages/AstroEvents"));
 const Contact = lazy(() => import("./pages/Contact"));
 const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
+const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

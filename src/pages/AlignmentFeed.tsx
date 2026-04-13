@@ -272,7 +272,7 @@ const AlignmentFeed = () => {
                 key={cat.value}
                 onClick={() => setFilter(filter === cat.value ? null : cat.value)}
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap ${
-                  filter === cat.value ? cat.color : "border-border/30 text-muted-foreground"
+                  filter === cat.value ? cat.color + " ring-1 ring-offset-1 ring-offset-background ring-current" : "border-border/30 text-muted-foreground"
                 }`}
               >
                 <cat.icon className="w-3 h-3" />

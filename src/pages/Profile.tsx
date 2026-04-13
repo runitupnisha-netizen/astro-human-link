@@ -331,7 +331,7 @@ const Profile = () => {
                 <Star className="w-5 h-5 text-accent" />
                 Photo Gallery
               </h2>
-              <PhotoGallery userId={user!.id} editable={true} maxPhotos={9} columns={3} currentAvatarUrl={profile?.avatar_url} onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })} />
+              <PhotoGallery userId={user!.id} editable={true} columns={3} currentAvatarUrl={profile?.avatar_url} onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })} />
             </CardContent>
           </Card>
 

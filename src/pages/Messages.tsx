@@ -1091,27 +1091,6 @@ const Messages = () => {
                           className="hidden"
                         />
                         <div className="flex items-center gap-2">
-                          <VoiceRecorder
-                            onRecordingComplete={handleVoiceRecording}
-                            disabled={sending || uploadingVoice || uploadingImage}
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="shrink-0 text-muted-foreground hover:text-foreground"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploadingImage}
-                          >
-                            <Image className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="shrink-0 text-muted-foreground hover:text-foreground text-lg"
-                            onClick={() => setShowGifPicker(!showGifPicker)}
-                          >
-                            GIF
-                          </Button>
                           <Input
                             placeholder="Say something..."
                             value={newMessage}
@@ -1135,6 +1114,30 @@ const Messages = () => {
                             className="bg-primary hover:bg-primary/90 shadow-glow shrink-0"
                           >
                             <Send className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {/* Media buttons row — separate from text input */}
+                        <div className="flex items-center gap-1 mt-2">
+                          <VoiceRecorder
+                            onRecordingComplete={handleVoiceRecording}
+                            disabled={sending || uploadingVoice || uploadingImage}
+                          />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground h-8 w-8"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                          >
+                            <Image className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="shrink-0 text-muted-foreground hover:text-foreground h-8 w-8 text-xs font-bold"
+                            onClick={() => setShowGifPicker(!showGifPicker)}
+                          >
+                            GIF
                           </Button>
                         </div>
                         {uploadingVoice && (

@@ -113,9 +113,8 @@ const SwipeCard = ({
 
   const handleDragEnd = useCallback((_: any, info: PanInfo) => {
     const { offset, velocity } = info;
-    // Super like: swipe up
-    if (offset.y < -80 && Math.abs(offset.x) < 60) {
-      if (!isPremium) return;
+    // Super like: swipe up (only if premium)
+    if (isPremium && offset.y < -80 && Math.abs(offset.x) < 60) {
       onSwipe("super");
       return;
     }

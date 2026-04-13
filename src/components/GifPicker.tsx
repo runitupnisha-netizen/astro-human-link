@@ -75,24 +75,24 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 320 }}
+      animate={{ opacity: 1, height: "min(60vh, 420px)" }}
       exit={{ opacity: 0, height: 0 }}
       className="border-t border-border overflow-hidden bg-card/95 backdrop-blur-sm"
     >
-      <div className="p-3 space-y-2 h-full flex flex-col">
+      <div className="p-3 sm:p-4 space-y-3 h-full flex flex-col">
         {/* Search bar */}
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search GIFs..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-8 h-8 text-sm bg-background/50 border-border"
+              className="pl-9 h-10 text-sm bg-background/50 border-border"
               autoFocus
             />
           </div>
-          <Button size="icon" variant="ghost" className="w-8 h-8 shrink-0" onClick={onClose}>
+          <Button size="icon" variant="ghost" className="w-10 h-10 shrink-0" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>

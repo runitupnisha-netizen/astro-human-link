@@ -35,12 +35,18 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        setStatus(data.status as VerificationStatus);
+        const s = data.status as VerificationStatus;
+        setStatus(s);
+        // If already verified, redirect to app
+        if (s === "verified") {
+          navigate("/", { replace: true });
+          return;
+        }
       }
       setLoading(false);
     };
     check();
-  }, [user]);
+  }, [user, navigate]);
 
   const startCamera = useCallback(async () => {
     try {

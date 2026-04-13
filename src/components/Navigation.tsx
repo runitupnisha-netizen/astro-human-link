@@ -98,7 +98,7 @@ const Navigation = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? item.premium ? "bg-gradient-golden text-background shadow-golden" : "nav-pill-active"
                         : item.premium

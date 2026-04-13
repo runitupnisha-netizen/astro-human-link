@@ -228,23 +228,7 @@ const Connections = () => {
           </motion.div>
 
           {matches.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-16"
-            >
-              <div className="w-24 h-24 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-6">
-                <Users className="w-12 h-12 text-muted-foreground" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-foreground">No Connections Yet</h3>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Keep discovering people — when you both like each other, you'll match!
-              </p>
-              <Button onClick={() => navigate("/")} style={{ background: "var(--gradient-aurora)" }} className="h-11 px-6 shadow-glow">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Start Discovering
-              </Button>
-            </motion.div>
+            <EmptyState type="connections" />
           ) : (
             <div className="space-y-4">
               {matches.map((match, i) => (

@@ -86,9 +86,6 @@ const Messages = () => {
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
-  const [gifSearch, setGifSearch] = useState("");
-  const [gifResults, setGifResults] = useState<{ url: string; preview: string; title: string }[]>([]);
-  const [searchingGifs, setSearchingGifs] = useState(false);
   const [imagePreview, setImagePreview] = useState<{ file: File; url: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

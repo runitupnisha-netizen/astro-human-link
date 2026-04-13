@@ -102,6 +102,17 @@ const Messages = () => {
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
   const verifiedUsers = useVerificationStatuses(otherUserIds);
 
+  // Persist last_seen_at on mount and periodically
+  useEffect(() => {
+    if (!user) return;
+    const updateLastSeen = () => {
+      supabase.from("profiles").update({ last_seen_at: new Date().toISOString() } as any).eq("user_id", user.id).then();
+    };
+    updateLastSeen();
+    const interval = setInterval(updateLastSeen, 60000); // every minute
+    return () => clearInterval(interval);
+  }, [user]);
+
   // Online presence tracking
   useEffect(() => {
     if (!user) return;
@@ -126,6 +137,20 @@ const Messages = () => {
       supabase.removeChannel(presenceChannel);
     };
   }, [user]);
+
+  // Format last seen relative time
+  const formatLastSeen = (dateStr: string | null) => {
+    if (!dateStr) return "Offline";
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString();
+  };
 
   // Typing indicator channel per match
   useEffect(() => {

@@ -294,7 +294,13 @@ const SwipeCard = ({
             </div>
           )}
 
-          {/* Shared aspects / what you have in common */}
+          {/* Relationship goal */}
+          {profile.relationship_goal && (
+            <Badge variant="outline" className="text-[10px] border-primary/20 text-primary w-fit">
+              {profile.relationship_goal}
+            </Badge>
+          )}
+
           {profile.shared_aspects && profile.shared_aspects.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
               <span className="text-[10px] text-muted-foreground mr-1">In common:</span>

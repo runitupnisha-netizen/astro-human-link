@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, Send, Sparkles, BookOpen, Flame, Leaf, Star, User, Loader2, Trash2, Feather } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { getDisplayIdentity } from "@/lib/utils";
 
 const CATEGORIES = [
   { value: "reflection", label: "Reflection", icon: BookOpen, color: "bg-primary/15 text-primary border-primary/30" },
@@ -27,6 +29,7 @@ interface FeedPost {
   created_at: string;
   profile?: {
     display_name: string | null;
+    username?: string | null;
     avatar_url: string | null;
     sun_sign: string | null;
   };
@@ -46,6 +49,7 @@ const SparkleParticle = ({ delay, x, y, size, color }: { delay: number; x: numbe
 const AlignmentFeed = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -70,7 +74,7 @@ const AlignmentFeed = () => {
     const userIds = [...new Set(postsData.map(p => p.user_id))];
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("user_id, display_name, avatar_url, sun_sign")
+      .select("user_id, display_name, username, avatar_url, sun_sign")
       .in("user_id", userIds);
 
     const { data: myLikes } = await supabase
@@ -386,7 +390,16 @@ const AlignmentFeed = () => {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-foreground text-sm">{post.profile?.display_name || "Someone"}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(post.user_id === user?.id ? "/profile" : `/profile/${post.user_id}`)}
+                                  className="font-medium text-foreground text-sm hover:text-primary transition-colors text-left"
+                                >
+                                  {getDisplayIdentity({
+                                    displayName: post.profile?.display_name,
+                                    username: post.profile?.username,
+                                  })}
+                                </button>
                                 {post.profile?.sun_sign && (
                                   <span className="text-xs text-muted-foreground">☉ {post.profile.sun_sign}</span>
                                 )}

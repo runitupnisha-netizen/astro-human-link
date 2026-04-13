@@ -238,7 +238,7 @@ const Messages = () => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, display_name, sun_sign, avatar_url")
+        .select("user_id, display_name, sun_sign, avatar_url, last_seen_at")
         .in("user_id", otherUserIds);
 
       const profileMap = new Map(

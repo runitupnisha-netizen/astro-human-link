@@ -68,30 +68,32 @@ serve(async (req) => {
 
 VOICE & TONE:
 - Confident, flirty, and effortlessly cool — like a text from someone who reads their birth chart AND has great taste in music
+- HUMOR IS KEY. At least 2-3 of the icebreakers should genuinely make someone laugh or at minimum crack a smile. Think witty observations, playful teasing, funny hypotheticals, pop culture references mixed with astrology
 - Weave in cosmic references naturally, never forced or lecture-y. Think subtle flex, not astrology textbook
 - Mix spiritual awareness with real-world charm. A Scorpio Moon reference should feel as smooth as a music recommendation
-- Humor is welcome — witty, self-aware, a little cheeky. Never corny, never try-hard
 - Keep it conversational. These should sound like something you'd ACTUALLY send, not a horoscope greeting card
 
 CATEGORIES (generate exactly one per category):
-1. 🎉 LIGHT & FUN — Playful, zero-pressure, makes them smile. Think "would you rather" energy or a funny observation about their chart
-2. 💬 CASUAL & FLIRTY — Warm, a little cheeky, easy to respond to. The kind of opener that just flows
-3. 🔮 CURIOUS & COSMIC — References something specific from their profile (sign, HD type, Gene Keys) in a genuinely intriguing way
-4. 🌊 DEEP & MEANINGFUL — An honest, thoughtful question that invites real conversation. Emotional intelligence on display
-5. 🔥 BOLD — Confident, direct, maybe a little spicy. Shows you know what you want
+1. 🎉 LIGHT & FUN — Playful, zero-pressure, makes them smile or laugh out loud. Think funny hypotheticals, "would you rather" energy, pop culture x astrology mashups, absurd-but-charming scenarios
+2. 😂 JOKES & VIBES — Pure humor. A genuinely funny observation about their chart combo, a playful roast, a meme-worthy take on their cosmic profile. Make them screenshot this and send it to their group chat
+3. 💬 CASUAL & FLIRTY — Warm, a little cheeky, easy to respond to. The kind of opener that just flows
+4. 🔮 CURIOUS & COSMIC — References something specific from their profile (sign, HD type, Gene Keys) in a genuinely intriguing way
+5. 🌊 DEEP & MEANINGFUL — An honest, thoughtful question that invites real conversation. Emotional intelligence on display
+6. 🔥 BOLD — Confident, direct, maybe a little spicy. Shows you know what you want
 
 RULES:
 - Reference 1-2 specific details from their profiles (signs, HD type, Gene Keys, shared interests) but keep it breezy
 - Each icebreaker must be 1-2 sentences MAX
+- At least 3 of the 6 should lean humorous — funny > serious for first messages
 - NO jargon dumps. "Your Sacral energy is magnetic" > "As a Generator with Sacral authority you have defined centers that..."
 - Avoid: "the stars aligned", "cosmic connection", "written in the stars", "universe brought us together" — too cliché
-- Range from light banter to deep questions so the sender can pick their vibe
+- Range from laugh-out-loud to deep questions so the sender can pick their vibe
 
-Generate exactly 5 icebreakers that Person A can send to Person B.`,
+Generate exactly 6 icebreakers that Person A can send to Person B.`,
           },
           {
             role: "user",
-            content: `Person A: ${formatProfile(myProfile)}\nPerson B: ${formatProfile(theirProfile)}\n\nGenerate 5 cosmic icebreakers.`,
+            content: `Person A: ${formatProfile(myProfile)}\nPerson B: ${formatProfile(theirProfile)}\n\nGenerate 6 cosmic icebreakers — make at least 3 genuinely funny.`,
           },
         ],
         tools: [
@@ -99,7 +101,7 @@ Generate exactly 5 icebreakers that Person A can send to Person B.`,
             type: "function",
             function: {
               name: "return_icebreakers",
-              description: "Return 3 icebreaker conversation starters",
+              description: "Return 6 icebreaker conversation starters",
               parameters: {
                 type: "object",
                 properties: {
@@ -108,12 +110,12 @@ Generate exactly 5 icebreakers that Person A can send to Person B.`,
                     items: {
                       type: "object",
                       properties: {
-                        category: { type: "string", enum: ["🎉 Light & Fun", "💬 Casual & Flirty", "🔮 Curious & Cosmic", "🌊 Deep & Meaningful", "🔥 Bold"] },
+                        category: { type: "string", enum: ["🎉 Light & Fun", "😂 Jokes & Vibes", "💬 Casual & Flirty", "🔮 Curious & Cosmic", "🌊 Deep & Meaningful", "🔥 Bold"] },
                         text: { type: "string" },
                       },
                       required: ["category", "text"],
                     },
-                    description: "Exactly 5 icebreaker messages with their category labels",
+                    description: "Exactly 6 icebreaker messages with their category labels",
                   },
                 },
                 required: ["icebreakers"],
@@ -146,7 +148,7 @@ Generate exactly 5 icebreakers that Person A can send to Person B.`,
 
     const { icebreakers } = JSON.parse(toolCall.function.arguments);
 
-    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 5) }), {
+    return new Response(JSON.stringify({ icebreakers: icebreakers.slice(0, 6) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

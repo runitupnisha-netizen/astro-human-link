@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone, Ban, MoreVertical } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Phone, Ban, MoreVertical, Video } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +32,8 @@ import AudioPlayer from "@/components/AudioPlayer";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
+import GifPicker from "@/components/GifPicker";
+import CallScreen from "@/components/CallScreen";
 
 interface Match {
   id: string;
@@ -84,9 +86,6 @@ const Messages = () => {
   const [icebreakers, setIcebreakers] = useState<{ category: string; text: string }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
-  const [gifSearch, setGifSearch] = useState("");
-  const [gifResults, setGifResults] = useState<{ url: string; preview: string; title: string }[]>([]);
-  const [searchingGifs, setSearchingGifs] = useState(false);
   const [imagePreview, setImagePreview] = useState<{ file: File; url: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +96,8 @@ const Messages = () => {
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showCallScreen, setShowCallScreen] = useState(false);
+  const [callType, setCallType] = useState<"voice" | "video">("voice");
 
   // Collect other user IDs for batch verification check
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
@@ -584,8 +585,6 @@ const Messages = () => {
   const sendGif = useCallback(async (gifUrl: string) => {
     if (!selectedMatchId || !user) return;
     setShowGifPicker(false);
-    setGifSearch("");
-    setGifResults([]);
 
     const optimisticMsg: Message = {
       id: `temp-gif-${Date.now()}`,
@@ -610,39 +609,6 @@ const Messages = () => {
       setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
     }
   }, [selectedMatchId, user, toast]);
-
-  // GIF search using Tenor (free, no key needed for basic search)
-  const searchGifs = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setGifResults([]);
-      return;
-    }
-    setSearchingGifs(true);
-    try {
-      // Use a curated set of popular reaction GIFs as fallback
-      const popularGifs = [
-        { url: `https://media.tenor.com/images/search/${encodeURIComponent(query)}`, preview: '', title: query },
-      ];
-      // Simple approach: generate GIF suggestions based on common reactions
-      const reactions = [
-        { emoji: "😂", terms: ["laugh", "lol", "funny", "haha"] },
-        { emoji: "❤️", terms: ["love", "heart", "kiss", "cute"] },
-        { emoji: "🔥", terms: ["fire", "hot", "lit", "amazing"] },
-        { emoji: "😍", terms: ["love eyes", "crush", "beautiful", "gorgeous"] },
-        { emoji: "🥺", terms: ["please", "puppy eyes", "aww", "sweet"] },
-        { emoji: "💃", terms: ["dance", "party", "celebrate", "happy"] },
-        { emoji: "👋", terms: ["hi", "hello", "hey", "wave"] },
-        { emoji: "😘", terms: ["kiss", "blowing kiss", "mwah", "xoxo"] },
-      ];
-      setGifResults(reactions.map(r => ({
-        url: r.emoji,
-        preview: r.emoji,
-        title: r.terms[0],
-      })));
-    } finally {
-      setSearchingGifs(false);
-    }
-  }, []);
 
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 
@@ -679,10 +645,25 @@ const Messages = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="relative">
-          <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin relative" />
+      <div className="min-h-screen bg-background relative">
+        <CosmicBackground />
+        <div className="relative z-10 pt-20 pb-20">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="space-y-0">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 flex items-center gap-3 border-b border-border/30 animate-pulse">
+                  <div className="w-12 h-12 rounded-full bg-muted/40 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-24 bg-muted/40 rounded" />
+                      <div className="h-3 w-10 bg-muted/40 rounded" />
+                    </div>
+                    <div className="h-3 w-40 bg-muted/40 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -855,34 +836,21 @@ const Messages = () => {
                             )}
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={async () => {
-                            if (!selectedMatchId || !user) return;
-                            const callMsg: Message = {
-                              id: `temp-call-${Date.now()}`,
-                              match_id: selectedMatchId,
-                              sender_id: user.id,
-                              content: "📞 Requested a voice/video call",
-                              message_type: "call_request",
-                              created_at: new Date().toISOString(),
-                              read_at: null,
-                            };
-                            setMessages((prev) => [...prev, callMsg]);
-                            await supabase.from("messages").insert({
-                              match_id: selectedMatchId,
-                              sender_id: user.id,
-                              content: "📞 Requested a voice/video call",
-                              message_type: "call_request",
-                            });
-                            toast({ title: "Call request sent! 📞" });
-                          }}
-                          className="text-primary hover:text-primary hover:bg-primary/10"
-                          title="Request a call"
-                        >
-                          <Phone className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
+                              <Phone className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => { setCallType("voice"); setShowCallScreen(true); }}>
+                              <Phone className="w-4 h-4 mr-2" /> Voice Call
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setCallType("video"); setShowCallScreen(true); }}>
+                              <span className="mr-2">📹</span> Video Call
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
@@ -1007,7 +975,11 @@ const Messages = () => {
                                       onClick={() => window.open(msg.content, '_blank')}
                                     />
                                   ) : msg.message_type === "gif" ? (
-                                    <div className="text-4xl">{msg.content}</div>
+                                    <img
+                                      src={msg.content}
+                                      alt="GIF"
+                                      className="rounded-lg max-w-[220px] max-h-[220px] object-cover"
+                                    />
                                   ) : (
                                     <p className="text-sm leading-relaxed">{msg.content}</p>
                                   )}
@@ -1139,43 +1111,10 @@ const Messages = () => {
                       {/* GIF Picker */}
                       <AnimatePresence>
                         {showGifPicker && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 200 }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="border-t border-border overflow-hidden"
-                          >
-                            <div className="p-3 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Search className="w-4 h-4 text-muted-foreground" />
-                                <Input
-                                  placeholder="Search reactions..."
-                                  value={gifSearch}
-                                  onChange={(e) => {
-                                    setGifSearch(e.target.value);
-                                    searchGifs(e.target.value);
-                                  }}
-                                  className="flex-1 h-8 text-sm bg-background/50 border-border"
-                                  autoFocus
-                                />
-                                <Button size="icon" variant="ghost" className="w-8 h-8" onClick={() => { setShowGifPicker(false); setGifSearch(""); setGifResults([]); }}>
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                              <div className="grid grid-cols-4 gap-2 overflow-y-auto max-h-[140px]">
-                                {/* Quick emoji reactions */}
-                                {["😂", "❤️", "🔥", "😍", "🥺", "💃", "👋", "😘", "🎉", "💀", "😭", "🥰", "✨", "💯", "🙈", "😏"].map((emoji) => (
-                                  <button
-                                    key={emoji}
-                                    onClick={() => sendGif(emoji)}
-                                    className="text-2xl p-2 rounded-lg hover:bg-muted/60 transition-colors"
-                                  >
-                                    {emoji}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </motion.div>
+                          <GifPicker
+                            onSelect={(gifUrl) => sendGif(gifUrl)}
+                            onClose={() => setShowGifPicker(false)}
+                          />
                         )}
                       </AnimatePresence>
 
@@ -1271,6 +1210,16 @@ const Messages = () => {
           </div>
         </div>
       </div>
+      {/* Call Screen */}
+      {selectedConvo && (
+        <CallScreen
+          open={showCallScreen}
+          onClose={() => setShowCallScreen(false)}
+          callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          callerAvatar={selectedConvo.otherProfile.avatar_url}
+          callType={callType}
+        />
+      )}
     </div>
   );
 };

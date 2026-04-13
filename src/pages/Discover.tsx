@@ -6,7 +6,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import AdvancedFilters, { AdvancedFilterState } from "@/components/AdvancedFilters";
-import { Sparkles, Loader2, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
+import { Sparkles, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,6 +15,7 @@ import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
 import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
+import { ProfileCardSkeleton } from "@/components/Skeletons";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -234,9 +235,8 @@ const Discover = () => {
         {/* Card stack */}
         <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-220px)] max-h-[580px] [@media(max-height:700px)]:h-[calc(100svh-200px)] md:h-[580px]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-muted-foreground text-sm">{t("discover.loading")}</p>
+            <div className="flex items-center justify-center h-full">
+              <ProfileCardSkeleton />
             </div>
           ) : profiles.length === 0 ? (
             <motion.div

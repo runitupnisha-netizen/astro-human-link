@@ -15,6 +15,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
+import CosmicNudge from "./components/CosmicNudge";
 import { TranslationProvider } from "@/hooks/useTranslation";
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -97,6 +98,7 @@ const AppRoutes = () => {
       {user && onboardingComplete && <Navigation />}
       {user && onboardingComplete && <EmailVerificationReminder />}
       {user && onboardingComplete && <InAppFeedback />}
+      {user && onboardingComplete && <CosmicNudge />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />

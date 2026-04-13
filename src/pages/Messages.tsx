@@ -585,8 +585,6 @@ const Messages = () => {
   const sendGif = useCallback(async (gifUrl: string) => {
     if (!selectedMatchId || !user) return;
     setShowGifPicker(false);
-    setGifSearch("");
-    setGifResults([]);
 
     const optimisticMsg: Message = {
       id: `temp-gif-${Date.now()}`,
@@ -611,39 +609,6 @@ const Messages = () => {
       setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
     }
   }, [selectedMatchId, user, toast]);
-
-  // GIF search using Tenor (free, no key needed for basic search)
-  const searchGifs = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setGifResults([]);
-      return;
-    }
-    setSearchingGifs(true);
-    try {
-      // Use a curated set of popular reaction GIFs as fallback
-      const popularGifs = [
-        { url: `https://media.tenor.com/images/search/${encodeURIComponent(query)}`, preview: '', title: query },
-      ];
-      // Simple approach: generate GIF suggestions based on common reactions
-      const reactions = [
-        { emoji: "😂", terms: ["laugh", "lol", "funny", "haha"] },
-        { emoji: "❤️", terms: ["love", "heart", "kiss", "cute"] },
-        { emoji: "🔥", terms: ["fire", "hot", "lit", "amazing"] },
-        { emoji: "😍", terms: ["love eyes", "crush", "beautiful", "gorgeous"] },
-        { emoji: "🥺", terms: ["please", "puppy eyes", "aww", "sweet"] },
-        { emoji: "💃", terms: ["dance", "party", "celebrate", "happy"] },
-        { emoji: "👋", terms: ["hi", "hello", "hey", "wave"] },
-        { emoji: "😘", terms: ["kiss", "blowing kiss", "mwah", "xoxo"] },
-      ];
-      setGifResults(reactions.map(r => ({
-        url: r.emoji,
-        preview: r.emoji,
-        title: r.terms[0],
-      })));
-    } finally {
-      setSearchingGifs(false);
-    }
-  }, []);
 
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 

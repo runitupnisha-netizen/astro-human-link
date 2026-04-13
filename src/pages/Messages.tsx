@@ -645,10 +645,25 @@ const Messages = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="relative">
-          <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse scale-150" />
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin relative" />
+      <div className="min-h-screen bg-background relative">
+        <CosmicBackground />
+        <div className="relative z-10 pt-20 pb-20">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="space-y-0">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 flex items-center gap-3 border-b border-border/30 animate-pulse">
+                  <div className="w-12 h-12 rounded-full bg-muted/40 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-24 bg-muted/40 rounded" />
+                      <div className="h-3 w-10 bg-muted/40 rounded" />
+                    </div>
+                    <div className="h-3 w-40 bg-muted/40 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

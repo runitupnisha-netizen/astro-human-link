@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Square, Loader2 } from "lucide-react";
+import { Mic, Square } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface VoiceRecorderProps {
   onRecordingComplete: (blob: Blob) => void;
@@ -11,21 +12,45 @@ interface VoiceRecorderProps {
 const VoiceRecorder = ({ onRecordingComplete, disabled }: VoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [micError, setMicError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const { toast } = useToast();
 
   const startRecording = useCallback(async () => {
+    setMicError(null);
+
+    // Check permission status (not supported in Safari, so wrap in try/catch)
+    try {
+      if (navigator.permissions) {
+        const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
+        if (status.state === "denied") {
+          const msg = "Microphone blocked. Enable it in your browser settings.";
+          setMicError(msg);
+          toast({ title: msg, variant: "destructive" });
+          return;
+        }
+      }
+    } catch {
+      // Safari doesn't support microphone permission query — continue
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-          ? "audio/webm;codecs=opus"
-          : "audio/webm",
-      });
+      // Pick best supported mimeType
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : undefined;
+
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -34,20 +59,30 @@ const VoiceRecorder = ({ onRecordingComplete, disabled }: VoiceRecorderProps) =>
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const actualType = mimeType || "audio/webm";
+        const blob = new Blob(chunksRef.current, { type: actualType });
         onRecordingComplete(blob);
         stream.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
       };
 
-      mediaRecorder.start(100);
+      mediaRecorder.start(250);
       setIsRecording(true);
       setDuration(0);
       timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
-    } catch {
-      // Microphone permission denied or not available
+    } catch (err: any) {
+      let msg = "Could not access microphone.";
+      if (err.name === "NotAllowedError") {
+        msg = "Microphone permission denied. Allow it in your browser settings.";
+      } else if (err.name === "NotFoundError") {
+        msg = "No microphone found on this device.";
+      } else if (err.name === "NotReadableError") {
+        msg = "Microphone is in use by another app.";
+      }
+      setMicError(msg);
+      toast({ title: msg, variant: "destructive" });
     }
-  }, [onRecordingComplete]);
+  }, [onRecordingComplete, toast]);
 
   const stopRecording = useCallback(() => {
     mediaRecorderRef.current?.stop();
@@ -95,6 +130,7 @@ const VoiceRecorder = ({ onRecordingComplete, disabled }: VoiceRecorderProps) =>
             onClick={startRecording}
             disabled={disabled}
             className="h-9 w-9 text-muted-foreground hover:text-primary shrink-0"
+            title={micError || "Record voice note"}
           >
             <Mic className="w-4 h-4" />
           </Button>

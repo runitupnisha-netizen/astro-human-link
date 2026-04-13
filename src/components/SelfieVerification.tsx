@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, RotateCcw, Upload, CheckCircle2, Clock, Loader2, BadgeCheck } from "lucide-react";
@@ -12,6 +13,7 @@ type VerificationStatus = "none" | "pending" | "verified" | "rejected";
 const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -33,12 +35,18 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        setStatus(data.status as VerificationStatus);
+        const s = data.status as VerificationStatus;
+        setStatus(s);
+        // If already verified, redirect to app
+        if (s === "verified") {
+          navigate("/", { replace: true });
+          return;
+        }
       }
       setLoading(false);
     };
     check();
-  }, [user]);
+  }, [user, navigate]);
 
   const startCamera = useCallback(async () => {
     try {
@@ -117,6 +125,8 @@ const SelfieVerification = () => {
       setStatus("verified");
       setCapturedImage(null);
       toast({ title: "You're verified! ✨", description: "Your profile now shows a trust badge." });
+      // Redirect to main app after a brief moment
+      setTimeout(() => navigate("/", { replace: true }), 1500);
     } catch (e: any) {
       toast({ title: "Verification failed", description: e.message, variant: "destructive" });
     } finally {

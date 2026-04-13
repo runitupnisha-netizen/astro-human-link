@@ -89,7 +89,7 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
               {desktopNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -98,7 +98,7 @@ const Navigation = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? item.premium ? "bg-gradient-golden text-background shadow-golden" : "nav-pill-active"
                         : item.premium

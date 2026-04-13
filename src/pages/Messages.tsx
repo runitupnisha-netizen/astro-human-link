@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, Wand2, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Search, Phone } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import AudioPlayer from "@/components/AudioPlayer";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
+import { sanitizeDisplayName } from "@/lib/utils";
 
 interface Match {
   id: string;
@@ -692,7 +693,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
                               <h3 className="font-semibold text-foreground text-sm truncate flex items-center gap-1">
-                                {convo.otherProfile.display_name || "Someone"}
+                                {sanitizeDisplayName(convo.otherProfile.display_name) || "Someone"}
                                 {verifiedUsers.has(convo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                               </h3>
                               {convo.lastMessage && (

@@ -1233,6 +1233,16 @@ const Messages = () => {
           </div>
         </div>
       </div>
+      {/* Call Screen */}
+      {selectedConvo && (
+        <CallScreen
+          open={showCallScreen}
+          onClose={() => setShowCallScreen(false)}
+          callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          callerAvatar={selectedConvo.otherProfile.avatar_url}
+          callType={callType}
+        />
+      )}
     </div>
   );
 };

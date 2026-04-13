@@ -1195,7 +1195,7 @@ const Messages = () => {
                             size="icon"
                             variant="ghost"
                             className="shrink-0 text-muted-foreground hover:text-foreground h-8 w-8"
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={triggerFileInput}
                             disabled={uploadingImage}
                           >
                             <Image className="w-4 h-4" />

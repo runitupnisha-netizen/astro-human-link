@@ -15,6 +15,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
+import CosmicNudge from "./components/CosmicNudge";
 import { TranslationProvider } from "@/hooks/useTranslation";
 
 const Auth = lazy(() => import("./pages/Auth"));

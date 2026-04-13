@@ -320,6 +320,25 @@ const Connections = () => {
                             )}
                           </div>
 
+                          {/* Key info: relationship goal, interests */}
+                          <div className="flex flex-wrap items-center gap-1 mb-2">
+                            {match.otherProfile.relationship_goal && (
+                              <Badge variant="outline" className="text-[10px] border-accent/20 text-accent">
+                                {match.otherProfile.relationship_goal}
+                              </Badge>
+                            )}
+                            {match.otherProfile.spiritual_practice && (
+                              <Badge variant="outline" className="text-[10px] border-primary/20 text-primary">
+                                {match.otherProfile.spiritual_practice}
+                              </Badge>
+                            )}
+                            {match.otherProfile.interests && match.otherProfile.interests.slice(0, 3).map((interest, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-[10px] bg-muted/40">
+                                {interest}
+                              </Badge>
+                            ))}
+                          </div>
+
                           {/* Last message or compatibility summary */}
                           {match.lastMessage ? (
                             <p className="text-sm text-muted-foreground truncate">

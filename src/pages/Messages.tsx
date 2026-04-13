@@ -818,15 +818,6 @@ const Messages = () => {
                         >
                           <Phone className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleGenerateIcebreakers}
-                          disabled={sendingIcebreaker}
-                          className="text-accent hover:text-accent hover:bg-accent/10"
-                        >
-                          <Wand2 className={`w-4 h-4 ${messages.length === 0 ? 'animate-pulse' : ''}`} />
-                        </Button>
                       </div>
 
                       {/* Messages */}

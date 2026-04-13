@@ -236,12 +236,11 @@ const Messages = () => {
 
       // Deep-link: auto-select match from URL param
       const matchParam = searchParams.get("match");
-      if (matchParam && !deepLinked) {
+      if (matchParam) {
         const found = convos.find((c) => c.match.id === matchParam);
         if (found) {
           setSelectedMatchId(matchParam);
           setShowMobileChat(true);
-          setDeepLinked(true);
         }
       }
     };

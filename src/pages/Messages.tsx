@@ -664,8 +664,8 @@ const Messages = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-4">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[calc(100vh-6rem)]">
+        <div className="relative z-10 pt-20 pb-20 lg:pb-4">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)]">
           {conversations.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

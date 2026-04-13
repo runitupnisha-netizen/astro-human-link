@@ -29,6 +29,9 @@ interface MatchWithProfile {
     life_path_number: number | null;
     current_latitude: number | null;
     current_longitude: number | null;
+    interests: string[] | null;
+    relationship_goal: string | null;
+    spiritual_practice: string | null;
   };
   lastMessage: string | null;
   lastMessageAt: string | null;
@@ -76,7 +79,7 @@ const Connections = () => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude")
+        .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
         .in("user_id", otherIds);
 
       const matchIds = matchRows.map((m) => m.id);
@@ -124,6 +127,9 @@ const Connections = () => {
             life_path_number: null,
             current_latitude: null,
             current_longitude: null,
+            interests: null,
+            relationship_goal: null,
+            spiritual_practice: null,
           },
           lastMessage: lastMsg?.content || null,
           lastMessageAt: lastMsg?.created_at || null,

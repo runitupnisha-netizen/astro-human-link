@@ -89,7 +89,7 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
               {desktopNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;

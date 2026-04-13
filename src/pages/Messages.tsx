@@ -99,6 +99,8 @@ const Messages = () => {
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showCallScreen, setShowCallScreen] = useState(false);
+  const [callType, setCallType] = useState<"voice" | "video">("voice");
 
   // Collect other user IDs for batch verification check
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);

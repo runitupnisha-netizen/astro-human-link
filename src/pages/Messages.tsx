@@ -1134,43 +1134,10 @@ const Messages = () => {
                       {/* GIF Picker */}
                       <AnimatePresence>
                         {showGifPicker && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 200 }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="border-t border-border overflow-hidden"
-                          >
-                            <div className="p-3 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Search className="w-4 h-4 text-muted-foreground" />
-                                <Input
-                                  placeholder="Search reactions..."
-                                  value={gifSearch}
-                                  onChange={(e) => {
-                                    setGifSearch(e.target.value);
-                                    searchGifs(e.target.value);
-                                  }}
-                                  className="flex-1 h-8 text-sm bg-background/50 border-border"
-                                  autoFocus
-                                />
-                                <Button size="icon" variant="ghost" className="w-8 h-8" onClick={() => { setShowGifPicker(false); setGifSearch(""); setGifResults([]); }}>
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                              <div className="grid grid-cols-4 gap-2 overflow-y-auto max-h-[140px]">
-                                {/* Quick emoji reactions */}
-                                {["😂", "❤️", "🔥", "😍", "🥺", "💃", "👋", "😘", "🎉", "💀", "😭", "🥰", "✨", "💯", "🙈", "😏"].map((emoji) => (
-                                  <button
-                                    key={emoji}
-                                    onClick={() => sendGif(emoji)}
-                                    className="text-2xl p-2 rounded-lg hover:bg-muted/60 transition-colors"
-                                  >
-                                    {emoji}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </motion.div>
+                          <GifPicker
+                            onSelect={(gifUrl) => sendGif(gifUrl)}
+                            onClose={() => setShowGifPicker(false)}
+                          />
                         )}
                       </AnimatePresence>
 

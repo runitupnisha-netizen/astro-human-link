@@ -64,6 +64,8 @@ serve(async (req) => {
     });
 
     const smsData = await smsResponse.json();
+    console.log("Twilio response status:", smsResponse.status);
+    console.log("Twilio response body:", JSON.stringify(smsData));
     if (!smsResponse.ok) {
       console.error("Twilio error:", JSON.stringify(smsData));
       throw new Error(`SMS send failed [${smsResponse.status}]: ${JSON.stringify(smsData)}`);

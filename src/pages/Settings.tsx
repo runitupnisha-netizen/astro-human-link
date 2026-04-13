@@ -400,6 +400,22 @@ const Settings = () => {
 
                 <Separator />
 
+                {/* Email - Likes */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-pink-400" /> Photo Likes
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email when someone likes your photos</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.likes}
+                    onCheckedChange={(checked) => updateEmailPref("likes", checked)}
+                  />
+                </div>
+
+                <Separator />
+
                 {/* Email - Messages */}
                 <div className="flex items-center justify-between">
                   <div>

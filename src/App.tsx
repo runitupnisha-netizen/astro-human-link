@@ -98,6 +98,7 @@ const AppRoutes = () => {
       {user && onboardingComplete && <Navigation />}
       {user && onboardingComplete && <EmailVerificationReminder />}
       {user && onboardingComplete && <InAppFeedback />}
+      {user && onboardingComplete && <CosmicNudge />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />

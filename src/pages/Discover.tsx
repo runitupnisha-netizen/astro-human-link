@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import MatchCelebration from "@/components/MatchCelebration";
+import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
@@ -39,6 +40,7 @@ const Discover = () => {
   const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
+  const [boostUntil, setBoostUntil] = useState<string | null>(null);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | "super" | null>(null);
   const [pendingSwipe, setPendingSwipe] = useState<{
     profileId: string;
@@ -63,6 +65,13 @@ const Discover = () => {
   }, [user, toast]);
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
+
+  // Fetch boost status
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("boost_until").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => { if (data?.boost_until) setBoostUntil(data.boost_until); });
+  }, [user]);
 
   // Count today's likes
   useEffect(() => {
@@ -192,11 +201,19 @@ const Discover = () => {
             Filters
           </Button>
 
-          {!isPremium && (
-            <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
-              {likesLeft} likes left today
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <BoostButton
+              isPremium={isPremium}
+              boostUntil={boostUntil}
+              onBoostActivated={(until) => setBoostUntil(until)}
+              onUpsell={() => { setUpsellFeature("boost"); setShowUpsell(true); }}
+            />
+            {!isPremium && (
+              <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
+                {likesLeft} likes left
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Filter panel */}

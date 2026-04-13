@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
+import EmptyState from "@/components/EmptyState";
+import { ConnectionCardSkeleton } from "@/components/Skeletons";
 
 interface MatchWithProfile {
   id: string;

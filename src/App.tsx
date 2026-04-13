@@ -54,15 +54,15 @@ const LoadingScreen = () => (
   </div>
 );
 
-const ProtectedRoute = ({ children, allowDuringOnboarding = false }: { children: ReactNode; allowDuringOnboarding?: boolean }) => {
+const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  if (loading || verLoading) return <LoadingScreen />;
+  if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
   // After onboarding, require verification before accessing the app
-  if (onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
+  if (!skipVerificationCheck && onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
 
   return <>{children}</>;
 };
@@ -100,7 +100,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
-            <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding><VerificationGate /></ProtectedRoute></PageTransition>} />
+            <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding skipVerificationCheck><VerificationGate /></ProtectedRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />
             <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />

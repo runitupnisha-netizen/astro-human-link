@@ -410,6 +410,8 @@ serve(async (req) => {
         distance_km: sc.distance_km,
         bio_prompt_1: c.bio_prompt_1,
         bio_prompt_1_answer: c.bio_prompt_1_answer,
+        relationship_goal: c.relationship_goal,
+        about_me: c.about_me,
         photo_urls: photosByUser.get(c.user_id) || [],
       };
     });

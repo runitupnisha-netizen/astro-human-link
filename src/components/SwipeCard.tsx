@@ -29,6 +29,8 @@ export interface DiscoverProfile {
   distance_km?: number | null;
   bio_prompt_1: string | null;
   bio_prompt_1_answer: string | null;
+  relationship_goal?: string | null;
+  about_me?: string | null;
   photo_urls?: string[];
 }
 
@@ -260,7 +262,7 @@ const SwipeCard = ({
           </div>
         </div>
 
-        {/* Compact info section */}
+          {/* Compact info section */}
         <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2">
           {/* Astro badges — just the essentials */}
           <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
@@ -278,7 +280,27 @@ const SwipeCard = ({
             )}
           </div>
 
-          {/* Shared aspects / what you have in common */}
+          {/* Interests */}
+          {profile.interests && profile.interests.length > 0 && (
+            <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
+              {profile.interests.slice(0, 5).map((interest, i) => (
+                <Badge key={i} variant="secondary" className="text-[10px] bg-accent/10 text-accent border border-accent/20">
+                  {interest}
+                </Badge>
+              ))}
+              {profile.interests.length > 5 && (
+                <span className="text-[10px] text-muted-foreground">+{profile.interests.length - 5} more</span>
+              )}
+            </div>
+          )}
+
+          {/* Relationship goal */}
+          {profile.relationship_goal && (
+            <Badge variant="outline" className="text-[10px] border-primary/20 text-primary w-fit">
+              {profile.relationship_goal}
+            </Badge>
+          )}
+
           {profile.shared_aspects && profile.shared_aspects.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
               <span className="text-[10px] text-muted-foreground mr-1">In common:</span>

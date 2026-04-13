@@ -859,34 +859,21 @@ const Messages = () => {
                             )}
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={async () => {
-                            if (!selectedMatchId || !user) return;
-                            const callMsg: Message = {
-                              id: `temp-call-${Date.now()}`,
-                              match_id: selectedMatchId,
-                              sender_id: user.id,
-                              content: "📞 Requested a voice/video call",
-                              message_type: "call_request",
-                              created_at: new Date().toISOString(),
-                              read_at: null,
-                            };
-                            setMessages((prev) => [...prev, callMsg]);
-                            await supabase.from("messages").insert({
-                              match_id: selectedMatchId,
-                              sender_id: user.id,
-                              content: "📞 Requested a voice/video call",
-                              message_type: "call_request",
-                            });
-                            toast({ title: "Call request sent! 📞" });
-                          }}
-                          className="text-primary hover:text-primary hover:bg-primary/10"
-                          title="Request a call"
-                        >
-                          <Phone className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
+                              <Phone className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => { setCallType("voice"); setShowCallScreen(true); }}>
+                              <Phone className="w-4 h-4 mr-2" /> Voice Call
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setCallType("video"); setShowCallScreen(true); }}>
+                              <span className="mr-2">📹</span> Video Call
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">

@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye } from "lucide-react";
 import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -58,7 +58,7 @@ const Settings = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  const defaultNotifPrefs = { matches: true, messages: true, insights: true, marketing: false };
+  const defaultNotifPrefs = { matches: true, messages: true, likes: true, insights: true, marketing: false };
   const [notifPrefs, setNotifPrefs] = useState(() => {
     try {
       const stored = localStorage.getItem("stellara-notif-prefs");
@@ -66,7 +66,7 @@ const Settings = () => {
     } catch { return defaultNotifPrefs; }
   });
 
-  const defaultEmailPrefs = { matches: true, messages: false, insights: true, marketing: false };
+  const defaultEmailPrefs = { matches: true, messages: false, likes: true, insights: true, marketing: false };
   const [emailPrefs, setEmailPrefs] = useState(() => {
     try {
       const stored = localStorage.getItem("stellara-email-prefs");
@@ -311,7 +311,21 @@ const Settings = () => {
 
                 <Separator />
 
-                {/* Messages */}
+                {/* Likes */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-pink-400" /> Photo Likes
+                    </span>
+                    <p className="text-sm text-muted-foreground">When someone likes your photos</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.likes}
+                    onCheckedChange={(checked) => updateNotifPref("likes", checked)}
+                  />
+                </div>
+
+                <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
@@ -381,6 +395,22 @@ const Settings = () => {
                   <Switch
                     checked={emailPrefs.matches}
                     onCheckedChange={(checked) => updateEmailPref("matches", checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Email - Likes */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-pink-400" /> Photo Likes
+                    </span>
+                    <p className="text-sm text-muted-foreground">Email when someone likes your photos</p>
+                  </div>
+                  <Switch
+                    checked={emailPrefs.likes}
+                    onCheckedChange={(checked) => updateEmailPref("likes", checked)}
                   />
                 </div>
 

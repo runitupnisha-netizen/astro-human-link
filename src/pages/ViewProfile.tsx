@@ -13,6 +13,7 @@ import BioPrompts from "@/components/BioPrompts";
 import UserActions from "@/components/UserActions";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
+import { sanitizeDisplayName } from "@/lib/utils";
 
 interface ProfileData {
   display_name: string | null;
@@ -164,8 +165,8 @@ const ViewProfile = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-12">
-        <div className="max-w-2xl mx-auto px-6">
+      <div className="relative z-10 pt-20 pb-24">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Back + Actions */}
           <div className="flex items-center justify-between mb-4">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-muted-foreground">
@@ -186,8 +187,8 @@ const ViewProfile = () => {
               )}
             </div>
             <div className="flex items-center justify-center gap-2 mb-1">
-              <h1 className="text-3xl font-bold text-foreground">
-                {profile.display_name || "Cosmic Soul"}
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                {sanitizeDisplayName(profile.display_name) || "Cosmic Soul"}
               </h1>
               {isVerified && <VerifiedBadge size="md" />}
               {profile.birth_date && (

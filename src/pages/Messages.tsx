@@ -247,7 +247,7 @@ const Messages = () => {
     };
 
     loadConversations();
-  }, [user]);
+  }, [user, searchParams]);
 
   // Load messages + realtime subscription
   useEffect(() => {

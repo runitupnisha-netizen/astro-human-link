@@ -256,18 +256,10 @@ const Discover = () => {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button onClick={async () => {
-                  if (user) {
-                    try {
-                      await supabase.from("swipes").delete().eq("user_id", user.id);
-                    } catch (e) { console.error("Reset swipes error:", e); }
-                  }
-                  setSwipeCount(0);
-                  setDailyLikesUsed(0);
-                  setLikeLimitReached(false);
+                <Button onClick={() => {
                   fetchProfiles();
                 }} variant="outline" className="gap-2">
-                  <RefreshCw className="w-4 h-4" /> Reset & Refresh
+                  <RefreshCw className="w-4 h-4" /> Refresh
                 </Button>
                 {swipeCount > 0 && (
                   <Button onClick={() => navigate("/connections")} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>

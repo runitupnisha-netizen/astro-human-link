@@ -959,9 +959,9 @@ const Messages = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
-                            className="px-4 pb-2 space-y-2"
+                            className="px-4 pb-2 max-h-[60vh] overflow-y-auto space-y-2"
                           >
-                            <span className="text-[10px] text-accent font-semibold uppercase tracking-wider">
+                            <span className="text-[10px] text-accent font-semibold uppercase tracking-wider sticky top-0 bg-card/95 backdrop-blur-sm py-1 block z-10">
                               ✨ Tap one to send — light, deep, or somewhere in between:
                             </span>
                             {icebreakers.map((ib, i) => (
@@ -977,6 +977,7 @@ const Messages = () => {
                                   ib.category.includes('🔮') ? 'bg-purple-500/8 border-purple-500/25 hover:bg-purple-500/15 hover:border-purple-500/40' :
                                   ib.category.includes('🌊') ? 'bg-cyan-500/8 border-cyan-500/25 hover:bg-cyan-500/15 hover:border-cyan-500/40' :
                                   ib.category.includes('🔥') ? 'bg-orange-500/8 border-orange-500/25 hover:bg-orange-500/15 hover:border-orange-500/40' :
+                                  ib.category.includes('😂') ? 'bg-emerald-500/8 border-emerald-500/25 hover:bg-emerald-500/15 hover:border-emerald-500/40' :
                                   'bg-accent/5 border-accent/20 hover:bg-accent/15 hover:border-accent/40'
                                 }`}
                               >
@@ -986,6 +987,7 @@ const Messages = () => {
                                   ib.category.includes('🔮') ? 'text-purple-400' :
                                   ib.category.includes('🌊') ? 'text-cyan-400' :
                                   ib.category.includes('🔥') ? 'text-orange-500' :
+                                  ib.category.includes('😂') ? 'text-emerald-400' :
                                   'text-accent'
                                 }`}>
                                   {ib.category}

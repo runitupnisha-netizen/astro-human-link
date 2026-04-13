@@ -770,7 +770,7 @@ const Messages = () => {
                               navigate(`/profile/${otherId}`);
                             }}
                           >
-                            {selectedConvo.otherProfile.display_name || "Someone"}
+                            {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Someone"}
                           </h3>
                           {verifiedUsers.has(selectedConvo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                           <div className="flex items-center gap-2">

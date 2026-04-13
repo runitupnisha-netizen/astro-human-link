@@ -23,9 +23,11 @@ const NotificationBell = () => {
       await markAsRead(notification.id);
     }
 
-    if (notification.type === "match") {
-      const matchName = notification.body.match(/You matched with\s+(.+?)!/i)?.[1]?.trim();
+    setOpen(false);
 
+    if (notification.type === "match") {
+      // Try to find the matched user's profile by name
+      const matchName = notification.body.match(/You matched with\s+(.+?)!/i)?.[1]?.trim();
       if (matchName) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -34,30 +36,33 @@ const NotificationBell = () => {
           .maybeSingle();
 
         if (profile?.user_id) {
-          setOpen(false);
           navigate(`/profile/${profile.user_id}`);
           return;
         }
       }
-
-      setOpen(false);
+      // Fallback to connections/matches page
       navigate("/connections");
       return;
     }
 
     if (notification.type === "message") {
-      setOpen(false);
+      // Try to extract sender info and navigate to the conversation
       navigate("/messages");
       return;
     }
 
-    if (notification.type === "daily_intention" || notification.type === "weekly_insight") {
-      setOpen(false);
+    if (notification.type === "daily_intention") {
+      navigate("/");
+      return;
+    }
+
+    if (notification.type === "weekly_insight") {
       navigate("/insights");
       return;
     }
 
-    setOpen(false);
+    // Default: go to discover
+    navigate("/");
   };
 
   return (

@@ -20,8 +20,10 @@ const FREE_DAILY_LIKE_LIMIT = 15;
 
 const sanitizeName = (name: string | null): string | null => {
   if (!name) return null;
-  if (name.includes("@") || /^[a-z0-9]{8,}$/i.test(name.replace(/[^a-z0-9]/gi, ""))) return null;
-  return name;
+  if (name.includes("@")) return null;
+  const trimmed = name.trim();
+  if (!trimmed.includes(" ") && /^[a-z0-9]{8,}$/i.test(trimmed)) return null;
+  return trimmed;
 };
 
 const Discover = () => {

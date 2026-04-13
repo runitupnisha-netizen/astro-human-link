@@ -146,7 +146,7 @@ const SwipeCard = ({
       }}
       drag={isTop && !exitDirection}
       dragConstraints={{ left: 0, right: 0, top: isPremium ? 0 : 0, bottom: 0 }}
-      dragElastic={{ x: 0.85, y: isPremium ? 0.85 : 0.15 }}
+      dragElastic={{ left: 0.85, right: 0.85, top: isPremium ? 0.85 : 0.1, bottom: 0.1 }}
       onDragEnd={isTop ? handleDragEnd : undefined}
       initial={stackStyle}
       animate={

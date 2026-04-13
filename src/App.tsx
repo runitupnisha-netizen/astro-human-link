@@ -41,6 +41,7 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const AstroEvents = lazy(() => import("./pages/AstroEvents"));
 const Contact = lazy(() => import("./pages/Contact"));
 const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
+const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -117,6 +118,7 @@ const AppRoutes = () => {
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
+            <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>

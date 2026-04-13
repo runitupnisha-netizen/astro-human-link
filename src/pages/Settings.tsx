@@ -311,7 +311,21 @@ const Settings = () => {
 
                 <Separator />
 
-                {/* Messages */}
+                {/* Likes */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-pink-400" /> Photo Likes
+                    </span>
+                    <p className="text-sm text-muted-foreground">When someone likes your photos</p>
+                  </div>
+                  <Switch
+                    checked={notifPrefs.likes}
+                    onCheckedChange={(checked) => updateNotifPref("likes", checked)}
+                  />
+                </div>
+
+                <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">

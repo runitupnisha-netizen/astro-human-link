@@ -616,7 +616,24 @@ const Messages = () => {
       setSearchingGifs(false);
     }
   }, []);
+  const handleBlockUser = useCallback(async () => {
+    if (!user || !selectedConvo) return;
+    const otherId = selectedConvo.match.user_a === user.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+    try {
+      await supabase.from("blocks").insert({ blocker_id: user.id, blocked_id: otherId });
+      toast({ title: "User blocked", description: "They can no longer contact you." });
+      setSelectedMatchId(null);
+      setShowMobileChat(false);
+      setConversations((prev) => prev.filter((c) => c.match.id !== selectedConvo.match.id));
+    } catch {
+      toast({ title: "Failed to block user", variant: "destructive" });
+    }
+    setShowBlockDialog(false);
+  }, [user, selectedConvo, toast]);
 
+  const triggerFileInput = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   const selectedConvo = conversations.find((c) => c.match.id === selectedMatchId);
 

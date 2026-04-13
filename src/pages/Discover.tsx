@@ -40,6 +40,7 @@ const Discover = () => {
   const [upsellFeature, setUpsellFeature] = useState<string>("super_like");
   const [dailyLikesUsed, setDailyLikesUsed] = useState(0);
   const [likeLimitReached, setLikeLimitReached] = useState(false);
+  const [boostUntil, setBoostUntil] = useState<string | null>(null);
   const [exitDirection, setExitDirection] = useState<"left" | "right" | "super" | null>(null);
   const [pendingSwipe, setPendingSwipe] = useState<{
     profileId: string;

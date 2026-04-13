@@ -219,6 +219,21 @@ const ViewProfile = () => {
                 )}
               </p>
             )}
+            {profile.last_seen_at && (
+              <p className="text-xs text-muted-foreground mb-1">
+                {(() => {
+                  const diff = Date.now() - new Date(profile.last_seen_at).getTime();
+                  const mins = Math.floor(diff / 60000);
+                  if (mins < 2) return "🟢 Online now";
+                  if (mins < 60) return `Last seen ${mins}m ago`;
+                  const hours = Math.floor(mins / 60);
+                  if (hours < 24) return `Last seen ${hours}h ago`;
+                  const days = Math.floor(hours / 24);
+                  if (days < 7) return `Last seen ${days}d ago`;
+                  return `Last seen ${new Date(profile.last_seen_at).toLocaleDateString()}`;
+                })()}
+              </p>
+            )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">
               {profile.sun_sign && <span>☉ {profile.sun_sign}</span>}
               {profile.moon_sign && <span>☽ {profile.moon_sign}</span>}

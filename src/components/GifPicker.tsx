@@ -125,7 +125,7 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
               <p className="text-xs">Try a different search</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {gifs.map((gif) => (
                 <motion.button
                   key={gif.id}

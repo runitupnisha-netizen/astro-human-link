@@ -235,9 +235,8 @@ const Discover = () => {
         {/* Card stack */}
         <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-220px)] max-h-[580px] [@media(max-height:700px)]:h-[calc(100svh-200px)] md:h-[580px]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-muted-foreground text-sm">{t("discover.loading")}</p>
+            <div className="flex items-center justify-center h-full">
+              <ProfileCardSkeleton />
             </div>
           ) : profiles.length === 0 ? (
             <motion.div

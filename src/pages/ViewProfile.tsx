@@ -46,6 +46,7 @@ interface ProfileData {
   current_city: string | null;
   current_latitude: number | null;
   current_longitude: number | null;
+  last_seen_at: string | null;
 }
 
 const ViewProfile = () => {
@@ -71,7 +72,7 @@ const ViewProfile = () => {
     const load = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, current_latitude, current_longitude")
+        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, current_latitude, current_longitude, last_seen_at")
         .eq("user_id", userId)
         .maybeSingle();
       setProfile(data);
@@ -216,6 +217,21 @@ const ViewProfile = () => {
                     <Navigation className="w-3.5 h-3.5" /> {(() => { const mi = Math.round(distanceKm * 0.621371); return mi < 1 ? "< 1" : mi; })()} mi away
                   </span>
                 )}
+              </p>
+            )}
+            {profile.last_seen_at && (
+              <p className="text-xs text-muted-foreground mb-1">
+                {(() => {
+                  const diff = Date.now() - new Date(profile.last_seen_at).getTime();
+                  const mins = Math.floor(diff / 60000);
+                  if (mins < 2) return "🟢 Online now";
+                  if (mins < 60) return `Last seen ${mins}m ago`;
+                  const hours = Math.floor(mins / 60);
+                  if (hours < 24) return `Last seen ${hours}h ago`;
+                  const days = Math.floor(hours / 24);
+                  if (days < 7) return `Last seen ${days}d ago`;
+                  return `Last seen ${new Date(profile.last_seen_at).toLocaleDateString()}`;
+                })()}
               </p>
             )}
             <div className="flex items-center justify-center gap-3 text-muted-foreground text-sm">

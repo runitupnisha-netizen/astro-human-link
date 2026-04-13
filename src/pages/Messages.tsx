@@ -47,6 +47,7 @@ interface Profile {
   display_name: string | null;
   sun_sign: string | null;
   avatar_url: string | null;
+  last_seen_at: string | null;
 }
 
 interface Message {
@@ -101,6 +102,17 @@ const Messages = () => {
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
   const verifiedUsers = useVerificationStatuses(otherUserIds);
 
+  // Persist last_seen_at on mount and periodically
+  useEffect(() => {
+    if (!user) return;
+    const updateLastSeen = () => {
+      supabase.from("profiles").update({ last_seen_at: new Date().toISOString() } as any).eq("user_id", user.id).then();
+    };
+    updateLastSeen();
+    const interval = setInterval(updateLastSeen, 60000); // every minute
+    return () => clearInterval(interval);
+  }, [user]);
+
   // Online presence tracking
   useEffect(() => {
     if (!user) return;
@@ -125,6 +137,20 @@ const Messages = () => {
       supabase.removeChannel(presenceChannel);
     };
   }, [user]);
+
+  // Format last seen relative time
+  const formatLastSeen = (dateStr: string | null) => {
+    if (!dateStr) return "Offline";
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString();
+  };
 
   // Typing indicator channel per match
   useEffect(() => {
@@ -212,7 +238,7 @@ const Messages = () => {
 
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, display_name, sun_sign, avatar_url")
+        .select("user_id, display_name, sun_sign, avatar_url, last_seen_at")
         .in("user_id", otherUserIds);
 
       const profileMap = new Map(
@@ -236,6 +262,7 @@ const Messages = () => {
               display_name: "Cosmic Soul",
               sun_sign: null,
               avatar_url: null,
+              last_seen_at: null,
             },
             lastMessage: lastMsgs?.[0],
             unreadCount: 0,
@@ -810,9 +837,11 @@ const Messages = () => {
                           {verifiedUsers.has(selectedConvo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                           <div className="flex items-center gap-2">
                             {onlineUsers.has(selectedConvo.otherProfile.user_id) ? (
-                              <span className="text-[10px] text-green-500 font-medium">Online</span>
+                              <span className="text-[10px] text-emerald-500 font-medium">● Online</span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground">Offline</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {formatLastSeen(selectedConvo.otherProfile.last_seen_at)}
+                              </span>
                             )}
                             {selectedConvo.match.compatibility_score && (
                               <Badge variant="outline" className="text-[10px] border-accent/30 text-accent h-5">

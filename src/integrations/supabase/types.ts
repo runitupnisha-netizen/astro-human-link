@@ -417,6 +417,7 @@ export type Database = {
           is_incognito: boolean
           is_paused: boolean
           kids_preference: string | null
+          last_seen_at: string | null
           life_path_number: number | null
           max_distance_km: number | null
           moon_sign: string | null
@@ -480,6 +481,7 @@ export type Database = {
           is_incognito?: boolean
           is_paused?: boolean
           kids_preference?: string | null
+          last_seen_at?: string | null
           life_path_number?: number | null
           max_distance_km?: number | null
           moon_sign?: string | null
@@ -543,6 +545,7 @@ export type Database = {
           is_incognito?: boolean
           is_paused?: boolean
           kids_preference?: string | null
+          last_seen_at?: string | null
           life_path_number?: number | null
           max_distance_km?: number | null
           moon_sign?: string | null

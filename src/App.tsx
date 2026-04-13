@@ -118,6 +118,7 @@ const AppRoutes = () => {
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
+            <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>

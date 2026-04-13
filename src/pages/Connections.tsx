@@ -185,8 +185,15 @@ const Connections = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background relative">
+        <CosmicBackground />
+        <div className="relative z-10 pt-20 pb-24 md:pb-12">
+          <div className="max-w-4xl mx-auto px-6 space-y-4 mt-16">
+            {[0, 1, 2, 3].map((i) => (
+              <ConnectionCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

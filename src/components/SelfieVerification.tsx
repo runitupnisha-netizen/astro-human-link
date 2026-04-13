@@ -119,6 +119,8 @@ const SelfieVerification = () => {
       setStatus("verified");
       setCapturedImage(null);
       toast({ title: "You're verified! ✨", description: "Your profile now shows a trust badge." });
+      // Redirect to main app after a brief moment
+      setTimeout(() => navigate("/", { replace: true }), 1500);
     } catch (e: any) {
       toast({ title: "Verification failed", description: e.message, variant: "destructive" });
     } finally {

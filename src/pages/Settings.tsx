@@ -58,7 +58,7 @@ const Settings = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  const defaultNotifPrefs = { matches: true, messages: true, insights: true, marketing: false };
+  const defaultNotifPrefs = { matches: true, messages: true, likes: true, insights: true, marketing: false };
   const [notifPrefs, setNotifPrefs] = useState(() => {
     try {
       const stored = localStorage.getItem("stellara-notif-prefs");
@@ -66,7 +66,7 @@ const Settings = () => {
     } catch { return defaultNotifPrefs; }
   });
 
-  const defaultEmailPrefs = { matches: true, messages: false, insights: true, marketing: false };
+  const defaultEmailPrefs = { matches: true, messages: false, likes: true, insights: true, marketing: false };
   const [emailPrefs, setEmailPrefs] = useState(() => {
     try {
       const stored = localStorage.getItem("stellara-email-prefs");

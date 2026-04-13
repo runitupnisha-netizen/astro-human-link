@@ -846,7 +846,7 @@ const Messages = () => {
                               className="gap-2"
                               style={{ background: "var(--gradient-aurora)" }}
                             >
-                              <Wand2 className="w-4 h-4" />
+                              <Sparkles className="w-4 h-4" />
                               Get Conversation Starters
                             </Button>
                           </motion.div>

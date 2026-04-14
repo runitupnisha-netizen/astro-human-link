@@ -494,6 +494,26 @@ const Settings = () => {
               </CardContent>
             </Card>
 
+            {/* Photo Verification */}
+            {verificationStatus !== "verified" && (
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-accent" />
+                    Photo Verification
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {hasSkippedVerification() && !verificationStatus && (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You skipped verification earlier. Verify now to earn a trust badge on your profile.
+                    </p>
+                  )}
+                  <SelfieVerification />
+                </CardContent>
+              </Card>
+            )}
+
             <LanguageCard />
 
 

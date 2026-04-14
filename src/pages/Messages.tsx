@@ -36,6 +36,7 @@ import { sanitizeDisplayName } from "@/lib/utils";
 import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
 import BirthChartOverlay from "@/components/BirthChartOverlay";
+import { validateImage } from "@/lib/imageValidation";
 
 interface Match {
   id: string;
@@ -607,17 +608,17 @@ const Messages = () => {
     }
   }, [selectedMatchId, user, toast]);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast({ title: "Only images are supported", variant: "destructive" });
+    
+    const validation = await validateImage(file);
+    if (!validation.valid) {
+      toast({ title: "Invalid image", description: validation.error, variant: "destructive" });
+      e.target.value = '';
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "Image too large", description: "Max 10MB", variant: "destructive" });
-      return;
-    }
+    
     const url = URL.createObjectURL(file);
     setImagePreview({ file, url });
     e.target.value = '';

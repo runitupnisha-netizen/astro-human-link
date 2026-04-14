@@ -788,6 +788,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
                               <h3 className="font-semibold text-foreground text-sm truncate flex items-center gap-1">
+                                {pinnedMatchIds.has(convo.match.id) && <Pin className="w-3 h-3 text-accent shrink-0" />}
                                 {sanitizeDisplayName(convo.otherProfile.display_name) || "Someone"}
                                 {verifiedUsers.has(convo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                               </h3>
@@ -917,6 +918,25 @@ const Messages = () => {
                               }}
                             >
                               <User className="w-4 h-4 mr-2" /> View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => togglePin(selectedConvo.match.id)}
+                            >
+                              {pinnedMatchIds.has(selectedConvo.match.id) ? (
+                                <><PinOff className="w-4 h-4 mr-2" /> Unpin</>
+                              ) : (
+                                <><Pin className="w-4 h-4 mr-2" /> Pin Conversation</>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                const otherId = selectedConvo.match.user_a === user?.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+                                const { data } = await supabase.from("profiles").select("sun_sign, moon_sign, rising_sign").eq("user_id", otherId).maybeSingle();
+                                if (data) setOtherProfileFull(data);
+                                setShowBirthChart(true);
+                              }}
+                            >
+                              <BarChart3 className="w-4 h-4 mr-2" /> Synastry Chart
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"

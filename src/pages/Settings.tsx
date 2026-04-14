@@ -148,6 +148,7 @@ const Settings = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
       
+      
       <div className="relative z-10 pt-24 md:pt-28 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-8">

@@ -265,6 +265,30 @@ const Premium = () => {
             </motion.div>
           );
         })}
+
+        {/* Restore Purchase */}
+        {!subscribed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-center mt-8"
+          >
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                try {
+                  await manageSubscription();
+                } catch {
+                  toast({ title: "No subscription found", description: "If you believe this is an error, please contact support.", variant: "destructive" });
+                }
+              }}
+              className="text-muted-foreground hover:text-foreground text-sm"
+            >
+              Restore Previous Purchase
+            </Button>
+          </motion.div>
+        )}
       </div>
     </div>
   );

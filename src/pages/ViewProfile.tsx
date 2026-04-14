@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation } from "lucide-react";
+import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation, Music } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import UserActions from "@/components/UserActions";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
+import SpotifyNowPlaying from "@/components/SpotifyNowPlaying";
 
 interface ProfileData {
   display_name: string | null;
@@ -252,6 +253,17 @@ const ViewProfile = () => {
           {userId && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
               <BioPrompts userId={userId} editable={false} />
+            </motion.div>
+          )}
+
+          {/* Spotify */}
+          {userId && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-6">
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                <CardContent className="pt-4">
+                  <SpotifyNowPlaying userId={userId} />
+                </CardContent>
+              </Card>
             </motion.div>
           )}
 

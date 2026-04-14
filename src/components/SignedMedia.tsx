@@ -14,17 +14,32 @@ const SignedMedia = ({ bucket, path, type, isMe }: SignedMediaProps) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // If path is already a full URL (legacy signed URL or external), use it directly
-    if (path.startsWith("http")) {
-      setUrl(path);
-      return;
-    }
-
     let cancelled = false;
+
+    // Extract storage path from legacy signed URLs
+    const extractPath = (input: string): string => {
+      if (!input.startsWith("http")) return input;
+      try {
+        const url = new URL(input);
+        // Supabase signed URLs: /storage/v1/object/sign/<bucket>/<path>?token=...
+        const signMatch = url.pathname.match(/\/storage\/v1\/object\/sign\/[^/]+\/(.+)/);
+        if (signMatch) return decodeURIComponent(signMatch[1]);
+        // Public URLs: /storage/v1/object/public/<bucket>/<path>
+        const pubMatch = url.pathname.match(/\/storage\/v1\/object\/public\/[^/]+\/(.+)/);
+        if (pubMatch) return decodeURIComponent(pubMatch[1]);
+      } catch {}
+      // Can't parse — use as-is (external URL like Tenor GIF)
+      setUrl(input);
+      return "";
+    };
+
+    const storagePath = extractPath(path);
+    if (!storagePath) return; // was set directly above
+
     const getUrl = async () => {
       const { data, error } = await supabase.storage
         .from(bucket)
-        .createSignedUrl(path, 3600);
+        .createSignedUrl(storagePath, 3600);
       if (cancelled) return;
       if (error || !data?.signedUrl) {
         setError(true);

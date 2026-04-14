@@ -100,6 +100,11 @@ const Messages = () => {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showCallScreen, setShowCallScreen] = useState(false);
   const [callType, setCallType] = useState<"voice" | "video">("voice");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pinnedMatchIds, setPinnedMatchIds] = useState<Set<string>>(new Set());
+  const [showBirthChart, setShowBirthChart] = useState(false);
+  const [myProfile, setMyProfile] = useState<{ sun_sign: string | null; moon_sign: string | null; rising_sign: string | null } | null>(null);
+  const [otherProfileFull, setOtherProfileFull] = useState<{ sun_sign: string | null; moon_sign: string | null; rising_sign: string | null } | null>(null);
 
   // Collect other user IDs for batch verification check
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);

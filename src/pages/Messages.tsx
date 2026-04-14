@@ -1292,8 +1292,12 @@ const Messages = () => {
         <BirthChartOverlay
           open={showBirthChart}
           onClose={() => setShowBirthChart(false)}
-          mySigns={myProfile}
-          theirSigns={otherProfileFull || { sun_sign: selectedConvo.otherProfile.sun_sign, moon_sign: null, rising_sign: null }}
+          mySigns={{ sun: myProfile.sun_sign, moon: myProfile.moon_sign, rising: myProfile.rising_sign }}
+          theirSigns={{
+            sun: otherProfileFull?.sun_sign || selectedConvo.otherProfile.sun_sign || null,
+            moon: otherProfileFull?.moon_sign || null,
+            rising: otherProfileFull?.rising_sign || null,
+          }}
           theirName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
           score={selectedConvo.match.compatibility_score || 0}
         />

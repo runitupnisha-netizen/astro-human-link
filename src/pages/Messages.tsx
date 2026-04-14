@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Phone, Ban, MoreVertical, Video } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Phone, Ban, MoreVertical, Video, Search, Pin, PinOff, BarChart3 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,8 @@ import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
+import BirthChartOverlay from "@/components/BirthChartOverlay";
+import { validateImage } from "@/lib/imageValidation";
 
 interface Match {
   id: string;
@@ -99,6 +101,11 @@ const Messages = () => {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showCallScreen, setShowCallScreen] = useState(false);
   const [callType, setCallType] = useState<"voice" | "video">("voice");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pinnedMatchIds, setPinnedMatchIds] = useState<Set<string>>(new Set());
+  const [showBirthChart, setShowBirthChart] = useState(false);
+  const [myProfile, setMyProfile] = useState<{ sun_sign: string | null; moon_sign: string | null; rising_sign: string | null } | null>(null);
+  const [otherProfileFull, setOtherProfileFull] = useState<{ sun_sign: string | null; moon_sign: string | null; rising_sign: string | null } | null>(null);
 
   // Collect other user IDs for batch verification check
   const otherUserIds = conversations.map((c) => c.otherProfile.user_id);
@@ -294,6 +301,52 @@ const Messages = () => {
 
     loadConversations();
   }, [user, searchParams]);
+
+  // Load pinned matches
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("pinned_matches" as any).select("match_id").eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data) setPinnedMatchIds(new Set((data as any[]).map((d: any) => d.match_id)));
+      });
+  }, [user]);
+
+  // Load my profile signs for birth chart overlay
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("sun_sign, moon_sign, rising_sign").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => { if (data) setMyProfile(data); });
+  }, [user]);
+
+  // Sort conversations: pinned first, then by recency
+  const filteredConversations = conversations
+    .filter((c) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const name = (c.otherProfile.display_name || "").toLowerCase();
+      const lastMsg = (c.lastMessage?.content || "").toLowerCase();
+      return name.includes(q) || lastMsg.includes(q);
+    })
+    .sort((a, b) => {
+      const aPinned = pinnedMatchIds.has(a.match.id);
+      const bPinned = pinnedMatchIds.has(b.match.id);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      const aTime = a.lastMessage?.created_at || a.match.created_at;
+      const bTime = b.lastMessage?.created_at || b.match.created_at;
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
+    });
+
+  const togglePin = async (matchId: string) => {
+    if (!user) return;
+    if (pinnedMatchIds.has(matchId)) {
+      await supabase.from("pinned_matches" as any).delete().eq("user_id", user.id).eq("match_id", matchId);
+      setPinnedMatchIds((prev) => { const next = new Set(prev); next.delete(matchId); return next; });
+    } else {
+      await supabase.from("pinned_matches" as any).insert({ user_id: user.id, match_id: matchId } as any);
+      setPinnedMatchIds((prev) => new Set(prev).add(matchId));
+    }
+  };
 
   // Load messages + realtime subscription
   useEffect(() => {
@@ -555,17 +608,17 @@ const Messages = () => {
     }
   }, [selectedMatchId, user, toast]);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      toast({ title: "Only images are supported", variant: "destructive" });
+    
+    const validation = await validateImage(file);
+    if (!validation.valid) {
+      toast({ title: "Invalid image", description: validation.error, variant: "destructive" });
+      e.target.value = '';
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "Image too large", description: "Max 10MB", variant: "destructive" });
-      return;
-    }
+    
     const url = URL.createObjectURL(file);
     setImagePreview({ file, url });
     e.target.value = '';
@@ -686,14 +739,24 @@ const Messages = () => {
               {/* Conversations List */}
               <Card className={`bg-card/80 backdrop-blur-sm border-border/50 lg:col-span-1 overflow-hidden ${showMobileChat ? "hidden lg:block" : ""}`}>
                 <CardContent className="p-0 h-full flex flex-col">
-                  <div className="p-4 border-b border-border">
+                  <div className="p-4 border-b border-border space-y-2">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
                       {t("messages.title")}
                     </h2>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search conversations..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 h-8 text-sm bg-muted/30 border-border/40"
+                        aria-label="Search conversations"
+                      />
+                    </div>
                   </div>
                   <div className="overflow-y-auto flex-1">
-                    {conversations.map((convo, idx) => (
+                    {filteredConversations.map((convo, idx) => (
                       <motion.div
                         key={convo.match.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -726,6 +789,7 @@ const Messages = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-0.5">
                               <h3 className="font-semibold text-foreground text-sm truncate flex items-center gap-1">
+                                {pinnedMatchIds.has(convo.match.id) && <Pin className="w-3 h-3 text-accent shrink-0" />}
                                 {sanitizeDisplayName(convo.otherProfile.display_name) || "Someone"}
                                 {verifiedUsers.has(convo.otherProfile.user_id) && <VerifiedBadge size="sm" />}
                               </h3>
@@ -855,6 +919,25 @@ const Messages = () => {
                               }}
                             >
                               <User className="w-4 h-4 mr-2" /> View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => togglePin(selectedConvo.match.id)}
+                            >
+                              {pinnedMatchIds.has(selectedConvo.match.id) ? (
+                                <><PinOff className="w-4 h-4 mr-2" /> Unpin</>
+                              ) : (
+                                <><Pin className="w-4 h-4 mr-2" /> Pin Conversation</>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                const otherId = selectedConvo.match.user_a === user?.id ? selectedConvo.match.user_b : selectedConvo.match.user_a;
+                                const { data } = await supabase.from("profiles").select("sun_sign, moon_sign, rising_sign").eq("user_id", otherId).maybeSingle();
+                                if (data) setOtherProfileFull(data);
+                                setShowBirthChart(true);
+                              }}
+                            >
+                              <BarChart3 className="w-4 h-4 mr-2" /> Synastry Chart
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
@@ -1203,6 +1286,21 @@ const Messages = () => {
           callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
           callerAvatar={selectedConvo.otherProfile.avatar_url}
           callType={callType}
+        />
+      )}
+      {/* Birth Chart Overlay */}
+      {selectedConvo && myProfile && (
+        <BirthChartOverlay
+          open={showBirthChart}
+          onClose={() => setShowBirthChart(false)}
+          mySigns={{ sun: myProfile.sun_sign, moon: myProfile.moon_sign, rising: myProfile.rising_sign }}
+          theirSigns={{
+            sun: otherProfileFull?.sun_sign || selectedConvo.otherProfile.sun_sign || null,
+            moon: otherProfileFull?.moon_sign || null,
+            rising: otherProfileFull?.rising_sign || null,
+          }}
+          theirName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          score={selectedConvo.match.compatibility_score || 0}
         />
       )}
     </div>

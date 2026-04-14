@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
@@ -29,6 +29,7 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import ProfilePreview from "@/components/ProfilePreview";
 import ProfileCompletionScore from "@/components/ProfileCompletionScore";
+import VoiceIntro from "@/components/VoiceIntro";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -289,6 +290,24 @@ const Profile = () => {
                 Photo Gallery
               </h2>
               <PhotoGallery userId={user!.id} editable={true} columns={3} currentAvatarUrl={profile?.avatar_url} onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })} />
+            </CardContent>
+          </Card>
+
+          {/* Voice Intro */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Mic className="w-5 h-5 text-accent" />
+                Voice Intro
+                <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">15s max</Badge>
+              </h2>
+              <p className="text-sm text-muted-foreground mb-3">Record a short voice intro so matches can hear your vibe.</p>
+              <VoiceIntro
+                userId={user!.id}
+                currentUrl={profile.voice_intro_url}
+                onUpdate={(url) => setProfile({ ...profile, voice_intro_url: url })}
+                editable={true}
+              />
             </CardContent>
           </Card>
 

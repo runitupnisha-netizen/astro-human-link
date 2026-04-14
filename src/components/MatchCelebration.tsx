@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import YinYangAnimation from "@/components/YinYangAnimation";
+import WrittenInTheStars from "@/components/WrittenInTheStars";
 import confetti from "canvas-confetti";
 
 interface MatchProfile {
@@ -19,9 +20,10 @@ interface MatchCelebrationProps {
   profile: MatchProfile | null;
   onClose: () => void;
   onMessage: () => void;
+  myAvatar?: string | null;
 }
 
-const MatchCelebration = ({ profile, onClose, onMessage }: MatchCelebrationProps) => {
+const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebrationProps) => {
   const confettiFired = useRef(false);
 
   useEffect(() => {
@@ -157,14 +159,14 @@ const MatchCelebration = ({ profile, onClose, onMessage }: MatchCelebrationProps
               </span>
             </motion.div>
 
-            {/* Yin Yang */}
+            {/* Written in the Stars constellation animation */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, type: "spring", damping: 12 }}
               className="mb-2"
             >
-              <YinYangAnimation />
+              <WrittenInTheStars myAvatar={myAvatar} theirAvatar={profile.avatar_url} />
             </motion.div>
 
             {/* Title */}

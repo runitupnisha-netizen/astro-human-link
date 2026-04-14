@@ -16,6 +16,7 @@ import MatchCelebration from "@/components/MatchCelebration";
 import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
 import { ProfileCardSkeleton } from "@/components/Skeletons";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -49,6 +50,8 @@ const Discover = () => {
     profileId: string;
     action: "pass" | "like" | "super_like";
   } | null>(null);
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null);
+
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;
@@ -69,11 +72,19 @@ const Discover = () => {
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 
-  // Fetch boost status
+  // Pull-to-refresh
+  const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: fetchProfiles,
+  });
+
+  // Fetch boost status & avatar
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("boost_until").eq("user_id", user.id).maybeSingle()
-      .then(({ data }) => { if (data?.boost_until) setBoostUntil(data.boost_until); });
+    supabase.from("profiles").select("boost_until, avatar_url").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => {
+        if (data?.boost_until) setBoostUntil(data.boost_until);
+        if (data?.avatar_url) setMyAvatarUrl(data.avatar_url);
+      });
   }, [user]);
 
   // Count today's likes
@@ -177,7 +188,8 @@ const Discover = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
 
-      <div className="relative z-10 flex flex-col items-center pt-20 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-16 [@media(max-height:700px)]:pb-[72px]">
+      <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-20 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-16 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
+        {pullIndicator}
         {/* Clean header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -302,6 +314,7 @@ const Discover = () => {
 
       <MatchCelebration
         profile={matchPopup}
+        myAvatar={myAvatarUrl}
         onClose={() => setMatchPopup(null)}
         onMessage={() => {
           const matchedId = matchPopup?.user_id;

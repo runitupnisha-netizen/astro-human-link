@@ -75,7 +75,7 @@ const Navigation = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30" role="navigation" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-14">
             <Link to="/" className="flex items-center gap-2.5 group">
@@ -147,8 +147,8 @@ const Navigation = () => {
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom">
-        <div className="grid grid-cols-5 h-[72px] px-1">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom" role="navigation" aria-label="Bottom navigation">
+        <div className="grid grid-cols-5 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
             const isActive = item.path === "/profile"
@@ -159,7 +159,9 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center rounded-xl transition-all duration-200 ${
+                aria-label={`${item.label}${item.badge && item.badge > 0 ? `, ${item.badge} unread` : ""}`}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center rounded-xl transition-all duration-200 min-h-[44px] min-w-[44px] ${
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground"

@@ -196,7 +196,7 @@ const SwipeCard = ({
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
         {/* Photo — large, immersive */}
-        <div className="relative w-full flex-1 min-h-0 bg-muted">
+        <div className="relative w-full flex-1 min-h-0 max-h-[55%] bg-muted">
           {currentPhoto ? (
             <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
           ) : (
@@ -268,7 +268,7 @@ const SwipeCard = ({
         </div>
 
           {/* Compact info section */}
-        <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2">
+        <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2 overflow-y-auto">
           {/* Astro badges — just the essentials */}
           <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
             {profile.sun_sign && (
@@ -308,7 +308,7 @@ const SwipeCard = ({
 
           {/* About me bio */}
           {profile.about_me && (
-            <p className="text-sm text-foreground/90 leading-relaxed line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">
+            <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
               {profile.about_me}
             </p>
           )}

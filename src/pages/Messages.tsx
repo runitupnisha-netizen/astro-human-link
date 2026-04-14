@@ -28,7 +28,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceRecorder from "@/components/VoiceRecorder";
-import AudioPlayer from "@/components/AudioPlayer";
+
+import SignedMedia from "@/components/SignedMedia";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
@@ -477,19 +478,12 @@ const Messages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData, error: signError } = await supabase.storage
-        .from("voice-messages")
-        .createSignedUrl(fileName, 3600);
-
-      if (signError || !urlData?.signedUrl) throw signError || new Error("Failed to get signed URL");
-      const voiceUrl = urlData.signedUrl;
-
-      // Optimistic update
+      // Store the file path, not a signed URL
       const optimisticMsg: Message = {
         id: `temp-voice-${Date.now()}`,
         match_id: selectedMatchId,
         sender_id: user.id,
-        content: voiceUrl,
+        content: fileName,
         message_type: "voice",
         created_at: new Date().toISOString(),
         read_at: null,
@@ -499,7 +493,7 @@ const Messages = () => {
       const { error } = await supabase.from("messages").insert({
         match_id: selectedMatchId,
         sender_id: user.id,
-        content: voiceUrl,
+        content: fileName,
         message_type: "voice",
       });
 
@@ -529,18 +523,14 @@ const Messages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData, error: signError } = await supabase.storage
-        .from("chat-media")
-        .createSignedUrl(fileName, 3600);
+      if (uploadError) throw uploadError;
 
-      if (signError || !urlData?.signedUrl) throw signError || new Error("Failed to get signed URL");
-      const imageUrl = urlData.signedUrl;
-
+      // Store the file path, not a signed URL
       const optimisticMsg: Message = {
         id: `temp-img-${Date.now()}`,
         match_id: selectedMatchId,
         sender_id: user.id,
-        content: imageUrl,
+        content: fileName,
         message_type: "image",
         created_at: new Date().toISOString(),
         read_at: null,
@@ -550,7 +540,7 @@ const Messages = () => {
       const { error } = await supabase.from("messages").insert({
         match_id: selectedMatchId,
         sender_id: user.id,
-        content: imageUrl,
+        content: fileName,
         message_type: "image",
       });
 
@@ -966,14 +956,9 @@ const Messages = () => {
                                       <span className="font-medium">Call Requested</span>
                                     </div>
                                   ) : msg.message_type === "voice" ? (
-                                    <AudioPlayer src={msg.content} isMe={isMe} />
+                                    <SignedMedia bucket="voice-messages" path={msg.content} type="voice" isMe={isMe} />
                                   ) : msg.message_type === "image" ? (
-                                    <img
-                                      src={msg.content}
-                                      alt="Shared image"
-                                      className="rounded-lg max-w-[260px] max-h-[300px] object-cover cursor-pointer"
-                                      onClick={() => window.open(msg.content, '_blank')}
-                                    />
+                                    <SignedMedia bucket="chat-media" path={msg.content} type="image" isMe={isMe} />
                                   ) : msg.message_type === "gif" ? (
                                     <img
                                       src={msg.content}

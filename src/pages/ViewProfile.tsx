@@ -256,6 +256,17 @@ const ViewProfile = () => {
             </motion.div>
           )}
 
+          {/* Spotify */}
+          {userId && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-6">
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+                <CardContent className="pt-4">
+                  <SpotifyNowPlaying userId={userId} />
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Quick Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <div className="flex flex-wrap gap-2 justify-center mb-6">

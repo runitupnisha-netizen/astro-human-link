@@ -67,93 +67,94 @@ const Connections = () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!user) return;
+    const [matchResult, myProfileResult] = await Promise.all([
+      supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
+      supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
+    ]);
 
-    const load = async () => {
-      const [matchResult, myProfileResult] = await Promise.all([
-        supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
-        supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
-      ]);
+    const matchRows = matchResult.data;
+    const myCoords = myProfileResult.data;
 
-      const matchRows = matchResult.data;
-      const myCoords = myProfileResult.data;
+    if (!matchRows || matchRows.length === 0) {
+      setLoading(false);
+      return;
+    }
 
-      if (!matchRows || matchRows.length === 0) {
-        setLoading(false);
-        return;
+    const otherIds = matchRows.map((m) =>
+      m.user_a === user.id ? m.user_b : m.user_a
+    );
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
+      .in("user_id", otherIds);
+
+    const matchIds = matchRows.map((m) => m.id);
+    const { data: messages } = await supabase
+      .from("messages")
+      .select("match_id, content, created_at")
+      .in("match_id", matchIds)
+      .order("created_at", { ascending: false });
+
+    const lastMessageMap = new Map<string, { content: string; created_at: string }>();
+    (messages || []).forEach((msg) => {
+      if (!lastMessageMap.has(msg.match_id)) {
+        lastMessageMap.set(msg.match_id, { content: msg.content, created_at: msg.created_at });
+      }
+    });
+
+    const profileMap = new Map(
+      (profiles || []).map((p) => [p.user_id, p])
+    );
+
+    const results: MatchWithProfile[] = matchRows.map((m) => {
+      const otherId = m.user_a === user.id ? m.user_b : m.user_a;
+      const prof = profileMap.get(otherId);
+      const lastMsg = lastMessageMap.get(m.id);
+
+      let distanceKm: number | null = null;
+      if (myCoords?.current_latitude && myCoords?.current_longitude && prof?.current_latitude && prof?.current_longitude) {
+        distanceKm = Math.round(calcDistance(myCoords.current_latitude, myCoords.current_longitude, prof.current_latitude, prof.current_longitude));
       }
 
-      const otherIds = matchRows.map((m) =>
-        m.user_a === user.id ? m.user_b : m.user_a
-      );
+      return {
+        id: m.id,
+        compatibility_score: m.compatibility_score,
+        compatibility_summary: m.compatibility_summary,
+        created_at: m.created_at,
+        otherUserId: otherId,
+        otherProfile: prof || {
+          display_name: "New Match",
+          sun_sign: null,
+          moon_sign: null,
+          rising_sign: null,
+          human_design_type: null,
+          compatibility_tags: null,
+          avatar_url: null,
+          life_path_number: null,
+          current_latitude: null,
+          current_longitude: null,
+          interests: null,
+          relationship_goal: null,
+          spiritual_practice: null,
+        },
+        lastMessage: lastMsg?.content || null,
+        lastMessageAt: lastMsg?.created_at || null,
+        distanceKm,
+      };
+    });
 
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
-        .in("user_id", otherIds);
-
-      const matchIds = matchRows.map((m) => m.id);
-      const { data: messages } = await supabase
-        .from("messages")
-        .select("match_id, content, created_at")
-        .in("match_id", matchIds)
-        .order("created_at", { ascending: false });
-
-      const lastMessageMap = new Map<string, { content: string; created_at: string }>();
-      (messages || []).forEach((msg) => {
-        if (!lastMessageMap.has(msg.match_id)) {
-          lastMessageMap.set(msg.match_id, { content: msg.content, created_at: msg.created_at });
-        }
-      });
-
-      const profileMap = new Map(
-        (profiles || []).map((p) => [p.user_id, p])
-      );
-
-      const results: MatchWithProfile[] = matchRows.map((m) => {
-        const otherId = m.user_a === user.id ? m.user_b : m.user_a;
-        const prof = profileMap.get(otherId);
-        const lastMsg = lastMessageMap.get(m.id);
-
-        let distanceKm: number | null = null;
-        if (myCoords?.current_latitude && myCoords?.current_longitude && prof?.current_latitude && prof?.current_longitude) {
-          distanceKm = Math.round(calcDistance(myCoords.current_latitude, myCoords.current_longitude, prof.current_latitude, prof.current_longitude));
-        }
-
-        return {
-          id: m.id,
-          compatibility_score: m.compatibility_score,
-          compatibility_summary: m.compatibility_summary,
-          created_at: m.created_at,
-          otherUserId: otherId,
-          otherProfile: prof || {
-            display_name: "New Match",
-            sun_sign: null,
-            moon_sign: null,
-            rising_sign: null,
-            human_design_type: null,
-            compatibility_tags: null,
-            avatar_url: null,
-            life_path_number: null,
-            current_latitude: null,
-            current_longitude: null,
-            interests: null,
-            relationship_goal: null,
-            spiritual_practice: null,
-          },
-          lastMessage: lastMsg?.content || null,
-          lastMessageAt: lastMsg?.created_at || null,
-          distanceKm,
-        };
-      });
-
-      setMatches(results);
-      setLoading(false);
-    };
-
-    load();
+    setMatches(results);
+    setLoading(false);
   }, [user]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: load,
+  });
 
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);

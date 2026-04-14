@@ -458,15 +458,20 @@ const Messages = () => {
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 
-    const { error } = await supabase.from("messages").insert({
-      match_id: selectedMatchId,
-      sender_id: user.id,
-      content,
-      message_type: "text",
-    });
-
-    if (error) {
-      toast({ title: "Failed to send message", variant: "destructive" });
+    try {
+      const { error } = await supabase.from("messages").insert({
+        match_id: selectedMatchId,
+        sender_id: user.id,
+        content,
+        message_type: "text",
+      });
+      if (error) throw error;
+    } catch {
+      toast({
+        title: "Failed to send message",
+        description: navigator.onLine ? "Please try again" : "You're offline — message will retry when connected",
+        variant: "destructive",
+      });
       setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
       setNewMessage(content);
     }
@@ -574,7 +579,6 @@ const Messages = () => {
         .from("chat-media")
         .upload(fileName, file, { contentType: file.type });
 
-      if (uploadError) throw uploadError;
 
       if (uploadError) throw uploadError;
 

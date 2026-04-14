@@ -9,6 +9,7 @@ import { useVerificationStatus } from "@/hooks/useVerification";
 export interface DiscoverProfile {
   user_id: string;
   display_name: string | null;
+  username?: string | null;
   avatar_url: string | null;
   sun_sign: string | null;
   moon_sign: string | null;
@@ -332,7 +333,7 @@ const SwipeCard = ({
           {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
             <div className="bg-primary/5 rounded-xl p-3 [@media(max-height:700px)]:p-2.5">
               <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
-              <p className="text-sm text-foreground line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.bio_prompt_1_answer}</p>
+              <p className="text-sm text-foreground [@media(max-height:700px)]:text-xs">{profile.bio_prompt_1_answer}</p>
             </div>
           )}
 

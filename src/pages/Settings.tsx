@@ -149,10 +149,10 @@ const Settings = () => {
       <CosmicBackground />
       
       
-      <div className="relative z-10 pt-24 md:pt-28 pb-24 md:pb-12">
+      <div className="relative z-10 pt-28 md:pt-32 pb-24 md:pb-12">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-aurora bg-clip-text text-transparent">
+          <div className="text-center mb-8 md:mb-10">
+            <h1 className="text-4xl font-bold leading-tight mb-4 bg-gradient-aurora bg-clip-text text-transparent">
               {t("settings.title")}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

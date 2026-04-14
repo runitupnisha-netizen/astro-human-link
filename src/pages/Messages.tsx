@@ -738,14 +738,24 @@ const Messages = () => {
               {/* Conversations List */}
               <Card className={`bg-card/80 backdrop-blur-sm border-border/50 lg:col-span-1 overflow-hidden ${showMobileChat ? "hidden lg:block" : ""}`}>
                 <CardContent className="p-0 h-full flex flex-col">
-                  <div className="p-4 border-b border-border">
+                  <div className="p-4 border-b border-border space-y-2">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
                       {t("messages.title")}
                     </h2>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search conversations..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 h-8 text-sm bg-muted/30 border-border/40"
+                        aria-label="Search conversations"
+                      />
+                    </div>
                   </div>
                   <div className="overflow-y-auto flex-1">
-                    {conversations.map((convo, idx) => (
+                    {filteredConversations.map((convo, idx) => (
                       <motion.div
                         key={convo.match.id}
                         initial={{ opacity: 0, x: -20 }}

@@ -16,6 +16,7 @@ import MatchCelebration from "@/components/MatchCelebration";
 import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
 import { ProfileCardSkeleton } from "@/components/Skeletons";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -49,6 +50,12 @@ const Discover = () => {
     profileId: string;
     action: "pass" | "like" | "super_like";
   } | null>(null);
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null);
+
+  // Pull-to-refresh
+  const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: fetchProfiles,
+  });
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

@@ -105,6 +105,18 @@ const Settings = () => {
         setProfile(data);
         setLoadingProfile(false);
       });
+
+    // Check verification status
+    supabase
+      .from("photo_verifications")
+      .select("status")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        setVerificationStatus(data?.status || null);
+      });
   }, [user]);
 
   const handleEnablePush = async () => {

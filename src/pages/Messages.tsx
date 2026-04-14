@@ -28,7 +28,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceRecorder from "@/components/VoiceRecorder";
-import AudioPlayer from "@/components/AudioPlayer";
+
 import SignedMedia from "@/components/SignedMedia";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";

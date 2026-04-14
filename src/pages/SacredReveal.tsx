@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 interface RevealProfile {
   user_id: string;
   display_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   sun_sign: string | null;
   moon_sign: string | null;

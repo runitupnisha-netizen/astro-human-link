@@ -9,6 +9,7 @@ import { useVerificationStatus } from "@/hooks/useVerification";
 export interface DiscoverProfile {
   user_id: string;
   display_name: string | null;
+  username?: string | null;
   avatar_url: string | null;
   sun_sign: string | null;
   moon_sign: string | null;
@@ -230,7 +231,7 @@ const SwipeCard = ({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <h2 className="min-w-0 truncate font-display text-xl sm:text-2xl font-bold leading-tight text-foreground">
-                    {sanitizeDisplayName(profile.display_name) || "New Here"}
+                    {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
                   </h2>
                   {age && <span className="shrink-0 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
                   {isVerified && <span className="shrink-0"><VerifiedBadge size="sm" /></span>}
@@ -332,7 +333,7 @@ const SwipeCard = ({
           {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
             <div className="bg-primary/5 rounded-xl p-3 [@media(max-height:700px)]:p-2.5">
               <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
-              <p className="text-sm text-foreground line-clamp-2 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-1">{profile.bio_prompt_1_answer}</p>
+              <p className="text-sm text-foreground [@media(max-height:700px)]:text-xs">{profile.bio_prompt_1_answer}</p>
             </div>
           )}
 

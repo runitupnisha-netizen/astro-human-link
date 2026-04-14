@@ -247,8 +247,10 @@ const Profile = () => {
           </div>
 
           {/* Stats bar — like Instagram */}
-          <div className="flex items-center justify-around mb-6 py-3 border-y border-border/30">
-            <ProfileCompletionScore profile={profile} photoCount={photoCount} />
+          <div className="flex items-center justify-between gap-3 mb-6 py-3 px-2 border-y border-border/30 overflow-visible">
+            <div className="shrink-0">
+              <ProfileCompletionScore profile={profile} photoCount={photoCount} />
+            </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-8 text-xs" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditUsername(profile.username || ""); setEditNameOpen(true); }}>
                 <Edit className="w-3.5 h-3.5" /> Edit

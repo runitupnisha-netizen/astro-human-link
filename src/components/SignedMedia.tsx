@@ -36,11 +36,10 @@ const SignedMedia = ({ bucket, path, type, isMe }: SignedMediaProps) => {
     const storagePath = extractPath(path);
     if (!storagePath) return; // was set directly above
 
-    let cancelled = false;
     const getUrl = async () => {
       const { data, error } = await supabase.storage
         .from(bucket)
-        .createSignedUrl(path, 3600);
+        .createSignedUrl(storagePath, 3600);
       if (cancelled) return;
       if (error || !data?.signedUrl) {
         setError(true);

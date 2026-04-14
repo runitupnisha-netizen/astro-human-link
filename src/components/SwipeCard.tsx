@@ -227,14 +227,14 @@ const SwipeCard = ({
 
           {/* Name & basics overlaid on gradient */}
           <div className="absolute bottom-0 left-0 right-0 p-5 [@media(max-height:700px)]:p-4 z-10">
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <h2 className="min-w-0 font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1 pr-1">
+                <div className="flex flex-wrap items-start gap-x-1.5 gap-y-1 min-w-0">
+                  <h2 className="min-w-0 flex-1 font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words whitespace-normal">
                     {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
                   </h2>
-                  {age && <span className="shrink-0 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
-                  {isVerified && <span className="shrink-0"><VerifiedBadge size="sm" /></span>}
+                  {age && <span className="shrink-0 pt-0.5 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
+                  {isVerified && <span className="shrink-0 pt-0.5"><VerifiedBadge size="sm" /></span>}
                 </div>
                 {city && (
                   <span className="mt-1 flex items-center gap-1 text-sm text-muted-foreground [@media(max-height:700px)]:text-xs">
@@ -246,8 +246,8 @@ const SwipeCard = ({
                   </span>
                 )}
               </div>
-              <div className="flex shrink-0 flex-col items-center gap-0.5">
-                <div className="relative w-14 h-14 flex items-center justify-center">
+              <div className="flex shrink-0 flex-col items-center gap-0.5 pt-0.5">
+                <div className="relative flex h-12 w-12 items-center justify-center sm:h-14 sm:w-14">
                   <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
                     <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.2" />
                     <circle
@@ -259,7 +259,7 @@ const SwipeCard = ({
                       strokeDashoffset={`${2 * Math.PI * 24 * (1 - profile.compatibility_score / 100)}`}
                     />
                   </svg>
-                  <span className="font-display text-base font-bold text-accent">{profile.compatibility_score}%</span>
+                  <span className="font-display text-sm font-bold text-accent sm:text-base">{profile.compatibility_score}%</span>
                 </div>
                 <span className="text-[9px] uppercase tracking-wider text-muted-foreground">Match</span>
               </div>

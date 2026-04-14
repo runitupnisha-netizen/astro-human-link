@@ -76,9 +76,9 @@ const Navigation = () => {
     <>
       {/* Top Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30" role="navigation" aria-label="Main navigation">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-14">
-            <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-7xl mx-auto px-4 md:px-5 lg:px-6">
+          <div className="flex items-center justify-between h-14 gap-2">
+            <Link to="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-md scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <img src={stellaraLogo} alt="Stellara" className="relative w-8 h-8 object-contain mix-blend-screen" />
@@ -89,7 +89,7 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
+            <div className="hidden md:flex items-center gap-0 overflow-x-auto scrollbar-hide flex-1 justify-center min-w-0 px-1">
               {desktopNavItems.map((item) => {
                 const Icon = item.icon;
             const isActive = item.path === "/profile"
@@ -100,7 +100,7 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-300 ${
+                className={`relative flex items-center gap-1 px-2 py-2 lg:px-2.5 rounded-xl text-[11px] lg:text-xs font-medium whitespace-nowrap transition-all duration-300 ${
                       isActive
                         ? item.premium ? "bg-gradient-golden text-background shadow-golden" : "nav-pill-active"
                         : item.premium
@@ -128,18 +128,18 @@ const Navigation = () => {
             </div>
 
             {/* Notification Bell + Sign Out (desktop) */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <NotificationBell />
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();
                   window.location.href = "/auth";
                 }}
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
+                className="hidden md:flex items-center gap-1 px-2 py-2 lg:px-2.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
-                <span>{t("settings.sign_out")}</span>
+                <span className="hidden xl:inline">{t("settings.sign_out")}</span>
               </button>
             </div>
           </div>

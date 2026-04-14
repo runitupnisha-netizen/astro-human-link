@@ -6,6 +6,7 @@ import { Camera, RotateCcw, Upload, CheckCircle2, Clock, Loader2, BadgeCheck } f
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { markSessionVerified } from "@/hooks/useVerificationGate";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";
@@ -56,7 +57,10 @@ const SelfieVerification = () => {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        // Wait for video metadata before playing — critical on mobile
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(() => {});
+        };
       }
       setCameraActive(true);
       setCapturedImage(null);
@@ -124,6 +128,7 @@ const SelfieVerification = () => {
 
       setStatus("verified");
       setCapturedImage(null);
+      markSessionVerified();
       toast({ title: "You're verified! ✨", description: "Your profile now shows a trust badge." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);

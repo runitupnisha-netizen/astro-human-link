@@ -8,13 +8,14 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye, Music } from "lucide-react";
 import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SpotifyConnect from "@/components/SpotifyConnect";
 
 const LanguageCard = () => {
   const { language, setLanguage, languages } = useTranslation();

@@ -6,6 +6,7 @@ import { Camera, RotateCcw, Upload, CheckCircle2, Clock, Loader2, BadgeCheck } f
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { markSessionVerified } from "@/hooks/useVerificationGate";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";

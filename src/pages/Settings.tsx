@@ -465,6 +465,20 @@ const Settings = () => {
               </CardContent>
             </Card>
 
+            {/* Spotify Integration */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Music className="w-5 h-5 text-[#1DB954]" />
+                  Spotify
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">Show what you're listening to on your profile</p>
+                <SpotifyConnect />
+              </CardContent>
+            </Card>
+
             <LanguageCard />
 
 

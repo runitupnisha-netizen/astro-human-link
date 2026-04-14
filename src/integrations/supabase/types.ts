@@ -300,6 +300,35 @@ export type Database = {
         }
         Relationships: []
       }
+      pinned_matches: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pinned_matches_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -438,6 +467,7 @@ export type Database = {
           updated_at: string
           user_id: string
           username: string | null
+          voice_intro_url: string | null
         }
         Insert: {
           about_me?: string | null
@@ -502,6 +532,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           username?: string | null
+          voice_intro_url?: string | null
         }
         Update: {
           about_me?: string | null
@@ -566,6 +597,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+          voice_intro_url?: string | null
         }
         Relationships: []
       }

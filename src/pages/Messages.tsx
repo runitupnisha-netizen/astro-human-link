@@ -579,7 +579,6 @@ const Messages = () => {
         .from("chat-media")
         .upload(fileName, file, { contentType: file.type });
 
-      if (uploadError) throw uploadError;
 
       if (uploadError) throw uploadError;
 

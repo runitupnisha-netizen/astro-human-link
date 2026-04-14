@@ -268,7 +268,7 @@ const SwipeCard = ({
         </div>
 
           {/* Compact info section */}
-        <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2">
+        <div className="p-4 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:space-y-2 overflow-y-auto">
           {/* Astro badges — just the essentials */}
           <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
             {profile.sun_sign && (

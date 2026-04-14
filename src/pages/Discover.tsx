@@ -50,12 +50,8 @@ const Discover = () => {
     profileId: string;
     action: "pass" | "like" | "super_like";
   } | null>(null);
-  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null);
 
-  // Pull-to-refresh
-  const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
-    onRefresh: fetchProfiles,
-  });
+
 
   const fetchProfiles = useCallback(async () => {
     if (!user) return;

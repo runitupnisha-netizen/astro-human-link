@@ -29,6 +29,7 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import ProfilePreview from "@/components/ProfilePreview";
 import ProfileCompletionScore from "@/components/ProfileCompletionScore";
+import VoiceIntro from "@/components/VoiceIntro";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {

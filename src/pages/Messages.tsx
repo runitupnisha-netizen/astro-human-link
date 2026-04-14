@@ -478,12 +478,6 @@ const Messages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData, error: signError } = await supabase.storage
-        .from("voice-messages")
-        .createSignedUrl(fileName, 3600);
-
-      if (uploadError) throw uploadError;
-
       // Store the file path, not a signed URL
       const optimisticMsg: Message = {
         id: `temp-voice-${Date.now()}`,

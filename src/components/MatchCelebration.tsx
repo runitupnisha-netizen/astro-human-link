@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import YinYangAnimation from "@/components/YinYangAnimation";
+import WrittenInTheStars from "@/components/WrittenInTheStars";
 import confetti from "canvas-confetti";
 
 interface MatchProfile {
@@ -19,9 +20,10 @@ interface MatchCelebrationProps {
   profile: MatchProfile | null;
   onClose: () => void;
   onMessage: () => void;
+  myAvatar?: string | null;
 }
 
-const MatchCelebration = ({ profile, onClose, onMessage }: MatchCelebrationProps) => {
+const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebrationProps) => {
   const confettiFired = useRef(false);
 
   useEffect(() => {

@@ -16,6 +16,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import SpotifyConnect from "@/components/SpotifyConnect";
+import SelfieVerification from "@/components/SelfieVerification";
+import { hasSkippedVerification, clearVerificationSkip } from "@/hooks/useVerificationGate";
 
 const LanguageCard = () => {
   const { language, setLanguage, languages } = useTranslation();
@@ -58,6 +60,7 @@ const Settings = () => {
   const [deleting, setDeleting] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   const defaultNotifPrefs = { matches: true, messages: true, likes: true, insights: true, marketing: false };
   const [notifPrefs, setNotifPrefs] = useState(() => {
@@ -101,6 +104,18 @@ const Settings = () => {
       .then(({ data }) => {
         setProfile(data);
         setLoadingProfile(false);
+      });
+
+    // Check verification status
+    supabase
+      .from("photo_verifications")
+      .select("status")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        setVerificationStatus(data?.status || null);
       });
   }, [user]);
 
@@ -478,6 +493,26 @@ const Settings = () => {
                 <SpotifyConnect />
               </CardContent>
             </Card>
+
+            {/* Photo Verification */}
+            {verificationStatus !== "verified" && (
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-accent" />
+                    Photo Verification
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {hasSkippedVerification() && !verificationStatus && (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You skipped verification earlier. Verify now to earn a trust badge on your profile.
+                    </p>
+                  )}
+                  <SelfieVerification />
+                </CardContent>
+              </Card>
+            )}
 
             <LanguageCard />
 

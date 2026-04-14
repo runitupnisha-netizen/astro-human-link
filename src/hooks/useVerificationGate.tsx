@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+const SKIP_KEY = "stellara-verification-skipped";
+
 // Session-level flag: once verified in this session, skip re-checking
 let sessionVerified = false;
 
@@ -8,12 +10,26 @@ export const markSessionVerified = () => {
   sessionVerified = true;
 };
 
+export const markVerificationSkipped = () => {
+  sessionVerified = true;
+  localStorage.setItem(SKIP_KEY, "true");
+};
+
+export const hasSkippedVerification = () => {
+  return localStorage.getItem(SKIP_KEY) === "true";
+};
+
+export const clearVerificationSkip = () => {
+  localStorage.removeItem(SKIP_KEY);
+};
+
 export const useVerificationGate = (userId: string | null | undefined) => {
-  const [verified, setVerified] = useState<boolean | null>(sessionVerified ? true : null);
-  const [loading, setLoading] = useState(!sessionVerified);
+  const skipped = hasSkippedVerification();
+  const [verified, setVerified] = useState<boolean | null>(sessionVerified || skipped ? true : null);
+  const [loading, setLoading] = useState(!sessionVerified && !skipped);
 
   useEffect(() => {
-    if (sessionVerified) {
+    if (sessionVerified || skipped) {
       setVerified(true);
       setLoading(false);
       return;

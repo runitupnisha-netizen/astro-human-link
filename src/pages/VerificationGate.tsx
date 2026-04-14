@@ -1,9 +1,19 @@
+import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 import SelfieVerification from "@/components/SelfieVerification";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
+import { markVerificationSkipped } from "@/hooks/useVerificationGate";
 
 const VerificationGate = () => {
+  const navigate = useNavigate();
+
+  const handleSkip = () => {
+    markVerificationSkipped();
+    navigate("/", { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-background relative flex items-center justify-center">
       <CosmicBackground />
@@ -25,6 +35,19 @@ const VerificationGate = () => {
         </motion.div>
 
         <SelfieVerification />
+
+        <div className="text-center mt-6">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground text-sm"
+            onClick={handleSkip}
+          >
+            Skip for now — I'll verify later
+          </Button>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            You can verify anytime from Settings
+          </p>
+        </div>
       </div>
     </div>
   );

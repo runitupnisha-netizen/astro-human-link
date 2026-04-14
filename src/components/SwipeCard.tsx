@@ -230,7 +230,7 @@ const SwipeCard = ({
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <h2 className="min-w-0 truncate font-display text-xl sm:text-2xl font-bold leading-tight text-foreground">
+                  <h2 className="min-w-0 font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words">
                     {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
                   </h2>
                   {age && <span className="shrink-0 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}

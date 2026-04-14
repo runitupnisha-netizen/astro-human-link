@@ -60,6 +60,7 @@ const Settings = () => {
   const [deleting, setDeleting] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   const defaultNotifPrefs = { matches: true, messages: true, likes: true, insights: true, marketing: false };
   const [notifPrefs, setNotifPrefs] = useState(() => {

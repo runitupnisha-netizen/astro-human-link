@@ -56,7 +56,10 @@ const SelfieVerification = () => {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        // Wait for video metadata before playing — critical on mobile
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(() => {});
+        };
       }
       setCameraActive(true);
       setCapturedImage(null);

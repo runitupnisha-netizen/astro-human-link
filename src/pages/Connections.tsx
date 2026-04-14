@@ -203,7 +203,8 @@ const Connections = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-24 md:pb-12">
+      <div ref={containerRef} {...pullHandlers} className="relative z-10 pt-20 pb-24 md:pb-12 overflow-y-auto">
+        {pullIndicator}
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
           <motion.div

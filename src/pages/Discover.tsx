@@ -72,11 +72,19 @@ const Discover = () => {
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 
-  // Fetch boost status
+  // Pull-to-refresh
+  const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: fetchProfiles,
+  });
+
+  // Fetch boost status & avatar
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("boost_until").eq("user_id", user.id).maybeSingle()
-      .then(({ data }) => { if (data?.boost_until) setBoostUntil(data.boost_until); });
+    supabase.from("profiles").select("boost_until, avatar_url").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => {
+        if (data?.boost_until) setBoostUntil(data.boost_until);
+        if (data?.avatar_url) setMyAvatarUrl(data.avatar_url);
+      });
   }, [user]);
 
   // Count today's likes

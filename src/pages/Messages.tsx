@@ -301,6 +301,52 @@ const Messages = () => {
     loadConversations();
   }, [user, searchParams]);
 
+  // Load pinned matches
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("pinned_matches" as any).select("match_id").eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data) setPinnedMatchIds(new Set((data as any[]).map((d: any) => d.match_id)));
+      });
+  }, [user]);
+
+  // Load my profile signs for birth chart overlay
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("sun_sign, moon_sign, rising_sign").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => { if (data) setMyProfile(data); });
+  }, [user]);
+
+  // Sort conversations: pinned first, then by recency
+  const filteredConversations = conversations
+    .filter((c) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const name = (c.otherProfile.display_name || "").toLowerCase();
+      const lastMsg = (c.lastMessage?.content || "").toLowerCase();
+      return name.includes(q) || lastMsg.includes(q);
+    })
+    .sort((a, b) => {
+      const aPinned = pinnedMatchIds.has(a.match.id);
+      const bPinned = pinnedMatchIds.has(b.match.id);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      const aTime = a.lastMessage?.created_at || a.match.created_at;
+      const bTime = b.lastMessage?.created_at || b.match.created_at;
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
+    });
+
+  const togglePin = async (matchId: string) => {
+    if (!user) return;
+    if (pinnedMatchIds.has(matchId)) {
+      await supabase.from("pinned_matches" as any).delete().eq("user_id", user.id).eq("match_id", matchId);
+      setPinnedMatchIds((prev) => { const next = new Set(prev); next.delete(matchId); return next; });
+    } else {
+      await supabase.from("pinned_matches" as any).insert({ user_id: user.id, match_id: matchId } as any);
+      setPinnedMatchIds((prev) => new Set(prev).add(matchId));
+    }
+  };
+
   // Load messages + realtime subscription
   useEffect(() => {
     if (!selectedMatchId) return;

@@ -53,7 +53,7 @@ const SacredReveal = () => {
         // Already have today's reveal - fetch the profile
         const { data: profile } = await supabase
           .from("profiles")
-          .select("user_id, display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
+          .select("user_id, display_name, username, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
           .eq("user_id", existing.revealed_user_id)
           .single();
 
@@ -73,7 +73,7 @@ const SacredReveal = () => {
 
         const { data: candidates } = await supabase
           .from("profiles")
-          .select("user_id, display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
+          .select("user_id, display_name, username, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
           .eq("onboarding_complete", true)
           .not("user_id", "in", `(${excludeIds.join(",")})`)
           .limit(20);

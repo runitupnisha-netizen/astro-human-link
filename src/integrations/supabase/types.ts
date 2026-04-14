@@ -706,6 +706,42 @@ export type Database = {
         }
         Relationships: []
       }
+      spotify_connections: {
+        Row: {
+          access_token: string
+          created_at: string
+          display_name: string | null
+          id: string
+          refresh_token: string
+          spotify_user_id: string | null
+          token_expires_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          refresh_token: string
+          spotify_user_id?: string | null
+          token_expires_at: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          refresh_token?: string
+          spotify_user_id?: string | null
+          token_expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       swipes: {
         Row: {
           action: string

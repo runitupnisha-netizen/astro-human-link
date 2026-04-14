@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Session-level flag: once verified in this session, skip re-checking
+let sessionVerified = false;
+
+export const markSessionVerified = () => {
+  sessionVerified = true;
+};
+
 export const useVerificationGate = (userId: string | null | undefined) => {
-  const [verified, setVerified] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [verified, setVerified] = useState<boolean | null>(sessionVerified ? true : null);
+  const [loading, setLoading] = useState(!sessionVerified);
 
   useEffect(() => {
+    if (sessionVerified) {
+      setVerified(true);
+      setLoading(false);
+      return;
+    }
     if (!userId) {
       setLoading(false);
       return;
@@ -20,7 +32,9 @@ export const useVerificationGate = (userId: string | null | undefined) => {
         .limit(1)
         .maybeSingle();
 
-      setVerified(data?.status === "verified" || data?.status === "pending");
+      const isVerified = data?.status === "verified" || data?.status === "pending";
+      if (isVerified) sessionVerified = true;
+      setVerified(isVerified);
       setLoading(false);
     };
     check();

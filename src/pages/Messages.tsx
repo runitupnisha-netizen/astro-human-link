@@ -1287,6 +1287,17 @@ const Messages = () => {
           callType={callType}
         />
       )}
+      {/* Birth Chart Overlay */}
+      {selectedConvo && myProfile && (
+        <BirthChartOverlay
+          open={showBirthChart}
+          onClose={() => setShowBirthChart(false)}
+          mySigns={myProfile}
+          theirSigns={otherProfileFull || { sun_sign: selectedConvo.otherProfile.sun_sign, moon_sign: null, rising_sign: null }}
+          theirName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          score={selectedConvo.match.compatibility_score || 0}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatuses } from "@/hooks/useVerification";
 import EmptyState from "@/components/EmptyState";
 import { ConnectionCardSkeleton } from "@/components/Skeletons";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 interface MatchWithProfile {
   id: string;

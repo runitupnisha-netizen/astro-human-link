@@ -23,6 +23,7 @@ interface MatchWithProfile {
   otherUserId: string;
   otherProfile: {
     display_name: string | null;
+    username: string | null;
     sun_sign: string | null;
     moon_sign: string | null;
     rising_sign: string | null;
@@ -88,7 +89,7 @@ const Connections = () => {
 
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("user_id, display_name, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
+      .select("user_id, display_name, username, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
       .in("user_id", otherIds);
 
     const matchIds = matchRows.map((m) => m.id);
@@ -127,6 +128,7 @@ const Connections = () => {
         otherUserId: otherId,
         otherProfile: prof || {
           display_name: "New Match",
+          username: null,
           sun_sign: null,
           moon_sign: null,
           rising_sign: null,
@@ -298,7 +300,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {sanitizeConnectionName(match.otherProfile.display_name) || "Someone New"}
+                              {sanitizeConnectionName(match.otherProfile.display_name) || (match.otherProfile.username ? `@${match.otherProfile.username}` : "New Connection")}
                             </h3>
                             {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                           </div>

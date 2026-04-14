@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 interface RevealProfile {
   user_id: string;
   display_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   sun_sign: string | null;
   moon_sign: string | null;
@@ -52,7 +53,7 @@ const SacredReveal = () => {
         // Already have today's reveal - fetch the profile
         const { data: profile } = await supabase
           .from("profiles")
-          .select("user_id, display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
+          .select("user_id, display_name, username, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
           .eq("user_id", existing.revealed_user_id)
           .single();
 
@@ -72,7 +73,7 @@ const SacredReveal = () => {
 
         const { data: candidates } = await supabase
           .from("profiles")
-          .select("user_id, display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
+          .select("user_id, display_name, username, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, life_path_number, compatibility_tags, gene_keys_life_purpose, interests")
           .eq("onboarding_complete", true)
           .not("user_id", "in", `(${excludeIds.join(",")})`)
           .limit(20);
@@ -280,7 +281,7 @@ const SacredReveal = () => {
                     transition={{ delay: 0.4 }}
                     className="font-display text-2xl font-bold text-foreground mb-1"
                   >
-                    {revealProfile.display_name || "Someone New"}
+                    {revealProfile.display_name || (revealProfile.username ? `@${revealProfile.username}` : "New Connection")}
                   </motion.h2>
 
                   <motion.div

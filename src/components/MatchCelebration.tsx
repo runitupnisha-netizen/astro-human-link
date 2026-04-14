@@ -159,14 +159,14 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               </span>
             </motion.div>
 
-            {/* Yin Yang */}
+            {/* Written in the Stars constellation animation */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, type: "spring", damping: 12 }}
               className="mb-2"
             >
-              <YinYangAnimation />
+              <WrittenInTheStars myAvatar={myAvatar} theirAvatar={profile.avatar_url} />
             </motion.div>
 
             {/* Title */}

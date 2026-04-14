@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Phone, Ban, MoreVertical, Video } from "lucide-react";
+import { MessageCircle, Send, Sparkles, ArrowLeft, ShieldAlert, User, Check, CheckCheck, Circle, Mic, Image, X, Phone, Ban, MoreVertical, Video, Search, Pin, PinOff, BarChart3 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,7 @@ import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
+import BirthChartOverlay from "@/components/BirthChartOverlay";
 
 interface Match {
   id: string;

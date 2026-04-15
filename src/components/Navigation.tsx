@@ -89,7 +89,7 @@ const Navigation = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-0 overflow-x-auto scrollbar-hide flex-1 justify-center min-w-0 px-1">
+            <div className="hidden md:flex items-center gap-0 flex-1 justify-center min-w-0 px-1">
               {desktopNavItems.map((item) => {
                 const Icon = item.icon;
             const isActive = item.path === "/profile"
@@ -100,7 +100,8 @@ const Navigation = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex items-center gap-1 px-2 py-2 lg:px-2.5 rounded-xl text-[11px] lg:text-xs font-medium whitespace-nowrap transition-all duration-300 ${
+                title={item.label}
+                className={`relative flex items-center gap-1 px-1.5 py-2 lg:px-2.5 rounded-xl text-[11px] lg:text-xs font-medium whitespace-nowrap transition-all duration-300 shrink-0 ${
                       isActive
                         ? item.premium ? "bg-gradient-golden text-background shadow-golden" : "nav-pill-active"
                         : item.premium
@@ -116,7 +117,7 @@ const Navigation = () => {
                         </span>
                       )}
                     </div>
-                    <span>{item.label}</span>
+                    <span className="hidden lg:inline">{item.label}</span>
                     {item.premium && !isActive && (
                       <span className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
                         <span className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite] bg-[linear-gradient(110deg,transparent_25%,rgba(251,191,36,0.15)_50%,transparent_75%)] bg-[length:250%_100%]" />

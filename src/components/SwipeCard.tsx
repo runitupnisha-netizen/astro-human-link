@@ -225,45 +225,43 @@ const SwipeCard = ({
           {/* Bottom gradient into info */}
           <div className="absolute bottom-0 left-0 right-0 h-28 [@media(max-height:700px)]:h-24 bg-gradient-to-t from-card via-card/80 to-transparent" />
 
+          {/* Match score badge — positioned in top-right of photo */}
+          <div className="absolute top-4 right-4 z-10 flex flex-col items-center">
+            <div className="relative flex h-11 w-11 items-center justify-center bg-card/70 backdrop-blur-md rounded-full">
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" opacity="0.2" />
+                <circle
+                  cx="22" cy="22" r="19" fill="none"
+                  stroke={profile.compatibility_score >= 80 ? "hsl(142, 71%, 45%)" : profile.compatibility_score >= 60 ? "hsl(var(--accent))" : "hsl(var(--primary))"}
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 19}`}
+                  strokeDashoffset={`${2 * Math.PI * 19 * (1 - profile.compatibility_score / 100)}`}
+                />
+              </svg>
+              <span className="font-display text-xs font-bold text-accent">{profile.compatibility_score}%</span>
+            </div>
+            <span className="text-[7px] uppercase tracking-wider text-white/80 mt-0.5 drop-shadow">Match</span>
+          </div>
+
           {/* Name & basics overlaid on gradient */}
           <div className="absolute bottom-0 left-0 right-0 p-5 [@media(max-height:700px)]:p-4 z-10">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1 pr-1">
-                <div className="flex flex-wrap items-start gap-x-1.5 gap-y-1 min-w-0">
-                  <h2 className="min-w-0 flex-1 font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words whitespace-normal">
-                    {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
-                  </h2>
-                  {age && <span className="shrink-0 pt-0.5 text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
-                  {isVerified && <span className="shrink-0 pt-0.5"><VerifiedBadge size="sm" /></span>}
-                </div>
-                {city && (
-                  <span className="mt-1 flex items-center gap-1 text-sm text-muted-foreground [@media(max-height:700px)]:text-xs">
-                    <MapPin className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{city}</span>
-                    {profile.distance_km != null && (
-                      <span className="shrink-0 text-muted-foreground/60">· {Math.round(profile.distance_km * 0.621371)} mi</span>
-                    )}
-                  </span>
-                )}
-              </div>
-              <div className="flex shrink-0 flex-col items-center gap-0 pt-0.5">
-                <div className="relative flex h-10 w-10 items-center justify-center sm:h-11 sm:w-11 [@media(max-height:700px)]:h-9 [@media(max-height:700px)]:w-9">
-                  <svg className="absolute inset-0 -rotate-90" viewBox="0 0 44 44">
-                    <circle cx="22" cy="22" r="19" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" opacity="0.2" />
-                    <circle
-                      cx="22" cy="22" r="19" fill="none"
-                      stroke={profile.compatibility_score >= 80 ? "hsl(142, 71%, 45%)" : profile.compatibility_score >= 60 ? "hsl(var(--accent))" : "hsl(var(--primary))"}
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 19}`}
-                      strokeDashoffset={`${2 * Math.PI * 19 * (1 - profile.compatibility_score / 100)}`}
-                    />
-                  </svg>
-                  <span className="font-display text-xs font-bold text-accent sm:text-sm">{profile.compatibility_score}%</span>
-                </div>
-                <span className="text-[8px] uppercase tracking-wider text-muted-foreground">Match</span>
-              </div>
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <h2 className="font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words">
+                {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
+              </h2>
+              {age && <span className="text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
+              {isVerified && <span className="relative -top-0.5"><VerifiedBadge size="sm" /></span>}
             </div>
+            {city && (
+              <span className="mt-1 flex items-center gap-1 text-sm text-muted-foreground [@media(max-height:700px)]:text-xs">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{city}</span>
+                {profile.distance_km != null && (
+                  <span className="shrink-0 text-muted-foreground/60">· {Math.round(profile.distance_km * 0.621371)} mi</span>
+                )}
+              </span>
+            )}
           </div>
         </div>
 

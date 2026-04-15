@@ -169,14 +169,14 @@ const Navigation = () => {
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`h-[18px] w-[18px] transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
+                  <Icon className={`h-[22px] w-[22px] transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
                   {item.badge && item.badge > 0 && (
                     <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
                 </div>
-                <span className={`max-w-full break-words text-[9px] font-medium leading-tight ${isActive ? "text-primary" : ""}`}>
+                <span className={`max-w-full break-words text-[10px] font-medium leading-tight ${isActive ? "text-primary" : ""}`}>
                   {item.label}
                 </span>
                 {isActive && (

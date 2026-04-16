@@ -246,12 +246,12 @@ const SwipeCard = ({
 
           {/* Name & basics overlaid on gradient */}
           <div className="absolute bottom-0 left-0 right-0 p-5 [@media(max-height:700px)]:p-4 z-10">
-            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <h2 className="font-display text-xl sm:text-2xl font-bold leading-tight text-foreground break-words">
+            <div className="flex flex-wrap items-end gap-x-2 gap-y-1 pt-1">
+              <h2 className="font-display text-xl sm:text-2xl font-bold leading-[1.2] text-foreground break-words pt-0.5">
                 {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
               </h2>
-              {age && <span className="text-lg sm:text-xl leading-none text-foreground/80">{age}</span>}
-              {isVerified && <span className="relative -top-0.5"><VerifiedBadge size="sm" /></span>}
+              {age && <span className="text-lg sm:text-xl leading-none text-foreground/80 pb-0.5">{age}</span>}
+              {isVerified && <span className="pb-1"><VerifiedBadge size="sm" /></span>}
             </div>
             {city && (
               <span className="mt-1 flex items-center gap-1 text-sm text-muted-foreground [@media(max-height:700px)]:text-xs">

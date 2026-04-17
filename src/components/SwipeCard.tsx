@@ -329,12 +329,23 @@ const SwipeCard = ({
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-2">{profile.compatibility_reason}</p>
           )}
 
-          {/* Bio prompt — only one, keeps it light */}
+          {/* Bio prompt — tap to expand */}
           {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
-            <div className="bg-primary/5 rounded-xl p-3 [@media(max-height:700px)]:p-2.5">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setBioExpanded((v) => !v); }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full text-left bg-primary/5 hover:bg-primary/10 transition-colors rounded-xl p-3 [@media(max-height:700px)]:p-2.5"
+              aria-expanded={bioExpanded}
+            >
               <p className="text-xs text-primary font-medium mb-0.5">{profile.bio_prompt_1}</p>
-              <p className="text-sm text-foreground [@media(max-height:700px)]:text-xs">{profile.bio_prompt_1_answer}</p>
-            </div>
+              <p className={`text-sm text-foreground [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-2"}`}>
+                {profile.bio_prompt_1_answer}
+              </p>
+              {!bioExpanded && profile.bio_prompt_1_answer.length > 80 && (
+                <span className="mt-1 inline-block text-[10px] text-primary/70">Tap to read more</span>
+              )}
+            </button>
           )}
 
           {/* View Full Profile */}

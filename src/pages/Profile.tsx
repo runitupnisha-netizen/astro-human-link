@@ -6,7 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown, Mic } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown, Mic, Music } from "lucide-react";
+import SpotifyConnect from "@/components/SpotifyConnect";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
@@ -284,6 +285,21 @@ const Profile = () => {
           </div>
 
           <ProfileChecklist profile={profile} photoCount={photoCount} />
+
+          {/* Spotify Quick Connect */}
+          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
+                <Music className="w-5 h-5 text-[#1DB954]" />
+                Music
+              </h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Show what you're listening to on your profile
+              </p>
+              <SpotifyConnect />
+            </CardContent>
+          </Card>
+
           {/* Photo Gallery */}
           <Card data-section="photo-gallery" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">

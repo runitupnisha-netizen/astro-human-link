@@ -93,6 +93,7 @@ const SwipeCard = ({
   const passOpacity = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const superLikeOpacity = useTransform(y, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   const allPhotos = (() => {
     const photos: string[] = [];

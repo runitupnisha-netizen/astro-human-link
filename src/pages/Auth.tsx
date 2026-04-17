@@ -298,14 +298,14 @@ const Auth = () => {
                 <Button
                   type="submit"
                   disabled={loading || (!isLogin && !agreedToTerms)}
-                  className="w-full h-12 text-base font-semibold"
+                  className="w-full h-13 min-h-[3.25rem] text-base font-semibold rounded-xl btn-shimmer"
                   style={{ background: "var(--gradient-aurora)" }}
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
                   ) : (
                     <>
-                      {isLogin ? "Sign In" : "Create Account"}
+                      {isLogin ? "Sign in" : "Create account"}
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -315,7 +315,7 @@ const Auth = () => {
               {/* Social Login Divider */}
               <div className="flex items-center gap-3 my-2">
                 <Separator className="flex-1 bg-border/50" />
-                <span className="text-xs text-muted-foreground uppercase tracking-wider">or continue with</span>
+                <span className="text-[11px] text-muted-foreground uppercase tracking-[0.18em]">or continue with</span>
                 <Separator className="flex-1 bg-border/50" />
               </div>
 
@@ -359,13 +359,17 @@ const Auth = () => {
                 </Button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center pt-1">
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
+                  {isLogin ? (
+                    <>New to Stellara? <span className="text-primary font-semibold">Create an account</span></>
+                  ) : (
+                    <>Already have an account? <span className="text-primary font-semibold">Sign in</span></>
+                  )}
                 </button>
               </div>
             </motion.div>

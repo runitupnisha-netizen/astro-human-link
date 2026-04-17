@@ -361,12 +361,12 @@ const Connections = () => {
                             </p>
                           )}
 
-                          {/* Action buttons — always visible on mobile, hover on desktop */}
-                          <div className="flex items-center gap-2 mt-3">
+                          {/* Action buttons — wrap on small screens, hover on desktop */}
+                          <div className="flex flex-wrap items-center gap-1.5 mt-3">
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 px-3 text-xs border-border/50 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="h-9 px-3 text-xs border-border/50 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
                               <User className="w-3 h-3 mr-1" />
@@ -375,7 +375,7 @@ const Connections = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 px-3 text-xs border-accent/30 text-accent md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="h-9 px-3 text-xs border-accent/30 text-accent md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
                             >
                               <Eye className="w-3 h-3 mr-1" />
@@ -384,7 +384,7 @@ const Connections = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 px-3 text-xs border-primary/30 text-primary md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="h-9 px-3 text-xs border-primary/30 text-primary md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/messages?match=${match.id}`); }}
                             >
                               <MessageCircle className="w-3 h-3 mr-1" />
@@ -394,14 +394,14 @@ const Connections = () => {
                         </div>
 
                         {/* Right side: score label + time */}
-                        <div className="shrink-0 flex flex-col items-end gap-2">
+                        <div className="shrink-0 flex flex-col items-end gap-1.5 max-w-[80px]">
                           {match.compatibility_score != null && (
-                            <Badge variant="outline" className="border-accent/30 text-accent text-xs whitespace-nowrap">
+                            <Badge variant="outline" className="border-accent/30 text-accent text-[10px] px-1.5 py-0 whitespace-nowrap">
                               {getScoreLabel(match.compatibility_score)}
                             </Badge>
                           )}
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 whitespace-nowrap">
+                            <Clock className="w-2.5 h-2.5" />
                             {formatTime(match.lastMessageAt || match.created_at)}
                           </span>
                         </div>

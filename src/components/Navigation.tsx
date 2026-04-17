@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-  import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
@@ -128,7 +135,7 @@ const Navigation = () => {
               })}
             </div>
 
-            {/* Notification Bell + Sign Out (desktop) */}
+            {/* Notification Bell + Sign Out (desktop) + Mobile Menu */}
             <div className="flex items-center gap-1 shrink-0">
               <NotificationBell />
               <button
@@ -142,6 +149,55 @@ const Navigation = () => {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden xl:inline">{t("settings.sign_out")}</span>
               </button>
+
+              {/* Mobile hamburger menu */}
+              <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetTrigger asChild>
+                  <button
+                    className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
+                    aria-label="Open menu"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px] bg-background/95 backdrop-blur-xl border-border/40">
+                  <SheetHeader>
+                    <SheetTitle className="text-gradient-aurora font-display text-xl text-left">Menu</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <Link
+                      to="/premium"
+                      onClick={() => setIsOpen(false)}
+                      className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-golden text-background shadow-golden font-medium overflow-hidden"
+                    >
+                      <Crown className="w-5 h-5" />
+                      <span>{t("premium.title")}</span>
+                      <span className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+                        <span className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite] bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.25)_50%,transparent_75%)] bg-[length:250%_100%]" />
+                      </span>
+                    </Link>
+                    <Link
+                      to="/settings"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Settings className="w-5 h-5" />
+                      <span>{t("nav.settings")}</span>
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        setIsOpen(false);
+                        await supabase.auth.signOut();
+                        window.location.href = "/auth";
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-destructive/10 transition-colors text-left"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span>{t("settings.sign_out")}</span>
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

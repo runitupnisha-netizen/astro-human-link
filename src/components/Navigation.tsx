@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-  import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import stellaraLogo from "@/assets/stellara-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";

@@ -241,23 +241,27 @@ const Premium = () => {
                   </ul>
 
                   {isCurrentPlan ? (
-                    <Button variant="outline" className="w-full border-primary/30" disabled>
+                    <Button variant="outline" className="w-full border-primary/30 min-h-[48px]" disabled>
                       Current Plan
                     </Button>
                   ) : (
                     <Button
                       onClick={() => handleCheckout(tierKey)}
                       disabled={checkoutLoading !== null}
-                      className={`w-full ${
+                      className={`w-full min-h-[48px] text-base font-semibold active:scale-[0.98] transition-transform touch-manipulation ${
                         details.highlight
-                          ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                          ? "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md shadow-accent/20"
                           : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
                     >
                       {checkoutLoading === tierKey ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : null}
-                      {subscribed ? "Switch Plan" : "Get Started"}
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Opening checkout...
+                        </>
+                      ) : (
+                        <>{subscribed ? "Switch to this plan" : "Start now"}</>
+                      )}
                     </Button>
                   )}
                 </CardContent>
@@ -266,13 +270,23 @@ const Premium = () => {
           );
         })}
 
+        {/* Trust line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="text-center text-xs text-muted-foreground font-body pt-4 px-4 leading-relaxed"
+        >
+          🔒 Secure checkout via Stripe · Cancel anytime · No hidden fees
+        </motion.p>
+
         {/* Restore Purchase */}
         {!subscribed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-center mt-8"
+            className="text-center mt-2"
           >
             <Button
               variant="ghost"
@@ -283,7 +297,7 @@ const Premium = () => {
                   toast({ title: "No subscription found", description: "If you believe this is an error, please contact support.", variant: "destructive" });
                 }
               }}
-              className="text-muted-foreground hover:text-foreground text-sm"
+              className="text-muted-foreground hover:text-foreground text-sm min-h-[44px]"
             >
               Restore Previous Purchase
             </Button>

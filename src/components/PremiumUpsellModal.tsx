@@ -100,9 +100,10 @@ const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUp
 
               <button
                 onClick={onClose}
-                className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-background/20 hover:bg-background/40 transition-colors"
+                aria-label="Close"
+                className="absolute top-2 right-2 z-10 w-11 h-11 rounded-full bg-background/30 hover:bg-background/50 active:scale-95 transition-all flex items-center justify-center touch-manipulation"
               >
-                <X className="w-4 h-4 text-foreground/70" />
+                <X className="w-5 h-5 text-foreground/80" />
               </button>
 
               <div className="relative z-10">
@@ -115,12 +116,16 @@ const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUp
                   <Crown className="w-8 h-8 text-primary-foreground" />
                 </motion.div>
 
-                <h2 className="font-display text-2xl font-bold text-foreground mb-1">
+                <h2 className="font-display text-2xl font-bold text-foreground mb-1.5">
                   Unlock {content.title}
                 </h2>
-                <p className="text-muted-foreground text-sm font-body">
+                <p className="text-muted-foreground text-sm font-body leading-relaxed">
                   {content.description}
                 </p>
+                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 border border-accent/30">
+                  <Sparkles className="w-3 h-3 text-accent" />
+                  <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">From $4.99/wk</span>
+                </div>
               </div>
             </div>
 
@@ -166,17 +171,17 @@ const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUp
                   onClose();
                   navigate("/premium");
                 }}
-                className="w-full bg-gradient-golden text-primary-foreground hover:opacity-90 font-display text-base py-5 shadow-[var(--shadow-golden)]"
+                className="w-full bg-gradient-golden text-primary-foreground hover:opacity-95 active:scale-[0.98] font-display text-base h-13 min-h-[52px] shadow-[var(--shadow-golden)] transition-transform touch-manipulation"
               >
                 <Crown className="w-4 h-4 mr-2" />
-                Upgrade to Premium
+                See Plans & Upgrade
               </Button>
 
               <button
                 onClick={onClose}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors mt-3 py-2"
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors mt-2 min-h-[44px] touch-manipulation"
               >
-                Maybe later
+                Not right now
               </button>
             </div>
           </motion.div>

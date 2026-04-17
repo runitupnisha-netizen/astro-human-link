@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sheet,

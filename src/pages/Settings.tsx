@@ -149,13 +149,13 @@ const Settings = () => {
       <CosmicBackground />
       
       
-      <div className="relative z-10 pt-28 md:pt-32 pb-24 md:pb-12">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-8 md:mb-10">
-            <h1 className="text-4xl font-bold leading-tight mb-4 bg-gradient-aurora bg-clip-text text-transparent">
+      <div className="relative z-10 pt-24 md:pt-28 pb-24 md:pb-12">
+        <div className="max-w-4xl mx-auto px-5">
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2 bg-gradient-aurora bg-clip-text text-transparent">
               {t("settings.title")}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
               {t("settings.subtitle")}
             </p>
           </div>
@@ -250,20 +250,21 @@ const Settings = () => {
                   <div className="flex items-center gap-3">
                     <Input
                       type="number"
-                      value={profile?.max_distance_km || 100}
+                      value={profile?.max_distance_km ? Math.round(profile.max_distance_km * 0.621371) : 62}
                       onChange={async (e) => {
-                        const val = parseInt(e.target.value);
-                        if (isNaN(val) || val < 1) return;
-                        setProfile({ ...profile, max_distance_km: val });
-                        await supabase.from("profiles").update({ max_distance_km: val }).eq("user_id", user!.id);
+                        const miles = parseInt(e.target.value);
+                        if (isNaN(miles) || miles < 1) return;
+                        const km = Math.round(miles / 0.621371);
+                        setProfile({ ...profile, max_distance_km: km });
+                        await supabase.from("profiles").update({ max_distance_km: km }).eq("user_id", user!.id);
                       }}
-                      className="bg-background/50 w-24"
+                      className="bg-background/50 w-24 h-11 text-base"
                       min={1}
-                      max={20000}
+                      max={12000}
                     />
-                    <span className="text-sm text-muted-foreground">km</span>
+                    <span className="text-sm text-muted-foreground">miles</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">How far to search for matches</p>
+                  <p className="text-xs text-muted-foreground mt-1.5">How far from you we'll search for matches</p>
                 </div>
               </CardContent>
             </Card>
@@ -296,15 +297,14 @@ const Settings = () => {
                   {isSupported && permission !== "granted" && (
                     <Button
                       variant="outline"
-                      size="sm"
                       onClick={handleEnablePush}
-                      className="border-primary/30 text-primary hover:bg-primary/10"
+                      className="border-primary/30 text-primary hover:bg-primary/10 min-h-[44px] px-5 active:scale-95 transition-transform"
                     >
                       Enable
                     </Button>
                   )}
                   {permission === "granted" && (
-                    <Badge className="bg-green-500/20 text-green-400">Active</Badge>
+                    <Badge className="bg-green-500/20 text-green-400 px-3 py-1">Active</Badge>
                   )}
                 </div>
 
@@ -439,7 +439,7 @@ const Settings = () => {
                     <span className="font-medium flex items-center gap-2">
                       <MessageSquare className="w-4 h-4 text-primary" /> Messages
                     </span>
-                    <p className="text-sm text-muted-foreground">Email digest of unread messages</p>
+                    <p className="text-sm text-muted-foreground">Email when you have unread messages</p>
                   </div>
                   <Switch
                     checked={emailPrefs.messages}

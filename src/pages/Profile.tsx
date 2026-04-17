@@ -248,19 +248,19 @@ const Profile = () => {
           </div>
 
           {/* Stats bar — like Instagram */}
-          <div className="flex items-center justify-between gap-3 mb-6 py-3 px-2 border-y border-border/30 overflow-visible">
+          <div className="flex items-center justify-between gap-2 mb-6 py-3 px-2 border-y border-border/30 overflow-visible">
             <div className="shrink-0">
               <ProfileCompletionScore profile={profile} photoCount={photoCount} />
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-8 text-xs" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditUsername(profile.username || ""); setEditNameOpen(true); }}>
+            <div className="flex items-center gap-1.5">
+              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-10 min-w-[44px] text-xs touch-manipulation active:scale-95 transition-transform" onClick={() => { setEditDisplayName(profile.display_name || ""); setEditUsername(profile.username || ""); setEditNameOpen(true); }}>
                 <Edit className="w-3.5 h-3.5" /> Edit
               </Button>
-              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-8 text-xs" onClick={() => setShowPreview(true)}>
+              <Button variant="outline" size="sm" className="border-primary/30 gap-1.5 h-10 min-w-[44px] text-xs touch-manipulation active:scale-95 transition-transform" onClick={() => setShowPreview(true)}>
                 <Eye className="w-3.5 h-3.5" /> Preview
               </Button>
-              <Button variant="outline" size="sm" className="border-accent/30 gap-1.5 h-8 text-xs md:hidden" onClick={() => navigate("/settings")}>
-                <Settings className="w-3.5 h-3.5" />
+              <Button variant="outline" size="sm" aria-label="Settings" className="border-accent/30 h-10 w-10 p-0 md:hidden touch-manipulation active:scale-95 transition-transform" onClick={() => navigate("/settings")}>
+                <Settings className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -276,10 +276,10 @@ const Profile = () => {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="flex flex-col items-center gap-1 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-2.5 transition-colors hover:bg-primary/10 hover:border-primary/30"
+                className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-3 min-h-[64px] transition-all hover:bg-primary/10 hover:border-primary/30 active:scale-95 touch-manipulation"
               >
-                <item.icon className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-medium text-foreground">{item.label}</span>
+                <item.icon className="h-5 w-5 text-primary" />
+                <span className="text-[11px] font-medium text-foreground leading-none">{item.label}</span>
               </button>
             ))}
           </div>

@@ -336,20 +336,20 @@ const SwipeCard = ({
               onClick={(e) => { e.stopPropagation(); e.preventDefault(); setBioExpanded((v) => !v); }}
               onPointerDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
-              className="w-full text-left bg-primary/5 hover:bg-primary/10 active:bg-primary/15 transition-colors rounded-xl p-3 [@media(max-height:700px)]:p-2.5 touch-manipulation"
+              className="group w-full text-left bg-gradient-to-br from-primary/10 via-primary/5 to-accent/5 hover:from-primary/15 hover:to-accent/10 active:scale-[0.99] transition-all duration-200 rounded-xl p-3.5 [@media(max-height:700px)]:p-3 border border-primary/25 hover:border-primary/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 touch-manipulation"
               aria-expanded={bioExpanded}
             >
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-xs text-primary font-medium mb-0.5 flex-1">{profile.bio_prompt_1}</p>
-                <span className="text-primary/70 text-base leading-none shrink-0" aria-hidden="true">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <p className="text-xs text-primary font-semibold flex-1 uppercase tracking-wide">{profile.bio_prompt_1}</p>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs leading-none transition-transform group-hover:scale-110" aria-hidden="true">
                   {bioExpanded ? "▴" : "▾"}
                 </span>
               </div>
-              <p className={`text-sm text-foreground [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-2"}`}>
+              <p className={`text-sm text-foreground/95 leading-relaxed [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-2"}`}>
                 {profile.bio_prompt_1_answer}
               </p>
               {profile.bio_prompt_1_answer.length > 80 && (
-                <span className="mt-1 inline-block text-[10px] text-primary/70 font-medium">
+                <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
                   {bioExpanded ? "Tap to collapse" : "Tap to read more"}
                 </span>
               )}

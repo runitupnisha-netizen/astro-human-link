@@ -241,23 +241,27 @@ const Premium = () => {
                   </ul>
 
                   {isCurrentPlan ? (
-                    <Button variant="outline" className="w-full border-primary/30" disabled>
+                    <Button variant="outline" className="w-full border-primary/30 min-h-[48px]" disabled>
                       Current Plan
                     </Button>
                   ) : (
                     <Button
                       onClick={() => handleCheckout(tierKey)}
                       disabled={checkoutLoading !== null}
-                      className={`w-full ${
+                      className={`w-full min-h-[48px] text-base font-semibold active:scale-[0.98] transition-transform touch-manipulation ${
                         details.highlight
-                          ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                          ? "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md shadow-accent/20"
                           : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
                     >
                       {checkoutLoading === tierKey ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : null}
-                      {subscribed ? "Switch Plan" : "Get Started"}
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Opening checkout...
+                        </>
+                      ) : (
+                        <>{subscribed ? "Switch to this plan" : "Start now"}</>
+                      )}
                     </Button>
                   )}
                 </CardContent>

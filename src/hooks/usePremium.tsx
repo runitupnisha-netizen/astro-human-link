@@ -102,7 +102,10 @@ export const usePremium = () => {
       const { data, error } = await supabase.functions.invoke("customer-portal");
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, "_blank");
+        const popup = window.open(data.url, "_blank");
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = data.url;
+        }
       }
     } catch (err) {
       console.error("Error opening customer portal:", err);

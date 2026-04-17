@@ -17,6 +17,8 @@ const DEFAULT_LIMITS: Record<string, RateLimitConfig> = {
   "analyze-compatibility": { maxRequests: 10, windowMs: 60_000 },
   "who-liked-me": { maxRequests: 15, windowMs: 60_000 },
   "push-vapid-key": { maxRequests: 10, windowMs: 60_000 },
+  "search-gifs": { maxRequests: 30, windowMs: 60_000 },
+  "spotify-auth": { maxRequests: 30, windowMs: 60_000 },
 };
 
 // In-memory rate limiter (resets per cold start, ~5 min window)

@@ -216,6 +216,7 @@ const Auth = () => {
                         onChange={(e) => setFullName(e.target.value)}
                         className="pl-10 bg-muted/50 border-border"
                         required={!isLogin}
+                        maxLength={40}
                       />
                     </div>
                     <div className="relative">

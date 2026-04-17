@@ -834,8 +834,9 @@ const Profile = () => {
                 onChange={(e) => setEditDisplayName(e.target.value)}
                 placeholder="Your display name"
                 className="bg-muted/50 border-border"
-                maxLength={50}
+                maxLength={40}
               />
+              <p className="text-[10px] text-muted-foreground">{editDisplayName.length}/40 characters</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-username">Username</Label>

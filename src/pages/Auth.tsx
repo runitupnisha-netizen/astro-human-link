@@ -49,7 +49,7 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Welcome back! ✌️");
+        toast.success("Welcome back ✨");
         navigate("/");
       } else {
         const { error, data } = await supabase.auth.signUp({
@@ -61,7 +61,7 @@ const Auth = () => {
           await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
         }
         if (error) throw error;
-        toast.success("Check your email to verify your account 🌟");
+        toast.success("Almost there — check your email to verify ✨");
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
@@ -132,15 +132,15 @@ const Auth = () => {
               <div className="absolute -inset-3 bg-white/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.6s' }} />
               <img src={stellaraAppIcon} alt="Stellara" className="relative w-20 h-20 object-contain rounded-xl shadow-2xl shadow-purple-400/60 ring-1 ring-purple-300/20" />
             </div>
-            <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-              {showForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Let's Get Started"}
+            <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">
+              {showForgotPassword ? "Reset password" : isLogin ? "Welcome back" : "Find your alignment"}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 text-sm md:text-base">
               {showForgotPassword
-                ? "Enter your email and we'll send you a reset link"
+                ? "We'll send a reset link to your inbox"
                 : isLogin
-                ? "Good to see you again ✌️"
-                : "Create your profile and start meeting people"}
+                ? "Your matches are waiting"
+                : "Real connections, written in the stars"}
             </p>
           </motion.div>
 

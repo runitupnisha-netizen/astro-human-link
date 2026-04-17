@@ -181,13 +181,13 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card className="bg-card/70 backdrop-blur-sm border-border/40 group">
+              <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-accent/5 backdrop-blur-sm border border-primary/25 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40 transition-all duration-200 group">
                 <CardContent className="p-4">
-                  <p className="text-xs font-medium text-primary mb-1.5 flex items-center gap-1.5">
+                  <p className="text-xs font-semibold text-primary mb-1.5 flex items-center gap-1.5 uppercase tracking-wide">
                     <MessageSquareQuote className="w-3 h-3" />
                     {prompt.question}
                   </p>
-                  <p className="text-sm text-foreground leading-relaxed">{prompt.answer}</p>
+                  <p className="text-sm text-foreground/95 leading-relaxed">{prompt.answer}</p>
                   {editable && (
                     <Button variant="ghost" size="sm" className="mt-2 h-7 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => startEditing(index)}>
                       <Edit className="w-3 h-3 mr-1" /> Edit

@@ -188,7 +188,7 @@ const Discover = () => {
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
 
-      <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-20 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-16 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
+      <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-16 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-12 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
         {pullIndicator}
         {/* Compact header — title only on desktop, hidden on mobile to maximize card real estate */}
         <motion.div
@@ -245,7 +245,7 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-220px)] max-h-[580px] [@media(max-height:700px)]:h-[calc(100svh-200px)] md:h-[580px]">
+        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-180px)] max-h-[620px] [@media(max-height:700px)]:h-[calc(100svh-160px)] md:h-[600px]">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <ProfileCardSkeleton />

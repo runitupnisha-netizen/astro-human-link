@@ -196,7 +196,7 @@ const SwipeCard = ({
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
         {/* Photo — large, immersive */}
-        <div className="relative w-full flex-1 min-h-0 max-h-[55%] bg-muted">
+        <div className="relative w-full basis-[52%] shrink-0 min-h-[15rem] max-h-[55%] bg-muted">
           {currentPhoto ? (
             <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
           ) : (
@@ -246,8 +246,8 @@ const SwipeCard = ({
 
           {/* Name & basics overlaid on gradient */}
           <div className="absolute bottom-0 left-0 right-0 p-5 [@media(max-height:700px)]:p-4 z-10">
-            <div className="flex flex-wrap items-end gap-x-2 gap-y-1 pt-1">
-              <h2 className="font-display text-xl sm:text-2xl font-bold leading-[1.2] text-foreground break-words pt-0.5">
+            <div className="flex flex-wrap items-end gap-x-2 gap-y-1.5 pt-2 overflow-visible">
+              <h2 className="block font-display text-xl sm:text-2xl font-bold leading-[1.28] text-foreground break-words overflow-visible">
                 {sanitizeDisplayName(profile.display_name) || (profile.username ? `@${profile.username}` : "New Here")}
               </h2>
               {age && <span className="text-lg sm:text-xl leading-none text-foreground/80 pb-0.5">{age}</span>}

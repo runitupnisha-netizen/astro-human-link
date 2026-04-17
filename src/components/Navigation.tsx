@@ -184,6 +184,39 @@ const Navigation = () => {
                       <Settings className="w-5 h-5" />
                       <span>{t("nav.settings")}</span>
                     </Link>
+                    <Link
+                      to="/achievements"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Trophy className="w-5 h-5" />
+                      <span>Achievements</span>
+                    </Link>
+                    <Link
+                      to="/referral"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Gift className="w-5 h-5" />
+                      <span>Referral Program</span>
+                    </Link>
+                    <Link
+                      to="/safety"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Shield className="w-5 h-5" />
+                      <span>Safety Center</span>
+                    </Link>
+                    <Link
+                      to="/contact"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Mail className="w-5 h-5" />
+                      <span>Contact</span>
+                    </Link>
+                    <div className="h-px bg-border/40 my-2" />
                     <button
                       onClick={async () => {
                         setIsOpen(false);

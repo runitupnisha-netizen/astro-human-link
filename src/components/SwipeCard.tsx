@@ -94,6 +94,7 @@ const SwipeCard = ({
   const superLikeOpacity = useTransform(y, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   const allPhotos = (() => {
     const photos: string[] = [];
@@ -108,6 +109,12 @@ const SwipeCard = ({
 
   const hasMultiplePhotos = allPhotos.length > 1;
   const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
+  const hasExtraDetails = Boolean(
+    profile.about_me ||
+    (profile.shared_aspects && profile.shared_aspects.length > 0) ||
+    profile.compatibility_reason ||
+    (profile.bio_prompt_1 && profile.bio_prompt_1_answer)
+  );
 
   const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
     e.stopPropagation();
@@ -118,6 +125,7 @@ const SwipeCard = ({
 
   const handleDragEnd = useCallback((_: any, info: PanInfo) => {
     const { offset, velocity } = info;
+    if (detailsExpanded) return;
     // Super like: swipe up (only if premium)
     if (isPremium && offset.y < -80 && Math.abs(offset.x) < 60) {
       onSwipe("super");
@@ -127,7 +135,7 @@ const SwipeCard = ({
     if (Math.abs(offset.x) > SWIPE_THRESHOLD || Math.abs(velocity.x) > 500) {
       onSwipe(offset.x > 0 ? "right" : "left");
     }
-  }, [isPremium, onSwipe]);
+  }, [detailsExpanded, isPremium, onSwipe]);
 
   const age = getAge(profile.birth_date);
   const city = profile.current_city || getCity(profile.birth_place);
@@ -149,7 +157,7 @@ const SwipeCard = ({
         zIndex: 10 - stackIndex,
         willChange: isTop ? "transform" : undefined,
       }}
-      drag={isTop && !exitDirection}
+      drag={isTop && !exitDirection && !detailsExpanded}
       dragConstraints={{ left: 0, right: 0, top: isPremium ? 0 : 0, bottom: 0 }}
       dragElastic={{ left: 0.85, right: 0.85, top: isPremium ? 0.85 : 0.1, bottom: 0.1 }}
       onDragEnd={isTop ? handleDragEnd : undefined}
@@ -170,7 +178,7 @@ const SwipeCard = ({
       }}
     >
       {/* Swipe overlays */}
-      {isTop && (
+      {isTop && !detailsExpanded && (
         <>
           <motion.div
             className="absolute top-8 right-8 z-20 border-2 border-green-400/80 rounded-2xl px-6 py-2 -rotate-12 bg-green-400/10 backdrop-blur-sm pointer-events-none"
@@ -197,7 +205,7 @@ const SwipeCard = ({
 
       <div className="w-full h-full rounded-3xl overflow-hidden border border-border/30 glass-card flex flex-col">
         {/* Photo — large, immersive */}
-        <div className="relative w-full basis-[52%] shrink-0 min-h-[15rem] max-h-[55%] bg-muted">
+        <div className={`relative w-full shrink-0 bg-muted transition-all duration-300 ${detailsExpanded ? "basis-[36%] min-h-[11rem] max-h-[40%]" : "basis-[52%] min-h-[15rem] max-h-[55%]"}`}>
           {currentPhoto ? (
             <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
           ) : (
@@ -266,8 +274,8 @@ const SwipeCard = ({
           </div>
         </div>
 
-          {/* Compact info section */}
-        <div className="flex-1 min-h-0 p-4 pb-5 space-y-3 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:pb-4 [@media(max-height:700px)]:space-y-2 overflow-y-auto overscroll-contain">
+        {/* Compact info section */}
+        <div className={`flex-1 min-h-0 p-4 pb-5 [@media(max-height:700px)]:p-3 [@media(max-height:700px)]:pb-4 overflow-y-auto overscroll-contain transition-all duration-300 ${detailsExpanded ? "space-y-3.5" : "space-y-3 [@media(max-height:700px)]:space-y-2"}`}>
 
           {/* Astro badges — just the essentials */}
           <div className="flex flex-wrap gap-1.5 [@media(max-height:700px)]:gap-1">
@@ -306,14 +314,41 @@ const SwipeCard = ({
             </Badge>
           )}
 
-          {/* About me bio */}
-          {profile.about_me && (
+          {hasExtraDetails && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setDetailsExpanded((v) => !v);
+                if (detailsExpanded) {
+                  setBioExpanded(false);
+                }
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              className="flex w-full items-center justify-between rounded-xl border border-primary/25 bg-primary/8 px-3.5 py-3 text-left transition-all duration-200 hover:border-primary/40 hover:bg-primary/12 active:scale-[0.99] touch-manipulation"
+              aria-expanded={detailsExpanded}
+            >
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">More details</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {detailsExpanded ? "Showing the full profile card" : "Tap to reveal the rest of this profile"}
+                </p>
+              </div>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary text-sm leading-none" aria-hidden="true">
+                {detailsExpanded ? "▴" : "▾"}
+              </span>
+            </button>
+          )}
+
+          {detailsExpanded && profile.about_me && (
             <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
               {profile.about_me}
             </p>
           )}
 
-          {profile.shared_aspects && profile.shared_aspects.length > 0 && (
+          {detailsExpanded && profile.shared_aspects && profile.shared_aspects.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
               <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
               {profile.shared_aspects.map((aspect, i) => (
@@ -324,13 +359,12 @@ const SwipeCard = ({
             </div>
           )}
 
-          {/* One-liner compatibility reason */}
-          {profile.compatibility_reason && (
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 [@media(max-height:700px)]:text-xs [@media(max-height:700px)]:line-clamp-2">{profile.compatibility_reason}</p>
+          {detailsExpanded && profile.compatibility_reason && (
+            <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{profile.compatibility_reason}</p>
           )}
 
           {/* Bio prompt — tap to expand */}
-          {profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
+          {detailsExpanded && profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); e.preventDefault(); setBioExpanded((v) => !v); }}

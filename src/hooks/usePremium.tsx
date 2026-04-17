@@ -85,7 +85,11 @@ export const usePremium = () => {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, "_blank");
+        // Try opening in new tab; if blocked (mobile/PWA), fall back to same-tab redirect
+        const popup = window.open(data.url, "_blank");
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          window.location.href = data.url;
+        }
       }
     } catch (err) {
       console.error("Error creating checkout:", err);

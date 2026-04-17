@@ -190,26 +190,26 @@ const Discover = () => {
 
       <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-20 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-16 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
         {pullIndicator}
-        {/* Clean header */}
+        {/* Compact header — title only on desktop, hidden on mobile to maximize card real estate */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-2 px-6 [@media(max-height:700px)]:mb-1.5"
+          className="hidden md:block text-center mb-2 px-6"
         >
-          <h1 className="font-display text-[2rem] leading-none md:text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
+          <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent">
             {t("discover.title")}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1 [@media(max-height:700px)]:mt-0.5 [@media(max-height:700px)]:text-xs">
+          <p className="text-muted-foreground text-sm mt-1">
             {t("discover.subtitle")}
           </p>
         </motion.div>
 
         {/* Minimal toolbar */}
-        <div className="w-full max-w-sm mx-auto px-4 mb-2 flex items-center justify-between [@media(max-height:700px)]:mb-1.5">
+        <div className="w-full max-w-sm mx-auto px-4 mb-2.5 flex items-center justify-between [@media(max-height:700px)]:mb-1.5">
           <Button
             variant="outline"
             size="sm"
-            className="border-border/40 hover:bg-muted/30"
+            className="h-9 border-border/40 hover:bg-muted/40 active:scale-95 transition-transform touch-manipulation"
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           >
             <SlidersHorizontal className="w-4 h-4 mr-1.5" />
@@ -224,8 +224,8 @@ const Discover = () => {
               onUpsell={() => { setUpsellFeature("boost"); setShowUpsell(true); }}
             />
             {!isPremium && (
-              <span className="text-xs text-muted-foreground [@media(max-height:700px)]:text-[11px]">
-                {likesLeft} likes left
+              <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${likesLeft <= 3 ? "border-accent/40 bg-accent/10 text-accent" : "border-border/40 bg-muted/30 text-muted-foreground"}`}>
+                {likesLeft} {likesLeft === 1 ? "like" : "likes"} left
               </span>
             )}
           </div>

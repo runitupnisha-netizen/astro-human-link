@@ -118,7 +118,7 @@ const Navigation = () => {
                   >
                     <div className="relative">
                       <Icon className={`w-4 h-4 ${item.premium && !isActive ? "drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" : ""} nav-icon`} />
-                      {item.badge && item.badge > 0 && (
+                      {!!item.badge && item.badge > 0 && (
                         <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
                           {item.badge > 99 ? "99+" : item.badge}
                         </span>
@@ -226,7 +226,7 @@ const Navigation = () => {
               >
                 <div className="relative">
                   <Icon className={`h-[22px] w-[22px] transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
-                  {item.badge && item.badge > 0 && (
+                  {!!item.badge && item.badge > 0 && (
                     <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>

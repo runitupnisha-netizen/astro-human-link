@@ -86,10 +86,11 @@ const CosmicNudge = ({ className = "" }: CosmicNudgeProps) => {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/10 to-primary/5 pointer-events-none" />
 
           <div className="relative p-4">
-            {/* Close button */}
+            {/* Close button — enlarged hit area for mobile, above decorative sparkles */}
             <button
               onClick={() => setVisible(false)}
-              className="absolute top-3 right-3 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              aria-label="Dismiss cosmic nudge"
+              className="absolute top-1.5 right-1.5 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -129,8 +130,8 @@ const CosmicNudge = ({ className = "" }: CosmicNudgeProps) => {
             )}
           </div>
 
-          {/* Floating stars decoration */}
-          <div className="absolute -top-1 -right-1 opacity-30">
+          {/* Floating stars decoration — moved to bottom-right so it doesn't block close button */}
+          <div className="pointer-events-none absolute -bottom-1 -right-1 opacity-30">
             <motion.div
               animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.7, 0.3] }}
               transition={{ duration: 2, repeat: Infinity }}

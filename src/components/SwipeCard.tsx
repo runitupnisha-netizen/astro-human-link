@@ -168,8 +168,8 @@ const SwipeCard = ({
               x: exitDirection === "left" ? -exitDistanceX : exitDirection === "right" ? exitDistanceX : 0,
               y: exitDirection === "super" ? -exitDistanceY : 0,
               opacity: 1,
-              rotate: exitDirection === "left" ? -15 : exitDirection === "right" ? 15 : 0,
-              transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+              rotate: exitDirection === "left" ? -18 : exitDirection === "right" ? 18 : 0,
+              transition: { duration: 0.18, ease: [0.32, 0, 0.67, 0] },
             }
           : stackStyle
       }
@@ -327,16 +327,18 @@ const SwipeCard = ({
               }}
               onPointerDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
-              className="flex w-full items-center justify-between rounded-xl border border-primary/25 bg-primary/8 px-3.5 py-3 text-left transition-all duration-200 hover:border-primary/40 hover:bg-primary/12 active:scale-[0.99] touch-manipulation"
+              className="flex w-full items-center justify-between rounded-xl border border-primary/30 bg-gradient-to-br from-primary/12 via-primary/6 to-accent/6 px-4 py-3 text-left transition-all duration-200 hover:border-primary/50 hover:from-primary/18 active:scale-[0.99] touch-manipulation min-h-[52px]"
               aria-expanded={detailsExpanded}
             >
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">More details</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
+                  {detailsExpanded ? "Less details" : "More details"}
+                </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  {detailsExpanded ? "Showing the full profile card" : "Tap to reveal the rest of this profile"}
+                  {detailsExpanded ? "Tap to hide" : "See bio, shared aspects & more"}
                 </p>
               </div>
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary text-sm leading-none" aria-hidden="true">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary text-sm leading-none font-bold transition-transform" aria-hidden="true">
                 {detailsExpanded ? "▴" : "▾"}
               </span>
             </button>
@@ -406,36 +408,39 @@ const SwipeCard = ({
         {isTop && (
           <div className="flex items-center justify-center gap-5 px-5 pb-5 pt-1 [@media(max-height:700px)]:gap-4 [@media(max-height:700px)]:px-4 [@media(max-height:700px)]:pb-4">
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => onSwipe("left")}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-destructive/20 bg-card shadow-sm transition-shadow active:shadow-none [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
+              aria-label="Pass"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-destructive/25 bg-card shadow-md hover:border-destructive/50 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
-              <X className="h-6 w-6 text-destructive [@media(max-height:700px)]:h-5 [@media(max-height:700px)]:w-5" />
+              <X className="h-7 w-7 text-destructive [@media(max-height:700px)]:h-6 [@media(max-height:700px)]:w-6" strokeWidth={2.5} />
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => onSwipe("super")}
-              className={`relative flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 ${!isPremium ? "opacity-50" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
+              aria-label={isPremium ? "Super like" : "Super like (premium)"}
+              className={`relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent/40 hover:border-accent/70 shadow-lg transition-all touch-manipulation ${!isPremium ? "opacity-70" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >
-              <Star className="h-7 w-7 fill-current text-accent-foreground [@media(max-height:700px)]:h-6 [@media(max-height:700px)]:w-6" />
+              <Star className="h-7 w-7 fill-current text-accent-foreground [@media(max-height:700px)]:h-6 [@media(max-height:700px)]:w-6" strokeWidth={2} />
               {!isPremium && (
-                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary [@media(max-height:700px)]:h-4.5 [@media(max-height:700px)]:w-4.5">
-                  <Lock className="h-3 w-3 text-primary-foreground [@media(max-height:700px)]:h-2.5 [@media(max-height:700px)]:w-2.5" />
+                <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary border border-card shadow-sm">
+                  <Lock className="h-3 w-3 text-primary-foreground" />
                 </div>
               )}
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => onSwipe("right")}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-green-400/20 bg-card shadow-sm transition-shadow active:shadow-none [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
+              aria-label="Like"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-green-400/25 bg-card shadow-md hover:border-green-400/60 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
-              <Heart className="h-6 w-6 text-green-400 [@media(max-height:700px)]:h-5 [@media(max-height:700px)]:w-5" />
+              <Heart className="h-7 w-7 text-green-400 fill-green-400/20 [@media(max-height:700px)]:h-6 [@media(max-height:700px)]:w-6" strokeWidth={2.5} />
             </motion.button>
           </div>
         )}

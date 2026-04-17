@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -25,6 +25,7 @@ const Auth = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSocialLogin = async (provider: "google" | "apple") => {
@@ -49,7 +50,7 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success("Welcome back! ✌️");
+        toast.success("Welcome back ✨");
         navigate("/");
       } else {
         const { error, data } = await supabase.auth.signUp({
@@ -61,7 +62,7 @@ const Auth = () => {
           await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
         }
         if (error) throw error;
-        toast.success("Check your email to verify your account 🌟");
+        toast.success("Almost there — check your email to verify ✨");
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
@@ -127,20 +128,20 @@ const Auth = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
           >
             <div className="relative w-20 h-20 mx-auto mb-4">
-              <div className="absolute -inset-8 bg-purple-400/50 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute -inset-5 bg-purple-300/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.3s' }} />
-              <div className="absolute -inset-3 bg-white/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.6s' }} />
-              <img src={stellaraAppIcon} alt="Stellara" className="relative w-20 h-20 object-contain rounded-xl shadow-2xl shadow-purple-400/60 ring-1 ring-purple-300/20" />
+              <div className="absolute -inset-8 bg-primary/40 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute -inset-5 bg-primary/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.3s' }} />
+              <div className="absolute -inset-3 bg-foreground/15 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.6s' }} />
+              <img src={stellaraAppIcon} alt="Stellara" className="relative w-20 h-20 object-contain rounded-xl shadow-2xl shadow-primary/50 ring-1 ring-primary/20" />
             </div>
-            <h1 className="font-display text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-              {showForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Let's Get Started"}
+            <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">
+              {showForgotPassword ? "Reset password" : isLogin ? "Welcome back" : "Find your alignment"}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 text-sm md:text-base">
               {showForgotPassword
-                ? "Enter your email and we'll send you a reset link"
+                ? "We'll send a reset link to your inbox"
                 : isLogin
-                ? "Good to see you again ✌️"
-                : "Create your profile and start meeting people"}
+                ? "Your matches are waiting"
+                : "Real connections, written in the stars"}
             </p>
           </motion.div>
 
@@ -232,28 +233,36 @@ const Auth = () => {
                 )}
 
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-muted/50 border-border"
+                    className="pl-10 h-12 bg-muted/50 border-border"
                     required
                   />
                 </div>
 
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-muted/50 border-border"
+                    className="pl-10 pr-11 h-12 bg-muted/50 border-border"
                     required
                     minLength={6}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
 
                 {isLogin && (
@@ -289,14 +298,14 @@ const Auth = () => {
                 <Button
                   type="submit"
                   disabled={loading || (!isLogin && !agreedToTerms)}
-                  className="w-full h-12 text-base font-semibold"
+                  className="w-full h-13 min-h-[3.25rem] text-base font-semibold rounded-xl btn-shimmer"
                   style={{ background: "var(--gradient-aurora)" }}
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
                   ) : (
                     <>
-                      {isLogin ? "Sign In" : "Create Account"}
+                      {isLogin ? "Sign in" : "Create account"}
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </>
                   )}
@@ -306,7 +315,7 @@ const Auth = () => {
               {/* Social Login Divider */}
               <div className="flex items-center gap-3 my-2">
                 <Separator className="flex-1 bg-border/50" />
-                <span className="text-xs text-muted-foreground uppercase tracking-wider">or continue with</span>
+                <span className="text-[11px] text-muted-foreground uppercase tracking-[0.18em]">or continue with</span>
                 <Separator className="flex-1 bg-border/50" />
               </div>
 
@@ -350,13 +359,17 @@ const Auth = () => {
                 </Button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center pt-1">
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
+                  {isLogin ? (
+                    <>New to Stellara? <span className="text-primary font-semibold">Create an account</span></>
+                  ) : (
+                    <>Already have an account? <span className="text-primary font-semibold">Sign in</span></>
+                  )}
                 </button>
               </div>
             </motion.div>

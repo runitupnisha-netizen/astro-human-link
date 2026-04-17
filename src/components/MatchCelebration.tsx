@@ -138,9 +138,10 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
+            transition={{ delay: 0.6 }}
             onClick={onClose}
-            className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-card/60 backdrop-blur-sm border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Close"
+            className="absolute top-6 right-6 z-10 w-11 h-11 rounded-full bg-card/70 backdrop-blur-sm border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors touch-manipulation"
           >
             <X className="w-5 h-5" />
           </motion.button>
@@ -154,8 +155,8 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-2"
             >
-              <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium">
-                ✦ It's Written in the Stars ✦
+              <span className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground font-medium">
+                ✦ Written in the Stars ✦
               </span>
             </motion.div>
 
@@ -176,20 +177,20 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               transition={{ delay: 0.5, type: "spring", damping: 15 }}
               className="font-display text-4xl md:text-5xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
             >
-              Soul Connection!
+              It's a Match!
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.6 }}
               className="text-muted-foreground text-sm font-serif mb-6"
             >
               You and{" "}
               <span className="text-foreground font-semibold">
-                {profile.display_name || "Someone special"}
+                {profile.display_name || "someone special"}
               </span>{" "}
-              are cosmically aligned
+              are aligned ✨
             </motion.p>
 
             {/* Score Ring */}
@@ -275,23 +276,23 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
+              transition={{ delay: 1.0 }}
               className="flex gap-3 w-full"
             >
               <Button
                 variant="outline"
-                className="flex-1 border-border/50 h-12"
+                className="flex-1 border-border/50 h-12 min-h-[3rem] touch-manipulation"
                 onClick={onClose}
               >
-                Keep Exploring
+                Keep Swiping
               </Button>
               <Button
-                className="flex-1 gap-2 h-12"
+                className="flex-1 gap-2 h-12 min-h-[3rem] font-semibold touch-manipulation"
                 style={{ background: "var(--gradient-aurora)" }}
                 onClick={onMessage}
               >
                 <Send className="w-4 h-4" />
-                Say Hello
+                Send Message
               </Button>
             </motion.div>
           </div>

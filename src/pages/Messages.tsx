@@ -725,18 +725,26 @@ const Messages = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center h-full text-center"
+              className="flex flex-col items-center justify-center h-full text-center px-6"
             >
               <div className="relative mb-6">
-                <div className="absolute inset-0 bg-white/10 rounded-full blur-2xl animate-pulse scale-150" />
+                <div className="absolute inset-0 bg-primary/15 rounded-full blur-2xl animate-pulse scale-150" />
                 <div className="relative w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
                   <MessageCircle className="w-10 h-10 text-foreground" />
                 </div>
               </div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-2">No Matches Yet</h2>
-              <p className="text-muted-foreground max-w-md font-serif">
-                When you and someone both like each other, you can message here. Keep discovering!
+              <h2 className="font-display text-2xl font-bold text-foreground mb-2">No matches yet</h2>
+              <p className="text-muted-foreground max-w-md font-serif mb-5">
+                Once you and someone both like each other, your conversation lands here.
               </p>
+              <Button
+                onClick={() => navigate("/discover")}
+                className="gap-2 h-11 font-semibold"
+                style={{ background: "var(--gradient-aurora)" }}
+              >
+                <Sparkles className="w-4 h-4" />
+                Start Discovering
+              </Button>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
@@ -986,18 +994,18 @@ const Messages = () => {
                               </div>
                             </div>
                             <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                              You matched! 🎉
+                              You're a match ✨
                             </h3>
                             <p className="text-muted-foreground text-sm mb-5 max-w-xs mx-auto font-serif">
-                              Don't be shy — {selectedConvo.otherProfile.display_name || "your match"} is waiting to hear from you.
+                              Slide into their DMs — {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "they"} swiped right too.
                             </p>
                             <Button
                               onClick={handleGenerateIcebreakers}
-                              className="gap-2"
+                              className="gap-2 h-11 font-semibold"
                               style={{ background: "var(--gradient-aurora)" }}
                             >
                               <Sparkles className="w-4 h-4" />
-                              Get Conversation Starters
+                              Get Icebreakers
                             </Button>
                           </motion.div>
                         )}

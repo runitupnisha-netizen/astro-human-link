@@ -270,13 +270,23 @@ const Premium = () => {
           );
         })}
 
+        {/* Trust line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="text-center text-xs text-muted-foreground font-body pt-4 px-4 leading-relaxed"
+        >
+          🔒 Secure checkout via Stripe · Cancel anytime · No hidden fees
+        </motion.p>
+
         {/* Restore Purchase */}
         {!subscribed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="text-center mt-8"
+            className="text-center mt-2"
           >
             <Button
               variant="ghost"
@@ -287,7 +297,7 @@ const Premium = () => {
                   toast({ title: "No subscription found", description: "If you believe this is an error, please contact support.", variant: "destructive" });
                 }
               }}
-              className="text-muted-foreground hover:text-foreground text-sm"
+              className="text-muted-foreground hover:text-foreground text-sm min-h-[44px]"
             >
               Restore Previous Purchase
             </Button>

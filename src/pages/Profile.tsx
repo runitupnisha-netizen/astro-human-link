@@ -284,10 +284,8 @@ const Profile = () => {
             ))}
           </div>
 
-          <ProfileChecklist profile={profile} photoCount={photoCount} />
-
           {/* Spotify Quick Connect */}
-          <Card className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+          <Card className="mb-6 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
                 <Music className="w-5 h-5 text-[#1DB954]" />
@@ -299,6 +297,8 @@ const Profile = () => {
               <SpotifyConnect />
             </CardContent>
           </Card>
+
+          <ProfileChecklist profile={profile} photoCount={photoCount} />
 
           {/* Photo Gallery */}
           <Card data-section="photo-gallery" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">

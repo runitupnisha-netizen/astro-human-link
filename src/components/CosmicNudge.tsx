@@ -71,76 +71,85 @@ const CosmicNudge = ({ className = "" }: CosmicNudgeProps) => {
     loadNudge();
   }, [user]);
 
-  if (!visible) return null;
+  const handleDismiss = (e: React.MouseEvent | React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setVisible(false);
+  };
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-        className={`fixed bottom-24 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 ${className}`}
-      >
-        <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-card/95 backdrop-blur-lg shadow-elevated">
-          {/* Cosmic gradient border effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/10 to-primary/5 pointer-events-none" />
+      {visible && (
+        <motion.div
+          key="cosmic-nudge"
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          className={`fixed bottom-24 left-4 right-4 md:left-auto md:right-6 md:max-w-sm z-50 ${className}`}
+        >
+          <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-card/95 backdrop-blur-lg shadow-elevated">
+            {/* Cosmic gradient border effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/10 to-primary/5 pointer-events-none" />
 
-          <div className="relative p-4">
-            {/* Close button — enlarged hit area for mobile, above decorative sparkles */}
-            <button
-              onClick={() => setVisible(false)}
-              aria-label="Dismiss cosmic nudge"
-              className="absolute top-1.5 right-1.5 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-2">
-              <motion.div
-                animate={{ rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
+            <div className="relative p-4">
+              {/* Close button — large hit area, top-most layer, pointer-down for instant response */}
+              <button
+                type="button"
+                onPointerDown={handleDismiss}
+                onClick={handleDismiss}
+                aria-label="Dismiss cosmic nudge"
+                className="absolute top-1.5 right-1.5 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-muted-foreground hover:text-foreground hover:bg-card transition-colors active:scale-95 touch-manipulation"
               >
-                <Sparkles className="w-5 h-5 text-accent" />
-              </motion.div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-accent">
-                Daily Cosmic Nudge
-              </span>
+                <X className="w-4 h-4 pointer-events-none" />
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-2 pr-10">
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Sparkles className="w-5 h-5 text-accent" />
+                </motion.div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-accent">
+                  Daily Cosmic Nudge
+                </span>
+              </div>
+
+              {/* Nudge text */}
+              <p className="text-sm text-foreground leading-relaxed mb-3">
+                {nudgeText}
+              </p>
+
+              {/* CTA */}
+              {matchId && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    navigate(`/messages?match=${matchId}`);
+                    setVisible(false);
+                  }}
+                  className="gap-1.5 text-xs"
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Message {matchName}
+                </Button>
+              )}
             </div>
 
-            {/* Nudge text */}
-            <p className="text-sm text-foreground leading-relaxed mb-3 pr-6">
-              {nudgeText}
-            </p>
-
-            {/* CTA */}
-            {matchId && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  navigate(`/messages?match=${matchId}`);
-                  setVisible(false);
-                }}
-                className="gap-1.5 text-xs"
-                style={{ background: "var(--gradient-aurora)" }}
+            {/* Floating stars decoration — bottom-right, non-interactive */}
+            <div className="pointer-events-none absolute -bottom-1 -right-1 opacity-30">
+              <motion.div
+                animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                Message {matchName}
-              </Button>
-            )}
+                <Sparkles className="w-8 h-8 text-accent" />
+              </motion.div>
+            </div>
           </div>
-
-          {/* Floating stars decoration — moved to bottom-right so it doesn't block close button */}
-          <div className="pointer-events-none absolute -bottom-1 -right-1 opacity-30">
-            <motion.div
-              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.7, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Sparkles className="w-8 h-8 text-accent" />
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };

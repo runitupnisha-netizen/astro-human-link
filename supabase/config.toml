@@ -1,37 +1,29 @@
 project_id = "wquzijmkiotkupygoxdf"
 
-[functions.generate-cosmic-profile]
-verify_jwt = false
-
-[functions.discover-profiles]
-verify_jwt = false
-
-[functions.generate-icebreaker]
-verify_jwt = false
-
-[functions.generate-weekly-insights]
-verify_jwt = false
-
-[functions.generate-daily-intention]
-verify_jwt = false
-
-[functions.push-vapid-key]
-verify_jwt = false
-
-[functions.who-liked-me]
-verify_jwt = false
-
-[functions.create-checkout]
-verify_jwt = false
-
-[functions.check-subscription]
-verify_jwt = false
-
-[functions.customer-portal]
-verify_jwt = false
-
-[functions.search-gifs]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.check-subscription]
+    verify_jwt = false
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.customer-portal]
+    verify_jwt = false
+  [functions.discover-profiles]
+    verify_jwt = false
+  [functions.generate-cosmic-profile]
+    verify_jwt = false
+  [functions.generate-daily-intention]
+    verify_jwt = false
+  [functions.generate-icebreaker]
+    verify_jwt = false
+  [functions.generate-weekly-insights]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.push-vapid-key]
+    verify_jwt = false
+  [functions.search-gifs]
+    verify_jwt = false
+  [functions.who-liked-me]
+    verify_jwt = false

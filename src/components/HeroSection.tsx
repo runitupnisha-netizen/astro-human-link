@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 
 const fadeUp = (delay: number) => ({
@@ -10,6 +12,9 @@ const fadeUp = (delay: number) => ({
 });
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background logo */}
@@ -49,19 +54,21 @@ const HeroSection = () => {
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
           <Button 
             size="lg" 
+            onClick={() => navigate(user ? "/discover" : "/auth")}
             className="bg-primary hover:bg-primary/90 shadow-glow px-8 py-5 text-base font-medium rounded-2xl"
           >
             <Heart className="w-5 h-5 mr-2" />
-            Get Started
+            {user ? "Start Exploring" : "Get Started"}
           </Button>
           
           <Button 
             variant="outline" 
             size="lg"
+            onClick={() => navigate(user ? "/profile" : "/auth")}
             className="border-accent/30 hover:bg-accent/10 px-8 py-5 text-base rounded-2xl"
           >
             <Star className="w-5 h-5 mr-2" />
-            See Your Profile
+            {user ? "See Your Profile" : "Sign In"}
           </Button>
         </motion.div>
 

@@ -48,6 +48,22 @@ const FROM_DOMAIN = "stellaraapp.net" // Domain shown in From address (may be ro
 // even if the project's domain has changed since the template was scaffolded.
 const SAMPLE_PROJECT_URL = "https://astro-human-link.lovable.app"
 const SAMPLE_EMAIL = "user@example.test"
+
+function buildRecoveryLandingUrl(rawConfirmationUrl: string): string {
+  try {
+    const confirmationUrl = new URL(rawConfirmationUrl)
+    const redirectTo = confirmationUrl.searchParams.get('redirect_to') || `${SAMPLE_PROJECT_URL}/reset-password`
+    const landingUrl = new URL(redirectTo)
+
+    landingUrl.searchParams.set('confirmation_url', rawConfirmationUrl)
+    landingUrl.searchParams.set('mode', 'confirm-recovery')
+
+    return landingUrl.toString()
+  } catch (_error) {
+    return `${SAMPLE_PROJECT_URL}/reset-password?mode=confirm-recovery&confirmation_url=${encodeURIComponent(rawConfirmationUrl)}`
+  }
+}
+
 const SAMPLE_DATA: Record<string, object> = {
   signup: {
     siteName: SITE_NAME,
@@ -61,7 +77,7 @@ const SAMPLE_DATA: Record<string, object> = {
   },
   recovery: {
     siteName: SITE_NAME,
-    confirmationUrl: SAMPLE_PROJECT_URL,
+    confirmationUrl: `${SAMPLE_PROJECT_URL}/reset-password?mode=confirm-recovery`,
   },
   invite: {
     siteName: SITE_NAME,
@@ -217,12 +233,17 @@ async function handleWebhook(req: Request): Promise<Response> {
     )
   }
 
+  const renderedConfirmationUrl =
+    emailType === 'recovery'
+      ? buildRecoveryLandingUrl(payload.data.url)
+      : payload.data.url
+
   // Build template props from payload.data (HookData structure)
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
     recipient: payload.data.email,
-    confirmationUrl: payload.data.url,
+    confirmationUrl: renderedConfirmationUrl,
     token: payload.data.token,
     email: payload.data.email,
     newEmail: payload.data.new_email,

@@ -9,7 +9,10 @@ import {
   Head,
   Heading,
   Html,
+  Img,
+  Link,
   Preview,
+  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -18,26 +21,36 @@ interface RecoveryEmailProps {
   confirmationUrl: string
 }
 
-export const RecoveryEmail = ({
-  siteName,
-  confirmationUrl,
-}: RecoveryEmailProps) => (
+const LOGO_URL =
+  'https://wquzijmkiotkupygoxdf.supabase.co/storage/v1/object/public/email-assets/stellara-logo.png'
+
+export const RecoveryEmail = ({ confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>Reset your Stellara password 🌙</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
+        <Section style={logoSection}>
+          <Img src={LOGO_URL} width="64" height="64" alt="Stellara" style={logo} />
+        </Section>
+        <Heading style={h1}>Reset your password 🌙</Heading>
+        <Text style={tagline}>Where love aligns with the stars</Text>
         <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
+          We received a request to reset your Stellara password. Click below to
+          choose a new one — the link expires in one hour.
         </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
+        <Section style={buttonSection}>
+          <Button style={button} href={confirmationUrl}>
+            Reset Password
+          </Button>
+        </Section>
         <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
+          If you didn't request this, you can safely ignore this email — your
+          password will stay the same.
+          <br />
+          <Link href="https://stellaraapp.net" style={footerLink}>
+            stellaraapp.net
+          </Link>
         </Text>
       </Container>
     </Body>
@@ -46,26 +59,55 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily: '"Cormorant Garamond", Georgia, serif',
+  margin: 0,
+  padding: 0,
+}
+const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px' }
+const logoSection = { textAlign: 'center' as const, margin: '0 0 24px' }
+const logo = { margin: '0 auto', borderRadius: '14px' }
 const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
+  fontFamily: '"Cinzel Decorative", Georgia, serif',
+  fontSize: '28px',
+  fontWeight: 700 as const,
+  color: 'hsl(220, 35%, 7%)',
+  textAlign: 'center' as const,
+  margin: '0 0 8px',
+  letterSpacing: '0.02em',
+}
+const tagline = {
+  fontSize: '14px',
+  fontStyle: 'italic' as const,
+  color: 'hsl(270, 45%, 58%)',
+  textAlign: 'center' as const,
+  margin: '0 0 32px',
+  letterSpacing: '0.05em',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
+  fontSize: '16px',
+  color: 'hsl(220, 20%, 30%)',
+  lineHeight: '1.6',
+  margin: '0 0 20px',
 }
+const buttonSection = { textAlign: 'center' as const, margin: '32px 0' }
 const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
+  background: 'linear-gradient(45deg, hsl(42, 75%, 62%), hsl(35, 70%, 55%))',
+  color: 'hsl(220, 35%, 7%)',
+  fontSize: '15px',
+  fontWeight: 600 as const,
+  borderRadius: '12px',
+  padding: '14px 32px',
   textDecoration: 'none',
+  display: 'inline-block',
+  letterSpacing: '0.03em',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const footer = {
+  fontSize: '12px',
+  color: 'hsl(220, 10%, 55%)',
+  textAlign: 'center' as const,
+  margin: '40px 0 0',
+  lineHeight: '1.6',
+}
+const footerLink = { color: 'hsl(270, 45%, 58%)', textDecoration: 'none' }

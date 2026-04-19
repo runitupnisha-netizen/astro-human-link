@@ -10,7 +10,16 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Set up the auth state listener FIRST so we don't miss events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (typeof window !== "undefined") {
+        if (event === "PASSWORD_RECOVERY") {
+          window.sessionStorage.setItem("auth-recovery-pending", "true");
+        }
+        if (event === "SIGNED_OUT") {
+          window.sessionStorage.removeItem("auth-recovery-pending");
+        }
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
       // Only set loading false here if we've already initialized

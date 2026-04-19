@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
@@ -95,8 +96,13 @@ const RecoveryLinkRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const hasPendingRecovery =
+      typeof window !== "undefined" &&
+      window.sessionStorage.getItem("auth-recovery-pending") === "true";
+
     const searchParams = new URLSearchParams(location.search);
     const isRecoveryFlow =
+      hasPendingRecovery ||
       location.hash.includes("type=recovery") ||
       searchParams.get("type") === "recovery" ||
       searchParams.get("mode") === "confirm-recovery";
@@ -112,6 +118,20 @@ const RecoveryLinkRedirect = () => {
       { replace: true }
     );
   }, [location.hash, location.pathname, location.search, navigate]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "PASSWORD_RECOVERY") return;
+
+      window.sessionStorage.setItem("auth-recovery-pending", "true");
+
+      if (window.location.pathname !== "/reset-password") {
+        navigate("/reset-password", { replace: true });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   return null;
 };

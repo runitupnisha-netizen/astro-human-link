@@ -8,6 +8,15 @@ import { Mail, Send, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Please enter a valid email").max(255),
+  subject: z.string().trim().max(200).optional(),
+  message: z.string().trim().min(1, "Message is required").max(2000),
+});
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -16,16 +25,61 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      toast({ title: "Please fill in all required fields", variant: "destructive" });
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      const first = parsed.error.errors[0]?.message || "Please check your inputs";
+      toast({ title: first, variant: "destructive" });
       return;
     }
     setSending(true);
-    // Simulate send — in production, wire to an edge function
-    await new Promise((r) => setTimeout(r, 1200));
-    toast({ title: "Message sent!", description: "We'll get back to you as soon as possible." });
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setSending(false);
+    try {
+      const { name, email, subject, message } = parsed.data;
+      const submissionId = crypto.randomUUID();
+
+      const adminPromise = supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "contact-notification",
+          idempotencyKey: `contact-notify-${submissionId}`,
+          templateData: { name, email, subject: subject || "", message },
+        },
+      });
+      const userPromise = supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "contact-confirmation",
+          recipientEmail: email,
+          idempotencyKey: `contact-confirm-${submissionId}`,
+          templateData: { name, subject: subject || "", message },
+        },
+      });
+
+      const [adminRes, userRes] = await Promise.all([adminPromise, userPromise]);
+      if (adminRes.error) console.error("Admin email error:", adminRes.error);
+      if (userRes.error) console.error("User email error:", userRes.error);
+
+      if (adminRes.error) {
+        toast({
+          title: "Couldn't send right now",
+          description: "Please try again in a moment, or email us directly at stellaradating@gmail.com.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Message sent ✨",
+        description: "We've received your message. Check your inbox for confirmation — we'll reply within 24–48 hours.",
+      });
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      console.error("Contact submit failed:", err);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again or email us at stellaradating@gmail.com.",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (

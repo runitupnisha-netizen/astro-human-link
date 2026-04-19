@@ -46,6 +46,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -130,6 +131,7 @@ const AppRoutes = () => {
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
             <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+            <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>
 

@@ -101,18 +101,24 @@ const RecoveryLinkRedirect = () => {
       window.sessionStorage.getItem("auth-recovery-pending") === "true";
 
     const searchParams = new URLSearchParams(location.search);
+    const cameFromAuthVerify =
+      typeof document !== "undefined" && document.referrer.includes("/verify");
     const isRecoveryFlow =
       hasPendingRecovery ||
       location.hash.includes("type=recovery") ||
       searchParams.get("type") === "recovery" ||
-      searchParams.get("mode") === "confirm-recovery";
+      searchParams.get("mode") === "confirm-recovery" ||
+      searchParams.get("reset") === "1" ||
+      cameFromAuthVerify;
 
     if (!isRecoveryFlow || location.pathname === "/reset-password") return;
+
+    const nextSearch = location.search || "?reset=1";
 
     navigate(
       {
         pathname: "/reset-password",
-        search: location.search,
+        search: nextSearch,
         hash: location.hash,
       },
       { replace: true }

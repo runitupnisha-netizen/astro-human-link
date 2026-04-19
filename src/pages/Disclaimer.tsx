@@ -14,7 +14,7 @@ const Disclaimer = () => {
             <h1 className="text-3xl font-bold mb-2 text-foreground">
               Disclaimer &amp; Terms of Use
             </h1>
-            <p className="text-muted-foreground">Last updated: March 2026</p>
+            <p className="text-muted-foreground">Last updated: April 2026</p>
           </div>
 
           <Card className="bg-card/80 backdrop-blur-sm border-border/50">

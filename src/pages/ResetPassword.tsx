@@ -23,12 +23,19 @@ const ResetPassword = () => {
   useEffect(() => {
     let recovered = false;
     let failureTimer: number | undefined;
+    let sessionPoller: number | undefined;
 
     const params = new URLSearchParams(window.location.search);
     const encodedConfirmationUrl = params.get("confirmation_url");
     const safeConfirmationUrl = encodedConfirmationUrl
       ? decodeURIComponent(encodedConfirmationUrl)
       : null;
+    const hasRecoveryIntent =
+      params.get("reset") === "1" ||
+      window.location.hash.includes("type=recovery") ||
+      window.location.hash.includes("access_token") ||
+      window.sessionStorage.getItem("auth-recovery-pending") === "true" ||
+      document.referrer.includes("/verify");
 
     if (safeConfirmationUrl) {
       setConfirmationUrl(safeConfirmationUrl);
@@ -44,9 +51,6 @@ const ResetPassword = () => {
       }
     });
 
-    const hash = window.location.hash;
-    const hasRecoveryHash = hash.includes("type=recovery") || hash.includes("access_token");
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setReady(true);
@@ -59,24 +63,39 @@ const ResetPassword = () => {
         return;
       }
 
-      if (hasRecoveryHash) {
+      if (hasRecoveryIntent) {
         setVerifyingLink(true);
+        sessionPoller = window.setInterval(async () => {
+          const { data } = await supabase.auth.getSession();
+          if (!data.session) return;
+
+          recovered = true;
+          window.clearInterval(sessionPoller);
+          setReady(true);
+          setVerifyingLink(false);
+        }, 500);
       }
 
       failureTimer = window.setTimeout(() => {
         if (!recovered) {
+          if (sessionPoller) {
+            window.clearInterval(sessionPoller);
+          }
           window.sessionStorage.removeItem("auth-recovery-pending");
           setVerifyingLink(false);
           toast.error("Invalid or expired reset link. Please request a new one.");
           navigate("/auth", { replace: true });
         }
-      }, 2000);
+      }, hasRecoveryIntent ? 12000 : 2000);
     });
 
     return () => {
       subscription.subscription.unsubscribe();
       if (failureTimer) {
         window.clearTimeout(failureTimer);
+      }
+      if (sessionPoller) {
+        window.clearInterval(sessionPoller);
       }
     };
   }, [navigate]);

@@ -48,6 +48,11 @@ export const RecoveryEmail = ({ confirmationUrl }: RecoveryEmailProps) => (
           If you didn't request this, you can safely ignore this email — your
           password will stay the same.
           <br />
+          Need help? Contact us at{' '}
+          <Link href="mailto:info@stellaraapp.net" style={footerLink}>
+            info@stellaraapp.net
+          </Link>
+          <br />
           <Link href="https://stellaraapp.net" style={footerLink}>
             stellaraapp.net
           </Link>

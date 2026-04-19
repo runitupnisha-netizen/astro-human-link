@@ -63,6 +63,11 @@ export const SignupEmail = ({
         <Text style={footer}>
           If you didn't create a Stellara account, you can safely ignore this email.
           <br />
+          Need help? Contact us at{' '}
+          <Link href="mailto:info@stellaraapp.net" style={footerLink}>
+            info@stellaraapp.net
+          </Link>
+          <br />
           <Link href={siteUrl} style={footerLink}>
             stellaraapp.net
           </Link>

@@ -52,6 +52,11 @@ export const InviteEmail = ({ siteUrl, confirmationUrl }: InviteEmailProps) => (
         <Text style={footer}>
           If you weren't expecting this invitation, you can safely ignore this email.
           <br />
+          Need help? Contact us at{' '}
+          <Link href="mailto:info@stellaraapp.net" style={footerLink}>
+            info@stellaraapp.net
+          </Link>
+          <br />
           <Link href={siteUrl} style={footerLink}>
             stellaraapp.net
           </Link>

@@ -41,6 +41,11 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
           This code expires shortly. If you didn't request this, you can safely
           ignore this email.
           <br />
+          Need help? Contact us at{' '}
+          <Link href="mailto:info@stellaraapp.net" style={footerLink}>
+            info@stellaraapp.net
+          </Link>
+          <br />
           <Link href="https://stellaraapp.net" style={footerLink}>
             stellaraapp.net
           </Link>

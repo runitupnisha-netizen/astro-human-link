@@ -14,15 +14,45 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [ready, setReady] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for recovery token in URL hash
+    let recovered = false;
+
+    // Listen for the PASSWORD_RECOVERY event fired when the recovery link is consumed
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        recovered = true;
+        setReady(true);
+      }
+    });
+
+    // Also handle the case where the session is already established by the time we mount
+    // (Supabase strips the hash after exchanging the token, so don't rely on type=recovery)
     const hash = window.location.hash;
-    if (!hash.includes("type=recovery")) {
-      toast.error("Invalid or expired reset link");
-      navigate("/auth");
-    }
+    const hasRecoveryHash = hash.includes("type=recovery") || hash.includes("access_token");
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setReady(true);
+        return;
+      }
+      // Give the auth listener a moment to fire if a hash is present
+      if (hasRecoveryHash) return;
+
+      // No session and no recovery hash — give listener a brief window, then fail
+      setTimeout(() => {
+        if (!recovered) {
+          toast.error("Invalid or expired reset link. Please request a new one.");
+          navigate("/auth");
+        }
+      }, 1500);
+    });
+
+    return () => {
+      subscription.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleReset = async (e: React.FormEvent) => {

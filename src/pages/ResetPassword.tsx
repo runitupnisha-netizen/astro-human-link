@@ -65,6 +65,7 @@ const ResetPassword = () => {
 
       failureTimer = window.setTimeout(() => {
         if (!recovered) {
+          window.sessionStorage.removeItem("auth-recovery-pending");
           setVerifyingLink(false);
           toast.error("Invalid or expired reset link. Please request a new one.");
           navigate("/auth", { replace: true });
@@ -102,6 +103,7 @@ const ResetPassword = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+      window.sessionStorage.removeItem("auth-recovery-pending");
       setSuccess(true);
       toast.success("Password updated successfully!");
       setTimeout(() => navigate("/"), 2000);

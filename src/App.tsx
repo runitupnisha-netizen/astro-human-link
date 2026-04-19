@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
@@ -90,6 +90,32 @@ const AnalyticsTracker = () => {
   return null;
 };
 
+const RecoveryLinkRedirect = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const isRecoveryFlow =
+      location.hash.includes("type=recovery") ||
+      searchParams.get("type") === "recovery" ||
+      searchParams.get("mode") === "confirm-recovery";
+
+    if (!isRecoveryFlow || location.pathname === "/reset-password") return;
+
+    navigate(
+      {
+        pathname: "/reset-password",
+        search: location.search,
+        hash: location.hash,
+      },
+      { replace: true }
+    );
+  }, [location.hash, location.pathname, location.search, navigate]);
+
+  return null;
+};
+
 const AppRoutes = () => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   if (loading) return <LoadingScreen />;
@@ -97,6 +123,7 @@ const AppRoutes = () => {
   return (
     <>
       <AnalyticsTracker />
+      <RecoveryLinkRedirect />
       {user && onboardingComplete && <Navigation />}
       {user && onboardingComplete && <EmailVerificationReminder />}
       {user && onboardingComplete && <InAppFeedback />}

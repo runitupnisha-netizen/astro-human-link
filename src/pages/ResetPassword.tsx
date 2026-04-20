@@ -35,6 +35,7 @@ const ResetPassword = () => {
       window.location.hash.includes("type=recovery") ||
       window.location.hash.includes("access_token") ||
       window.sessionStorage.getItem("auth-recovery-pending") === "true" ||
+      window.localStorage.getItem("auth-recovery-pending") === "true" ||
       document.referrer.includes("/verify");
 
     if (safeConfirmationUrl) {
@@ -82,6 +83,8 @@ const ResetPassword = () => {
             window.clearInterval(sessionPoller);
           }
           window.sessionStorage.removeItem("auth-recovery-pending");
+          window.localStorage.removeItem("auth-recovery-pending");
+          window.localStorage.removeItem("auth-recovery-requested-at");
           setVerifyingLink(false);
           toast.error("Invalid or expired reset link. Please request a new one.");
           navigate("/auth", { replace: true });
@@ -123,6 +126,8 @@ const ResetPassword = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       window.sessionStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-requested-at");
       setSuccess(true);
       toast.success("Password updated successfully!");
       setTimeout(() => navigate("/"), 2000);

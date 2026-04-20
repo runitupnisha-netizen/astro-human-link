@@ -96,9 +96,13 @@ const RecoveryLinkRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasPendingRecovery =
-      typeof window !== "undefined" &&
-      window.sessionStorage.getItem("auth-recovery-pending") === "true";
+    const hasPendingRecovery = typeof window !== "undefined" && (() => {
+      const sessionFlag = window.sessionStorage.getItem("auth-recovery-pending") === "true";
+      const localFlag = window.localStorage.getItem("auth-recovery-pending") === "true";
+      const requestedAt = Number(window.localStorage.getItem("auth-recovery-requested-at") || "0");
+      const recoveryWindowActive = requestedAt > 0 && Date.now() - requestedAt < 30 * 60 * 1000;
+      return sessionFlag || (localFlag && recoveryWindowActive);
+    })();
 
     const searchParams = new URLSearchParams(location.search);
     const cameFromAuthVerify =
@@ -130,6 +134,8 @@ const RecoveryLinkRedirect = () => {
       if (event !== "PASSWORD_RECOVERY") return;
 
       window.sessionStorage.setItem("auth-recovery-pending", "true");
+      window.localStorage.setItem("auth-recovery-pending", "true");
+      window.localStorage.setItem("auth-recovery-requested-at", Date.now().toString());
 
       if (window.location.pathname !== "/reset-password") {
         navigate("/reset-password", { replace: true });

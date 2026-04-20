@@ -170,12 +170,8 @@ const ResetPassword = () => {
           if (sessionPoller) {
             window.clearInterval(sessionPoller);
           }
-          window.sessionStorage.removeItem("auth-recovery-pending");
-          window.localStorage.removeItem("auth-recovery-pending");
-          window.localStorage.removeItem("auth-recovery-requested-at");
           setVerifyingLink(false);
-          toast.error("Invalid or expired reset link. Please request a new one.");
-          navigate("/auth", { replace: true });
+          setShowManualFallback(true);
         }
       }, hasRecoveryIntent ? 12000 : 2000);
     };

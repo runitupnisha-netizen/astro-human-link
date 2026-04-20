@@ -226,19 +226,23 @@ const ResetPassword = () => {
 
   const title = success
     ? "You're All Set"
-    : confirmationUrl
-      ? "One more secure step"
-      : ready
-        ? "Set New Password"
-        : "Verifying reset link";
+    : ready
+      ? "Set New Password"
+      : showManualFallback
+        ? "Recover Access Manually"
+        : confirmationUrl
+          ? "One more secure step"
+          : "Verifying reset link";
 
   const description = success
     ? "Your password has been updated"
-    : confirmationUrl
-      ? "Tap below to open your one-time reset link safely"
-      : ready
-        ? "Enter your new password below"
-        : "Checking your password reset session";
+    : ready
+      ? "Enter your new password below"
+      : showManualFallback
+        ? "Paste the reset link from your email to continue"
+        : confirmationUrl
+          ? "Tap below to open your one-time reset link safely"
+          : "Checking your password reset session";
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4">

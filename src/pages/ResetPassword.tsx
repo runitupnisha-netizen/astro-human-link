@@ -402,48 +402,6 @@ const ResetPassword = () => {
             </button>
           </div>
         )}
-          <form onSubmit={handleReset} className="glass-card glow-border p-6 space-y-4">
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="password"
-                placeholder="New Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-muted/50 border-border"
-                required
-                minLength={6}
-              />
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="password"
-                placeholder="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="pl-10 bg-muted/50 border-border"
-                required
-                minLength={6}
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 text-base font-semibold"
-              style={{ background: "var(--gradient-aurora)" }}
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-              ) : (
-                <>
-                  Update Password
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </Button>
-          </form>
-        )}
       </motion.div>
     </div>
   );

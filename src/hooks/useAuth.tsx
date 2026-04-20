@@ -14,9 +14,13 @@ export const useAuth = () => {
       if (typeof window !== "undefined") {
         if (event === "PASSWORD_RECOVERY") {
           window.sessionStorage.setItem("auth-recovery-pending", "true");
+          window.localStorage.setItem("auth-recovery-pending", "true");
+          window.localStorage.setItem("auth-recovery-requested-at", Date.now().toString());
         }
         if (event === "SIGNED_OUT") {
           window.sessionStorage.removeItem("auth-recovery-pending");
+          window.localStorage.removeItem("auth-recovery-pending");
+          window.localStorage.removeItem("auth-recovery-requested-at");
         }
       }
 

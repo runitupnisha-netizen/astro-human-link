@@ -58,6 +58,19 @@ const LoadingScreen = () => (
   </div>
 );
 
+const hasRecoverySignal = (location: { search: string; hash: string }) => {
+  const searchParams = new URLSearchParams(location.search);
+
+  return (
+    location.hash.includes("type=recovery") ||
+    location.hash.includes("access_token=") ||
+    location.hash.includes("refresh_token=") ||
+    searchParams.get("type") === "recovery" ||
+    searchParams.get("mode") === "confirm-recovery" ||
+    searchParams.get("reset") === "1"
+  );
+};
+
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
@@ -104,15 +117,11 @@ const RecoveryLinkRedirect = () => {
       return sessionFlag || (localFlag && recoveryWindowActive);
     })();
 
-    const searchParams = new URLSearchParams(location.search);
     const cameFromAuthVerify =
       typeof document !== "undefined" && document.referrer.includes("/verify");
     const isRecoveryFlow =
       hasPendingRecovery ||
-      location.hash.includes("type=recovery") ||
-      searchParams.get("type") === "recovery" ||
-      searchParams.get("mode") === "confirm-recovery" ||
-      searchParams.get("reset") === "1" ||
+      hasRecoverySignal(location) ||
       cameFromAuthVerify;
 
     if (!isRecoveryFlow || location.pathname === "/reset-password") return;
@@ -149,17 +158,20 @@ const RecoveryLinkRedirect = () => {
 };
 
 const AppRoutes = () => {
+  const location = useLocation();
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  if (loading) return <LoadingScreen />;
+  const isRecoveryRoute = location.pathname === "/reset-password" || hasRecoverySignal(location);
+
+  if (loading && !isRecoveryRoute) return <LoadingScreen />;
 
   return (
     <>
       <AnalyticsTracker />
       <RecoveryLinkRedirect />
-      {user && onboardingComplete && <Navigation />}
-      {user && onboardingComplete && <EmailVerificationReminder />}
-      {user && onboardingComplete && <InAppFeedback />}
-      {user && onboardingComplete && <CosmicNudge />}
+      {!isRecoveryRoute && user && onboardingComplete && <Navigation />}
+      {!isRecoveryRoute && user && onboardingComplete && <EmailVerificationReminder />}
+      {!isRecoveryRoute && user && onboardingComplete && <InAppFeedback />}
+      {!isRecoveryRoute && user && onboardingComplete && <CosmicNudge />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />

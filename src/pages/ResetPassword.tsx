@@ -9,6 +9,16 @@ import CosmicBackground from "@/components/CosmicBackground";
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import { motion } from "framer-motion";
 
+const getRecoveryTokensFromHash = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+  return {
+    accessToken: hashParams.get("access_token"),
+    refreshToken: hashParams.get("refresh_token"),
+    type: hashParams.get("type"),
+  };
+};
+
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,6 +36,7 @@ const ResetPassword = () => {
     let sessionPoller: number | undefined;
 
     const params = new URLSearchParams(window.location.search);
+    const { accessToken, refreshToken, type } = getRecoveryTokensFromHash();
     const encodedConfirmationUrl = params.get("confirmation_url");
     const safeConfirmationUrl = encodedConfirmationUrl
       ? decodeURIComponent(encodedConfirmationUrl)
@@ -34,6 +45,7 @@ const ResetPassword = () => {
       params.get("reset") === "1" ||
       window.location.hash.includes("type=recovery") ||
       window.location.hash.includes("access_token") ||
+      window.location.hash.includes("refresh_token") ||
       window.sessionStorage.getItem("auth-recovery-pending") === "true" ||
       window.localStorage.getItem("auth-recovery-pending") === "true" ||
       document.referrer.includes("/verify");
@@ -52,7 +64,23 @@ const ResetPassword = () => {
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initializeRecovery = async () => {
+      if (accessToken && refreshToken && (type === "recovery" || hasRecoveryIntent)) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (!error) {
+          recovered = true;
+          setReady(true);
+          setVerifyingLink(false);
+          window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+          return;
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setReady(true);
         setVerifyingLink(false);
@@ -90,7 +118,9 @@ const ResetPassword = () => {
           navigate("/auth", { replace: true });
         }
       }, hasRecoveryIntent ? 12000 : 2000);
-    });
+    };
+
+    void initializeRecovery();
 
     return () => {
       subscription.subscription.unsubscribe();

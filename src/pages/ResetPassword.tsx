@@ -271,7 +271,93 @@ const ResetPassword = () => {
             </div>
             <p className="text-muted-foreground">Redirecting you back...</p>
           </div>
-        ) : confirmationUrl && !ready ? (
+        ) : ready ? (
+          <form onSubmit={handleReset} className="glass-card glow-border p-6 space-y-4">
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder="New Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+                minLength={6}
+              />
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="password"
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+                minLength={6}
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 text-base font-semibold"
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+              ) : (
+                <>
+                  Update Password
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+          </form>
+        ) : showManualFallback ? (
+          <form onSubmit={handleManualRecover} className="glass-card glow-border p-6 space-y-4">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                We couldn't auto-verify the link. Open the reset email, copy the full
+                <span className="font-semibold text-foreground"> "Reset Password" </span>
+                link (right-click → Copy link), and paste it below.
+              </p>
+            </div>
+            <div className="relative">
+              <Link2 className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="url"
+                placeholder="Paste reset link here…"
+                value={manualLink}
+                onChange={(e) => setManualLink(e.target.value)}
+                className="pl-10 bg-muted/50 border-border"
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={manualLoading}
+              className="w-full h-12 text-base font-semibold"
+              style={{ background: "var(--gradient-aurora)" }}
+            >
+              {manualLoading ? (
+                <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+              ) : (
+                <>
+                  Verify & Continue
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+            <button
+              type="button"
+              onClick={() => navigate("/auth", { replace: true })}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Request a new reset link instead
+            </button>
+          </form>
+        ) : confirmationUrl ? (
           <div className="glass-card glow-border p-6 space-y-4 text-center">
             <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
               <ShieldCheck className="w-7 h-7 text-primary" />
@@ -295,13 +381,27 @@ const ResetPassword = () => {
                 </>
               )}
             </Button>
-          </div>
-        ) : !ready || verifyingLink ? (
-          <div className="glass-card glow-border p-8 text-center">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Verifying your reset link...</p>
+            <button
+              type="button"
+              onClick={() => setShowManualFallback(true)}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Link not working? Paste it manually
+            </button>
           </div>
         ) : (
+          <div className="glass-card glow-border p-8 text-center space-y-4">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-muted-foreground">Verifying your reset link...</p>
+            <button
+              type="button"
+              onClick={() => setShowManualFallback(true)}
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Taking too long? Paste your link manually
+            </button>
+          </div>
+        )}
           <form onSubmit={handleReset} className="glass-card glow-border p-6 space-y-4">
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />

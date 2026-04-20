@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, ArrowRight, Check, ShieldCheck } from "lucide-react";
+import { Lock, ArrowRight, Check, ShieldCheck, Link2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
@@ -28,7 +28,67 @@ const ResetPassword = () => {
   const [ready, setReady] = useState(false);
   const [verifyingLink, setVerifyingLink] = useState(true);
   const [confirmationUrl, setConfirmationUrl] = useState<string | null>(null);
+  const [showManualFallback, setShowManualFallback] = useState(false);
+  const [manualLink, setManualLink] = useState("");
+  const [manualLoading, setManualLoading] = useState(false);
   const navigate = useNavigate();
+
+  const extractTokensFromAnyUrl = (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+    try {
+      // Accept either full URL or just the hash/query fragment
+      let url: URL;
+      try {
+        url = new URL(trimmed);
+      } catch {
+        url = new URL(trimmed, window.location.origin);
+      }
+      const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
+      const query = url.searchParams;
+      const accessToken = hash.get("access_token") || query.get("access_token");
+      const refreshToken = hash.get("refresh_token") || query.get("refresh_token");
+      const tokenHash = query.get("token_hash") || query.get("token");
+      const type = hash.get("type") || query.get("type") || "recovery";
+      return { accessToken, refreshToken, tokenHash, type };
+    } catch {
+      return null;
+    }
+  };
+
+  const handleManualRecover = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const tokens = extractTokensFromAnyUrl(manualLink);
+    if (!tokens || (!tokens.accessToken && !tokens.tokenHash)) {
+      toast.error("Couldn't find a valid token in that link. Paste the full URL from the email.");
+      return;
+    }
+    setManualLoading(true);
+    try {
+      if (tokens.accessToken && tokens.refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: tokens.accessToken,
+          refresh_token: tokens.refreshToken,
+        });
+        if (error) throw error;
+      } else if (tokens.tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({
+          type: "recovery",
+          token_hash: tokens.tokenHash,
+        });
+        if (error) throw error;
+      }
+      setReady(true);
+      setShowManualFallback(false);
+      setConfirmationUrl(null);
+      setVerifyingLink(false);
+      toast.success("Link verified — set your new password ✨");
+    } catch (err: any) {
+      toast.error(err.message || "Could not verify that link. Request a fresh one.");
+    } finally {
+      setManualLoading(false);
+    }
+  };
 
   useEffect(() => {
     let recovered = false;

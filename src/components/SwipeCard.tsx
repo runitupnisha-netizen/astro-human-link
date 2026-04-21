@@ -365,16 +365,16 @@ const SwipeCard = ({
             </button>
           )}
 
-          {detailsExpanded && profile.about_me && (
+          {detailsExpanded && aboutMe && (
             <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
-              {profile.about_me}
+              {aboutMe}
             </p>
           )}
 
-          {detailsExpanded && profile.shared_aspects && profile.shared_aspects.length > 0 && (
+          {detailsExpanded && sharedAspects.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
               <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
-              {profile.shared_aspects.map((aspect, i) => (
+              {sharedAspects.map((aspect, i) => (
                 <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
                   {aspect}
                 </span>
@@ -382,35 +382,55 @@ const SwipeCard = ({
             </div>
           )}
 
-          {detailsExpanded && profile.compatibility_reason && (
-            <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{profile.compatibility_reason}</p>
+          {detailsExpanded && compatibilityReason && (
+            <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{compatibilityReason}</p>
           )}
 
-          {/* Bio prompt — always visible, tap to expand */}
-          {hasBioPrompt && (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); e.preventDefault(); setBioExpanded((v) => !v); }}
-              onPointerDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              className="group w-full text-left bg-gradient-to-br from-primary/10 via-primary/5 to-accent/5 hover:from-primary/15 hover:to-accent/10 active:scale-[0.99] transition-all duration-200 rounded-xl p-3.5 [@media(max-height:700px)]:p-3 border border-primary/25 hover:border-primary/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 touch-manipulation"
-              aria-expanded={bioExpanded}
-            >
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <p className="text-xs text-primary font-semibold flex-1 uppercase tracking-wide">{profile.bio_prompt_1}</p>
+          {/* Bio prompt — always visible. Falls back to a friendly placeholder when missing. */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (!isBioPlaceholder) setBioExpanded((v) => !v);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            disabled={isBioPlaceholder}
+            className={`group w-full text-left bg-gradient-to-br from-primary/10 via-primary/5 to-accent/5 transition-all duration-200 rounded-xl p-3.5 [@media(max-height:700px)]:p-3 border border-primary/25 shadow-sm touch-manipulation ${
+              isBioPlaceholder
+                ? "opacity-80 cursor-default"
+                : "hover:from-primary/15 hover:to-accent/10 active:scale-[0.99] hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5"
+            }`}
+            aria-expanded={isBioPlaceholder ? undefined : bioExpanded}
+          >
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-xs text-primary font-semibold flex-1 uppercase tracking-wide">{bioPromptLabel}</p>
+              {!isBioPlaceholder && (
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs leading-none transition-transform group-hover:scale-110" aria-hidden="true">
                   {bioExpanded ? "▴" : "▾"}
                 </span>
-              </div>
-              <p className={`text-sm text-foreground/95 leading-relaxed [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-3"}`}>
-                {profile.bio_prompt_1_answer}
-              </p>
-              {profile.bio_prompt_1_answer && profile.bio_prompt_1_answer.length > 100 && (
-                <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
-                  {bioExpanded ? "Tap to collapse" : "Tap to read more"}
-                </span>
               )}
-            </button>
+            </div>
+            <p
+              className={`text-sm leading-relaxed [@media(max-height:700px)]:text-xs ${
+                isBioPlaceholder ? "text-muted-foreground italic" : "text-foreground/95"
+              } ${bioExpanded || isBioPlaceholder ? "" : "line-clamp-3"}`}
+            >
+              {bioAnswerDisplay}
+            </p>
+            {!isBioPlaceholder && bioAnswer && bioAnswer.length > 100 && (
+              <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
+                {bioExpanded ? "Tap to collapse" : "Tap to read more"}
+              </span>
+            )}
+          </button>
+
+          {/* Last-resort fallback so the body never looks empty */}
+          {!hasAnyVisibleInfo && isBioPlaceholder && (
+            <p className="text-xs text-muted-foreground italic text-center pt-1">
+              {NO_INFO_PLACEHOLDER}
+            </p>
           )}
 
           {/* View Full Profile */}

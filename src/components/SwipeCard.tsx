@@ -18,6 +18,7 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
+import { useAccessibility } from "@/hooks/useAccessibility";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -117,6 +118,10 @@ const SwipeCard = ({
 }: SwipeCardProps) => {
   const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
+  const { prefersReducedMotion } = useAccessibility();
+  // When the user prefers reduced motion, expand/collapse should be instant.
+  const motionDuration = prefersReducedMotion ? 0 : 0.25;
+  const fastMotionDuration = prefersReducedMotion ? 0 : 0.2;
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-15, 15]);

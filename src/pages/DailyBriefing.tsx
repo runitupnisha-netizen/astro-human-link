@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff, CloudOff, CloudUpload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
 import { ReflectionsTimeline } from "@/components/ReflectionsTimeline";
+import { useOfflineReflections } from "@/hooks/useOfflineReflections";
 
 // Reflections-per-day limit by tier
 const TIER_ACCESS = {
@@ -34,6 +35,15 @@ const DailyBriefing = () => {
   const [reflectionsToday, setReflectionsToday] = useState(0);
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const handleQueueSynced = () => {
+    // Refresh count + timeline once any pending offline reflections sync.
+    setSaved(true);
+    setTimelineRefresh((n) => n + 1);
+    setTimeout(() => setSaved(false), 2500);
+  };
+  const { queue: offlineQueue, syncing: queueSyncing, enqueue, flush } =
+    useOfflineReflections(handleQueueSynced);
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
   const tierAccess = TIER_ACCESS[tierKey];
@@ -117,6 +127,25 @@ const DailyBriefing = () => {
       });
       return;
     }
+    const text = reflection.trim();
+
+    // Offline path: queue locally, surface confirmation, exit early.
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      enqueue({
+        briefing_id: briefing.id,
+        briefing_date: briefing.briefing_date,
+        reflection: text,
+      });
+      setReflection("");
+      setSaved(true);
+      toast({
+        title: "Saved offline ✨",
+        description: "We'll sync this to your journal when you're back online.",
+      });
+      setTimeout(() => setSaved(false), 2500);
+      return;
+    }
+
     setSaving(true);
     try {
       const { error: insErr } = await supabase
@@ -124,7 +153,7 @@ const DailyBriefing = () => {
         .insert({
           user_id: user.id,
           briefing_id: briefing.id,
-          reflection: reflection.trim(),
+          reflection: text,
         });
       if (insErr) throw insErr;
       setSaved(true);
@@ -133,11 +162,19 @@ const DailyBriefing = () => {
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      toast({
-        title: "Could not save",
-        description: "Please try again.",
-        variant: "destructive",
+      // Network or server failure → queue and tell the user we'll retry.
+      enqueue({
+        briefing_id: briefing.id,
+        briefing_date: briefing.briefing_date,
+        reflection: text,
       });
+      setReflection("");
+      setSaved(true);
+      toast({
+        title: "Saved offline ✨",
+        description: "Connection hiccup — we'll sync this once you're back online.",
+      });
+      setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
     }
@@ -180,6 +217,41 @@ const DailyBriefing = () => {
                   )}
                   .
                 </span>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Pending offline reflections */}
+        {offlineQueue.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-3 flex items-center justify-between gap-3 text-xs font-body">
+                <div className="flex items-center gap-2 min-w-0">
+                  {queueSyncing ? (
+                    <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
+                  ) : (
+                    <CloudOff className="w-4 h-4 text-primary shrink-0" />
+                  )}
+                  <span className="text-foreground truncate">
+                    {queueSyncing
+                      ? `Syncing ${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"}…`
+                      : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-primary hover:bg-primary/10"
+                  disabled={queueSyncing || isOffline}
+                  onClick={() => flush()}
+                >
+                  <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
+                </Button>
               </CardContent>
             </Card>
           </motion.div>

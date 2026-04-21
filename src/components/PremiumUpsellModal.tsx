@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2, Rocket, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes" | "boost" | "incognito";
 
@@ -69,6 +69,7 @@ const allPerks = [
 
 const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUpsellModalProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const content = featureContent[feature];
 
   return (
@@ -169,7 +170,8 @@ const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUp
               <Button
                 onClick={() => {
                   onClose();
-                  navigate("/premium");
+                  const back = `${location.pathname}${location.search}`;
+                  navigate(`/premium?redirect=${encodeURIComponent(back)}`);
                 }}
                 className="w-full bg-gradient-golden text-primary-foreground hover:opacity-95 active:scale-[0.98] font-display text-base h-13 min-h-[52px] shadow-[var(--shadow-golden)] transition-transform touch-manipulation"
               >

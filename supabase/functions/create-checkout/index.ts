@@ -39,9 +39,18 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { priceId } = await req.json();
+    const { priceId, redirectTo } = await req.json();
     if (!priceId) throw new Error("priceId is required");
-    logStep("Price ID received", { priceId });
+    logStep("Price ID received", { priceId, redirectTo });
+
+    // Sanitize redirect target: must be a same-origin path starting with "/"
+    // and not a protocol-relative URL ("//host"). Falls back to "/discover".
+    const safeRedirect = (() => {
+      if (typeof redirectTo !== "string") return "/discover";
+      if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) return "/discover";
+      if (redirectTo.length > 512) return "/discover";
+      return redirectTo;
+    })();
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -52,13 +61,14 @@ serve(async (req) => {
     logStep("Customer lookup", { customerId: customerId || "new customer" });
 
     const origin = req.headers.get("origin") || "https://stellara.app";
+    const redirectParam = encodeURIComponent(safeRedirect);
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${origin}/premium?success=true`,
-      cancel_url: `${origin}/premium?canceled=true`,
+      success_url: `${origin}/premium?success=true&redirect=${redirectParam}`,
+      cancel_url: `${origin}/premium?canceled=true&redirect=${redirectParam}`,
     });
     logStep("Checkout session created", { sessionId: session.id });
 

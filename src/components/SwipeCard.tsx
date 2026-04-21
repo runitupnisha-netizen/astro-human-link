@@ -532,7 +532,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("left")}
+              onClick={() => { haptic(10); onSwipe("left"); }}
               aria-label="Pass"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-destructive/25 bg-card shadow-md hover:border-destructive/50 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
@@ -542,7 +542,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("super")}
+              onClick={() => { haptic([10, 30, 20]); onSwipe("super"); }}
               aria-label={isPremium ? "Super like" : "Super like (premium)"}
               className={`relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent/40 hover:border-accent/70 shadow-lg transition-all touch-manipulation ${!isPremium ? "opacity-70" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
@@ -558,7 +558,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("right")}
+              onClick={() => { haptic(18); onSwipe("right"); }}
               aria-label="Like"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-green-400/25 bg-card shadow-md hover:border-green-400/60 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >

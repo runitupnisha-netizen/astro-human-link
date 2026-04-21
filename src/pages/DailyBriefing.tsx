@@ -127,6 +127,25 @@ const DailyBriefing = () => {
       });
       return;
     }
+    const text = reflection.trim();
+
+    // Offline path: queue locally, surface confirmation, exit early.
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      enqueue({
+        briefing_id: briefing.id,
+        briefing_date: briefing.briefing_date,
+        reflection: text,
+      });
+      setReflection("");
+      setSaved(true);
+      toast({
+        title: "Saved offline ✨",
+        description: "We'll sync this to your journal when you're back online.",
+      });
+      setTimeout(() => setSaved(false), 2500);
+      return;
+    }
+
     setSaving(true);
     try {
       const { error: insErr } = await supabase
@@ -134,7 +153,7 @@ const DailyBriefing = () => {
         .insert({
           user_id: user.id,
           briefing_id: briefing.id,
-          reflection: reflection.trim(),
+          reflection: text,
         });
       if (insErr) throw insErr;
       setSaved(true);
@@ -143,11 +162,19 @@ const DailyBriefing = () => {
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      toast({
-        title: "Could not save",
-        description: "Please try again.",
-        variant: "destructive",
+      // Network or server failure → queue and tell the user we'll retry.
+      enqueue({
+        briefing_id: briefing.id,
+        briefing_date: briefing.briefing_date,
+        reflection: text,
       });
+      setReflection("");
+      setSaved(true);
+      toast({
+        title: "Saved offline ✨",
+        description: "Connection hiccup — we'll sync this once you're back online.",
+      });
+      setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
     }

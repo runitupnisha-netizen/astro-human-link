@@ -152,5 +152,5 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     return () => window.removeEventListener("online", handleOnline);
   }, [user, flush]);
 
-  return { queue, syncing, enqueue, flush };
+  return { queue, syncing, progress, enqueue, flush };
 };

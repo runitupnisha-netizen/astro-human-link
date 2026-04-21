@@ -15,18 +15,16 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // jsdom doesn't implement these — needed by framer-motion
-if (!window.IntersectionObserver) {
-  // @ts-expect-error - test stub
-  window.IntersectionObserver = class {
+if (!(window as any).IntersectionObserver) {
+  (window as any).IntersectionObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}
     takeRecords() { return []; }
   };
 }
-if (!window.ResizeObserver) {
-  // @ts-expect-error - test stub
-  window.ResizeObserver = class {
+if (!(window as any).ResizeObserver) {
+  (window as any).ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}

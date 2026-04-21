@@ -17,6 +17,7 @@ import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
 import { ProfileCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import SwipeTutorialOverlay from "@/components/SwipeTutorialOverlay";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 

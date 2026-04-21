@@ -77,7 +77,7 @@ const InnerWorld = () => {
   const navigate = useNavigate();
   const { subscribed, currentTier } = usePremium();
   const [upsellOpen, setUpsellOpen] = useState(false);
-  const [upsellFeature, setUpsellFeature] = useState("");
+  const [upsellFeature, setUpsellFeature] = useState<"synastry" | "unlimited_swipes">("synastry");
 
   const isVipOrYearly = currentTier === "vip" || currentTier === "yearly";
 
@@ -85,7 +85,7 @@ const InnerWorld = () => {
     if (tool.id === "briefing") {
       // Briefing is for any subscriber; non-subscribers see upsell
       if (!subscribed) {
-        setUpsellFeature(tool.title);
+        setUpsellFeature("unlimited_swipes");
         setUpsellOpen(true);
         return;
       }
@@ -93,7 +93,7 @@ const InnerWorld = () => {
       return;
     }
     if (!isVipOrYearly) {
-      setUpsellFeature(tool.title);
+      setUpsellFeature("synastry");
       setUpsellOpen(true);
       return;
     }
@@ -227,7 +227,7 @@ const InnerWorld = () => {
 
       <PremiumUpsellModal
         open={upsellOpen}
-        onOpenChange={setUpsellOpen}
+        onClose={() => setUpsellOpen(false)}
         feature={upsellFeature}
       />
     </div>

@@ -1,7 +1,18 @@
-import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, User, MapPin, Lock, Eye } from "lucide-react";
+import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown } from "lucide-react";
 import { useState, useCallback } from "react";
+
+// Light haptic tap (no-op on unsupported devices / desktop)
+const haptic = (pattern: number | number[] = 12) => {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+  } catch {
+    /* ignore */
+  }
+};
 import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";

@@ -37,7 +37,7 @@ const TIER_ACCESS = {
 } as const;
 
 const DailyBriefing = () => {
-  const { briefing, loading, error, refresh, isOffline, cachedAt } = useDailyBriefing();
+  const { briefing, loading, error, refresh, isOffline, cachedAt, refreshQueued } = useDailyBriefing();
   const { user } = useAuth();
   const { subscribed, currentTier } = usePremium();
   const { toast } = useToast();
@@ -250,6 +250,9 @@ const DailyBriefing = () => {
                     </>
                   )}
                   .
+                  {refreshQueued && (
+                    <> We'll refresh it automatically once you're back online.</>
+                  )}
                 </span>
               </CardContent>
             </Card>

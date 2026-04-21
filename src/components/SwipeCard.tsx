@@ -321,9 +321,6 @@ const SwipeCard = ({
                 e.stopPropagation();
                 e.preventDefault();
                 setDetailsExpanded((v) => !v);
-                if (detailsExpanded) {
-                  setBioExpanded(false);
-                }
               }}
               onPointerDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}

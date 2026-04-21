@@ -119,4 +119,18 @@ describe("SwipeCard — profile bio & expander smoke tests", () => {
     fireEvent.click(screen.getByRole("button", { name: /More details/i }));
     expect(screen.getByText(/My ideal Sunday/i)).toBeInTheDocument();
   });
+
+  it("bio expanded state is independent of 'More details' toggle", () => {
+    renderCard();
+    const bioBtn = screen.getByRole("button", { name: /My ideal Sunday/i });
+    // Expand bio
+    fireEvent.click(bioBtn);
+    expect(bioBtn).toHaveAttribute("aria-expanded", "true");
+
+    // Toggle More details open then closed — bio should remain expanded
+    const moreBtn = screen.getByRole("button", { name: /More details/i });
+    fireEvent.click(moreBtn); // open
+    fireEvent.click(screen.getByRole("button", { name: /Less details/i })); // close
+    expect(bioBtn).toHaveAttribute("aria-expanded", "true");
+  });
 });

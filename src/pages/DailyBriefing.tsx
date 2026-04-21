@@ -314,6 +314,7 @@ const DailyBriefing = () => {
         {/* Pending offline reflections */}
         {offlineQueue.length > 0 && (
           <motion.div
+            id="offline-queue-banner"
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-4"

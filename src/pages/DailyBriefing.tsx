@@ -11,6 +11,7 @@ import { usePremium } from "@/hooks/usePremium";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
+import { ReflectionsTimeline } from "@/components/ReflectionsTimeline";
 
 // Reflections-per-day limit by tier
 const TIER_ACCESS = {
@@ -31,6 +32,7 @@ const DailyBriefing = () => {
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
+  const [timelineRefresh, setTimelineRefresh] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
@@ -126,6 +128,8 @@ const DailyBriefing = () => {
         });
       if (insErr) throw insErr;
       setSaved(true);
+      setReflection("");
+      setTimelineRefresh((n) => n + 1);
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
@@ -380,6 +384,11 @@ const DailyBriefing = () => {
                   )}
                 </CardContent>
               </Card>
+            </motion.div>
+
+            {/* Private reflections timeline */}
+            <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+              <ReflectionsTimeline refreshKey={timelineRefresh} locked={tierKey === "free"} />
             </motion.div>
 
             <p className="text-center text-xs text-muted-foreground font-body mt-6">

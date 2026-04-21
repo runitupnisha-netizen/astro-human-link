@@ -47,6 +47,7 @@ const Achievements = lazy(() => import("./pages/Achievements"));
 const AstroEvents = lazy(() => import("./pages/AstroEvents"));
 const Contact = lazy(() => import("./pages/Contact"));
 const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
+const InnerWorld = lazy(() => import("./pages/InnerWorld"));
 const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
@@ -199,6 +200,7 @@ const AppRoutes = () => {
             <Route path="/achievements" element={<PageTransition><ProtectedRoute><Achievements /></ProtectedRoute></PageTransition>} />
             <Route path="/astro-events" element={<PageTransition><ProtectedRoute><AstroEvents /></ProtectedRoute></PageTransition>} />
             <Route path="/briefing" element={<PageTransition><ProtectedRoute><DailyBriefing /></ProtectedRoute></PageTransition>} />
+            <Route path="/inner-world" element={<PageTransition><ProtectedRoute><InnerWorld /></ProtectedRoute></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />

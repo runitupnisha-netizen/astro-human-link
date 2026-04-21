@@ -318,23 +318,23 @@ const SwipeCard = ({
           </div>
 
           {/* Interests */}
-          {profile.interests && profile.interests.length > 0 && (
+          {interests.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
-              {profile.interests.slice(0, 5).map((interest, i) => (
+              {interests.slice(0, 5).map((interest, i) => (
                 <Badge key={i} variant="secondary" className="text-[10px] bg-accent/10 text-accent border border-accent/20">
                   {interest}
                 </Badge>
               ))}
-              {profile.interests.length > 5 && (
-                <span className="text-[10px] text-muted-foreground">+{profile.interests.length - 5} more</span>
+              {interests.length > 5 && (
+                <span className="text-[10px] text-muted-foreground">+{interests.length - 5} more</span>
               )}
             </div>
           )}
 
           {/* Relationship goal */}
-          {profile.relationship_goal && (
+          {relationshipGoal && (
             <Badge variant="outline" className="text-[10px] border-primary/20 text-primary w-fit">
-              {profile.relationship_goal}
+              {relationshipGoal}
             </Badge>
           )}
 

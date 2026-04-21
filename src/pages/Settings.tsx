@@ -346,6 +346,10 @@ const Settings = () => {
                     Re-show Checklist
                   </Button>
                 </div>
+
+                <Separator />
+
+                <BriefingCacheRow />
               </CardContent>
             </Card>
 

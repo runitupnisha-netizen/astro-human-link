@@ -109,11 +109,11 @@ const SwipeCard = ({
 
   const hasMultiplePhotos = allPhotos.length > 1;
   const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
+  const hasBioPrompt = Boolean(profile.bio_prompt_1 && profile.bio_prompt_1_answer);
   const hasExtraDetails = Boolean(
     profile.about_me ||
     (profile.shared_aspects && profile.shared_aspects.length > 0) ||
-    profile.compatibility_reason ||
-    (profile.bio_prompt_1 && profile.bio_prompt_1_answer)
+    profile.compatibility_reason
   );
 
   const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {

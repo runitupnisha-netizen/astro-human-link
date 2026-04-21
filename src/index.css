@@ -249,3 +249,50 @@
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ---------------------------------------------------------------------------
+ * Accessibility toggles (driven by useAccessibility hook on <html>)
+ * ------------------------------------------------------------------------- */
+
+/* Reduced motion: collapses non-essential animations & transitions.
+   Also respected automatically when the OS sets prefers-reduced-motion. */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+/* Keep page-enter visible (one-shot fade) but instant. */
+html.reduce-motion .animate-fade-in,
+html.reduce-motion .animate-scale-in,
+html.reduce-motion .animate-enter {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* High-contrast mode: opaque surfaces, stronger borders, no glassy blur,
+   denser foreground/background separation. */
+html.high-contrast {
+  --border: 270 30% 75%;
+  --muted-foreground: 240 8% 78%;
+}
+html.high-contrast .glass-card,
+html.high-contrast [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: hsl(var(--card)) !important;
+}
+html.high-contrast .border,
+html.high-contrast [class*="border-"] {
+  border-color: hsl(var(--border)) !important;
+}
+html.high-contrast .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.85) !important;
+}
+html.high-contrast :focus-visible {
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+}

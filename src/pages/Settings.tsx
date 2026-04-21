@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye, Music } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye, Music, Accessibility, Zap, Contrast } from "lucide-react";
 import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import SpotifyConnect from "@/components/SpotifyConnect";
 import SelfieVerification from "@/components/SelfieVerification";
 import { hasSkippedVerification, clearVerificationSkip } from "@/hooks/useVerificationGate";
+import { useAccessibility } from "@/hooks/useAccessibility";
 
 const LanguageCard = () => {
   const { language, setLanguage, languages } = useTranslation();
@@ -44,6 +45,68 @@ const LanguageCard = () => {
               {label}
             </button>
           ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const AccessibilityCard = () => {
+  const {
+    reducedMotion,
+    highContrast,
+    systemReducedMotion,
+    setReducedMotion,
+    setHighContrast,
+  } = useAccessibility();
+
+  return (
+    <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Accessibility className="w-5 h-5 text-primary" />
+          Accessibility
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <span className="font-medium flex items-center gap-2">
+              <Zap className="w-4 h-4 text-accent" /> Reduced motion
+            </span>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Disables expand/collapse animations, page transitions and hover effects.
+              {systemReducedMotion && (
+                <span className="block text-[11px] text-accent mt-1">
+                  Your device already requests reduced motion — this is on by default.
+                </span>
+              )}
+            </p>
+          </div>
+          <Switch
+            checked={reducedMotion || systemReducedMotion}
+            disabled={systemReducedMotion}
+            onCheckedChange={(v) => setReducedMotion(v)}
+            aria-label="Toggle reduced motion"
+          />
+        </div>
+
+        <Separator className="bg-border/40" />
+
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <span className="font-medium flex items-center gap-2">
+              <Contrast className="w-4 h-4 text-primary" /> High contrast
+            </span>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Removes glassy translucency, strengthens borders and boosts text contrast for easier reading.
+            </p>
+          </div>
+          <Switch
+            checked={highContrast}
+            onCheckedChange={(v) => setHighContrast(v)}
+            aria-label="Toggle high contrast"
+          />
         </div>
       </CardContent>
     </Card>
@@ -516,6 +579,8 @@ const Settings = () => {
             )}
 
             <LanguageCard />
+
+            <AccessibilityCard />
 
 
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">

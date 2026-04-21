@@ -19,6 +19,7 @@ import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import { TranslationProvider } from "@/hooks/useTranslation";
+import { AccessibilityProvider } from "@/hooks/useAccessibility";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -215,18 +216,20 @@ const AppRoutes = () => {
 
 const App = () => (
   <ErrorBoundary>
-    <TranslationProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <OfflineIndicator />
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </TranslationProvider>
+    <AccessibilityProvider>
+      <TranslationProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <OfflineIndicator />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </TranslationProvider>
+    </AccessibilityProvider>
   </ErrorBoundary>
 );
 

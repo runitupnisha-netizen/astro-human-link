@@ -18,6 +18,7 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
+import { useAccessibility } from "@/hooks/useAccessibility";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -117,6 +118,10 @@ const SwipeCard = ({
 }: SwipeCardProps) => {
   const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
+  const { prefersReducedMotion } = useAccessibility();
+  // When the user prefers reduced motion, expand/collapse should be instant.
+  const motionDuration = prefersReducedMotion ? 0 : 0.25;
+  const fastMotionDuration = prefersReducedMotion ? 0 : 0.2;
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-15, 15]);
@@ -485,7 +490,7 @@ const SwipeCard = ({
               <motion.span
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary"
                 animate={{ rotate: detailsExpanded ? 180 : 0 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                transition={{ duration: motionDuration, ease: "easeOut" }}
                 aria-hidden="true"
               >
                 <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
@@ -500,7 +505,7 @@ const SwipeCard = ({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                transition={{ duration: motionDuration, ease: "easeOut" }}
                 className="overflow-hidden"
               >
                 <div className="space-y-3 pt-1">
@@ -554,7 +559,7 @@ const SwipeCard = ({
                 <motion.span
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"
                   animate={{ rotate: bioExpanded ? 180 : 0 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  transition={{ duration: fastMotionDuration, ease: "easeOut" }}
                   aria-hidden="true"
                 >
                   <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
@@ -562,11 +567,11 @@ const SwipeCard = ({
               )}
             </div>
             <motion.p
-              layout
+              layout={prefersReducedMotion ? false : true}
               className={`text-sm leading-relaxed [@media(max-height:700px)]:text-xs ${
                 isBioPlaceholder ? "text-muted-foreground italic" : "text-foreground/95"
               } ${bioExpanded || isBioPlaceholder ? "" : "line-clamp-3"}`}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{ duration: fastMotionDuration, ease: "easeOut" }}
             >
               {bioAnswerDisplay}
             </motion.p>

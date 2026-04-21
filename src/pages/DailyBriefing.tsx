@@ -77,12 +77,17 @@ const DailyBriefing = () => {
     if (!shareCardRef.current || !briefing) return;
     setSharing(true);
     try {
+      // Offline-safe rendering:
+      // - `cacheBust: true` would force `cache: 'no-cache'` fetches for any
+      //   referenced sub-resources, which fails when offline. Leave it off so
+      //   the browser/service worker cache can satisfy requests.
+      // - We decode the data URL to a Blob synchronously instead of going
+      //   through `fetch(dataUrl)`, which avoids any SW interception path.
       const dataUrl = await toPng(shareCardRef.current, {
-        cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#0b0a1a",
       });
-      const blob = await (await fetch(dataUrl)).blob();
+      const blob = dataUrlToBlob(dataUrl);
       const file = new File([blob], `stellara-briefing-${briefing.briefing_date}.png`, {
         type: "image/png",
       });
@@ -101,14 +106,18 @@ const DailyBriefing = () => {
         link.click();
         toast({
           title: "Card downloaded ✨",
-          description: "Share it anywhere from your camera roll.",
+          description: isOffline
+            ? "Saved offline — share it anywhere from your camera roll."
+            : "Share it anywhere from your camera roll.",
         });
       }
     } catch (err) {
       console.error("[share]", err);
       toast({
         title: "Could not generate card",
-        description: "Please try again.",
+        description: isOffline
+          ? "Some images couldn't load offline. Try again once you're back online."
+          : "Please try again.",
         variant: "destructive",
       });
     } finally {

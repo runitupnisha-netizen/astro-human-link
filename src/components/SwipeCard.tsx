@@ -1,7 +1,18 @@
-import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, User, MapPin, Lock, Eye } from "lucide-react";
+import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown } from "lucide-react";
 import { useState, useCallback } from "react";
+
+// Light haptic tap (no-op on unsupported devices / desktop)
+const haptic = (pattern: number | number[] = 12) => {
+  try {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(pattern);
+    }
+  } catch {
+    /* ignore */
+  }
+};
 import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
@@ -152,11 +163,13 @@ const SwipeCard = ({
     if (detailsExpanded) return;
     // Super like: swipe up (only if premium)
     if (isPremium && offset.y < -80 && Math.abs(offset.x) < 60) {
+      haptic([10, 30, 20]);
       onSwipe("super");
       return;
     }
     // Left/right threshold: offset OR velocity
     if (Math.abs(offset.x) > SWIPE_THRESHOLD || Math.abs(velocity.x) > 500) {
+      haptic(offset.x > 0 ? 18 : 10);
       onSwipe(offset.x > 0 ? "right" : "left");
     }
   }, [detailsExpanded, isPremium, onSwipe]);
@@ -237,22 +250,59 @@ const SwipeCard = ({
               <User className="w-16 h-16 text-muted-foreground/40" />
             </div>
           )}
-          {/* Photo dots */}
+          {/* Photo dots — tappable, with safe-area padding for notched devices */}
           {hasMultiplePhotos && (
-            <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10">
+            <div
+              className="absolute left-0 right-0 flex justify-center gap-1.5 z-20 px-4"
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 0.75rem)" }}
+              role="tablist"
+              aria-label="Profile photos"
+            >
               {allPhotos.map((_, i) => (
-                <div
+                <button
                   key={i}
-                  className={`h-1 rounded-full transition-all ${i === photoIndex ? "w-6 bg-white/90" : "w-2 bg-white/40"}`}
-                />
+                  type="button"
+                  role="tab"
+                  aria-selected={i === photoIndex}
+                  aria-label={`Photo ${i + 1} of ${allPhotos.length}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (i !== photoIndex) {
+                      haptic(8);
+                      setPhotoIndex(i);
+                    }
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="group relative flex h-8 items-center justify-center touch-manipulation"
+                  style={{ flex: i === photoIndex ? "0 0 28px" : "0 0 12px" }}
+                >
+                  <span
+                    className={`block h-1 rounded-full transition-all duration-200 ${
+                      i === photoIndex ? "w-7 bg-white/95" : "w-2.5 bg-white/45 group-hover:bg-white/70"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           )}
-          {/* Photo tap zones */}
+          {/* Photo tap zones — narrower so dots remain tappable; skip the center */}
           {hasMultiplePhotos && isTop && (
             <>
-              <button className="absolute left-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "prev")} onPointerDown={(e) => e.stopPropagation()} />
-              <button className="absolute right-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "next")} onPointerDown={(e) => e.stopPropagation()} />
+              <button
+                type="button"
+                aria-label="Previous photo"
+                className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
+                onClick={(e) => { handlePhotoNav(e, "prev"); haptic(8); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              />
+              <button
+                type="button"
+                aria-label="Next photo"
+                className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
+                onClick={(e) => { handlePhotoNav(e, "next"); haptic(8); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              />
             </>
           )}
           {/* Bottom gradient into info */}
@@ -344,6 +394,7 @@ const SwipeCard = ({
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
+                haptic(10);
                 setDetailsExpanded((v) => !v);
               }}
               onPointerDown={(e) => e.stopPropagation()}
@@ -359,32 +410,50 @@ const SwipeCard = ({
                   {detailsExpanded ? "Tap to hide" : "See bio, shared aspects & more"}
                 </p>
               </div>
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary text-sm leading-none font-bold transition-transform" aria-hidden="true">
-                {detailsExpanded ? "▴" : "▾"}
-              </span>
+              <motion.span
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary"
+                animate={{ rotate: detailsExpanded ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                aria-hidden="true"
+              >
+                <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+              </motion.span>
             </button>
           )}
 
-          {detailsExpanded && aboutMe && (
-            <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
-              {aboutMe}
-            </p>
-          )}
-
-          {detailsExpanded && sharedAspects.length > 0 && (
-            <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
-              <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
-              {sharedAspects.map((aspect, i) => (
-                <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                  {aspect}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {detailsExpanded && compatibilityReason && (
-            <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{compatibilityReason}</p>
-          )}
+          <AnimatePresence initial={false}>
+            {detailsExpanded && (
+              <motion.div
+                key="details"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-3 pt-1">
+                  {aboutMe && (
+                    <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
+                      {aboutMe}
+                    </p>
+                  )}
+                  {sharedAspects.length > 0 && (
+                    <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
+                      <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
+                      {sharedAspects.map((aspect, i) => (
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+                          {aspect}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {compatibilityReason && (
+                    <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{compatibilityReason}</p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Bio prompt — always visible. Falls back to a friendly placeholder when missing. */}
           <button
@@ -392,7 +461,10 @@ const SwipeCard = ({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (!isBioPlaceholder) setBioExpanded((v) => !v);
+              if (!isBioPlaceholder) {
+                haptic(8);
+                setBioExpanded((v) => !v);
+              }
             }}
             onPointerDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
@@ -407,18 +479,25 @@ const SwipeCard = ({
             <div className="flex items-start justify-between gap-2 mb-1">
               <p className="text-xs text-primary font-semibold flex-1 uppercase tracking-wide">{bioPromptLabel}</p>
               {!isBioPlaceholder && (
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs leading-none transition-transform group-hover:scale-110" aria-hidden="true">
-                  {bioExpanded ? "▴" : "▾"}
-                </span>
+                <motion.span
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"
+                  animate={{ rotate: bioExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  aria-hidden="true"
+                >
+                  <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
+                </motion.span>
               )}
             </div>
-            <p
+            <motion.p
+              layout
               className={`text-sm leading-relaxed [@media(max-height:700px)]:text-xs ${
                 isBioPlaceholder ? "text-muted-foreground italic" : "text-foreground/95"
               } ${bioExpanded || isBioPlaceholder ? "" : "line-clamp-3"}`}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               {bioAnswerDisplay}
-            </p>
+            </motion.p>
             {!isBioPlaceholder && bioAnswer && bioAnswer.length > 100 && (
               <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
                 {bioExpanded ? "Tap to collapse" : "Tap to read more"}
@@ -436,11 +515,13 @@ const SwipeCard = ({
           {/* View Full Profile */}
           {isTop && !profile.user_id.startsWith("demo-") && (
             <button
-              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${profile.user_id}`); }}
+              type="button"
+              onClick={(e) => { e.stopPropagation(); haptic(10); navigate(`/profile/${profile.user_id}`); }}
               onPointerDown={(e) => e.stopPropagation()}
-              className="w-full flex items-center justify-center gap-1.5 text-xs text-primary hover:text-foreground transition-colors py-1"
+              aria-label="View full profile"
+              className="w-full min-h-11 flex items-center justify-center gap-1.5 text-xs font-semibold text-primary hover:text-foreground transition-colors rounded-lg px-3 py-2.5 active:bg-primary/5 touch-manipulation"
             >
-              <Eye className="w-3.5 h-3.5" /> View Full Profile
+              <Eye className="w-4 h-4" /> View Full Profile
             </button>
           )}
         </div>
@@ -451,7 +532,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("left")}
+              onClick={() => { haptic(10); onSwipe("left"); }}
               aria-label="Pass"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-destructive/25 bg-card shadow-md hover:border-destructive/50 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >
@@ -461,7 +542,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("super")}
+              onClick={() => { haptic([10, 30, 20]); onSwipe("super"); }}
               aria-label={isPremium ? "Super like" : "Super like (premium)"}
               className={`relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent/40 hover:border-accent/70 shadow-lg transition-all touch-manipulation ${!isPremium ? "opacity-70" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
@@ -477,7 +558,7 @@ const SwipeCard = ({
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => onSwipe("right")}
+              onClick={() => { haptic(18); onSwipe("right"); }}
               aria-label="Like"
               className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-green-400/25 bg-card shadow-md hover:border-green-400/60 hover:shadow-lg transition-all touch-manipulation [@media(max-height:700px)]:h-12 [@media(max-height:700px)]:w-12"
             >

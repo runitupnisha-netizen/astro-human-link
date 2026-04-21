@@ -394,6 +394,7 @@ const SwipeCard = ({
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
+                haptic(10);
                 setDetailsExpanded((v) => !v);
               }}
               onPointerDown={(e) => e.stopPropagation()}
@@ -409,32 +410,50 @@ const SwipeCard = ({
                   {detailsExpanded ? "Tap to hide" : "See bio, shared aspects & more"}
                 </p>
               </div>
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary text-sm leading-none font-bold transition-transform" aria-hidden="true">
-                {detailsExpanded ? "▴" : "▾"}
-              </span>
+              <motion.span
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary"
+                animate={{ rotate: detailsExpanded ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                aria-hidden="true"
+              >
+                <ChevronDown className="h-4 w-4" strokeWidth={2.5} />
+              </motion.span>
             </button>
           )}
 
-          {detailsExpanded && aboutMe && (
-            <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
-              {aboutMe}
-            </p>
-          )}
-
-          {detailsExpanded && sharedAspects.length > 0 && (
-            <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
-              <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
-              {sharedAspects.map((aspect, i) => (
-                <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                  {aspect}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {detailsExpanded && compatibilityReason && (
-            <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{compatibilityReason}</p>
-          )}
+          <AnimatePresence initial={false}>
+            {detailsExpanded && (
+              <motion.div
+                key="details"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-3 pt-1">
+                  {aboutMe && (
+                    <p className="text-sm text-foreground/90 leading-relaxed [@media(max-height:700px)]:text-xs">
+                      {aboutMe}
+                    </p>
+                  )}
+                  {sharedAspects.length > 0 && (
+                    <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">
+                      <span className="text-[10px] text-muted-foreground mr-1">In common:</span>
+                      {sharedAspects.map((aspect, i) => (
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+                          {aspect}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {compatibilityReason && (
+                    <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{compatibilityReason}</p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Bio prompt — always visible. Falls back to a friendly placeholder when missing. */}
           <button

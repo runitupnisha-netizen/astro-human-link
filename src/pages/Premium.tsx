@@ -150,7 +150,7 @@ const Premium = () => {
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);
     try {
-      await checkout(STELLARA_TIERS[tierKey].price_id);
+      await checkout(STELLARA_TIERS[tierKey].price_id, redirectTo);
     } catch {
       toast({ title: "Error", description: "Could not start checkout. Please try again.", variant: "destructive" });
     } finally {

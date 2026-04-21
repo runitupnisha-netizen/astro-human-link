@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Crown, X, Sparkles, Phone, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface PremiumRequiredScreenProps {
   open: boolean;
@@ -15,6 +15,7 @@ const PremiumRequiredScreen = ({
   feature = "video",
 }: PremiumRequiredScreenProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!open) return null;
 
@@ -28,7 +29,8 @@ const PremiumRequiredScreen = ({
 
   const handleUpgrade = () => {
     onClose();
-    navigate("/premium");
+    const back = `${location.pathname}${location.search}`;
+    navigate(`/premium?redirect=${encodeURIComponent(back)}`);
   };
 
   return (

@@ -78,10 +78,10 @@ export const usePremium = () => {
     return () => clearInterval(interval);
   }, [checkSubscription]);
 
-  const checkout = async (priceId: string) => {
+  const checkout = async (priceId: string, redirectTo?: string) => {
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId },
+        body: { priceId, redirectTo },
       });
       if (error) throw error;
       if (data?.url) {

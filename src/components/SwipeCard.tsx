@@ -159,6 +159,17 @@ const SwipeCard = ({
   const hasExtraDetails = Boolean(aboutMe || sharedAspects.length > 0 || compatibilityReason);
   const hasAnyVisibleInfo = hasAnyAstro || interests.length > 0 || !!relationshipGoal || hasExtraDetails;
 
+  // Compact, deterministic "Your cosmic overlap" summary (max 3 short points).
+  const overlapPoints = buildCosmicOverlap({
+    sun_sign: profile.sun_sign,
+    moon_sign: profile.moon_sign,
+    rising_sign: profile.rising_sign,
+    human_design_type: profile.human_design_type,
+    shared_aspects: profile.shared_aspects,
+    viewer: viewerChart ?? undefined,
+  });
+  const showOverlap = hasAnyAstro || (profile.shared_aspects?.length ?? 0) > 0;
+
   const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
     e.stopPropagation();
     e.preventDefault();

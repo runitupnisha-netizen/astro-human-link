@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff, CloudOff, CloudUpload } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff, CloudOff, CloudUpload, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ const DailyBriefing = () => {
   const [sharing, setSharing] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
   const [timelineRefresh, setTimelineRefresh] = useState(0);
+  const [showQueuedDetails, setShowQueuedDetails] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Toast on connection transitions during this page's session.
@@ -328,6 +329,67 @@ const DailyBriefing = () => {
                       {queueProgress.current}/{queueProgress.total}
                     </span>
                   </div>
+                )}
+
+                {/* Expand/collapse list of pending reflections */}
+                <button
+                  type="button"
+                  onClick={() => setShowQueuedDetails((v) => !v)}
+                  aria-expanded={showQueuedDetails}
+                  aria-controls="queued-reflections-list"
+                  className="self-start inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors min-h-[28px] touch-manipulation"
+                >
+                  {showQueuedDetails ? (
+                    <>
+                      <ChevronUp className="w-3 h-3" /> Hide details
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-3 h-3" /> Show what will sync
+                    </>
+                  )}
+                </button>
+
+                {showQueuedDetails && (
+                  <ul
+                    id="queued-reflections-list"
+                    className="mt-1 space-y-1.5 max-h-56 overflow-y-auto pr-1"
+                  >
+                    {offlineQueue.map((item) => {
+                      const dayLabel = (() => {
+                        // briefing_date is "YYYY-MM-DD" — render in the
+                        // user's locale without timezone shifts.
+                        const [y, m, d] = item.briefing_date.split("-").map(Number);
+                        if (!y || !m || !d) return item.briefing_date;
+                        return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      })();
+                      const queuedTime = new Date(item.queued_at).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      });
+                      const preview =
+                        item.reflection.length > 140
+                          ? `${item.reflection.slice(0, 140).trimEnd()}…`
+                          : item.reflection;
+                      return (
+                        <li
+                          key={item.id}
+                          className="rounded-md border border-primary/15 bg-background/40 px-2.5 py-1.5"
+                        >
+                          <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                            <span>{dayLabel}</span>
+                            <span>queued {queuedTime}</span>
+                          </div>
+                          <p className="text-foreground/85 text-xs leading-snug whitespace-pre-wrap mt-0.5">
+                            {preview}
+                          </p>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 )}
               </CardContent>
             </Card>

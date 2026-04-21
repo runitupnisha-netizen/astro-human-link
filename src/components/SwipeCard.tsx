@@ -386,6 +386,31 @@ const SwipeCard = ({
             )}
           </div>
 
+          {/* Your cosmic overlap — explains *why* this match was suggested */}
+          {showOverlap && (
+            <div className="rounded-xl border border-accent/25 bg-gradient-to-br from-accent/10 via-primary/5 to-transparent p-3 [@media(max-height:700px)]:p-2.5">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                  Your cosmic overlap
+                </p>
+              </div>
+              <ul className="space-y-1">
+                {overlapPoints.map((p, i) => (
+                  <li key={i} className="flex gap-1.5 text-[11.5px] leading-snug [@media(max-height:700px)]:text-[11px]">
+                    <span className="font-semibold text-foreground/90 shrink-0">{p.label}:</span>
+                    <span className="text-muted-foreground">{p.detail}</span>
+                  </li>
+                ))}
+              </ul>
+              {!viewerChart && (
+                <p className="mt-1.5 text-[10px] italic text-muted-foreground/70">
+                  Add your birth details for a richer overlap.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Interests */}
           {interests.length > 0 && (
             <div className="flex flex-wrap gap-1 [@media(max-height:700px)]:gap-0.5">

@@ -37,6 +37,27 @@ const writeCache = (userId: string, briefing: DailyBriefing) => {
   }
 };
 
+/**
+ * Number of daily briefings currently cached locally for this user.
+ * The cache stores at most one day's briefing per user (today's), so this
+ * returns 0 or 1. Exposed so Settings can show an honest count and offer
+ * a Clear control.
+ */
+export const getBriefingCacheCount = (userId: string): number => {
+  return readCache(userId) ? 1 : 0;
+};
+
+/**
+ * Remove every locally cached daily briefing for this user.
+ */
+export const clearBriefingCache = (userId: string): void => {
+  try {
+    localStorage.removeItem(cacheKey(userId));
+  } catch {
+    /* storage disabled — ignore */
+  }
+};
+
 export const useDailyBriefing = () => {
   const { user } = useAuth();
   const [briefing, setBriefing] = useState<DailyBriefing | null>(null);

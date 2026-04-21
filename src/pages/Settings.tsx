@@ -8,12 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye, Music, Accessibility, Zap, Contrast } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartphone, Trash2, Loader2, LogOut, PauseCircle, MessageSquare, Megaphone, Mail, Globe, Sparkles, Trophy, Gift, ShieldCheck, Calendar, ChevronRight, Eye, Music, Accessibility, Zap, Contrast, Database } from "lucide-react";
 import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { getBriefingCacheCount, clearBriefingCache } from "@/hooks/useDailyBriefing";
 import { toast } from "sonner";
 import SpotifyConnect from "@/components/SpotifyConnect";
 import SelfieVerification from "@/components/SelfieVerification";
@@ -48,6 +49,51 @@ const LanguageCard = () => {
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+const BriefingCacheRow = () => {
+  const { user } = useAuth();
+  const [count, setCount] = useState<number>(() =>
+    user ? getBriefingCacheCount(user.id) : 0
+  );
+
+  // Recompute when the auth user changes (e.g. on first render after login).
+  useEffect(() => {
+    setCount(user ? getBriefingCacheCount(user.id) : 0);
+  }, [user]);
+
+  const handleClear = () => {
+    if (!user) return;
+    clearBriefingCache(user.id);
+    setCount(0);
+    toast.success("Cached briefings cleared");
+  };
+
+  const dayLabel = count === 1 ? "day" : "days";
+
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <span className="font-medium flex items-center gap-2">
+          <Database className="w-4 h-4 text-primary" /> Cached Daily Briefings
+        </span>
+        <p className="text-sm text-muted-foreground">
+          {count === 0
+            ? "Nothing cached yet — your briefing will be saved here for offline use."
+            : `${count} ${dayLabel} stored locally for offline access.`}
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="border-primary/30 text-primary hover:bg-primary/10 shrink-0"
+        onClick={handleClear}
+        disabled={count === 0}
+      >
+        <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Clear
+      </Button>
+    </div>
   );
 };
 
@@ -345,6 +391,10 @@ const Settings = () => {
                     Re-show Checklist
                   </Button>
                 </div>
+
+                <Separator />
+
+                <BriefingCacheRow />
               </CardContent>
             </Card>
 

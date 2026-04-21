@@ -161,6 +161,30 @@ const DailyBriefing = () => {
           </p>
         </motion.header>
 
+        {/* Offline indicator */}
+        {isOffline && briefing && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <Card className="border-amber-400/30 bg-amber-400/5">
+              <CardContent className="p-3 flex items-center gap-2 text-xs font-body">
+                <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="text-foreground">
+                  You're offline — showing your saved briefing
+                  {cachedAt && (
+                    <> from{" "}
+                      {new Date(cachedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                    </>
+                  )}
+                  .
+                </span>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Tier access banner */}
         <motion.div
           initial={{ opacity: 0, y: -6 }}

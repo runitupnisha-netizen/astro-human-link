@@ -163,11 +163,13 @@ const SwipeCard = ({
     if (detailsExpanded) return;
     // Super like: swipe up (only if premium)
     if (isPremium && offset.y < -80 && Math.abs(offset.x) < 60) {
+      haptic([10, 30, 20]);
       onSwipe("super");
       return;
     }
     // Left/right threshold: offset OR velocity
     if (Math.abs(offset.x) > SWIPE_THRESHOLD || Math.abs(velocity.x) > 500) {
+      haptic(offset.x > 0 ? 18 : 10);
       onSwipe(offset.x > 0 ? "right" : "left");
     }
   }, [detailsExpanded, isPremium, onSwipe]);

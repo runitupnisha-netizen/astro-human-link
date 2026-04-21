@@ -18,6 +18,7 @@ import { demoProfiles } from "@/data/demoProfiles";
 import { ProfileCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import SwipeTutorialOverlay from "@/components/SwipeTutorialOverlay";
+import { prefetchImages } from "@/lib/imagePrefetch";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 

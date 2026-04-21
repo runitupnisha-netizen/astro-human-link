@@ -71,6 +71,7 @@ export const AnalyticsEvents = {
   SUPER_LIKE: "super_like",
   UNDO_SWIPE: "undo_swipe",
   DAILY_LIMIT_HIT: "daily_limit_hit",
+  CARD_DETAILS_TOGGLED: "card_details_toggled",
 
   // Profile
   PROFILE_VIEW: "profile_view",

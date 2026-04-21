@@ -222,6 +222,41 @@ const DailyBriefing = () => {
           </motion.div>
         )}
 
+        {/* Pending offline reflections */}
+        {offlineQueue.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4"
+          >
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-3 flex items-center justify-between gap-3 text-xs font-body">
+                <div className="flex items-center gap-2 min-w-0">
+                  {queueSyncing ? (
+                    <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
+                  ) : (
+                    <CloudOff className="w-4 h-4 text-primary shrink-0" />
+                  )}
+                  <span className="text-foreground truncate">
+                    {queueSyncing
+                      ? `Syncing ${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"}…`
+                      : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-primary hover:bg-primary/10"
+                  disabled={queueSyncing || isOffline}
+                  onClick={() => flush()}
+                >
+                  <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Tier access banner */}
         <motion.div
           initial={{ opacity: 0, y: -6 }}

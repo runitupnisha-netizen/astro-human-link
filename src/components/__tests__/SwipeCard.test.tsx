@@ -80,10 +80,30 @@ describe("SwipeCard — profile bio & expander smoke tests", () => {
     expect(bioBtn).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("does NOT render the bio block when the profile has no bio prompt", () => {
+  it("renders a friendly placeholder when bio_prompt_1_answer is missing", () => {
     renderCard({ bio_prompt_1: null, bio_prompt_1_answer: null });
-    expect(screen.queryByText(/My ideal Sunday/i)).not.toBeInTheDocument();
+    // Default prompt label appears so the block is never empty
+    expect(screen.getByText(/A little about me/i)).toBeInTheDocument();
+    // Friendly placeholder copy
+    expect(
+      screen.getByText(/hasn't shared their story yet/i)
+    ).toBeInTheDocument();
+    // Disabled — no expand affordance
     expect(screen.queryByText(/Tap to read more/i)).not.toBeInTheDocument();
+  });
+
+  it("treats whitespace-only bio answer as missing and falls back gracefully", () => {
+    renderCard({ bio_prompt_1: "What lights you up?", bio_prompt_1_answer: "   \n  " });
+    expect(screen.getByText(/What lights you up\?/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/hasn't shared their story yet/i)
+    ).toBeInTheDocument();
+  });
+
+  it("uses provided bio_prompt_1_answer even when bio_prompt_1 is missing (falls back to default label)", () => {
+    renderCard({ bio_prompt_1: null, bio_prompt_1_answer: "I love long walks under the stars." });
+    expect(screen.getByText(/A little about me/i)).toBeInTheDocument();
+    expect(screen.getByText(/long walks under the stars/i)).toBeInTheDocument();
   });
 
   it("renders 'More details' expander for secondary content (about_me, shared aspects, reason)", () => {

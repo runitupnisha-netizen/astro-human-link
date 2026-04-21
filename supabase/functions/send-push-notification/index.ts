@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { type, record } = await req.json();
+    const { type, record, user_id, title: customTitle, body: customBody, url: customUrl } = await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -63,6 +63,11 @@ Deno.serve(async (req) => {
       title = "💬 New Message";
       body = `${senderName} sent you a message`;
       url = `/messages?match=${matchId}`;
+    } else if (type === "daily_briefing" && user_id) {
+      targetUserIds = [user_id];
+      title = customTitle || "🌅 Your Daily Cosmic Briefing";
+      body = customBody || "Today's energy is ready to read.";
+      url = customUrl || "/briefing";
     } else {
       return new Response(JSON.stringify({ ok: false, error: "Unknown type" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -86,7 +91,7 @@ Deno.serve(async (req) => {
       user_id: userId,
       title,
       body,
-      type: type === "new_match" ? "match" : "message",
+      type: type === "new_match" ? "match" : type === "daily_briefing" ? "daily_briefing" : "message",
     }));
 
     await supabase.from("notifications").insert(notifications);

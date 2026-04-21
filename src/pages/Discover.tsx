@@ -52,6 +52,12 @@ const Discover = () => {
     action: "pass" | "like" | "super_like";
   } | null>(null);
   const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null);
+  const [myChart, setMyChart] = useState<{
+    sun_sign: string | null;
+    moon_sign: string | null;
+    rising_sign: string | null;
+    human_design_type: string | null;
+  } | null>(null);
 
 
   const fetchProfiles = useCallback(async () => {
@@ -78,13 +84,23 @@ const Discover = () => {
     onRefresh: fetchProfiles,
   });
 
-  // Fetch boost status & avatar
+  // Fetch boost status, avatar & viewer's own chart (for cosmic overlap)
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("boost_until, avatar_url").eq("user_id", user.id).maybeSingle()
+    supabase
+      .from("profiles")
+      .select("boost_until, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type")
+      .eq("user_id", user.id)
+      .maybeSingle()
       .then(({ data }) => {
         if (data?.boost_until) setBoostUntil(data.boost_until);
         if (data?.avatar_url) setMyAvatarUrl(data.avatar_url);
+        setMyChart({
+          sun_sign: data?.sun_sign ?? null,
+          moon_sign: data?.moon_sign ?? null,
+          rising_sign: data?.rising_sign ?? null,
+          human_design_type: data?.human_design_type ?? null,
+        });
       });
   }, [user]);
 

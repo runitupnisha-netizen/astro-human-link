@@ -186,11 +186,13 @@ const Discover = () => {
     if (direction === "super" && !isPremium) {
       setUpsellFeature("super_like");
       setShowUpsell(true);
+      track(AnalyticsEvents.DAILY_LIMIT_HIT, { trigger: "super_like_locked" });
       return;
     }
     if ((direction === "right" || direction === "super") && !isPremium && likeLimitReached) {
       setUpsellFeature("daily_likes");
       setShowUpsell(true);
+      track(AnalyticsEvents.DAILY_LIMIT_HIT, { trigger: "daily_likes", limit: FREE_DAILY_LIKE_LIMIT });
       return;
     }
 
@@ -199,6 +201,19 @@ const Discover = () => {
     // Start exit animation and only remove the card once it has fully cleared the viewport
     setPendingSwipe({ profileId: topProfile.user_id, action });
     setExitDirection(direction);
+
+    const eventName =
+      direction === "left"
+        ? AnalyticsEvents.SWIPE_LEFT
+        : direction === "super"
+        ? AnalyticsEvents.SUPER_LIKE
+        : AnalyticsEvents.SWIPE_RIGHT;
+    track(eventName, {
+      target_user_id: topProfile.user_id,
+      compatibility_score: topProfile.compatibility_score ?? null,
+      is_demo: topProfile.user_id.startsWith("demo-"),
+      stack_position: 0,
+    });
 
     if (direction === "super") {
       toast({ title: "⭐ Super Like Sent!", description: `${sanitizeName(topProfile.display_name) || "Someone special"} will notice this one` });

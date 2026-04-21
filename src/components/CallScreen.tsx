@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
+import { toast } from "sonner";
 
 interface CallScreenProps {
   open: boolean;
@@ -10,13 +13,15 @@ interface CallScreenProps {
   callerAvatar: string | null;
   callType: "voice" | "video";
   isIncoming?: boolean;
+  matchId?: string;
 }
 
-const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false }: CallScreenProps) => {
+const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
   const [callStatus, setCallStatus] = useState<"ringing" | "connected" | "ended">("ringing");
   const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
   const [videoOff, setVideoOff] = useState(callType === "voice");
+  const [showPremium, setShowPremium] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
@@ -25,16 +30,54 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setDuration(0);
       setMuted(false);
       setVideoOff(callType === "voice");
+      setShowPremium(false);
       return;
     }
 
-    // Simulate connection after 2 seconds
-    const connectTimeout = setTimeout(() => {
-      setCallStatus("connected");
-    }, 2000);
+    // Verify premium & provision call room via edge function
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke(
+          "create-call-room",
+          { body: { matchId } },
+        );
 
-    return () => clearTimeout(connectTimeout);
-  }, [open, callType]);
+        if (cancelled) return;
+
+        // supabase-js wraps non-2xx as FunctionsHttpError; inspect underlying response
+        const status = (error as any)?.context?.status ?? (data as any)?.status;
+        const code = (data as any)?.code ?? (error as any)?.context?.code;
+
+        if (status === 403 || code === "PREMIUM_REQUIRED") {
+          setShowPremium(true);
+          return;
+        }
+
+        if (error) {
+          toast.error(error.message || "Could not start call");
+          onClose();
+          return;
+        }
+
+        if (!data?.url) {
+          toast.error("Call service unavailable");
+          onClose();
+          return;
+        }
+
+        setCallStatus("connected");
+      } catch (e) {
+        if (cancelled) return;
+        toast.error(e instanceof Error ? e.message : "Could not start call");
+        onClose();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, callType, matchId, onClose]);
 
   useEffect(() => {
     if (callStatus === "connected") {
@@ -59,6 +102,16 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
   return (
     <AnimatePresence>
+      {showPremium && (
+        <PremiumRequiredScreen
+          open={showPremium}
+          onClose={() => {
+            setShowPremium(false);
+            onClose();
+          }}
+          feature={callType}
+        />
+      )}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

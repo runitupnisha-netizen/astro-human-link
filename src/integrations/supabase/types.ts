@@ -557,6 +557,11 @@ export type Database = {
           birth_time: string | null
           birthday_number: number | null
           boost_until: string | null
+          briefing_email_reminder: boolean
+          briefing_last_reminder_date: string | null
+          briefing_push_reminder: boolean
+          briefing_reminder_hour: number
+          briefing_reminder_timezone: string
           compatibility_tags: string[] | null
           created_at: string
           current_city: string | null
@@ -622,6 +627,11 @@ export type Database = {
           birth_time?: string | null
           birthday_number?: number | null
           boost_until?: string | null
+          briefing_email_reminder?: boolean
+          briefing_last_reminder_date?: string | null
+          briefing_push_reminder?: boolean
+          briefing_reminder_hour?: number
+          briefing_reminder_timezone?: string
           compatibility_tags?: string[] | null
           created_at?: string
           current_city?: string | null
@@ -687,6 +697,11 @@ export type Database = {
           birth_time?: string | null
           birthday_number?: number | null
           boost_until?: string | null
+          briefing_email_reminder?: boolean
+          briefing_last_reminder_date?: string | null
+          briefing_push_reminder?: boolean
+          briefing_reminder_hour?: number
+          briefing_reminder_timezone?: string
           compatibility_tags?: string[] | null
           created_at?: string
           current_city?: string | null

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import { useDailyBriefing } from "@/hooks/useDailyBriefing";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -42,7 +43,7 @@ const DailyBriefing = () => {
     setTimelineRefresh((n) => n + 1);
     setTimeout(() => setSaved(false), 2500);
   };
-  const { queue: offlineQueue, syncing: queueSyncing, enqueue, flush } =
+  const { queue: offlineQueue, syncing: queueSyncing, progress: queueProgress, enqueue, flush } =
     useOfflineReflections(handleQueueSynced);
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";

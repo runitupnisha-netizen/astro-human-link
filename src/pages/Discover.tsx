@@ -17,6 +17,7 @@ import BoostButton from "@/components/BoostButton";
 import { demoProfiles } from "@/data/demoProfiles";
 import { ProfileCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import SwipeTutorialOverlay from "@/components/SwipeTutorialOverlay";
 
 const FREE_DAILY_LIKE_LIMIT = 15;
 
@@ -187,6 +188,7 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
+      {!loading && profiles.length > 0 && <SwipeTutorialOverlay />}
 
       <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-16 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-12 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
         {pullIndicator}

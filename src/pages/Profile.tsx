@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown, Mic, Music } from "lucide-react";
+import { Star, Heart, Edit, MapPin, Calendar, Sparkles, Users, Zap, Dna, Hash, Wine, Cigarette, Pill, Baby, Loader2, Share2, Download, Info, RefreshCw, Eye, Trophy, Gift, ShieldCheck, ChevronRight, Settings, Crown, Mic, Music, Sun } from "lucide-react";
 import SpotifyConnect from "@/components/SpotifyConnect";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -266,11 +266,12 @@ const Profile = () => {
           </div>
 
           {/* Quick links grid */}
-          <div className="mb-6 grid grid-cols-4 gap-2">
+          <div className="mb-6 grid grid-cols-5 gap-2">
             {[
+              { label: "Briefing", icon: Sun, path: "/briefing" },
               { label: "Premium", icon: Crown, path: "/premium" },
               { label: "Insights", icon: Star, path: "/insights" },
-              { label: "Achievements", icon: Trophy, path: "/achievements" },
+              { label: "Wins", icon: Trophy, path: "/achievements" },
               { label: "Referrals", icon: Gift, path: "/referral" },
             ].map((item) => (
               <button

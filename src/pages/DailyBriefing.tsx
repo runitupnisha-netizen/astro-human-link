@@ -318,16 +318,43 @@ const DailyBriefing = () => {
                     <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
                   </Button>
                 </div>
-                {/* Progress indicator during sync */}
-                {queueSyncing && queueProgress && (
-                  <div className="flex items-center gap-2">
-                    <Progress 
-                      value={(queueProgress.current / queueProgress.total) * 100} 
-                      className="h-1.5 flex-1"
-                    />
-                    <span className="text-muted-foreground shrink-0">
-                      {queueProgress.current}/{queueProgress.total}
-                    </span>
+                {/* Progress indicator — ticks after each reflection lands in the journal */}
+                {queueProgress && (
+                  <div
+                    className="flex flex-col gap-1"
+                    role="status"
+                    aria-live="polite"
+                    aria-label={`Synced ${queueProgress.synced} of ${queueProgress.total} reflections`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Progress
+                        value={(queueProgress.synced / Math.max(queueProgress.total, 1)) * 100}
+                        className="h-1.5 flex-1"
+                      />
+                      <span className="text-muted-foreground shrink-0 tabular-nums">
+                        {queueProgress.synced}/{queueProgress.total}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        {queueSyncing ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Writing reflection {Math.min(queueProgress.current + 1, queueProgress.total)} of {queueProgress.total} to your journal…
+                          </>
+                        ) : queueProgress.failed === 0 ? (
+                          <>
+                            <Check className="w-3 h-3 text-primary" />
+                            All {queueProgress.synced} reflection{queueProgress.synced === 1 ? "" : "s"} saved to your journal
+                          </>
+                        ) : (
+                          <>
+                            <CloudOff className="w-3 h-3" />
+                            Saved {queueProgress.synced}, {queueProgress.failed} pending retry
+                          </>
+                        )}
+                      </span>
+                    </div>
                   </div>
                 )}
 

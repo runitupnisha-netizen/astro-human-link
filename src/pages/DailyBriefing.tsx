@@ -1,24 +1,58 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useDailyBriefing } from "@/hooks/useDailyBriefing";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
 
+// Reflections-per-day limit by tier
+const TIER_ACCESS = {
+  free:    { label: "Free",     reflectionsPerDay: 0,        accessLabel: "Read-only briefing" },
+  weekly:  { label: "Weekly",   reflectionsPerDay: 1,        accessLabel: "1 reflection / day" },
+  monthly: { label: "Monthly",  reflectionsPerDay: 3,        accessLabel: "3 reflections / day" },
+  vip:     { label: "VIP",      reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
+  yearly:  { label: "Yearly",   reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
+} as const;
+
 const DailyBriefing = () => {
   const { briefing, loading, error, refresh } = useDailyBriefing();
   const { user } = useAuth();
+  const { subscribed, currentTier } = usePremium();
   const { toast } = useToast();
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [reflectionsToday, setReflectionsToday] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
+
+  const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
+  const tierAccess = TIER_ACCESS[tierKey];
+  const limit = tierAccess.reflectionsPerDay;
+  const limitReached = reflectionsToday >= limit;
+  const limitDisplay = limit === Infinity ? "∞" : limit;
+
+  // Count today's reflections to show usage
+  useEffect(() => {
+    if (!user || !briefing) return;
+    let cancelled = false;
+    (async () => {
+      const { count } = await supabase
+        .from("briefing_reflections")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("briefing_id", briefing.id);
+      if (!cancelled) setReflectionsToday(count ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, [user, briefing, saved]);
 
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
@@ -71,6 +105,16 @@ const DailyBriefing = () => {
 
   const saveReflection = async () => {
     if (!briefing || !user || !reflection.trim()) return;
+    if (limitReached) {
+      toast({
+        title: "Daily reflection limit reached",
+        description: limit === 0
+          ? "Subscribe to save private reflections."
+          : `Your ${tierAccess.label} plan includes ${limit} reflection${limit === 1 ? "" : "s"} per day. Upgrade for unlimited.`,
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     try {
       const { error: insErr } = await supabase

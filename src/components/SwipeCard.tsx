@@ -250,22 +250,59 @@ const SwipeCard = ({
               <User className="w-16 h-16 text-muted-foreground/40" />
             </div>
           )}
-          {/* Photo dots */}
+          {/* Photo dots — tappable, with safe-area padding for notched devices */}
           {hasMultiplePhotos && (
-            <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10">
+            <div
+              className="absolute left-0 right-0 flex justify-center gap-1.5 z-20 px-4"
+              style={{ top: "calc(env(safe-area-inset-top, 0px) + 0.75rem)" }}
+              role="tablist"
+              aria-label="Profile photos"
+            >
               {allPhotos.map((_, i) => (
-                <div
+                <button
                   key={i}
-                  className={`h-1 rounded-full transition-all ${i === photoIndex ? "w-6 bg-white/90" : "w-2 bg-white/40"}`}
-                />
+                  type="button"
+                  role="tab"
+                  aria-selected={i === photoIndex}
+                  aria-label={`Photo ${i + 1} of ${allPhotos.length}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (i !== photoIndex) {
+                      haptic(8);
+                      setPhotoIndex(i);
+                    }
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="group relative flex h-8 items-center justify-center touch-manipulation"
+                  style={{ flex: i === photoIndex ? "0 0 28px" : "0 0 12px" }}
+                >
+                  <span
+                    className={`block h-1 rounded-full transition-all duration-200 ${
+                      i === photoIndex ? "w-7 bg-white/95" : "w-2.5 bg-white/45 group-hover:bg-white/70"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           )}
-          {/* Photo tap zones */}
+          {/* Photo tap zones — narrower so dots remain tappable; skip the center */}
           {hasMultiplePhotos && isTop && (
             <>
-              <button className="absolute left-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "prev")} onPointerDown={(e) => e.stopPropagation()} />
-              <button className="absolute right-0 top-0 bottom-0 w-1/3 z-10" onClick={(e) => handlePhotoNav(e, "next")} onPointerDown={(e) => e.stopPropagation()} />
+              <button
+                type="button"
+                aria-label="Previous photo"
+                className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
+                onClick={(e) => { handlePhotoNav(e, "prev"); haptic(8); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              />
+              <button
+                type="button"
+                aria-label="Next photo"
+                className="absolute right-0 top-0 bottom-0 w-1/3 z-10"
+                onClick={(e) => { handlePhotoNav(e, "next"); haptic(8); }}
+                onPointerDown={(e) => e.stopPropagation()}
+              />
             </>
           )}
           {/* Bottom gradient into info */}

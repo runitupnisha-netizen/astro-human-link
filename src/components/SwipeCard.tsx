@@ -120,12 +120,25 @@ const SwipeCard = ({
 
   const hasMultiplePhotos = allPhotos.length > 1;
   const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
-  const hasBioPrompt = Boolean(profile.bio_prompt_1 && profile.bio_prompt_1_answer);
-  const hasExtraDetails = Boolean(
-    profile.about_me ||
-    (profile.shared_aspects && profile.shared_aspects.length > 0) ||
-    profile.compatibility_reason
+
+  // Normalize potentially-missing text fields with graceful fallbacks.
+  const bioPromptLabel = cleanText(profile.bio_prompt_1) ?? DEFAULT_PROMPT;
+  const bioAnswer = cleanText(profile.bio_prompt_1_answer);
+  // Always render the bio block — show a friendly placeholder instead of hiding.
+  const bioAnswerDisplay = bioAnswer ?? BIO_PLACEHOLDER;
+  const isBioPlaceholder = bioAnswer === null;
+
+  const aboutMe = cleanText(profile.about_me);
+  const compatibilityReason = cleanText(profile.compatibility_reason);
+  const sharedAspects = (profile.shared_aspects ?? []).filter(hasText);
+  const interests = (profile.interests ?? []).filter(hasText);
+  const relationshipGoal = cleanText(profile.relationship_goal);
+
+  const hasAnyAstro = Boolean(
+    profile.sun_sign || profile.moon_sign || profile.rising_sign || profile.human_design_type
   );
+  const hasExtraDetails = Boolean(aboutMe || sharedAspects.length > 0 || compatibilityReason);
+  const hasAnyVisibleInfo = hasAnyAstro || interests.length > 0 || !!relationshipGoal || hasExtraDetails;
 
   const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
     e.stopPropagation();

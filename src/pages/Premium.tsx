@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,14 +73,18 @@ const premiumPerks = [
 ];
 
 const Premium = () => {
-  const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription } = usePremium();
+  const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription } = usePremium();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const toastShown = useRef(false);
+  const redirectTriggered = useRef(false);
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
+  const redirectTo = searchParams.get("redirect") || "/discover";
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (toastShown.current) return;
@@ -93,6 +97,55 @@ const Premium = () => {
       toast({ title: "Checkout canceled", description: "You can upgrade anytime.", variant: "destructive" });
     }
   }, [success, canceled, toast]);
+
+  // After Stripe checkout success, poll the subscription status until it
+  // becomes active, then redirect the user back into the app.
+  useEffect(() => {
+    if (!success || redirectTriggered.current) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 12; // ~24s at 2s interval
+    setVerifying(true);
+
+    const tick = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      try {
+        await refreshSubscription();
+      } catch {
+        // swallow — we'll retry
+      }
+    };
+
+    // Kick off an immediate check, then poll.
+    tick();
+    const interval = setInterval(async () => {
+      if (cancelled) return;
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setVerifying(false);
+        return;
+      }
+      await tick();
+    }, 2000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [success, refreshSubscription]);
+
+  // Once subscription is confirmed active after a successful checkout, redirect.
+  useEffect(() => {
+    if (!success || redirectTriggered.current) return;
+    if (subscribed) {
+      redirectTriggered.current = true;
+      setVerifying(false);
+      const t = setTimeout(() => navigate(redirectTo, { replace: true }), 1200);
+      return () => clearTimeout(t);
+    }
+  }, [success, subscribed, navigate, redirectTo]);
 
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);

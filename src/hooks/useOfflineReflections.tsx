@@ -87,6 +87,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     setSyncing(true);
     setProgress({ current: 0, total: current.length });
     const remaining: QueuedReflection[] = [];
+    let synced = 0;
     try {
       // Local de-dupe: collapse any accidental duplicates that share a client_key.
       const seen = new Set<string>();

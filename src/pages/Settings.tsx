@@ -580,6 +580,8 @@ const Settings = () => {
 
             <LanguageCard />
 
+            <AccessibilityCard />
+
 
             <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
               <CardHeader>

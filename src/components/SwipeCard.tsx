@@ -474,7 +474,17 @@ const SwipeCard = ({
                 e.stopPropagation();
                 e.preventDefault();
                 haptic(10);
-                setDetailsExpanded((v) => !v);
+                setDetailsExpanded((v) => {
+                  const next = !v;
+                  if (isTop) {
+                    track("card_details_toggled", {
+                      target_user_id: profile.user_id,
+                      expanded: next,
+                      section: "more_details",
+                    });
+                  }
+                  return next;
+                });
               }}
               onPointerDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}

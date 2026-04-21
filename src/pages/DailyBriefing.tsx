@@ -348,10 +348,13 @@ const DailyBriefing = () => {
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs text-muted-foreground font-body">
                       {reflection.length}/2000
+                      {limit !== Infinity && limit > 0 && (
+                        <> · {reflectionsToday}/{limitDisplay} today</>
+                      )}
                     </span>
                     <Button
                       onClick={saveReflection}
-                      disabled={!reflection.trim() || saving}
+                      disabled={!reflection.trim() || saving || limitReached}
                       size="sm"
                       className="min-h-[40px]"
                     >
@@ -359,11 +362,22 @@ const DailyBriefing = () => {
                         <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving</>
                       ) : saved ? (
                         <><Check className="w-4 h-4 mr-2" /> Saved</>
+                      ) : limitReached ? (
+                        <><Lock className="w-4 h-4 mr-2" /> Limit reached</>
                       ) : (
                         <><Save className="w-4 h-4 mr-2" /> Save reflection</>
                       )}
                     </Button>
                   </div>
+                  {limitReached && (
+                    <p className="text-xs text-amber-400 mt-2 font-body">
+                      {limit === 0
+                        ? "Subscribe to save private reflections to your journal."
+                        : `You've used today's ${limit} reflection${limit === 1 ? "" : "s"}. Upgrade for unlimited.`}
+                      {" "}
+                      <Link to="/premium" className="underline">View plans</Link>
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>

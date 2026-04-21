@@ -552,7 +552,17 @@ const SwipeCard = ({
               e.preventDefault();
               if (!isBioPlaceholder) {
                 haptic(8);
-                setBioExpanded((v) => !v);
+                setBioExpanded((v) => {
+                  const next = !v;
+                  if (isTop) {
+                    track("card_details_toggled", {
+                      target_user_id: profile.user_id,
+                      expanded: next,
+                      section: "bio",
+                    });
+                  }
+                  return next;
+                });
               }
             }}
             onPointerDown={(e) => e.stopPropagation()}

@@ -19,6 +19,7 @@ import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
 import { useAccessibility } from "@/hooks/useAccessibility";
+import { useAnalytics, AnalyticsEvents } from "@/hooks/useAnalytics";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -119,6 +120,7 @@ const SwipeCard = ({
   const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
   const { prefersReducedMotion } = useAccessibility();
+  const { track } = useAnalytics();
   // When the user prefers reduced motion, expand/collapse should be instant.
   const motionDuration = prefersReducedMotion ? 0 : 0.25;
   const fastMotionDuration = prefersReducedMotion ? 0 : 0.2;
@@ -472,7 +474,17 @@ const SwipeCard = ({
                 e.stopPropagation();
                 e.preventDefault();
                 haptic(10);
-                setDetailsExpanded((v) => !v);
+                setDetailsExpanded((v) => {
+                  const next = !v;
+                  if (isTop) {
+                    track("card_details_toggled", {
+                      target_user_id: profile.user_id,
+                      expanded: next,
+                      section: "more_details",
+                    });
+                  }
+                  return next;
+                });
               }}
               onPointerDown={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
@@ -540,7 +552,17 @@ const SwipeCard = ({
               e.preventDefault();
               if (!isBioPlaceholder) {
                 haptic(8);
-                setBioExpanded((v) => !v);
+                setBioExpanded((v) => {
+                  const next = !v;
+                  if (isTop) {
+                    track("card_details_toggled", {
+                      target_user_id: profile.user_id,
+                      expanded: next,
+                      section: "bio",
+                    });
+                  }
+                  return next;
+                });
               }
             }}
             onPointerDown={(e) => e.stopPropagation()}

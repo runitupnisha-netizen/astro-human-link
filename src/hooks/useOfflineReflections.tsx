@@ -46,7 +46,9 @@ export const useOfflineReflections = (onSynced?: () => void) => {
   const { user } = useAuth();
   const [queue, setQueue] = useState<QueuedReflection[]>([]);
   const [syncing, setSyncing] = useState(false);
-  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
+  const [progress, setProgress] = useState<
+    { current: number; total: number; synced: number; failed: number } | null
+  >(null);
 
   // Hydrate queue when user becomes available
   useEffect(() => {
@@ -85,9 +87,10 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     if (current.length === 0) return { synced: 0, failed: 0 };
 
     setSyncing(true);
-    setProgress({ current: 0, total: current.length });
+    setProgress({ current: 0, total: current.length, synced: 0, failed: 0 });
     const remaining: QueuedReflection[] = [];
     let synced = 0;
+    let failed = 0;
     try {
       // Local de-dupe: collapse any accidental duplicates that share a client_key.
       const seen = new Set<string>();
@@ -98,11 +101,12 @@ export const useOfflineReflections = (onSynced?: () => void) => {
       });
 
       // Update total after dedupe
-      setProgress({ current: 0, total: deduped.length });
+      setProgress({ current: 0, total: deduped.length, synced: 0, failed: 0 });
 
       for (let i = 0; i < deduped.length; i++) {
         const item = deduped[i];
-        setProgress({ current: i, total: deduped.length });
+        // Mark which item is in-flight (1-based for "writing 2 of 5…")
+        setProgress({ current: i, total: deduped.length, synced, failed });
 
         // Pre-flight: if a row with this client_key already exists for this
         // user (e.g. a previous request reached the server before the network
@@ -116,6 +120,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
 
         if (existing) {
           synced++;
+          setProgress({ current: i + 1, total: deduped.length, synced, failed });
           continue;
         }
 
@@ -135,14 +140,19 @@ export const useOfflineReflections = (onSynced?: () => void) => {
           synced++;
         } else {
           remaining.push(item);
+          failed++;
         }
+        // Tick the bar after each item resolves, success or failure.
+        setProgress({ current: i + 1, total: deduped.length, synced, failed });
       }
-      setProgress({ current: deduped.length, total: deduped.length });
+      setProgress({ current: deduped.length, total: deduped.length, synced, failed });
     } finally {
       writeQueue(user.id, remaining);
       setQueue(remaining);
       setSyncing(false);
-      setProgress(null);
+      // Briefly hold the final state so users can see "5 of 5 synced",
+      // then clear. The DailyBriefing UI also reads `syncing` to gate visibility.
+      setTimeout(() => setProgress(null), 1200);
     }
     if (synced > 0) onSynced?.();
     return { synced, failed: remaining.length };

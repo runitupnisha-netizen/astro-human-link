@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -65,6 +65,23 @@ export const useDailyBriefing = () => {
   const [error, setError] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(false);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
+  // True when the page was opened (or the last fetch ran) while offline and
+  // we still owe the server a refresh. Used so reconnection always triggers
+  // an automatic update and the UI can surface a "queued" indicator.
+  const [refreshQueued, setRefreshQueued] = useState(false);
+  const refreshQueuedRef = useRef(false);
+
+  const queueRefresh = useCallback(() => {
+    if (refreshQueuedRef.current) return;
+    refreshQueuedRef.current = true;
+    setRefreshQueued(true);
+  }, []);
+
+  const clearQueuedRefresh = useCallback(() => {
+    if (!refreshQueuedRef.current) return;
+    refreshQueuedRef.current = false;
+    setRefreshQueued(false);
+  }, []);
 
   const fetchBriefing = useCallback(async () => {
     if (!user) return;
@@ -80,6 +97,10 @@ export const useDailyBriefing = () => {
     // 2. If browser reports offline, stop here and surface cached briefing
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       setIsOffline(true);
+      // Owe the server a refresh as soon as we're back online — even if
+      // we already have today's cached briefing (it might be stale, e.g.
+      // regenerated server-side).
+      queueRefresh();
       if (!cached || cached.briefing.briefing_date !== today) {
         setError("You're offline and today's briefing isn't cached yet.");
       }
@@ -114,10 +135,14 @@ export const useDailyBriefing = () => {
           setCachedAt(new Date().toISOString());
         }
       }
+      // Successful round-trip — drop any pending queued refresh.
+      clearQueuedRefresh();
     } catch (err) {
       console.error("[useDailyBriefing]", err);
       // Network/server failure: if we already have a cached briefing showing,
       // don't blank it out — just flag offline mode.
+      // Either way we still owe the server a refresh once we recover.
+      queueRefresh();
       if (cached?.briefing.briefing_date === today) {
         setIsOffline(true);
       } else {
@@ -127,17 +152,23 @@ export const useDailyBriefing = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, queueRefresh, clearQueuedRefresh]);
 
   useEffect(() => {
     if (user) fetchBriefing();
   }, [user, fetchBriefing]);
 
-  // Auto-refresh when the connection comes back online
+  // Auto-refresh when the connection comes back online — including when
+  // the page was first opened offline, in which case `refreshQueued` was
+  // set during the initial cache-only render and this listener drains it.
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false);
-      if (user) fetchBriefing();
+      if (user) {
+        // Always run a fetch on reconnect; `fetchBriefing` will clear
+        // `refreshQueued` on success or re-queue it on failure.
+        fetchBriefing();
+      }
     };
     const handleOffline = () => setIsOffline(true);
     window.addEventListener("online", handleOnline);
@@ -148,5 +179,24 @@ export const useDailyBriefing = () => {
     };
   }, [user, fetchBriefing]);
 
-  return { briefing, loading, error, isOffline, cachedAt, refresh: fetchBriefing };
+  // Safety net: if the user is online but a refresh is still queued (for
+  // example after a transient server error that flipped us offline), drain
+  // it once. This makes the "queued refresh" guarantee independent of the
+  // browser firing an `online` event.
+  useEffect(() => {
+    if (!user || !refreshQueued) return;
+    if (typeof navigator !== "undefined" && navigator.onLine && !isOffline) {
+      fetchBriefing();
+    }
+  }, [user, refreshQueued, isOffline, fetchBriefing]);
+
+  return {
+    briefing,
+    loading,
+    error,
+    isOffline,
+    cachedAt,
+    refreshQueued,
+    refresh: fetchBriefing,
+  };
 };

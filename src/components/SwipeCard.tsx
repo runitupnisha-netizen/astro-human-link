@@ -141,6 +141,25 @@ const SwipeCard = ({
   const hasMultiplePhotos = allPhotos.length > 1;
   const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
 
+  // --- Image prefetching ----------------------------------------------------
+  // Top card: prefetch neighbours (next + previous) whenever the active photo
+  // changes so dot-nav and tap-nav feel instant on slow connections.
+  useEffect(() => {
+    if (!isTop || allPhotos.length <= 1) return;
+    const next = allPhotos[photoIndex + 1];
+    const prev = allPhotos[photoIndex - 1];
+    // Look 2 ahead too so a quick double-tap is also covered.
+    const nextNext = allPhotos[photoIndex + 2];
+    prefetchImages([next, prev, nextNext]);
+  }, [isTop, photoIndex, allPhotos]);
+
+  // Stack cards: prefetch the first photo of upcoming cards once, so when
+  // they become the top card the hero image is already cached.
+  useEffect(() => {
+    if (isTop) return;
+    prefetchImage(allPhotos[0]);
+  }, [isTop, allPhotos]);
+
   // Normalize potentially-missing text fields with graceful fallbacks.
   const bioPromptLabel = cleanText(profile.bio_prompt_1) ?? DEFAULT_PROMPT;
   const bioAnswer = cleanText(profile.bio_prompt_1_answer);

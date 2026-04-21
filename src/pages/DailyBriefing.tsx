@@ -49,6 +49,32 @@ const DailyBriefing = () => {
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
+  // Toast on connection transitions during this page's session.
+  // We listen to the browser's own online/offline events so the toast
+  // fires for the actual transition (not just because the page mounted
+  // while already offline).
+  useEffect(() => {
+    const handleOnline = () => {
+      toast({
+        title: "Back online ✨",
+        description: "Refreshing your cosmic briefing…",
+      });
+    };
+    const handleOffline = () => {
+      toast({
+        title: "You're offline",
+        description: "We'll keep showing your saved briefing and sync when you reconnect.",
+        variant: "destructive",
+      });
+    };
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [toast]);
+
   const handleQueueSynced = () => {
     // Refresh count + timeline once any pending offline reflections sync.
     setSaved(true);

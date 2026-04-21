@@ -283,7 +283,15 @@ const SwipeCard = ({
         {/* Photo — large, immersive */}
         <div className={`relative w-full shrink-0 bg-muted transition-all duration-300 ${detailsExpanded ? "basis-[36%] min-h-[11rem] max-h-[40%]" : "basis-[52%] min-h-[15rem] max-h-[55%]"}`}>
           {currentPhoto ? (
-            <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
+            <img
+              src={currentPhoto}
+              alt={profile.display_name || ""}
+              className="w-full h-full object-cover"
+              loading={isTop ? "eager" : "lazy"}
+              decoding="async"
+              draggable={false}
+              {...({ fetchpriority: isTop ? "high" : "low" } as any)}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <User className="w-16 h-16 text-muted-foreground/40" />

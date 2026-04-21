@@ -128,6 +128,8 @@ const DailyBriefing = () => {
         });
       if (insErr) throw insErr;
       setSaved(true);
+      setReflection("");
+      setTimelineRefresh((n) => n + 1);
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {

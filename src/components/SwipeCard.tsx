@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown } from "lucide-react";
+import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown, Sparkles } from "lucide-react";
 import { useState, useCallback } from "react";
 
 // Light haptic tap (no-op on unsupported devices / desktop)
@@ -16,6 +16,7 @@ const haptic = (pattern: number | number[] = 12) => {
 import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
+import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -93,6 +94,12 @@ interface SwipeCardProps {
   stackIndex?: number;
   onViewProfile?: (profile: DiscoverProfile) => void;
   isPremium?: boolean;
+  viewerChart?: {
+    sun_sign: string | null;
+    moon_sign: string | null;
+    rising_sign: string | null;
+    human_design_type: string | null;
+  } | null;
   exitDirection?: "left" | "right" | "super" | null;
   onExitComplete?: () => void;
 }
@@ -103,6 +110,7 @@ const SwipeCard = ({
   isTop,
   stackIndex = 0,
   isPremium = false,
+  viewerChart = null,
   exitDirection = null,
   onExitComplete,
 }: SwipeCardProps) => {

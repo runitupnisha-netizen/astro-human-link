@@ -125,6 +125,17 @@ const Settings = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
+  // Daily Cosmic Briefing reminder prefs (server-stored)
+  const [briefingPrefs, setBriefingPrefs] = useState({
+    email: false,
+    push: false,
+    hour: 8,
+    timezone: typeof Intl !== "undefined"
+      ? Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+      : "UTC",
+  });
+  const [savingBriefing, setSavingBriefing] = useState(false);
+
   const defaultNotifPrefs = { matches: true, messages: true, likes: true, insights: true, marketing: false };
   const [notifPrefs, setNotifPrefs] = useState(() => {
     try {
@@ -180,6 +191,22 @@ const Settings = () => {
       .then(({ data }) => {
         setVerificationStatus(data?.status || null);
       });
+
+    // Load briefing reminder prefs
+    supabase
+      .from("profiles")
+      .select("briefing_email_reminder, briefing_push_reminder, briefing_reminder_hour, briefing_reminder_timezone")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        setBriefingPrefs((prev) => ({
+          email: !!data.briefing_email_reminder,
+          push: !!data.briefing_push_reminder,
+          hour: typeof data.briefing_reminder_hour === "number" ? data.briefing_reminder_hour : 8,
+          timezone: data.briefing_reminder_timezone || prev.timezone,
+        }));
+      });
   }, [user]);
 
   const handleEnablePush = async () => {
@@ -190,6 +217,37 @@ const Settings = () => {
       toast.error("Notifications are blocked in your browser settings");
     } else {
       toast.error("Could not enable push notifications");
+    }
+  };
+
+  const updateBriefingPref = async (
+    patch: Partial<{ email: boolean; push: boolean; hour: number; timezone: string }>
+  ) => {
+    if (!user) return;
+    const next = { ...briefingPrefs, ...patch };
+    setBriefingPrefs(next);
+    setSavingBriefing(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        briefing_email_reminder: next.email,
+        briefing_push_reminder: next.push,
+        briefing_reminder_hour: next.hour,
+        briefing_reminder_timezone: next.timezone,
+      })
+      .eq("user_id", user.id);
+    setSavingBriefing(false);
+    if (error) {
+      toast.error("Couldn't save reminder settings");
+      return;
+    }
+    if ("email" in patch || "push" in patch) {
+      const turnedOn = (patch.email ?? next.email) || (patch.push ?? next.push);
+      toast.success(
+        turnedOn ? "Daily Briefing reminders updated ✨" : "Reminders turned off"
+      );
+    } else {
+      toast.success("Reminder time updated");
     }
   };
 
@@ -368,6 +426,65 @@ const Settings = () => {
                   )}
                   {permission === "granted" && (
                     <Badge className="bg-green-500/20 text-green-400 px-3 py-1">Active</Badge>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Daily Cosmic Briefing reminders */}
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-medium flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-amber-400" /> Daily Cosmic Briefing reminders
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      Get a gentle morning ping with today's energy theme.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pl-6">
+                    <span className="text-sm flex items-center gap-2">
+                      <Smartphone className="w-3.5 h-3.5" /> Push notification
+                    </span>
+                    <Switch
+                      checked={briefingPrefs.push}
+                      disabled={savingBriefing}
+                      onCheckedChange={(v) => updateBriefingPref({ push: v })}
+                      aria-label="Toggle daily briefing push reminder"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pl-6">
+                    <span className="text-sm flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5" /> Email reminder
+                    </span>
+                    <Switch
+                      checked={briefingPrefs.email}
+                      disabled={savingBriefing}
+                      onCheckedChange={(v) => updateBriefingPref({ email: v })}
+                      aria-label="Toggle daily briefing email reminder"
+                    />
+                  </div>
+
+                  {(briefingPrefs.push || briefingPrefs.email) && (
+                    <div className="flex items-center justify-between gap-3 pl-6">
+                      <Label htmlFor="briefing-hour" className="text-sm flex items-center gap-2 mb-0">
+                        <Calendar className="w-3.5 h-3.5" /> Send at
+                      </Label>
+                      <select
+                        id="briefing-hour"
+                        value={briefingPrefs.hour}
+                        disabled={savingBriefing}
+                        onChange={(e) => updateBriefingPref({ hour: parseInt(e.target.value, 10) })}
+                        className="bg-background/60 border border-border/50 rounded-md px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                      >
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i}>
+                            {i.toString().padStart(2, "0")}:00 ({briefingPrefs.timezone})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   )}
                 </div>
 

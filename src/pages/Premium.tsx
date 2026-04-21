@@ -176,6 +176,31 @@ const Premium = () => {
 
   return (
     <div className="min-h-screen bg-background pt-16 pb-24">
+      {/* Post-checkout verification overlay */}
+      {success && (verifying || subscribed) && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-md">
+          <div className="text-center max-w-xs px-6">
+            {subscribed ? (
+              <>
+                <Crown className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h2 className="font-display text-xl text-foreground mb-2">You're Premium ✨</h2>
+                <p className="text-sm text-muted-foreground font-body">
+                  Redirecting you back to the app…
+                </p>
+              </>
+            ) : (
+              <>
+                <Loader2 className="w-10 h-10 animate-spin text-accent mx-auto mb-4" />
+                <h2 className="font-display text-lg text-foreground mb-2">Confirming your upgrade</h2>
+                <p className="text-sm text-muted-foreground font-body">
+                  Aligning the stars with your new plan…
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
       <div className="relative overflow-hidden pt-8 pb-12 px-4">
         <div className="absolute inset-0 bg-[var(--gradient-cosmic)] opacity-60" />

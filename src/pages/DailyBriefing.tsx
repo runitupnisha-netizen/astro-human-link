@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,7 @@ import { useDailyBriefing } from "@/hooks/useDailyBriefing";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toPng } from "html-to-image";
 
 const DailyBriefing = () => {
   const { briefing, loading, error, refresh } = useDailyBriefing();
@@ -16,12 +17,57 @@ const DailyBriefing = () => {
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
     day: "numeric",
   });
+
+  const handleShare = async () => {
+    if (!shareCardRef.current || !briefing) return;
+    setSharing(true);
+    try {
+      const dataUrl = await toPng(shareCardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#0b0a1a",
+      });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `stellara-briefing-${briefing.briefing_date}.png`, {
+        type: "image/png",
+      });
+
+      const navAny = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+      if (navAny.canShare && navAny.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "My Cosmic Briefing — Stellara",
+          text: `Today's energy: ${briefing.energy_theme} ✨`,
+        });
+      } else {
+        const link = document.createElement("a");
+        link.download = `stellara-briefing-${briefing.briefing_date}.png`;
+        link.href = dataUrl;
+        link.click();
+        toast({
+          title: "Card downloaded ✨",
+          description: "Share it anywhere from your camera roll.",
+        });
+      }
+    } catch (err) {
+      console.error("[share]", err);
+      toast({
+        title: "Could not generate card",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const saveReflection = async () => {
     if (!briefing || !user || !reflection.trim()) return;

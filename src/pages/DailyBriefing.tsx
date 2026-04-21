@@ -386,6 +386,11 @@ const DailyBriefing = () => {
               </Card>
             </motion.div>
 
+            {/* Private reflections timeline */}
+            <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+              <ReflectionsTimeline refreshKey={timelineRefresh} locked={tierKey === "free"} />
+            </motion.div>
+
             <p className="text-center text-xs text-muted-foreground font-body mt-6">
               ✨ A new briefing arrives each morning. Available on every Stellara plan.
             </p>

@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown, Sparkles } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 // Light haptic tap (no-op on unsupported devices / desktop)
 const haptic = (pattern: number | number[] = 12) => {
@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
+import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -139,6 +140,25 @@ const SwipeCard = ({
 
   const hasMultiplePhotos = allPhotos.length > 1;
   const currentPhoto = allPhotos[photoIndex] || profile.avatar_url;
+
+  // --- Image prefetching ----------------------------------------------------
+  // Top card: prefetch neighbours (next + previous) whenever the active photo
+  // changes so dot-nav and tap-nav feel instant on slow connections.
+  useEffect(() => {
+    if (!isTop || allPhotos.length <= 1) return;
+    const next = allPhotos[photoIndex + 1];
+    const prev = allPhotos[photoIndex - 1];
+    // Look 2 ahead too so a quick double-tap is also covered.
+    const nextNext = allPhotos[photoIndex + 2];
+    prefetchImages([next, prev, nextNext]);
+  }, [isTop, photoIndex, allPhotos]);
+
+  // Stack cards: prefetch the first photo of upcoming cards once, so when
+  // they become the top card the hero image is already cached.
+  useEffect(() => {
+    if (isTop) return;
+    prefetchImage(allPhotos[0]);
+  }, [isTop, allPhotos]);
 
   // Normalize potentially-missing text fields with graceful fallbacks.
   const bioPromptLabel = cleanText(profile.bio_prompt_1) ?? DEFAULT_PROMPT;
@@ -263,7 +283,15 @@ const SwipeCard = ({
         {/* Photo — large, immersive */}
         <div className={`relative w-full shrink-0 bg-muted transition-all duration-300 ${detailsExpanded ? "basis-[36%] min-h-[11rem] max-h-[40%]" : "basis-[52%] min-h-[15rem] max-h-[55%]"}`}>
           {currentPhoto ? (
-            <img src={currentPhoto} alt={profile.display_name || ""} className="w-full h-full object-cover" />
+            <img
+              src={currentPhoto}
+              alt={profile.display_name || ""}
+              className="w-full h-full object-cover"
+              loading={isTop ? "eager" : "lazy"}
+              decoding="async"
+              draggable={false}
+              {...({ fetchpriority: isTop ? "high" : "low" } as any)}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <User className="w-16 h-16 text-muted-foreground/40" />

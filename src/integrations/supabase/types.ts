@@ -92,6 +92,80 @@ export type Database = {
         }
         Relationships: []
       }
+      briefing_reflections: {
+        Row: {
+          briefing_id: string
+          created_at: string
+          id: string
+          reflection: string
+          user_id: string
+        }
+        Insert: {
+          briefing_id: string
+          created_at?: string
+          id?: string
+          reflection: string
+          user_id: string
+        }
+        Update: {
+          briefing_id?: string
+          created_at?: string
+          id?: string
+          reflection?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefing_reflections_briefing_id_fkey"
+            columns: ["briefing_id"]
+            isOneToOne: false
+            referencedRelation: "daily_briefings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_briefings: {
+        Row: {
+          affirmation: string | null
+          briefing_date: string
+          cosmic_weather: string | null
+          created_at: string
+          energy_theme: string
+          focus: string
+          id: string
+          journal_prompt: string
+          lucky_window: string | null
+          mood: string
+          user_id: string
+        }
+        Insert: {
+          affirmation?: string | null
+          briefing_date?: string
+          cosmic_weather?: string | null
+          created_at?: string
+          energy_theme: string
+          focus: string
+          id?: string
+          journal_prompt: string
+          lucky_window?: string | null
+          mood: string
+          user_id: string
+        }
+        Update: {
+          affirmation?: string | null
+          briefing_date?: string
+          cosmic_weather?: string | null
+          created_at?: string
+          energy_theme?: string
+          focus?: string
+          id?: string
+          journal_prompt?: string
+          lucky_window?: string | null
+          mood?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_reveals: {
         Row: {
           created_at: string

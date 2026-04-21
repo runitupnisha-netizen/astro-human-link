@@ -308,6 +308,7 @@ const Discover = () => {
                   isTop={index === 0}
                   stackIndex={index}
                   isPremium={isPremium}
+                  viewerChart={myChart}
                   exitDirection={index === 0 && pendingSwipe?.profileId === profile.user_id ? exitDirection : null}
                   onExitComplete={index === 0 && pendingSwipe?.profileId === profile.user_id ? finalizeSwipe : undefined}
                 />

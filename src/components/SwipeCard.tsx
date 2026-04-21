@@ -461,7 +461,10 @@ const SwipeCard = ({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (!isBioPlaceholder) setBioExpanded((v) => !v);
+              if (!isBioPlaceholder) {
+                haptic(8);
+                setBioExpanded((v) => !v);
+              }
             }}
             onPointerDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
@@ -476,18 +479,25 @@ const SwipeCard = ({
             <div className="flex items-start justify-between gap-2 mb-1">
               <p className="text-xs text-primary font-semibold flex-1 uppercase tracking-wide">{bioPromptLabel}</p>
               {!isBioPlaceholder && (
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs leading-none transition-transform group-hover:scale-110" aria-hidden="true">
-                  {bioExpanded ? "▴" : "▾"}
-                </span>
+                <motion.span
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"
+                  animate={{ rotate: bioExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  aria-hidden="true"
+                >
+                  <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
+                </motion.span>
               )}
             </div>
-            <p
+            <motion.p
+              layout
               className={`text-sm leading-relaxed [@media(max-height:700px)]:text-xs ${
                 isBioPlaceholder ? "text-muted-foreground italic" : "text-foreground/95"
               } ${bioExpanded || isBioPlaceholder ? "" : "line-clamp-3"}`}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               {bioAnswerDisplay}
-            </p>
+            </motion.p>
             {!isBioPlaceholder && bioAnswer && bioAnswer.length > 100 && (
               <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
                 {bioExpanded ? "Tap to collapse" : "Tap to read more"}
@@ -505,11 +515,13 @@ const SwipeCard = ({
           {/* View Full Profile */}
           {isTop && !profile.user_id.startsWith("demo-") && (
             <button
-              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${profile.user_id}`); }}
+              type="button"
+              onClick={(e) => { e.stopPropagation(); haptic(10); navigate(`/profile/${profile.user_id}`); }}
               onPointerDown={(e) => e.stopPropagation()}
-              className="w-full flex items-center justify-center gap-1.5 text-xs text-primary hover:text-foreground transition-colors py-1"
+              aria-label="View full profile"
+              className="w-full min-h-11 flex items-center justify-center gap-1.5 text-xs font-semibold text-primary hover:text-foreground transition-colors rounded-lg px-3 py-2.5 active:bg-primary/5 touch-manipulation"
             >
-              <Eye className="w-3.5 h-3.5" /> View Full Profile
+              <Eye className="w-4 h-4" /> View Full Profile
             </button>
           )}
         </div>

@@ -257,6 +257,31 @@ const DailyBriefing = () => {
           <p className="text-muted-foreground text-sm mt-1 font-body">
             Your personalised energy reading, tuned to your chart.
           </p>
+          {offlineQueue.length > 0 && (
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              onClick={() => {
+                document
+                  .getElementById("offline-queue-banner")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }}
+              aria-label={`${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync. Tap to view.`}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-body text-primary hover:bg-primary/15 transition-colors min-h-[28px] touch-manipulation"
+            >
+              {queueSyncing ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <CloudOff className="w-3 h-3" />
+              )}
+              <span className="tabular-nums font-medium">{offlineQueue.length}</span>
+              <span>
+                {queueSyncing ? "syncing now…" : `waiting to sync`}
+              </span>
+            </motion.button>
+          )}
         </motion.header>
 
         {/* Offline indicator */}

@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown, Sparkles } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 // Light haptic tap (no-op on unsupported devices / desktop)
 const haptic = (pattern: number | number[] = 12) => {
@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
+import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
 
 export interface DiscoverProfile {
   user_id: string;

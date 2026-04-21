@@ -154,6 +154,29 @@ const DailyBriefing = () => {
                       <span>{briefing.cosmic_weather}</span>
                     </p>
                   )}
+                  <div className="flex gap-2 mt-5">
+                    <Button
+                      onClick={handleShare}
+                      disabled={sharing}
+                      size="sm"
+                      variant="outline"
+                      className="border-accent/40 text-accent hover:bg-accent/10"
+                    >
+                      {sharing ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating card…</>
+                      ) : (
+                        <><Share2 className="w-4 h-4 mr-2" /> Share today</>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={refresh}
+                      size="sm"
+                      variant="ghost"
+                      className="text-muted-foreground"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

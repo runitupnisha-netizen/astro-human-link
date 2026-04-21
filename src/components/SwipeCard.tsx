@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown } from "lucide-react";
+import { Heart, X, Star, User, MapPin, Lock, Eye, ChevronDown, Sparkles } from "lucide-react";
 import { useState, useCallback } from "react";
 
 // Light haptic tap (no-op on unsupported devices / desktop)
@@ -16,6 +16,7 @@ const haptic = (pattern: number | number[] = 12) => {
 import { useNavigate } from "react-router-dom";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
+import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 
 export interface DiscoverProfile {
   user_id: string;
@@ -93,6 +94,12 @@ interface SwipeCardProps {
   stackIndex?: number;
   onViewProfile?: (profile: DiscoverProfile) => void;
   isPremium?: boolean;
+  viewerChart?: {
+    sun_sign: string | null;
+    moon_sign: string | null;
+    rising_sign: string | null;
+    human_design_type: string | null;
+  } | null;
   exitDirection?: "left" | "right" | "super" | null;
   onExitComplete?: () => void;
 }
@@ -103,6 +110,7 @@ const SwipeCard = ({
   isTop,
   stackIndex = 0,
   isPremium = false,
+  viewerChart = null,
   exitDirection = null,
   onExitComplete,
 }: SwipeCardProps) => {
@@ -150,6 +158,17 @@ const SwipeCard = ({
   );
   const hasExtraDetails = Boolean(aboutMe || sharedAspects.length > 0 || compatibilityReason);
   const hasAnyVisibleInfo = hasAnyAstro || interests.length > 0 || !!relationshipGoal || hasExtraDetails;
+
+  // Compact, deterministic "Your cosmic overlap" summary (max 3 short points).
+  const overlapPoints = buildCosmicOverlap({
+    sun_sign: profile.sun_sign,
+    moon_sign: profile.moon_sign,
+    rising_sign: profile.rising_sign,
+    human_design_type: profile.human_design_type,
+    shared_aspects: profile.shared_aspects,
+    viewer: viewerChart ?? undefined,
+  });
+  const showOverlap = hasAnyAstro || (profile.shared_aspects?.length ?? 0) > 0;
 
   const handlePhotoNav = (e: React.MouseEvent, direction: "prev" | "next") => {
     e.stopPropagation();
@@ -366,6 +385,31 @@ const SwipeCard = ({
               <Badge variant="outline" className="border-primary/30 text-primary text-xs [@media(max-height:700px)]:text-[11px]">{profile.human_design_type}</Badge>
             )}
           </div>
+
+          {/* Your cosmic overlap — explains *why* this match was suggested */}
+          {showOverlap && (
+            <div className="rounded-xl border border-accent/25 bg-gradient-to-br from-accent/10 via-primary/5 to-transparent p-3 [@media(max-height:700px)]:p-2.5">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-accent" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                  Your cosmic overlap
+                </p>
+              </div>
+              <ul className="space-y-1">
+                {overlapPoints.map((p, i) => (
+                  <li key={i} className="flex gap-1.5 text-[11.5px] leading-snug [@media(max-height:700px)]:text-[11px]">
+                    <span className="font-semibold text-foreground/90 shrink-0">{p.label}:</span>
+                    <span className="text-muted-foreground">{p.detail}</span>
+                  </li>
+                ))}
+              </ul>
+              {!viewerChart && (
+                <p className="mt-1.5 text-[10px] italic text-muted-foreground/70">
+                  Add your birth details for a richer overlap.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Interests */}
           {interests.length > 0 && (

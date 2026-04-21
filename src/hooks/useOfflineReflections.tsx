@@ -10,6 +10,12 @@ export interface QueuedReflection {
   queued_at: string;
   /** Stable per-entry idempotency key sent to the server. */
   client_key: string;
+  /** Number of failed sync attempts so far (0 = never tried). */
+  attempts?: number;
+  /** Short, user-readable reason from the last failure. */
+  last_error?: string;
+  /** ISO timestamp of the last attempt (success or failure). */
+  last_attempt_at?: string;
 }
 
 const queueKey = (userId: string) => `stellara.reflectionQueue.${userId}`;

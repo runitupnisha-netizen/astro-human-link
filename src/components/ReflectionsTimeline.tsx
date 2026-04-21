@@ -52,26 +52,40 @@ export const ReflectionsTimeline = ({ refreshKey = 0, locked = false }: Props) =
     const to = from + PAGE_SIZE; // fetch one extra to detect "more"
     const { data, error } = await supabase
       .from("briefing_reflections")
-      .select("id, reflection, created_at, briefing_id, daily_briefings!inner(briefing_date, energy_theme)")
+      .select("id, reflection, created_at, briefing_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .range(from, to);
 
-    setLoading(false);
     if (error) {
+      setLoading(false);
       console.error("[ReflectionsTimeline]", error);
       toast({ title: "Couldn't load reflections", variant: "destructive" });
       return;
     }
 
-    const rows = (data ?? []).map((r: any): TimelineEntry => ({
+    const reflections = data ?? [];
+    const briefingIds = Array.from(new Set(reflections.map((r) => r.briefing_id)));
+    let briefingMap: Record<string, { briefing_date: string | null; energy_theme: string | null }> = {};
+    if (briefingIds.length > 0) {
+      const { data: briefings } = await supabase
+        .from("daily_briefings")
+        .select("id, briefing_date, energy_theme")
+        .in("id", briefingIds);
+      briefingMap = Object.fromEntries(
+        (briefings ?? []).map((b) => [b.id, { briefing_date: b.briefing_date, energy_theme: b.energy_theme }])
+      );
+    }
+
+    const rows: TimelineEntry[] = reflections.map((r) => ({
       id: r.id,
       reflection: r.reflection,
       created_at: r.created_at,
       briefing_id: r.briefing_id,
-      briefing_date: r.daily_briefings?.briefing_date ?? null,
-      energy_theme: r.daily_briefings?.energy_theme ?? null,
+      briefing_date: briefingMap[r.briefing_id]?.briefing_date ?? null,
+      energy_theme: briefingMap[r.briefing_id]?.energy_theme ?? null,
     }));
+    setLoading(false);
 
     setHasMore(rows.length > PAGE_SIZE);
     const trimmed = rows.slice(0, PAGE_SIZE);

@@ -20,6 +20,7 @@ const tierDetails: Record<TierKey, {
     description: "Try Premium risk-free",
     features: [
       "Unlimited cosmic matches",
+      "Daily Cosmic Briefing + reflections",
       "Advanced compatibility insights",
       "Priority Sacred Reveals",
     ],
@@ -33,6 +34,8 @@ const tierDetails: Record<TierKey, {
       "Full synastry charts",
       "Who Liked Me access",
       "Advanced filters",
+      "5 Super Likes per week",
+      "Weekly cosmic insights digest",
     ],
   },
   vip: {
@@ -42,8 +45,9 @@ const tierDetails: Record<TierKey, {
     badge: "Best Value",
     features: [
       "Everything in Monthly",
-      "Unlimited Super Likes",
-      "Exclusive VIP cosmic insights",
+      "Unlimited Super Likes & Boosts",
+      "Inner World suite (AI Cosmic Guide, Dream Journal)",
+      "Compatibility lookup for anyone",
       "Priority profile visibility",
       "Personal energy readings",
     ],
@@ -53,10 +57,10 @@ const tierDetails: Record<TierKey, {
     description: "Save over 55%",
     badge: "Best Price",
     features: [
-      "Everything in Monthly",
-      "Full synastry charts",
-      "Who Liked Me access",
+      "Everything in VIP, billed yearly",
+      "Inner World suite included",
       "Save $99+ per year",
+      "Locked-in price for 12 months",
     ],
   },
 };

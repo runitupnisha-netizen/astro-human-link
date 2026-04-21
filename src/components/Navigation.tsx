@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sheet,
@@ -63,6 +63,7 @@ const Navigation = () => {
   const desktopNavItems = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
+    { path: "/inner-world", label: "Inner World", icon: Moon },
     { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/profile", label: t("nav.profile"), icon: User },
@@ -74,8 +75,8 @@ const Navigation = () => {
   const bottomTabs = [
     { path: "/", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
+    { path: "/inner-world", label: "Inner World", icon: Moon },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
-    { path: "/feed", label: "Community", icon: Users },
     { path: "/profile", label: t("nav.profile"), icon: User },
   ];
 

@@ -365,8 +365,8 @@ const SwipeCard = ({
             <p className="text-sm text-muted-foreground leading-relaxed [@media(max-height:700px)]:text-xs">{profile.compatibility_reason}</p>
           )}
 
-          {/* Bio prompt — tap to expand */}
-          {detailsExpanded && profile.bio_prompt_1 && profile.bio_prompt_1_answer && (
+          {/* Bio prompt — always visible, tap to expand */}
+          {hasBioPrompt && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); e.preventDefault(); setBioExpanded((v) => !v); }}
@@ -381,10 +381,10 @@ const SwipeCard = ({
                   {bioExpanded ? "▴" : "▾"}
                 </span>
               </div>
-              <p className={`text-sm text-foreground/95 leading-relaxed [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-2"}`}>
+              <p className={`text-sm text-foreground/95 leading-relaxed [@media(max-height:700px)]:text-xs ${bioExpanded ? "" : "line-clamp-3"}`}>
                 {profile.bio_prompt_1_answer}
               </p>
-              {profile.bio_prompt_1_answer.length > 80 && (
+              {profile.bio_prompt_1_answer && profile.bio_prompt_1_answer.length > 100 && (
                 <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-primary font-semibold">
                   {bioExpanded ? "Tap to collapse" : "Tap to read more"}
                 </span>

@@ -11,6 +11,7 @@ import { usePremium } from "@/hooks/usePremium";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
+import { ReflectionsTimeline } from "@/components/ReflectionsTimeline";
 
 // Reflections-per-day limit by tier
 const TIER_ACCESS = {
@@ -31,6 +32,7 @@ const DailyBriefing = () => {
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
+  const [timelineRefresh, setTimelineRefresh] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";

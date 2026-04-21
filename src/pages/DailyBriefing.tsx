@@ -15,6 +15,18 @@ import { toPng } from "html-to-image";
 import { ReflectionsTimeline } from "@/components/ReflectionsTimeline";
 import { useOfflineReflections } from "@/hooks/useOfflineReflections";
 
+// Decode a `data:` URL to a Blob without going through `fetch()`. Works
+// fully offline and avoids any service-worker interception path.
+const dataUrlToBlob = (dataUrl: string): Blob => {
+  const [header, base64] = dataUrl.split(",");
+  const mimeMatch = /data:([^;]+);base64/.exec(header);
+  const mime = mimeMatch?.[1] ?? "image/png";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+};
+
 // Reflections-per-day limit by tier
 const TIER_ACCESS = {
   free:    { label: "Free",     reflectionsPerDay: 0,        accessLabel: "Read-only briefing" },

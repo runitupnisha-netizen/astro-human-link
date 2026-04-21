@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,7 @@ import { useDailyBriefing } from "@/hooks/useDailyBriefing";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toPng } from "html-to-image";
 
 const DailyBriefing = () => {
   const { briefing, loading, error, refresh } = useDailyBriefing();
@@ -16,12 +17,57 @@ const DailyBriefing = () => {
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
     day: "numeric",
   });
+
+  const handleShare = async () => {
+    if (!shareCardRef.current || !briefing) return;
+    setSharing(true);
+    try {
+      const dataUrl = await toPng(shareCardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#0b0a1a",
+      });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `stellara-briefing-${briefing.briefing_date}.png`, {
+        type: "image/png",
+      });
+
+      const navAny = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+      if (navAny.canShare && navAny.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "My Cosmic Briefing — Stellara",
+          text: `Today's energy: ${briefing.energy_theme} ✨`,
+        });
+      } else {
+        const link = document.createElement("a");
+        link.download = `stellara-briefing-${briefing.briefing_date}.png`;
+        link.href = dataUrl;
+        link.click();
+        toast({
+          title: "Card downloaded ✨",
+          description: "Share it anywhere from your camera roll.",
+        });
+      }
+    } catch (err) {
+      console.error("[share]", err);
+      toast({
+        title: "Could not generate card",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const saveReflection = async () => {
     if (!briefing || !user || !reflection.trim()) return;
@@ -108,6 +154,29 @@ const DailyBriefing = () => {
                       <span>{briefing.cosmic_weather}</span>
                     </p>
                   )}
+                  <div className="flex gap-2 mt-5">
+                    <Button
+                      onClick={handleShare}
+                      disabled={sharing}
+                      size="sm"
+                      variant="outline"
+                      className="border-accent/40 text-accent hover:bg-accent/10"
+                    >
+                      {sharing ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating card…</>
+                      ) : (
+                        <><Share2 className="w-4 h-4 mr-2" /> Share today</>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={refresh}
+                      size="sm"
+                      variant="ghost"
+                      className="text-muted-foreground"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -214,6 +283,207 @@ const DailyBriefing = () => {
             <p className="text-center text-xs text-muted-foreground font-body mt-6">
               ✨ A new briefing arrives each morning. Available on every Stellara plan.
             </p>
+
+            {/* Off-screen share card (rendered at fixed dimensions for clean export) */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "fixed",
+                top: 0,
+                left: -10000,
+                pointerEvents: "none",
+              }}
+            >
+              <div
+                ref={shareCardRef}
+                style={{
+                  width: 1080,
+                  height: 1350,
+                  background:
+                    "radial-gradient(at 20% 10%, #1e1b4b 0%, transparent 60%), radial-gradient(at 80% 90%, #4c1d95 0%, transparent 55%), linear-gradient(160deg, #0b0a1a 0%, #1a0f2e 100%)",
+                  color: "#f5f0ff",
+                  padding: 80,
+                  display: "flex",
+                  flexDirection: "column",
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Decorative stars */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage:
+                      "radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,0.6), transparent), radial-gradient(1px 1px at 78% 22%, rgba(255,215,128,0.7), transparent), radial-gradient(2px 2px at 30% 78%, rgba(255,255,255,0.4), transparent), radial-gradient(1px 1px at 88% 65%, rgba(255,255,255,0.5), transparent), radial-gradient(1.5px 1.5px at 55% 40%, rgba(255,215,128,0.5), transparent)",
+                  }}
+                />
+
+                <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column" }}>
+                  {/* Header */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40 }}>
+                    <div
+                      style={{
+                        width: 14,
+                        height: 14,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+                        boxShadow: "0 0 20px rgba(251,191,36,0.6)",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: 18,
+                        letterSpacing: "0.4em",
+                        textTransform: "uppercase",
+                        color: "#fbbf24",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Stellara · Daily Briefing
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: 22,
+                      color: "rgba(245,240,255,0.7)",
+                      marginBottom: 24,
+                    }}
+                  >
+                    {today}
+                  </div>
+
+                  {/* Energy theme */}
+                  <div style={{ marginBottom: 56 }}>
+                    <div
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: 16,
+                        letterSpacing: "0.3em",
+                        textTransform: "uppercase",
+                        color: "#fbbf24",
+                        marginBottom: 16,
+                      }}
+                    >
+                      Today's Energy
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 78,
+                        lineHeight: 1.05,
+                        fontWeight: 500,
+                        color: "#f5f0ff",
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {briefing.energy_theme}
+                    </div>
+                  </div>
+
+                  {/* Mood + Focus */}
+                  <div style={{ display: "flex", gap: 24, marginBottom: 48 }}>
+                    <div
+                      style={{
+                        flex: 1,
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(251,191,36,0.2)",
+                        borderRadius: 24,
+                        padding: 32,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: 13,
+                          letterSpacing: "0.3em",
+                          textTransform: "uppercase",
+                          color: "#fbbf24",
+                          marginBottom: 12,
+                        }}
+                      >
+                        Mood
+                      </div>
+                      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, lineHeight: 1.4, color: "#f5f0ff" }}>
+                        {briefing.mood}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        flex: 1,
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(251,191,36,0.2)",
+                        borderRadius: 24,
+                        padding: 32,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: 13,
+                          letterSpacing: "0.3em",
+                          textTransform: "uppercase",
+                          color: "#fbbf24",
+                          marginBottom: 12,
+                        }}
+                      >
+                        Focus
+                      </div>
+                      <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 22, lineHeight: 1.4, color: "#f5f0ff" }}>
+                        {briefing.focus}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Affirmation */}
+                  {briefing.affirmation && (
+                    <div
+                      style={{
+                        fontStyle: "italic",
+                        fontSize: 36,
+                        lineHeight: 1.4,
+                        color: "rgba(245,240,255,0.92)",
+                        borderLeft: "3px solid #fbbf24",
+                        paddingLeft: 28,
+                      }}
+                    >
+                      "{briefing.affirmation}"
+                    </div>
+                  )}
+
+                  <div style={{ flex: 1 }} />
+
+                  {/* Footer */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderTop: "1px solid rgba(251,191,36,0.2)",
+                      paddingTop: 28,
+                      fontFamily: "'Inter', sans-serif",
+                    }}
+                  >
+                    <div style={{ fontSize: 18, color: "rgba(245,240,255,0.6)" }}>
+                      Where love aligns with the stars
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 600,
+                        letterSpacing: "0.2em",
+                        color: "#fbbf24",
+                      }}
+                    >
+                      ✦ STELLARA
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </>
         )}
       </div>

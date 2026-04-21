@@ -95,6 +95,7 @@ export type Database = {
       briefing_reflections: {
         Row: {
           briefing_id: string
+          client_key: string | null
           created_at: string
           id: string
           reflection: string
@@ -102,6 +103,7 @@ export type Database = {
         }
         Insert: {
           briefing_id: string
+          client_key?: string | null
           created_at?: string
           id?: string
           reflection: string
@@ -109,6 +111,7 @@ export type Database = {
         }
         Update: {
           briefing_id?: string
+          client_key?: string | null
           created_at?: string
           id?: string
           reflection?: string

@@ -157,6 +157,50 @@ const DailyBriefing = () => {
           </p>
         </motion.header>
 
+        {/* Tier access banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-5"
+        >
+          <Card className={`border ${tierKey === "free" ? "border-border/60 bg-card/60" : "border-amber-400/30 bg-gradient-to-r from-amber-500/5 via-card to-accent/5"}`}>
+            <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${tierKey === "free" ? "bg-muted" : "bg-amber-400/15"}`}>
+                  {tierKey === "free" ? (
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <Crown className="w-4 h-4 text-amber-400" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-body">
+                    Your access
+                  </p>
+                  <p className="text-sm text-foreground font-body truncate">
+                    <span className={tierKey === "free" ? "" : "text-amber-400 font-semibold"}>
+                      {tierAccess.label}
+                    </span>
+                    <span className="text-muted-foreground"> · {tierAccess.accessLabel}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {limit !== 0 && (
+                  <span className="text-xs text-muted-foreground font-body whitespace-nowrap">
+                    Today: <span className="text-foreground font-semibold">{reflectionsToday}</span>/{limitDisplay}
+                  </span>
+                )}
+                {tierKey !== "vip" && tierKey !== "yearly" && (
+                  <Button asChild size="sm" variant="outline" className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10">
+                    <Link to="/premium">{tierKey === "free" ? "Upgrade" : "Upgrade"}</Link>
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {loading && (
           <div className="flex flex-col items-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-primary mb-3" />

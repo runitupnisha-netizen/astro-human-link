@@ -80,6 +80,23 @@ const Discover = () => {
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 
+  // Prefetch the first photo (and a couple of extras for the next-up card)
+  // of upcoming profiles so swiping always reveals a fully-loaded photo.
+  useEffect(() => {
+    if (profiles.length === 0) return;
+    const urls: Array<string | null | undefined> = [];
+    // For the next 4 profiles in the queue, warm their hero photo
+    profiles.slice(0, 5).forEach((p, idx) => {
+      urls.push(p.avatar_url);
+      // For the immediate next-up card also warm photo #2 in case the
+      // user instantly tap-navigates the dots after swiping.
+      if (idx === 1 && p.photo_urls && p.photo_urls.length > 0) {
+        urls.push(p.photo_urls[0]);
+      }
+    });
+    prefetchImages(urls);
+  }, [profiles]);
+
   // Pull-to-refresh
   const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
     onRefresh: fetchProfiles,

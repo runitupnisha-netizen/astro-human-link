@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import { useDailyBriefing } from "@/hooks/useDailyBriefing";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -42,7 +43,7 @@ const DailyBriefing = () => {
     setTimelineRefresh((n) => n + 1);
     setTimeout(() => setSaved(false), 2500);
   };
-  const { queue: offlineQueue, syncing: queueSyncing, enqueue, flush } =
+  const { queue: offlineQueue, syncing: queueSyncing, progress: queueProgress, enqueue, flush } =
     useOfflineReflections(handleQueueSynced);
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
@@ -242,28 +243,42 @@ const DailyBriefing = () => {
             className="mb-4"
           >
             <Card className="border-primary/30 bg-primary/5">
-              <CardContent className="p-3 flex items-center justify-between gap-3 text-xs font-body">
-                <div className="flex items-center gap-2 min-w-0">
-                  {queueSyncing ? (
-                    <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
-                  ) : (
-                    <CloudOff className="w-4 h-4 text-primary shrink-0" />
-                  )}
-                  <span className="text-foreground truncate">
-                    {queueSyncing
-                      ? `Syncing ${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"}…`
-                      : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
-                  </span>
+              <CardContent className="p-3 flex flex-col gap-2 text-xs font-body">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {queueSyncing ? (
+                      <Loader2 className="w-4 h-4 text-primary shrink-0 animate-spin" />
+                    ) : (
+                      <CloudOff className="w-4 h-4 text-primary shrink-0" />
+                    )}
+                    <span className="text-foreground truncate">
+                      {queueSyncing
+                        ? `Syncing ${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"}…`
+                        : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-primary hover:bg-primary/10"
+                    disabled={queueSyncing || isOffline}
+                    onClick={() => flush()}
+                  >
+                    <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 text-primary hover:bg-primary/10"
-                  disabled={queueSyncing || isOffline}
-                  onClick={() => flush()}
-                >
-                  <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
-                </Button>
+                {/* Progress indicator during sync */}
+                {queueSyncing && queueProgress && (
+                  <div className="flex items-center gap-2">
+                    <Progress 
+                      value={(queueProgress.current / queueProgress.total) * 100} 
+                      className="h-1.5 flex-1"
+                    />
+                    <span className="text-muted-foreground shrink-0">
+                      {queueProgress.current}/{queueProgress.total}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>

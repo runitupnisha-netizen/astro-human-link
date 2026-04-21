@@ -46,6 +46,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
   const { user } = useAuth();
   const [queue, setQueue] = useState<QueuedReflection[]>([]);
   const [syncing, setSyncing] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
 
   // Hydrate queue when user becomes available
   useEffect(() => {
@@ -84,6 +85,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     if (current.length === 0) return { synced: 0, failed: 0 };
 
     setSyncing(true);
+    setProgress({ current: 0, total: current.length });
     const remaining: QueuedReflection[] = [];
     let synced = 0;
     try {
@@ -95,7 +97,13 @@ export const useOfflineReflections = (onSynced?: () => void) => {
         return true;
       });
 
-      for (const item of deduped) {
+      // Update total after dedupe
+      setProgress({ current: 0, total: deduped.length });
+
+      for (let i = 0; i < deduped.length; i++) {
+        const item = deduped[i];
+        setProgress({ current: i, total: deduped.length });
+
         // Pre-flight: if a row with this client_key already exists for this
         // user (e.g. a previous request reached the server before the network
         // dropped), treat it as already-synced.
@@ -129,10 +137,12 @@ export const useOfflineReflections = (onSynced?: () => void) => {
           remaining.push(item);
         }
       }
+      setProgress({ current: deduped.length, total: deduped.length });
     } finally {
       writeQueue(user.id, remaining);
       setQueue(remaining);
       setSyncing(false);
+      setProgress(null);
     }
     if (synced > 0) onSynced?.();
     return { synced, failed: remaining.length };
@@ -152,5 +162,5 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     return () => window.removeEventListener("online", handleOnline);
   }, [user, flush]);
 
-  return { queue, syncing, enqueue, flush };
+  return { queue, syncing, progress, enqueue, flush };
 };

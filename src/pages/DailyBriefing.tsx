@@ -128,6 +128,12 @@ const DailyBriefing = () => {
       return;
     }
     const text = reflection.trim();
+    // Stable idempotency key for this attempt — reused if we fall back to
+    // the offline queue so retries collapse onto the same server row.
+    const clientKey =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     // Offline path: queue locally, surface confirmation, exit early.
     if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -135,6 +141,7 @@ const DailyBriefing = () => {
         briefing_id: briefing.id,
         briefing_date: briefing.briefing_date,
         reflection: text,
+        client_key: clientKey,
       });
       setReflection("");
       setSaved(true);
@@ -154,8 +161,12 @@ const DailyBriefing = () => {
           user_id: user.id,
           briefing_id: briefing.id,
           reflection: text,
+          client_key: clientKey,
         });
-      if (insErr) throw insErr;
+      // Treat unique-violation as success — the row is already saved
+      // (e.g. request succeeded server-side before the network dropped
+      // and was retried).
+      if (insErr && (insErr as { code?: string }).code !== "23505") throw insErr;
       setSaved(true);
       setReflection("");
       setTimelineRefresh((n) => n + 1);
@@ -167,6 +178,7 @@ const DailyBriefing = () => {
         briefing_id: briefing.id,
         briefing_date: briefing.briefing_date,
         reflection: text,
+        client_key: clientKey,
       });
       setReflection("");
       setSaved(true);

@@ -36,6 +36,15 @@ const DailyBriefing = () => {
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
+  const handleQueueSynced = () => {
+    // Refresh count + timeline once any pending offline reflections sync.
+    setSaved(true);
+    setTimelineRefresh((n) => n + 1);
+    setTimeout(() => setSaved(false), 2500);
+  };
+  const { queue: offlineQueue, syncing: queueSyncing, enqueue, flush } =
+    useOfflineReflections(handleQueueSynced);
+
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
   const tierAccess = TIER_ACCESS[tierKey];
   const limit = tierAccess.reflectionsPerDay;

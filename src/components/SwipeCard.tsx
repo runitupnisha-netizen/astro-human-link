@@ -120,6 +120,7 @@ const SwipeCard = ({
   const navigate = useNavigate();
   const { isVerified } = useVerificationStatus(profile.user_id);
   const { prefersReducedMotion } = useAccessibility();
+  const { track } = useAnalytics();
   // When the user prefers reduced motion, expand/collapse should be instant.
   const motionDuration = prefersReducedMotion ? 0 : 0.25;
   const fastMotionDuration = prefersReducedMotion ? 0 : 0.2;

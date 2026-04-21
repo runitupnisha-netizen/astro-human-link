@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ const TIER_ACCESS = {
 } as const;
 
 const DailyBriefing = () => {
-  const { briefing, loading, error, refresh } = useDailyBriefing();
+  const { briefing, loading, error, refresh, isOffline, cachedAt } = useDailyBriefing();
   const { user } = useAuth();
   const { subscribed, currentTier } = usePremium();
   const { toast } = useToast();

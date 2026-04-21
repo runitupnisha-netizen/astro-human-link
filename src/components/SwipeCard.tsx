@@ -19,6 +19,7 @@ import { useVerificationStatus } from "@/hooks/useVerification";
 import { buildCosmicOverlap } from "@/lib/cosmicOverlap";
 import { prefetchImage, prefetchImages } from "@/lib/imagePrefetch";
 import { useAccessibility } from "@/hooks/useAccessibility";
+import { useAnalytics, AnalyticsEvents } from "@/hooks/useAnalytics";
 
 export interface DiscoverProfile {
   user_id: string;

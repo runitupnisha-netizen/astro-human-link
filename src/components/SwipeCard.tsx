@@ -62,6 +62,17 @@ const getCity = (place: string | null): string | null => {
   return place.split(",")[0].trim();
 };
 
+// --- Graceful fallback helpers --------------------------------------------
+const hasText = (v: string | null | undefined): v is string =>
+  typeof v === "string" && v.trim().length > 0;
+
+const cleanText = (v: string | null | undefined): string | null =>
+  hasText(v) ? v.trim() : null;
+
+const DEFAULT_PROMPT = "A little about me";
+const BIO_PLACEHOLDER = "This soul hasn't shared their story yet — open the full profile to learn more.";
+const NO_INFO_PLACEHOLDER = "New profile · still discovering their cosmic blueprint ✨";
+
 const SWIPE_THRESHOLD = 100;
 
 interface SwipeCardProps {

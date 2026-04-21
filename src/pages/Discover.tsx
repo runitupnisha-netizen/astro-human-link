@@ -188,6 +188,7 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
+      {!loading && profiles.length > 0 && <SwipeTutorialOverlay />}
 
       <div ref={containerRef} {...pullHandlers} className="relative z-10 flex flex-col items-center pt-16 pb-[78px] md:pt-24 md:pb-12 [@media(max-height:700px)]:pt-12 [@media(max-height:700px)]:pb-[72px] overflow-y-auto">
         {pullIndicator}

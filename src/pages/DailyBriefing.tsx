@@ -221,6 +221,7 @@ const DailyBriefing = () => {
         description: "We'll sync this to your journal when you're back online.",
       });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
       return;
     }
 
@@ -243,6 +244,7 @@ const DailyBriefing = () => {
       setTimelineRefresh((n) => n + 1);
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
     } catch (err) {
       // Network or server failure → queue and tell the user we'll retry.
       enqueue({

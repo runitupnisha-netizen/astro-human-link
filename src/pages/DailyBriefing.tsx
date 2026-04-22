@@ -451,14 +451,26 @@ const DailyBriefing = () => {
                         item.reflection.length > 140
                           ? `${item.reflection.slice(0, 140).trimEnd()}…`
                           : item.reflection;
+                      const hasFailed = (item.attempts ?? 0) > 0;
                       return (
                         <li
                           key={item.id}
-                          className="rounded-md border border-primary/15 bg-background/40 px-2.5 py-1.5"
+                          className={`rounded-md border px-2.5 py-1.5 ${
+                            hasFailed
+                              ? "border-amber-400/30 bg-amber-400/5"
+                              : "border-primary/15 bg-background/40"
+                          }`}
                         >
                           <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
                             <span>{dayLabel}</span>
-                            <span>queued {queuedTime}</span>
+                            <span className="inline-flex items-center gap-1">
+                              {hasFailed && (
+                                <span className="normal-case tracking-normal text-amber-400">
+                                  failed ×{item.attempts}
+                                </span>
+                              )}
+                              <span>queued {queuedTime}</span>
+                            </span>
                           </div>
                           <p className="text-foreground/85 text-xs leading-snug whitespace-pre-wrap mt-0.5">
                             {preview}

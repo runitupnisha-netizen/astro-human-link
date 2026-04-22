@@ -84,7 +84,9 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex-1 container max-w-2xl mx-auto px-4 py-12">
+      {/* pt-20 clears the fixed top nav; pb-24 clears the mobile bottom tab
+          bar so the form's submit button is never overlapped. */}
+      <div className="flex-1 container max-w-2xl mx-auto px-4 pt-20 pb-24 md:py-12">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"

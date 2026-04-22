@@ -142,7 +142,8 @@ const SacredReveal = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-12 flex flex-col items-center">
+      {/* pb-24 reserves space for the fixed mobile bottom tab bar. */}
+      <div className="relative z-10 pt-20 pb-24 md:pb-12 flex flex-col items-center">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 px-6">
            <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-2">
             Sacred Match Reveal

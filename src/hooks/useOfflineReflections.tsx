@@ -336,5 +336,12 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     };
   }, [user, queue, flush]);
 
-  return { queue, syncing, progress, enqueue, flush, retryFailed };
+  /** Wipe the dedupe audit log (UI "clear" action). */
+  const clearDedupeAudit = useCallback(() => {
+    if (!user) return;
+    writeAudit(user.id, []);
+    setDedupeAudit([]);
+  }, [user]);
+
+  return { queue, syncing, progress, enqueue, flush, retryFailed, dedupeAudit, clearDedupeAudit };
 };

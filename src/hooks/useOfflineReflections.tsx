@@ -113,14 +113,17 @@ export const useOfflineReflections = (onSynced?: () => void) => {
   const [progress, setProgress] = useState<
     { current: number; total: number; synced: number; failed: number } | null
   >(null);
+  const [dedupeAudit, setDedupeAudit] = useState<DedupeAuditEntry[]>([]);
 
-  // Hydrate queue when user becomes available
+  // Hydrate queue + audit log when user becomes available
   useEffect(() => {
     if (!user) {
       setQueue([]);
+      setDedupeAudit([]);
       return;
     }
     setQueue(readQueue(user.id));
+    setDedupeAudit(readAudit(user.id));
   }, [user]);
 
   const enqueue = useCallback(

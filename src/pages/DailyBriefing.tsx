@@ -93,6 +93,8 @@ const DailyBriefing = () => {
     enqueue,
     flush,
     retryFailed,
+    dedupeAudit,
+    clearDedupeAudit,
   } = useOfflineReflections(handleQueueSynced);
 
   const failedCount = offlineQueue.filter((it) => (it.attempts ?? 0) > 0).length;

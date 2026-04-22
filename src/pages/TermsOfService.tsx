@@ -6,7 +6,8 @@ import Footer from "@/components/Footer";
 const TermsOfService = () => (
   <div className="min-h-screen bg-background relative">
     <CosmicBackground />
-    <div className="relative z-10 pt-20 pb-12">
+    {/* pb-24 keeps the last section clear of the mobile bottom tab bar. */}
+    <div className="relative z-10 pt-20 pb-24 md:pb-12">
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-8">
           <FileText className="w-12 h-12 text-accent mx-auto mb-4" />

@@ -176,7 +176,9 @@ const AlignmentFeed = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-12">
+      {/* pb-24 reserves space for the fixed mobile bottom tab bar; pb-12 on
+          desktop where the tab bar isn't shown. */}
+      <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">

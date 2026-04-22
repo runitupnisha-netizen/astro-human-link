@@ -178,6 +178,9 @@ const DailyBriefing = () => {
 
   const saveReflection = async () => {
     if (!briefing || !user || !reflection.trim()) return;
+    // Prevent rapid-fire submissions (especially when offline, where each
+    // tap would otherwise queue another local copy instantly).
+    if (saving || cooldown > 0) return;
     if (limitReached) {
       toast({
         title: "Daily reflection limit reached",

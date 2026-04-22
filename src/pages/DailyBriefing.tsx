@@ -82,8 +82,16 @@ const DailyBriefing = () => {
     setTimelineRefresh((n) => n + 1);
     setTimeout(() => setSaved(false), 2500);
   };
-  const { queue: offlineQueue, syncing: queueSyncing, progress: queueProgress, enqueue, flush } =
-    useOfflineReflections(handleQueueSynced);
+  const {
+    queue: offlineQueue,
+    syncing: queueSyncing,
+    progress: queueProgress,
+    enqueue,
+    flush,
+    retryFailed,
+  } = useOfflineReflections(handleQueueSynced);
+
+  const failedCount = offlineQueue.filter((it) => (it.attempts ?? 0) > 0).length;
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
   const tierAccess = TIER_ACCESS[tierKey];

@@ -637,6 +637,99 @@ const DailyBriefing = () => {
           </motion.div>
         )}
 
+        {/* Dedupe audit log: shows when an offline reflection was *not*
+            re-inserted because the server already had a row with the same
+            client_key. Empty state is fine — it means nothing was ever
+            duplicated. */}
+        {dedupeAudit.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-5"
+          >
+            <Card className="border border-emerald-400/25 bg-emerald-400/[0.04]">
+              <CardContent className="p-3 sm:p-4 space-y-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 text-xs text-foreground font-body">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>
+                      <span className="font-semibold text-emerald-400">{dedupeAudit.length}</span>{" "}
+                      duplicate sync{dedupeAudit.length === 1 ? "" : "s"} prevented
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowDedupeAudit((v) => !v)}
+                      aria-expanded={showDedupeAudit}
+                      aria-controls="dedupe-audit-list"
+                      className="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-400/80 transition-colors min-h-[28px] touch-manipulation"
+                    >
+                      {showDedupeAudit ? (
+                        <><ChevronUp className="w-3 h-3" /> Hide audit log</>
+                      ) : (
+                        <><ChevronDown className="w-3 h-3" /> Show audit log</>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearDedupeAudit}
+                      title="Clear the dedupe audit log"
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors min-h-[28px] touch-manipulation"
+                    >
+                      <X className="w-3 h-3" /> Clear
+                    </button>
+                  </div>
+                </div>
+                <p className="text-[11px] text-muted-foreground font-body leading-snug">
+                  Each entry is an offline reflection that was already in your journal
+                  (matched by <code className="font-mono text-[10px]">client_key</code>) — no duplicate row was created.
+                </p>
+
+                {showDedupeAudit && (
+                  <ul
+                    id="dedupe-audit-list"
+                    className="mt-1 space-y-1.5 max-h-56 overflow-y-auto pr-1"
+                  >
+                    {dedupeAudit.map((entry) => {
+                      const detected = new Date(entry.detected_at).toLocaleString([], {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      });
+                      const sourceLabel =
+                        entry.source === "preflight_lookup"
+                          ? "pre-check matched"
+                          : "unique constraint hit";
+                      return (
+                        <li
+                          key={entry.id}
+                          className="rounded-md border border-emerald-400/20 bg-background/40 px-2.5 py-1.5"
+                        >
+                          <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                            <span>{detected}</span>
+                            <span className="normal-case tracking-normal text-emerald-400">
+                              {sourceLabel}
+                            </span>
+                          </div>
+                          <p className="text-foreground/85 text-xs leading-snug whitespace-pre-wrap mt-0.5">
+                            {entry.preview}
+                            {entry.preview.length >= 80 ? "…" : ""}
+                          </p>
+                          <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/70 truncate">
+                            key: {entry.client_key}
+                          </p>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Tier access banner */}
         <motion.div
           initial={{ opacity: 0, y: -6 }}

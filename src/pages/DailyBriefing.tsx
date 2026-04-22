@@ -82,8 +82,16 @@ const DailyBriefing = () => {
     setTimelineRefresh((n) => n + 1);
     setTimeout(() => setSaved(false), 2500);
   };
-  const { queue: offlineQueue, syncing: queueSyncing, progress: queueProgress, enqueue, flush } =
-    useOfflineReflections(handleQueueSynced);
+  const {
+    queue: offlineQueue,
+    syncing: queueSyncing,
+    progress: queueProgress,
+    enqueue,
+    flush,
+    retryFailed,
+  } = useOfflineReflections(handleQueueSynced);
+
+  const failedCount = offlineQueue.filter((it) => (it.attempts ?? 0) > 0).length;
 
   const tierKey: keyof typeof TIER_ACCESS = subscribed && currentTier ? currentTier : "free";
   const tierAccess = TIER_ACCESS[tierKey];
@@ -334,15 +342,31 @@ const DailyBriefing = () => {
                         : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
                     </span>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 px-2 text-primary hover:bg-primary/10"
-                    disabled={queueSyncing || isOffline}
-                    onClick={() => flush()}
-                  >
-                    <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {failedCount > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-amber-400 hover:bg-amber-400/10"
+                        disabled={queueSyncing || isOffline}
+                        onClick={() => retryFailed()}
+                        aria-label={`Retry ${failedCount} previously failed reflection${failedCount === 1 ? "" : "s"}`}
+                        title="Retry only the reflections that failed before"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                        Retry failed ({failedCount})
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-primary hover:bg-primary/10"
+                      disabled={queueSyncing || isOffline}
+                      onClick={() => flush()}
+                    >
+                      <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
+                    </Button>
+                  </div>
                 </div>
                 {/* Progress indicator — ticks after each reflection lands in the journal */}
                 {queueProgress && (
@@ -427,14 +451,26 @@ const DailyBriefing = () => {
                         item.reflection.length > 140
                           ? `${item.reflection.slice(0, 140).trimEnd()}…`
                           : item.reflection;
+                      const hasFailed = (item.attempts ?? 0) > 0;
                       return (
                         <li
                           key={item.id}
-                          className="rounded-md border border-primary/15 bg-background/40 px-2.5 py-1.5"
+                          className={`rounded-md border px-2.5 py-1.5 ${
+                            hasFailed
+                              ? "border-amber-400/30 bg-amber-400/5"
+                              : "border-primary/15 bg-background/40"
+                          }`}
                         >
                           <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
                             <span>{dayLabel}</span>
-                            <span>queued {queuedTime}</span>
+                            <span className="inline-flex items-center gap-1">
+                              {hasFailed && (
+                                <span className="normal-case tracking-normal text-amber-400">
+                                  failed ×{item.attempts}
+                                </span>
+                              )}
+                              <span>queued {queuedTime}</span>
+                            </span>
                           </div>
                           <p className="text-foreground/85 text-xs leading-snug whitespace-pre-wrap mt-0.5">
                             {preview}

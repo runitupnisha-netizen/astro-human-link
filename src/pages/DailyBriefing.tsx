@@ -260,6 +260,7 @@ const DailyBriefing = () => {
         description: "Connection hiccup — we'll sync this once you're back online.",
       });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
     } finally {
       setSaving(false);
     }

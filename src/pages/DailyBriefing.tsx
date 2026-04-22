@@ -846,6 +846,25 @@ const DailyBriefing = () => {
             {/* Private reflections timeline */}
             <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
               <ReflectionsTimeline refreshKey={timelineRefresh} locked={tierKey === "free"} />
+              {tierKey !== "free" && (
+                <div className="mt-3 flex justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleExportJournal}
+                    disabled={exporting}
+                    className="text-xs text-primary hover:bg-primary/10"
+                    title="Download every reflection as a CSV (includes sync keys for debugging)"
+                  >
+                    {exporting ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    ) : (
+                      <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Export my journal (CSV)
+                  </Button>
+                </div>
+              )}
             </motion.div>
 
             <p className="text-center text-xs text-muted-foreground font-body mt-6">

@@ -52,6 +52,7 @@ const DailyBriefing = () => {
   const [reflectionsToday, setReflectionsToday] = useState(0);
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const [showQueuedDetails, setShowQueuedDetails] = useState(false);
+  const [showDedupeAudit, setShowDedupeAudit] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Toast on connection transitions during this page's session.

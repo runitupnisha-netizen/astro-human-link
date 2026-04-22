@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff, CloudOff, CloudUpload, ChevronDown, ChevronUp } from "lucide-react";
+import { Sun, Compass, Clock, Sparkles, BookOpen, CloudMoon, Loader2, RefreshCw, Save, Check, Share2, Download, Crown, Lock, WifiOff, CloudOff, CloudUpload, ChevronDown, ChevronUp, FileDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ const DailyBriefing = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const [showQueuedDetails, setShowQueuedDetails] = useState(false);
@@ -246,6 +247,127 @@ const DailyBriefing = () => {
       setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
+    }
+  };
+
+  /**
+   * Export every reflection in the user's journal as a CSV. Includes synced
+   * server rows (joined to their briefing date) plus any locally-queued items
+   * that haven't synced yet. The file carries client_key, sync_status, and
+   * failure metadata so the user can hand it back for debugging.
+   */
+  const handleExportJournal = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      // Pull every synced reflection joined to its briefing for the date.
+      const { data, error } = await supabase
+        .from("briefing_reflections")
+        .select("id, client_key, reflection, created_at, briefing_id, daily_briefings(briefing_date)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      type Row = {
+        briefing_date: string;
+        reflection: string;
+        created_at: string;
+        client_key: string;
+        reflection_id: string;
+        briefing_id: string;
+        sync_status: "synced" | "queued" | "failed";
+        attempts: string;
+        last_error: string;
+      };
+
+      const escape = (v: string | number | null | undefined) => {
+        const s = v == null ? "" : String(v);
+        // RFC 4180: wrap in quotes and escape internal quotes by doubling them.
+        return `"${s.replace(/"/g, '""')}"`;
+      };
+
+      const syncedRows: Row[] = (data ?? []).map((r) => {
+        const briefing = (r as { daily_briefings?: { briefing_date?: string } | null })
+          .daily_briefings;
+        return {
+          briefing_date: briefing?.briefing_date ?? "",
+          reflection: r.reflection ?? "",
+          created_at: r.created_at ?? "",
+          client_key: r.client_key ?? "",
+          reflection_id: r.id ?? "",
+          briefing_id: r.briefing_id ?? "",
+          sync_status: "synced",
+          attempts: "",
+          last_error: "",
+        };
+      });
+
+      const queuedRows: Row[] = offlineQueue.map((q) => ({
+        briefing_date: q.briefing_date,
+        reflection: q.reflection,
+        created_at: q.queued_at,
+        client_key: q.client_key,
+        reflection_id: q.id, // local-only id
+        briefing_id: q.briefing_id,
+        sync_status: (q.attempts ?? 0) > 0 ? "failed" : "queued",
+        attempts: String(q.attempts ?? 0),
+        last_error: q.last_error ?? "",
+      }));
+
+      const allRows = [...syncedRows, ...queuedRows];
+
+      if (allRows.length === 0) {
+        toast({
+          title: "Nothing to export yet",
+          description: "Save a reflection first, then come back to download your journal.",
+        });
+        return;
+      }
+
+      const headers: (keyof Row)[] = [
+        "briefing_date",
+        "created_at",
+        "reflection",
+        "sync_status",
+        "attempts",
+        "last_error",
+        "client_key",
+        "reflection_id",
+        "briefing_id",
+      ];
+
+      const lines = [
+        headers.join(","),
+        ...allRows.map((row) => headers.map((h) => escape(row[h])).join(",")),
+      ];
+      // Prepend a UTF-8 BOM so Excel opens emoji/accented characters correctly.
+      const csv = "\uFEFF" + lines.join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const stamp = new Date().toISOString().slice(0, 10);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `stellara-journal-${stamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Journal exported ✨",
+        description: `${allRows.length} reflection${allRows.length === 1 ? "" : "s"} saved as CSV.`,
+      });
+    } catch (err) {
+      console.error("[journal-export]", err);
+      toast({
+        title: "Couldn't export your journal",
+        description: isOffline
+          ? "You're offline — reconnect to download the full archive."
+          : "Please try again in a moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -724,6 +846,25 @@ const DailyBriefing = () => {
             {/* Private reflections timeline */}
             <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
               <ReflectionsTimeline refreshKey={timelineRefresh} locked={tierKey === "free"} />
+              {tierKey !== "free" && (
+                <div className="mt-3 flex justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleExportJournal}
+                    disabled={exporting}
+                    className="text-xs text-primary hover:bg-primary/10"
+                    title="Download every reflection as a CSV (includes sync keys for debugging)"
+                  >
+                    {exporting ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    ) : (
+                      <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Export my journal (CSV)
+                  </Button>
+                </div>
+              )}
             </motion.div>
 
             <p className="text-center text-xs text-muted-foreground font-body mt-6">

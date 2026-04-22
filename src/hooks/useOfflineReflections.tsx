@@ -104,7 +104,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
    * is null, every queued item is attempted.
    */
   const runFlush = useCallback(
-    async (targetKeys: Set<string> | null) => {
+    async (targetKeys: Set<string> | null, opts?: { ignoreBackoff?: boolean }) => {
       if (!user) return { synced: 0, failed: 0 };
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         return { synced: 0, failed: 0 };
@@ -113,12 +113,17 @@ export const useOfflineReflections = (onSynced?: () => void) => {
       if (current.length === 0) return { synced: 0, failed: 0 };
 
       // Partition: items we'll attempt now vs. items we'll leave alone.
-      const toProcess = targetKeys
-        ? current.filter((it) => targetKeys.has(it.client_key))
-        : current;
-      const untouched = targetKeys
-        ? current.filter((it) => !targetKeys.has(it.client_key))
-        : [];
+      const now = Date.now();
+      const isPickable = (it: QueuedReflection) => {
+        if (targetKeys && !targetKeys.has(it.client_key)) return false;
+        if (!opts?.ignoreBackoff && it.next_retry_at) {
+          // Skip until backoff window passes.
+          if (new Date(it.next_retry_at).getTime() > now) return false;
+        }
+        return true;
+      };
+      const toProcess = current.filter(isPickable);
+      const untouched = current.filter((it) => !isPickable(it));
 
       if (toProcess.length === 0) return { synced: 0, failed: 0 };
 
@@ -167,13 +172,15 @@ export const useOfflineReflections = (onSynced?: () => void) => {
           } else if ((error as { code?: string }).code === "23505") {
             synced++;
           } else {
-            // Annotate the item with retry metadata so the UI can surface
-            // a "Retry failed" affordance later.
+            // Annotate the item with retry metadata + an exponential-backoff
+            // window so auto-flush stops hammering the server.
+            const attempts = (item.attempts ?? 0) + 1;
             remaining.push({
               ...item,
-              attempts: (item.attempts ?? 0) + 1,
+              attempts,
               last_error: error.message?.slice(0, 200) ?? "Unknown error",
               last_attempt_at: new Date().toISOString(),
+              next_retry_at: new Date(Date.now() + backoffFor(attempts)).toISOString(),
             });
             failed++;
           }

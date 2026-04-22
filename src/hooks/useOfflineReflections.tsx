@@ -258,6 +258,12 @@ export const useOfflineReflections = (onSynced?: () => void) => {
         const finalQueue = [...untouched, ...remaining];
         writeQueue(user.id, finalQueue);
         setQueue(finalQueue);
+        if (newAudits.length > 0) {
+          // Most-recent-first ordering so the UI shows fresh dedupes at the top.
+          const merged = [...newAudits.reverse(), ...readAudit(user.id)];
+          writeAudit(user.id, merged);
+          setDedupeAudit(merged.slice(0, AUDIT_MAX));
+        }
         setSyncing(false);
         setTimeout(() => setProgress(null), 1200);
       }

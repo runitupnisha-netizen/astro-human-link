@@ -831,12 +831,14 @@ const DailyBriefing = () => {
                     </span>
                     <Button
                       onClick={saveReflection}
-                      disabled={!reflection.trim() || saving || limitReached}
+                      disabled={!reflection.trim() || saving || limitReached || cooldown > 0}
                       size="sm"
                       className="min-h-[40px]"
                     >
                       {saving ? (
                         <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving</>
+                      ) : cooldown > 0 ? (
+                        <><Check className="w-4 h-4 mr-2" /> Just saved · {cooldown}s</>
                       ) : saved ? (
                         <><Check className="w-4 h-4 mr-2" /> Saved</>
                       ) : limitReached ? (

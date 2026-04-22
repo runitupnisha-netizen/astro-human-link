@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,7 +16,21 @@ export interface QueuedReflection {
   last_error?: string;
   /** ISO timestamp of the last attempt (success or failure). */
   last_attempt_at?: string;
+  /**
+   * ISO timestamp before which auto-flush should skip this item. Set after
+   * a failure using exponential backoff. Manual "Retry failed" ignores this.
+   */
+  next_retry_at?: string;
 }
+
+/**
+ * Exponential backoff schedule (milliseconds) capped at ~5 minutes. Index
+ * is the new attempt count after the failure (1st failure → 5s, 2nd → 15s,
+ * 3rd → 45s, 4th → 2m, 5th+ → 5m).
+ */
+const BACKOFF_MS = [5_000, 15_000, 45_000, 120_000, 300_000];
+const backoffFor = (attempts: number) =>
+  BACKOFF_MS[Math.min(attempts - 1, BACKOFF_MS.length - 1)] ?? 300_000;
 
 const queueKey = (userId: string) => `stellara.reflectionQueue.${userId}`;
 
@@ -90,7 +104,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
    * is null, every queued item is attempted.
    */
   const runFlush = useCallback(
-    async (targetKeys: Set<string> | null) => {
+    async (targetKeys: Set<string> | null, opts?: { ignoreBackoff?: boolean }) => {
       if (!user) return { synced: 0, failed: 0 };
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         return { synced: 0, failed: 0 };
@@ -99,12 +113,17 @@ export const useOfflineReflections = (onSynced?: () => void) => {
       if (current.length === 0) return { synced: 0, failed: 0 };
 
       // Partition: items we'll attempt now vs. items we'll leave alone.
-      const toProcess = targetKeys
-        ? current.filter((it) => targetKeys.has(it.client_key))
-        : current;
-      const untouched = targetKeys
-        ? current.filter((it) => !targetKeys.has(it.client_key))
-        : [];
+      const now = Date.now();
+      const isPickable = (it: QueuedReflection) => {
+        if (targetKeys && !targetKeys.has(it.client_key)) return false;
+        if (!opts?.ignoreBackoff && it.next_retry_at) {
+          // Skip until backoff window passes.
+          if (new Date(it.next_retry_at).getTime() > now) return false;
+        }
+        return true;
+      };
+      const toProcess = current.filter(isPickable);
+      const untouched = current.filter((it) => !isPickable(it));
 
       if (toProcess.length === 0) return { synced: 0, failed: 0 };
 
@@ -153,13 +172,15 @@ export const useOfflineReflections = (onSynced?: () => void) => {
           } else if ((error as { code?: string }).code === "23505") {
             synced++;
           } else {
-            // Annotate the item with retry metadata so the UI can surface
-            // a "Retry failed" affordance later.
+            // Annotate the item with retry metadata + an exponential-backoff
+            // window so auto-flush stops hammering the server.
+            const attempts = (item.attempts ?? 0) + 1;
             remaining.push({
               ...item,
-              attempts: (item.attempts ?? 0) + 1,
+              attempts,
               last_error: error.message?.slice(0, 200) ?? "Unknown error",
               last_attempt_at: new Date().toISOString(),
+              next_retry_at: new Date(Date.now() + backoffFor(attempts)).toISOString(),
             });
             failed++;
           }
@@ -185,7 +206,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
   /**
    * Retry only the items that previously failed at least once. Items that
    * were queued offline but never attempted are left alone — they'll sync
-   * on the next normal flush.
+   * on the next normal flush. Manual retries skip the backoff window.
    */
   const retryFailed = useCallback(async () => {
     if (!user) return { synced: 0, failed: 0 };
@@ -195,7 +216,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
         .map((it) => it.client_key)
     );
     if (failedKeys.size === 0) return { synced: 0, failed: 0 };
-    return runFlush(failedKeys);
+    return runFlush(failedKeys, { ignoreBackoff: true });
   }, [user, runFlush]);
 
   // Auto-flush when we come back online
@@ -211,6 +232,37 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     }
     return () => window.removeEventListener("online", handleOnline);
   }, [user, flush]);
+
+  // Backoff scheduler: when items have a `next_retry_at` in the future,
+  // schedule a single timer to fire at the soonest window so they sync
+  // automatically without the user having to tap "Retry failed".
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    if (!user || queue.length === 0) return;
+    const now = Date.now();
+    const upcoming = queue
+      .map((it) => (it.next_retry_at ? new Date(it.next_retry_at).getTime() : 0))
+      .filter((t) => t > now);
+    if (upcoming.length === 0) return;
+    const soonest = Math.min(...upcoming);
+    // +250ms guard so the comparison inside runFlush is safely past the window.
+    const delay = Math.max(soonest - now + 250, 250);
+    retryTimerRef.current = setTimeout(() => {
+      if (typeof navigator === "undefined" || navigator.onLine) {
+        void flush();
+      }
+    }, delay);
+    return () => {
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
+  }, [user, queue, flush]);
 
   return { queue, syncing, progress, enqueue, flush, retryFailed };
 };

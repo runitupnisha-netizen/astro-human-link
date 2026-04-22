@@ -466,7 +466,18 @@ const DailyBriefing = () => {
                             <span className="inline-flex items-center gap-1">
                               {hasFailed && (
                                 <span className="normal-case tracking-normal text-amber-400">
-                                  failed ×{item.attempts}
+                                  {(() => {
+                                    const ms = item.next_retry_at
+                                      ? new Date(item.next_retry_at).getTime() - Date.now()
+                                      : 0;
+                                    if (ms > 1000) {
+                                      const secs = Math.ceil(ms / 1000);
+                                      const label =
+                                        secs >= 60 ? `${Math.ceil(secs / 60)}m` : `${secs}s`;
+                                      return `failed ×${item.attempts} · retry in ${label}`;
+                                    }
+                                    return `failed ×${item.attempts}`;
+                                  })()}
                                 </span>
                               )}
                               <span>queued {queuedTime}</span>

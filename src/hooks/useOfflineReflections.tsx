@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,7 +16,21 @@ export interface QueuedReflection {
   last_error?: string;
   /** ISO timestamp of the last attempt (success or failure). */
   last_attempt_at?: string;
+  /**
+   * ISO timestamp before which auto-flush should skip this item. Set after
+   * a failure using exponential backoff. Manual "Retry failed" ignores this.
+   */
+  next_retry_at?: string;
 }
+
+/**
+ * Exponential backoff schedule (milliseconds) capped at ~5 minutes. Index
+ * is the new attempt count after the failure (1st failure → 5s, 2nd → 15s,
+ * 3rd → 45s, 4th → 2m, 5th+ → 5m).
+ */
+const BACKOFF_MS = [5_000, 15_000, 45_000, 120_000, 300_000];
+const backoffFor = (attempts: number) =>
+  BACKOFF_MS[Math.min(attempts - 1, BACKOFF_MS.length - 1)] ?? 300_000;
 
 const queueKey = (userId: string) => `stellara.reflectionQueue.${userId}`;
 

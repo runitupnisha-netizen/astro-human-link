@@ -84,85 +84,119 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     [user]
   );
 
-  const flush = useCallback(async () => {
-    if (!user) return { synced: 0, failed: 0 };
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      return { synced: 0, failed: 0 };
-    }
-    const current = readQueue(user.id);
-    if (current.length === 0) return { synced: 0, failed: 0 };
+  /**
+   * Core sync worker. Processes only the items in `targetKeys` (a set of
+   * client_keys), preserving any other queued items untouched. If `targetKeys`
+   * is null, every queued item is attempted.
+   */
+  const runFlush = useCallback(
+    async (targetKeys: Set<string> | null) => {
+      if (!user) return { synced: 0, failed: 0 };
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        return { synced: 0, failed: 0 };
+      }
+      const current = readQueue(user.id);
+      if (current.length === 0) return { synced: 0, failed: 0 };
 
-    setSyncing(true);
-    setProgress({ current: 0, total: current.length, synced: 0, failed: 0 });
-    const remaining: QueuedReflection[] = [];
-    let synced = 0;
-    let failed = 0;
-    try {
-      // Local de-dupe: collapse any accidental duplicates that share a client_key.
-      const seen = new Set<string>();
-      const deduped = current.filter((item) => {
-        if (seen.has(item.client_key)) return false;
-        seen.add(item.client_key);
-        return true;
-      });
+      // Partition: items we'll attempt now vs. items we'll leave alone.
+      const toProcess = targetKeys
+        ? current.filter((it) => targetKeys.has(it.client_key))
+        : current;
+      const untouched = targetKeys
+        ? current.filter((it) => !targetKeys.has(it.client_key))
+        : [];
 
-      // Update total after dedupe
-      setProgress({ current: 0, total: deduped.length, synced: 0, failed: 0 });
+      if (toProcess.length === 0) return { synced: 0, failed: 0 };
 
-      for (let i = 0; i < deduped.length; i++) {
-        const item = deduped[i];
-        // Mark which item is in-flight (1-based for "writing 2 of 5…")
-        setProgress({ current: i, total: deduped.length, synced, failed });
-
-        // Pre-flight: if a row with this client_key already exists for this
-        // user (e.g. a previous request reached the server before the network
-        // dropped), treat it as already-synced.
-        const { data: existing } = await supabase
-          .from("briefing_reflections")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("client_key", item.client_key)
-          .maybeSingle();
-
-        if (existing) {
-          synced++;
-          setProgress({ current: i + 1, total: deduped.length, synced, failed });
-          continue;
-        }
-
-        const { error } = await supabase.from("briefing_reflections").insert({
-          user_id: user.id,
-          briefing_id: item.briefing_id,
-          reflection: item.reflection,
-          client_key: item.client_key,
+      setSyncing(true);
+      setProgress({ current: 0, total: toProcess.length, synced: 0, failed: 0 });
+      const remaining: QueuedReflection[] = [];
+      let synced = 0;
+      let failed = 0;
+      try {
+        // Local de-dupe: collapse any accidental duplicates that share a client_key.
+        const seen = new Set<string>();
+        const deduped = toProcess.filter((item) => {
+          if (seen.has(item.client_key)) return false;
+          seen.add(item.client_key);
+          return true;
         });
 
-        if (!error) {
-          synced++;
-        } else if (
-          // Postgres unique violation → server already has it; safe to drop.
-          (error as { code?: string }).code === "23505"
-        ) {
-          synced++;
-        } else {
-          remaining.push(item);
-          failed++;
+        setProgress({ current: 0, total: deduped.length, synced: 0, failed: 0 });
+
+        for (let i = 0; i < deduped.length; i++) {
+          const item = deduped[i];
+          setProgress({ current: i, total: deduped.length, synced, failed });
+
+          const { data: existing } = await supabase
+            .from("briefing_reflections")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("client_key", item.client_key)
+            .maybeSingle();
+
+          if (existing) {
+            synced++;
+            setProgress({ current: i + 1, total: deduped.length, synced, failed });
+            continue;
+          }
+
+          const { error } = await supabase.from("briefing_reflections").insert({
+            user_id: user.id,
+            briefing_id: item.briefing_id,
+            reflection: item.reflection,
+            client_key: item.client_key,
+          });
+
+          if (!error) {
+            synced++;
+          } else if ((error as { code?: string }).code === "23505") {
+            synced++;
+          } else {
+            // Annotate the item with retry metadata so the UI can surface
+            // a "Retry failed" affordance later.
+            remaining.push({
+              ...item,
+              attempts: (item.attempts ?? 0) + 1,
+              last_error: error.message?.slice(0, 200) ?? "Unknown error",
+              last_attempt_at: new Date().toISOString(),
+            });
+            failed++;
+          }
+          setProgress({ current: i + 1, total: deduped.length, synced, failed });
         }
-        // Tick the bar after each item resolves, success or failure.
-        setProgress({ current: i + 1, total: deduped.length, synced, failed });
+        setProgress({ current: deduped.length, total: deduped.length, synced, failed });
+      } finally {
+        // Preserve items we deliberately skipped this run.
+        const finalQueue = [...untouched, ...remaining];
+        writeQueue(user.id, finalQueue);
+        setQueue(finalQueue);
+        setSyncing(false);
+        setTimeout(() => setProgress(null), 1200);
       }
-      setProgress({ current: deduped.length, total: deduped.length, synced, failed });
-    } finally {
-      writeQueue(user.id, remaining);
-      setQueue(remaining);
-      setSyncing(false);
-      // Briefly hold the final state so users can see "5 of 5 synced",
-      // then clear. The DailyBriefing UI also reads `syncing` to gate visibility.
-      setTimeout(() => setProgress(null), 1200);
-    }
-    if (synced > 0) onSynced?.();
-    return { synced, failed: remaining.length };
-  }, [user, onSynced]);
+      if (synced > 0) onSynced?.();
+      return { synced, failed };
+    },
+    [user, onSynced]
+  );
+
+  const flush = useCallback(() => runFlush(null), [runFlush]);
+
+  /**
+   * Retry only the items that previously failed at least once. Items that
+   * were queued offline but never attempted are left alone — they'll sync
+   * on the next normal flush.
+   */
+  const retryFailed = useCallback(async () => {
+    if (!user) return { synced: 0, failed: 0 };
+    const failedKeys = new Set(
+      readQueue(user.id)
+        .filter((it) => (it.attempts ?? 0) > 0)
+        .map((it) => it.client_key)
+    );
+    if (failedKeys.size === 0) return { synced: 0, failed: 0 };
+    return runFlush(failedKeys);
+  }, [user, runFlush]);
 
   // Auto-flush when we come back online
   useEffect(() => {

@@ -206,7 +206,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
   /**
    * Retry only the items that previously failed at least once. Items that
    * were queued offline but never attempted are left alone — they'll sync
-   * on the next normal flush.
+   * on the next normal flush. Manual retries skip the backoff window.
    */
   const retryFailed = useCallback(async () => {
     if (!user) return { synced: 0, failed: 0 };
@@ -216,7 +216,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
         .map((it) => it.client_key)
     );
     if (failedKeys.size === 0) return { synced: 0, failed: 0 };
-    return runFlush(failedKeys);
+    return runFlush(failedKeys, { ignoreBackoff: true });
   }, [user, runFlush]);
 
   // Auto-flush when we come back online
@@ -232,6 +232,37 @@ export const useOfflineReflections = (onSynced?: () => void) => {
     }
     return () => window.removeEventListener("online", handleOnline);
   }, [user, flush]);
+
+  // Backoff scheduler: when items have a `next_retry_at` in the future,
+  // schedule a single timer to fire at the soonest window so they sync
+  // automatically without the user having to tap "Retry failed".
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    if (!user || queue.length === 0) return;
+    const now = Date.now();
+    const upcoming = queue
+      .map((it) => (it.next_retry_at ? new Date(it.next_retry_at).getTime() : 0))
+      .filter((t) => t > now);
+    if (upcoming.length === 0) return;
+    const soonest = Math.min(...upcoming);
+    // +250ms guard so the comparison inside runFlush is safely past the window.
+    const delay = Math.max(soonest - now + 250, 250);
+    retryTimerRef.current = setTimeout(() => {
+      if (typeof navigator === "undefined" || navigator.onLine) {
+        void flush();
+      }
+    }, delay);
+    return () => {
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
+  }, [user, queue, flush]);
 
   return { queue, syncing, progress, enqueue, flush, retryFailed };
 };

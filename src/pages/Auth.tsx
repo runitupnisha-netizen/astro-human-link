@@ -362,20 +362,36 @@ const Auth = () => {
                       <Input
                         placeholder="Full Name"
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="pl-10 bg-muted/50 border-border"
+                        onChange={(e) => {
+                          setFullName(e.target.value);
+                          if (fieldErrors.fullName) setFieldErrors((p) => ({ ...p, fullName: "" }));
+                        }}
+                        className={`pl-10 bg-muted/50 border-border ${fieldErrors.fullName ? "border-destructive" : ""}`}
                         required={!isLogin}
                         maxLength={40}
+                        autoComplete="name"
+                        aria-invalid={!!fieldErrors.fullName}
                       />
+                      {fieldErrors.fullName && (
+                        <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.fullName}</p>
+                      )}
                     </div>
                     <div className="relative">
                       <span className="absolute left-3 top-3 text-muted-foreground text-sm font-medium">@</span>
                       <Input
                         placeholder="Username (optional)"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30))}
-                        className="pl-10 bg-muted/50 border-border"
+                        onChange={(e) => {
+                          setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30));
+                          if (fieldErrors.username) setFieldErrors((p) => ({ ...p, username: "" }));
+                        }}
+                        className={`pl-10 bg-muted/50 border-border ${fieldErrors.username ? "border-destructive" : ""}`}
+                        autoComplete="username"
+                        aria-invalid={!!fieldErrors.username}
                       />
+                      {fieldErrors.username && (
+                        <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.username}</p>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -386,10 +402,18 @@ const Auth = () => {
                     type="email"
                     placeholder="Email address"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 bg-muted/50 border-border"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: "" }));
+                    }}
+                    className={`pl-10 h-12 bg-muted/50 border-border ${fieldErrors.email ? "border-destructive" : ""}`}
                     required
+                    autoComplete="email"
+                    aria-invalid={!!fieldErrors.email}
                   />
+                  {fieldErrors.email && (
+                    <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.email}</p>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -398,10 +422,15 @@ const Auth = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-11 h-12 bg-muted/50 border-border"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (fieldErrors.password) setFieldErrors((p) => ({ ...p, password: "" }));
+                    }}
+                    className={`pl-10 pr-11 h-12 bg-muted/50 border-border ${fieldErrors.password ? "border-destructive" : ""}`}
                     required
-                    minLength={6}
+                    minLength={isLogin ? 1 : 8}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    aria-invalid={!!fieldErrors.password}
                   />
                   <button
                     type="button"
@@ -412,6 +441,14 @@ const Auth = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-xs text-destructive -mt-2 ml-1">{fieldErrors.password}</p>
+                )}
+                {!isLogin && !fieldErrors.password && (
+                  <p className="text-xs text-muted-foreground -mt-2 ml-1">
+                    At least 8 characters with a letter and a number
+                  </p>
+                )}
 
                 {isLogin && (
                   <div className="text-right">

@@ -342,15 +342,31 @@ const DailyBriefing = () => {
                         : `${offlineQueue.length} reflection${offlineQueue.length === 1 ? "" : "s"} waiting to sync`}
                     </span>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 px-2 text-primary hover:bg-primary/10"
-                    disabled={queueSyncing || isOffline}
-                    onClick={() => flush()}
-                  >
-                    <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {failedCount > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-amber-400 hover:bg-amber-400/10"
+                        disabled={queueSyncing || isOffline}
+                        onClick={() => retryFailed()}
+                        aria-label={`Retry ${failedCount} previously failed reflection${failedCount === 1 ? "" : "s"}`}
+                        title="Retry only the reflections that failed before"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                        Retry failed ({failedCount})
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-primary hover:bg-primary/10"
+                      disabled={queueSyncing || isOffline}
+                      onClick={() => flush()}
+                    >
+                      <CloudUpload className="w-3.5 h-3.5 mr-1" /> Sync now
+                    </Button>
+                  </div>
                 </div>
                 {/* Progress indicator — ticks after each reflection lands in the journal */}
                 {queueProgress && (

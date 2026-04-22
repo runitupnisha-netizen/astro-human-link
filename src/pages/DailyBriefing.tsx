@@ -44,6 +44,9 @@ const DailyBriefing = () => {
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Short cooldown after a save to prevent users from spamming multiple
+  // queued offline submissions in rapid succession.
+  const [cooldown, setCooldown] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
@@ -99,6 +102,13 @@ const DailyBriefing = () => {
   const limit = tierAccess.reflectionsPerDay;
   const limitReached = reflectionsToday >= limit;
   const limitDisplay = limit === Infinity ? "∞" : limit;
+
+  // Tick the post-save cooldown down to zero, then re-enable the Save button.
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setTimeout(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
+    return () => window.clearTimeout(id);
+  }, [cooldown]);
 
   // Count today's reflections to show usage
   useEffect(() => {
@@ -175,6 +185,9 @@ const DailyBriefing = () => {
 
   const saveReflection = async () => {
     if (!briefing || !user || !reflection.trim()) return;
+    // Prevent rapid-fire submissions (especially when offline, where each
+    // tap would otherwise queue another local copy instantly).
+    if (saving || cooldown > 0) return;
     if (limitReached) {
       toast({
         title: "Daily reflection limit reached",
@@ -208,6 +221,7 @@ const DailyBriefing = () => {
         description: "We'll sync this to your journal when you're back online.",
       });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
       return;
     }
 
@@ -230,6 +244,7 @@ const DailyBriefing = () => {
       setTimelineRefresh((n) => n + 1);
       toast({ title: "Saved ✨", description: "Your reflection is in your private journal." });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
     } catch (err) {
       // Network or server failure → queue and tell the user we'll retry.
       enqueue({
@@ -245,6 +260,7 @@ const DailyBriefing = () => {
         description: "Connection hiccup — we'll sync this once you're back online.",
       });
       setTimeout(() => setSaved(false), 2500);
+      setCooldown(3);
     } finally {
       setSaving(false);
     }
@@ -815,12 +831,14 @@ const DailyBriefing = () => {
                     </span>
                     <Button
                       onClick={saveReflection}
-                      disabled={!reflection.trim() || saving || limitReached}
+                      disabled={!reflection.trim() || saving || limitReached || cooldown > 0}
                       size="sm"
                       className="min-h-[40px]"
                     >
                       {saving ? (
                         <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving</>
+                      ) : cooldown > 0 ? (
+                        <><Check className="w-4 h-4 mr-2" /> Just saved · {cooldown}s</>
                       ) : saved ? (
                         <><Check className="w-4 h-4 mr-2" /> Saved</>
                       ) : limitReached ? (

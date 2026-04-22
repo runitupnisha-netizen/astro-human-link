@@ -177,6 +177,7 @@ export const useOfflineReflections = (onSynced?: () => void) => {
       setSyncing(true);
       setProgress({ current: 0, total: toProcess.length, synced: 0, failed: 0 });
       const remaining: QueuedReflection[] = [];
+      const newAudits: DedupeAuditEntry[] = [];
       let synced = 0;
       let failed = 0;
       try {
@@ -203,6 +204,15 @@ export const useOfflineReflections = (onSynced?: () => void) => {
 
           if (existing) {
             synced++;
+            newAudits.push({
+              id: makeId(),
+              client_key: item.client_key,
+              briefing_id: item.briefing_id,
+              briefing_date: item.briefing_date,
+              preview: item.reflection.slice(0, 80),
+              detected_at: new Date().toISOString(),
+              source: "preflight_lookup",
+            });
             setProgress({ current: i + 1, total: deduped.length, synced, failed });
             continue;
           }
@@ -218,6 +228,15 @@ export const useOfflineReflections = (onSynced?: () => void) => {
             synced++;
           } else if ((error as { code?: string }).code === "23505") {
             synced++;
+            newAudits.push({
+              id: makeId(),
+              client_key: item.client_key,
+              briefing_id: item.briefing_id,
+              briefing_date: item.briefing_date,
+              preview: item.reflection.slice(0, 80),
+              detected_at: new Date().toISOString(),
+              source: "unique_violation",
+            });
           } else {
             // Annotate the item with retry metadata + an exponential-backoff
             // window so auto-flush stops hammering the server.

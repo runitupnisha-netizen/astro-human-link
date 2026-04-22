@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -14,6 +14,46 @@ import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 import { motion } from "framer-motion";
+import { z } from "zod";
+
+const emailSchema = z
+  .string()
+  .trim()
+  .min(1, { message: "Email is required" })
+  .email({ message: "Please enter a valid email address" })
+  .max(255, { message: "Email is too long" });
+
+const passwordSchema = z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters" })
+  .max(128, { message: "Password is too long" })
+  .regex(/[A-Za-z]/, { message: "Password must include a letter" })
+  .regex(/[0-9]/, { message: "Password must include a number" });
+
+const fullNameSchema = z
+  .string()
+  .trim()
+  .min(1, { message: "Full name is required" })
+  .max(40, { message: "Full name must be 40 characters or fewer" });
+
+const usernameSchema = z
+  .string()
+  .trim()
+  .max(30, { message: "Username must be 30 characters or fewer" })
+  .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
+
+const friendlyAuthError = (message: string): string => {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login")) return "That email and password don't match. Try again or reset your password.";
+  if (m.includes("email not confirmed")) return "Please verify your email first. Check your inbox for the confirmation link.";
+  if (m.includes("user already registered") || m.includes("already been registered")) {
+    return "An account with this email already exists. Try signing in instead.";
+  }
+  if (m.includes("rate") && m.includes("limit")) return "Too many attempts — please wait a moment and try again.";
+  if (m.includes("pwned") || m.includes("compromised")) return "This password has been found in data breaches. Please choose a stronger one.";
+  if (m.includes("network") || m.includes("fetch")) return "Network error. Check your connection and try again.";
+  return message;
+};
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -26,6 +66,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
   const handleSocialLogin = async (provider: "google" | "apple") => {
@@ -44,28 +86,74 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
+
+    // Validate inputs
+    const errors: Record<string, string> = {};
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) errors.email = emailResult.error.issues[0].message;
+
+    if (isLogin) {
+      if (!password) errors.password = "Password is required";
+    } else {
+      const passwordResult = passwordSchema.safeParse(password);
+      if (!passwordResult.success) errors.password = passwordResult.error.issues[0].message;
+      const nameResult = fullNameSchema.safeParse(fullName);
+      if (!nameResult.success) errors.fullName = nameResult.error.issues[0].message;
+      if (username.trim()) {
+        const userResult = usernameSchema.safeParse(username);
+        if (!userResult.success) errors.username = userResult.error.issues[0].message;
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      toast.error(Object.values(errors)[0]);
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
         if (error) throw error;
         toast.success("Welcome back ✨");
         navigate("/");
       } else {
         const { error, data } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
-          options: { data: { full_name: fullName, username: username.trim() || undefined } },
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: { full_name: fullName.trim(), username: username.trim() || undefined },
+          },
         });
+        if (error) throw error;
         if (!error && data.user && username.trim()) {
           await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
         }
-        if (error) throw error;
-        toast.success("Almost there — check your email to verify ✨");
+        // If session is null, email confirmation is required
+        if (!data.session) {
+          toast.success(`Check ${email.trim()} to confirm your account ✨`, {
+            description: "We sent a verification link. Click it to activate your account, then sign in.",
+            duration: 8000,
+          });
+          // Switch to login view so user can sign in after confirming
+          setIsLogin(true);
+          setPassword("");
+        } else {
+          // Auto-confirm enabled — user is signed in directly
+          toast.success("Welcome to Stellara ✨");
+          navigate("/");
+        }
       }
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(friendlyAuthError(message));
     } finally {
       setLoading(false);
     }
@@ -73,20 +161,35 @@ const Auth = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
-      toast.error("Please enter your email address");
+    setFieldErrors({});
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      const msg = result.error.issues[0].message;
+      setFieldErrors({ email: msg });
+      toast.error(msg);
       return;
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password?reset=1`,
       });
       if (error) throw error;
-      toast.success("Password reset link sent! Check your inbox 📧");
-      setShowForgotPassword(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to send reset email");
+      // Always show success even if email doesn't exist (prevents user enumeration)
+      setResetSent(true);
+      toast.success("If an account exists, a reset link is on its way 📧", {
+        description: "Check your inbox and spam folder. Links expire in 1 hour.",
+        duration: 7000,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to send reset email";
+      // For rate limits, surface the message; otherwise still show generic success
+      if (message.toLowerCase().includes("rate")) {
+        toast.error(friendlyAuthError(message));
+      } else {
+        setResetSent(true);
+        toast.success("If an account exists, a reset link is on its way 📧");
+      }
     } finally {
       setLoading(false);
     }
@@ -147,6 +250,39 @@ const Auth = () => {
 
           {/* Forgot Password Form */}
           {showForgotPassword ? (
+            resetSent ? (
+              <motion.div
+                className="glass-card glow-border p-6 space-y-4 text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-7 h-7 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-base font-semibold text-foreground">Check your inbox</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    If an account exists for <span className="font-medium text-foreground">{email}</span>, we've sent a password reset link.
+                    It will expire in 1 hour.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Don't see it? Check your spam folder or wait a minute before requesting another.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetSent(false);
+                    setShowForgotPassword(false);
+                  }}
+                  className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mx-auto"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  Back to sign in
+                </button>
+              </motion.div>
+            ) : (
             <motion.form
               onSubmit={handleForgotPassword}
               className="glass-card glow-border p-6 space-y-4"
@@ -160,10 +296,18 @@ const Auth = () => {
                   type="email"
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-muted/50 border-border"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: "" }));
+                  }}
+                  className={`pl-10 bg-muted/50 border-border ${fieldErrors.email ? "border-destructive" : ""}`}
                   required
+                  autoComplete="email"
+                  aria-invalid={!!fieldErrors.email}
                 />
+                {fieldErrors.email && (
+                  <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.email}</p>
+                )}
               </div>
 
               <Button
@@ -185,7 +329,10 @@ const Auth = () => {
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => setShowForgotPassword(false)}
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setFieldErrors({});
+                  }}
                   className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mx-auto"
                 >
                   <ArrowLeft className="w-3 h-3" />
@@ -193,6 +340,7 @@ const Auth = () => {
                 </button>
               </div>
             </motion.form>
+            )
           ) : (
             <motion.div
               className="glass-card glow-border p-6 space-y-4"
@@ -214,20 +362,36 @@ const Auth = () => {
                       <Input
                         placeholder="Full Name"
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="pl-10 bg-muted/50 border-border"
+                        onChange={(e) => {
+                          setFullName(e.target.value);
+                          if (fieldErrors.fullName) setFieldErrors((p) => ({ ...p, fullName: "" }));
+                        }}
+                        className={`pl-10 bg-muted/50 border-border ${fieldErrors.fullName ? "border-destructive" : ""}`}
                         required={!isLogin}
                         maxLength={40}
+                        autoComplete="name"
+                        aria-invalid={!!fieldErrors.fullName}
                       />
+                      {fieldErrors.fullName && (
+                        <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.fullName}</p>
+                      )}
                     </div>
                     <div className="relative">
                       <span className="absolute left-3 top-3 text-muted-foreground text-sm font-medium">@</span>
                       <Input
                         placeholder="Username (optional)"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30))}
-                        className="pl-10 bg-muted/50 border-border"
+                        onChange={(e) => {
+                          setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30));
+                          if (fieldErrors.username) setFieldErrors((p) => ({ ...p, username: "" }));
+                        }}
+                        className={`pl-10 bg-muted/50 border-border ${fieldErrors.username ? "border-destructive" : ""}`}
+                        autoComplete="username"
+                        aria-invalid={!!fieldErrors.username}
                       />
+                      {fieldErrors.username && (
+                        <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.username}</p>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -238,10 +402,18 @@ const Auth = () => {
                     type="email"
                     placeholder="Email address"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 bg-muted/50 border-border"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: "" }));
+                    }}
+                    className={`pl-10 h-12 bg-muted/50 border-border ${fieldErrors.email ? "border-destructive" : ""}`}
                     required
+                    autoComplete="email"
+                    aria-invalid={!!fieldErrors.email}
                   />
+                  {fieldErrors.email && (
+                    <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.email}</p>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -250,10 +422,15 @@ const Auth = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-11 h-12 bg-muted/50 border-border"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (fieldErrors.password) setFieldErrors((p) => ({ ...p, password: "" }));
+                    }}
+                    className={`pl-10 pr-11 h-12 bg-muted/50 border-border ${fieldErrors.password ? "border-destructive" : ""}`}
                     required
-                    minLength={6}
+                    minLength={isLogin ? 1 : 8}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    aria-invalid={!!fieldErrors.password}
                   />
                   <button
                     type="button"
@@ -264,6 +441,14 @@ const Auth = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p className="text-xs text-destructive -mt-2 ml-1">{fieldErrors.password}</p>
+                )}
+                {!isLogin && !fieldErrors.password && (
+                  <p className="text-xs text-muted-foreground -mt-2 ml-1">
+                    At least 8 characters with a letter and a number
+                  </p>
+                )}
 
                 {isLogin && (
                   <div className="text-right">

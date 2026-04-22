@@ -27,7 +27,7 @@ const Contact = () => {
     e.preventDefault();
     const parsed = contactSchema.safeParse(formData);
     if (!parsed.success) {
-      const first = parsed.error.errors[0]?.message || "Please check your inputs";
+      const first = parsed.error.issues[0]?.message || "Please check your inputs";
       toast({ title: first, variant: "destructive" });
       return;
     }

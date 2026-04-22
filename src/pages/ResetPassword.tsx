@@ -8,6 +8,14 @@ import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import { motion } from "framer-motion";
+import { z } from "zod";
+
+const passwordSchema = z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters" })
+  .max(128, { message: "Password is too long" })
+  .regex(/[A-Za-z]/, { message: "Password must include a letter" })
+  .regex(/[0-9]/, { message: "Password must include a number" });
 
 const getRecoveryTokensFromHash = () => {
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
@@ -198,12 +206,13 @@ const ResetPassword = () => {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("Passwords don't match");
+    const result = passwordSchema.safeParse(password);
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
       return;
     }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (password !== confirmPassword) {
+      toast.error("Passwords don't match");
       return;
     }
 
@@ -215,10 +224,23 @@ const ResetPassword = () => {
       window.localStorage.removeItem("auth-recovery-pending");
       window.localStorage.removeItem("auth-recovery-requested-at");
       setSuccess(true);
-      toast.success("Password updated successfully!");
+      toast.success("Password updated! Welcome back ✨", {
+        description: "Redirecting you to the app...",
+      });
       setTimeout(() => navigate("/"), 2000);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to reset password");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to reset password";
+      const m = message.toLowerCase();
+      if (m.includes("same") && m.includes("password")) {
+        toast.error("Please choose a password different from your current one.");
+      } else if (m.includes("pwned") || m.includes("compromised")) {
+        toast.error("This password has been found in data breaches. Please choose a stronger one.");
+      } else if (m.includes("session") || m.includes("expired") || m.includes("token")) {
+        toast.error("Your reset link has expired. Please request a new one.");
+        setTimeout(() => navigate("/auth"), 2500);
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -282,7 +304,8 @@ const ResetPassword = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10 bg-muted/50 border-border"
                 required
-                minLength={6}
+                minLength={8}
+                autoComplete="new-password"
               />
             </div>
             <div className="relative">
@@ -294,9 +317,13 @@ const ResetPassword = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="pl-10 bg-muted/50 border-border"
                 required
-                minLength={6}
+                minLength={8}
+                autoComplete="new-password"
               />
             </div>
+            <p className="text-xs text-muted-foreground -mt-1 ml-1">
+              At least 8 characters with a letter and a number
+            </p>
             <Button
               type="submit"
               disabled={loading}

@@ -33,6 +33,50 @@ const backoffFor = (attempts: number) =>
   BACKOFF_MS[Math.min(attempts - 1, BACKOFF_MS.length - 1)] ?? 300_000;
 
 const queueKey = (userId: string) => `stellara.reflectionQueue.${userId}`;
+const auditKey = (userId: string) => `stellara.reflectionDedupeAudit.${userId}`;
+
+/** Maximum number of dedupe audit entries kept per user. Older entries are dropped. */
+const AUDIT_MAX = 50;
+
+/**
+ * One row in the dedupe audit log. Recorded any time a queued offline
+ * reflection was *not* inserted because the server already had a row with
+ * the same client_key — either via a pre-flight lookup or a 23505 unique
+ * violation on insert.
+ */
+export interface DedupeAuditEntry {
+  id: string;
+  client_key: string;
+  briefing_id: string;
+  briefing_date: string;
+  /** Short preview of the reflection so the user can verify by eye. */
+  preview: string;
+  /** ISO timestamp when the dedupe was detected. */
+  detected_at: string;
+  /** How we discovered the duplicate. */
+  source: "preflight_lookup" | "unique_violation";
+}
+
+const readAudit = (userId: string): DedupeAuditEntry[] => {
+  try {
+    const raw = localStorage.getItem(auditKey(userId));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeAudit = (userId: string, entries: DedupeAuditEntry[]) => {
+  try {
+    // Keep the most recent first, cap the list.
+    const trimmed = entries.slice(0, AUDIT_MAX);
+    localStorage.setItem(auditKey(userId), JSON.stringify(trimmed));
+  } catch {
+    /* ignore quota */
+  }
+};
 
 const readQueue = (userId: string): QueuedReflection[] => {
   try {

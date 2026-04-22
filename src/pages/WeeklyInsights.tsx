@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -74,11 +74,13 @@ const WeeklyInsights = () => {
         if (weekKey === currentWeekKey) {
           setAiInsights(data);
         }
-      } catch {}
+      } catch {
+        /* corrupt cache — ignore and re-generate below */
+      }
     }
   }, [user]);
 
-  const generateInsights = async () => {
+  const generateInsights = useCallback(async () => {
     if (!user) return;
     setGenerating(true);
     try {
@@ -94,20 +96,26 @@ const WeeklyInsights = () => {
       localStorage.setItem(`weekly_insights_${user.id}`, JSON.stringify({ data, weekKey }));
 
       toast.success("Your personalized cosmic reading is ready ✨");
-    } catch (e: any) {
+    } catch (e) {
       console.error("Failed to generate insights:", e);
-      toast.error(e.message || "Failed to generate insights");
+      const msg = e instanceof Error ? e.message : "Failed to generate insights";
+      toast.error(msg);
     } finally {
       setGenerating(false);
     }
-  };
+  }, [user]);
 
-  // Auto-generate on first load if no cached insights
+  // Auto-generate on first load if no cached insights. Guarded with a ref
+  // so React StrictMode's double-effect can't trigger two parallel
+  // edge-function calls (which previously raced and could double-charge
+  // the AI generation rate-limit budget).
+  const autoGenStartedRef = useRef(false);
   useEffect(() => {
-    if (!loading && profile && !aiInsights && !generating) {
-      generateInsights();
-    }
-  }, [loading, profile, aiInsights]);
+    if (loading || !profile || aiInsights || generating) return;
+    if (autoGenStartedRef.current) return;
+    autoGenStartedRef.current = true;
+    void generateInsights();
+  }, [loading, profile, aiInsights, generating, generateInsights]);
 
   if (loading) {
     return (

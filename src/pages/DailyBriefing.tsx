@@ -103,6 +103,13 @@ const DailyBriefing = () => {
   const limitReached = reflectionsToday >= limit;
   const limitDisplay = limit === Infinity ? "∞" : limit;
 
+  // Tick the post-save cooldown down to zero, then re-enable the Save button.
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setTimeout(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
+    return () => window.clearTimeout(id);
+  }, [cooldown]);
+
   // Count today's reflections to show usage
   useEffect(() => {
     if (!user || !briefing) return;

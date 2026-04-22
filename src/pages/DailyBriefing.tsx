@@ -44,6 +44,9 @@ const DailyBriefing = () => {
   const [reflection, setReflection] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Short cooldown after a save to prevent users from spamming multiple
+  // queued offline submissions in rapid succession.
+  const [cooldown, setCooldown] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);

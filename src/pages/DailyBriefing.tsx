@@ -45,6 +45,7 @@ const DailyBriefing = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [reflectionsToday, setReflectionsToday] = useState(0);
   const [timelineRefresh, setTimelineRefresh] = useState(0);
   const [showQueuedDetails, setShowQueuedDetails] = useState(false);

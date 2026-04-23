@@ -94,13 +94,35 @@ serve(async (req) => {
     }
     log("Premium verified");
 
-    // 3. Parse body (optional matchId for naming)
+    // 3. Parse body — matchId required, must belong to the caller
     let matchId: string | undefined;
     try {
       const body = await req.json();
-      if (body && typeof body.matchId === "string") matchId = body.matchId;
+      if (body && typeof body.matchId === "string") matchId = body.matchId.trim();
     } catch (_) {
       // body is optional
+    }
+
+    const UUID_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!matchId || !UUID_RE.test(matchId)) {
+      return json({ error: "Valid matchId is required" }, 400);
+    }
+
+    const { data: match, error: matchError } = await supabase
+      .from("matches")
+      .select("id, user_a, user_b")
+      .eq("id", matchId)
+      .maybeSingle();
+
+    if (matchError || !match) {
+      log("Match lookup failed", { matchError: matchError?.message });
+      return json({ error: "Match not found" }, 404);
+    }
+
+    if (match.user_a !== user.id && match.user_b !== user.id) {
+      log("User not part of match", { matchId, userId: user.id });
+      return json({ error: "Not a participant of this match" }, 403);
     }
 
     // 4. Create Daily.co room
@@ -110,10 +132,15 @@ serve(async (req) => {
       return json({ error: "Calling service not configured" }, 500);
     }
 
-    const roomName = `stellara-${matchId ?? user.id.slice(0, 8)}-${Date.now()
+    // Deterministic room per match within a 30-minute bucket so both
+    // participants land in the same room without coordination.
+    const bucket = Math.floor(Date.now() / (30 * 60 * 1000));
+    const roomName = `stellara-${matchId.replace(/-/g, "").slice(0, 16)}-${bucket
       .toString(36)}`;
     const expSeconds = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hour
 
+    // Try to create the room; if it already exists (other participant created
+    // it first this bucket), fall through and just mint a token for it.
     const roomRes = await fetch("https://api.daily.co/v1/rooms", {
       method: "POST",
       headers: {
@@ -130,17 +157,31 @@ serve(async (req) => {
           start_video_off: false,
           start_audio_off: false,
           eject_at_room_exp: true,
+          max_participants: 2,
         },
       }),
     });
 
-    if (!roomRes.ok) {
+    let room: { url?: string; name?: string };
+    if (roomRes.ok) {
+      room = await roomRes.json();
+    } else if (roomRes.status === 409) {
+      // Room already exists — fetch it
+      const existing = await fetch(
+        `https://api.daily.co/v1/rooms/${roomName}`,
+        { headers: { Authorization: `Bearer ${dailyApiKey}` } },
+      );
+      if (!existing.ok) {
+        const errText = await existing.text();
+        log("Daily room fetch failed", { status: existing.status, errText });
+        return json({ error: "Failed to retrieve call room" }, 502);
+      }
+      room = await existing.json();
+    } else {
       const errText = await roomRes.text();
       log("Daily room creation failed", { status: roomRes.status, errText });
       return json({ error: "Failed to create call room" }, 502);
     }
-
-    const room = await roomRes.json();
 
     // 5. Create meeting token scoped to this user
     const tokenRes = await fetch("https://api.daily.co/v1/meeting-tokens", {
@@ -169,12 +210,15 @@ serve(async (req) => {
     }
 
     const { token: meetingToken } = await tokenRes.json();
-    const joinUrl = `${room.url}?t=${meetingToken}`;
+    const roomUrl = room.url ?? `https://stellara.daily.co/${roomName}`;
+    const joinUrl = `${roomUrl}?t=${meetingToken}`;
 
     log("Room ready", { roomName });
     return json({
-      url: joinUrl,
+      url: joinUrl, // prebuilt iframe URL with embedded token
+      roomUrl, // bare room URL (for SDK use)
       roomName,
+      token: meetingToken, // for client-side SDK joins
       expiresAt: new Date(expSeconds * 1000).toISOString(),
     });
   } catch (error) {

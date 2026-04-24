@@ -253,7 +253,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId, joinDailyRoom]);
+  }, [matchId, joinDailyRoom, subscribed, premiumLoading]);
 
   useEffect(() => {
     if (!open) {
@@ -272,7 +272,10 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     }
 
     cancelledRef.current = false;
-    provisionRoom("connecting");
+    // Don't fire until subscription state is known
+    if (!premiumLoading) {
+      provisionRoom("connecting");
+    }
 
     // Hang up cleanly if the user navigates away or closes the tab
     const handleBeforeUnload = () => {
@@ -287,7 +290,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handleBeforeUnload);
     };
-  }, [open, callType, provisionRoom, teardownCallObject]);
+  }, [open, callType, provisionRoom, teardownCallObject, premiumLoading]);
 
   // Promote waiting → connected as soon as a remote participant arrives
   useEffect(() => {

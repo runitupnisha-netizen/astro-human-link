@@ -55,6 +55,37 @@ const storeResumeContext = (ctx: PremiumResumeContext): string => {
   }
 };
 
+/**
+ * Reads (and removes) a previously stored resume context. The resuming page
+ * should call this once on mount when it sees `?resumeCall=<key>` in the URL
+ * and act on the returned `payload` (e.g. reopen CallScreen).
+ * Returns null if the key is unknown, malformed, or older than 30 minutes
+ * (we don't want to spring open a call modal hours later).
+ */
+export const consumePremiumResumeContext = (
+  key: string,
+): PremiumResumeContext | null => {
+  if (!key) return null;
+  try {
+    const storageKey = `${RESUME_STORAGE_PREFIX}${key}`;
+    const raw = sessionStorage.getItem(storageKey);
+    if (!raw) return null;
+    sessionStorage.removeItem(storageKey);
+    const parsed = JSON.parse(raw) as PremiumResumeContext & { savedAt?: number };
+    if (parsed.savedAt && Date.now() - parsed.savedAt > 30 * 60 * 1000) {
+      return null;
+    }
+    if (!parsed.type || !parsed.payload) return null;
+    return {
+      type: parsed.type,
+      returnPath: parsed.returnPath,
+      payload: parsed.payload,
+    };
+  } catch {
+    return null;
+  }
+};
+
 interface PremiumRequiredScreenProps {
   open: boolean;
   onClose: () => void;

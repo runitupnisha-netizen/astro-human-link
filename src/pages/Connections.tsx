@@ -233,6 +233,23 @@ const Connections = () => {
             </p>
           </motion.div>
 
+          {/* Check a Connection CTA — works for any name, even outside matches */}
+          <div className="flex justify-center mb-8 -mt-4">
+            <button
+              onClick={() => navigate("/check-connection")}
+              className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full transition-colors hover:bg-primary/10"
+              style={{
+                backgroundColor: "hsl(var(--primary) / 0.08)",
+                border: "0.5px solid hsl(var(--primary) / 0.3)",
+                color: "hsl(var(--primary))",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Check a Connection ✦
+            </button>
+          </div>
+
           {matches.length === 0 ? (
             <EmptyState type="connections" />
           ) : (

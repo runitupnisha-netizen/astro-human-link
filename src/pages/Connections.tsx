@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +56,9 @@ const Connections = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
+  const [recentChecks, setRecentChecks] = useState<
+    Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>
+  >([]);
 
   const otherIds = matches.map((m) => m.otherUserId);
   const verifiedUsers = useVerificationStatuses(otherIds);
@@ -150,6 +153,15 @@ const Connections = () => {
     });
 
     setMatches(results);
+
+    // Recent Cosmic Checks — last 5 saved Check a Connection runs
+    const { data: checks } = await supabase
+      .from("connection_checks")
+      .select("id,their_name,compatibility_score,created_at")
+      .order("created_at", { ascending: false })
+      .limit(5);
+    setRecentChecks(checks ?? []);
+
     setLoading(false);
   }, [user]);
 
@@ -249,6 +261,63 @@ const Connections = () => {
               Check a Connection ✦
             </button>
           </div>
+
+          {/* Recent Cosmic Checks — quick rerun of past Check a Connection readings */}
+          {recentChecks.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-3 px-1">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                  Recent Cosmic Checks
+                </h3>
+                <button
+                  onClick={() => navigate("/check-connection")}
+                  className="text-xs text-primary hover:underline underline-offset-2"
+                >
+                  View all
+                </button>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+                {recentChecks.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => navigate(`/check-connection?rerun=${c.id}`)}
+                    className="group shrink-0 flex flex-col items-start gap-1.5 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      backgroundColor: "hsl(var(--primary) / 0.06)",
+                      border: "0.5px solid hsl(var(--primary) / 0.2)",
+                      minWidth: "140px",
+                      maxWidth: "180px",
+                    }}
+                    aria-label={`Rerun cosmic check for ${c.their_name || "previous connection"}`}
+                  >
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <span
+                        className="text-sm font-medium truncate text-foreground"
+                        style={{ fontFamily: "Lora, Georgia, serif" }}
+                      >
+                        {c.their_name?.trim() || "Unnamed"}
+                      </span>
+                      {typeof c.compatibility_score === "number" && (
+                        <span
+                          className="text-[10px] font-semibold shrink-0 px-1.5 py-0.5 rounded-full"
+                          style={{
+                            color: "hsl(var(--primary))",
+                            backgroundColor: "hsl(var(--primary) / 0.12)",
+                          }}
+                        >
+                          {c.compatibility_score}%
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <RotateCw className="w-2.5 h-2.5 group-hover:rotate-180 transition-transform duration-500" />
+                      <span>Rerun · {formatTime(c.created_at)}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {matches.length === 0 ? (
             <EmptyState type="connections" />

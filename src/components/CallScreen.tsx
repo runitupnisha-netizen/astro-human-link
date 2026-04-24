@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X } from "lucide-react";
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
@@ -16,17 +16,74 @@ interface CallScreenProps {
   matchId?: string;
 }
 
+type CallStatus = "connecting" | "ringing" | "connected" | "rejoining" | "error" | "ended";
+
+const MAX_REJOIN_ATTEMPTS = 3;
+
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
-  const [callStatus, setCallStatus] = useState<"ringing" | "connected" | "ended">("ringing");
+  const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [rejoinAttempt, setRejoinAttempt] = useState(0);
   const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
   const [videoOff, setVideoOff] = useState(callType === "voice");
   const [showPremium, setShowPremium] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const cancelledRef = useRef(false);
+
+  const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
+    setCallStatus(mode);
+    setErrorMessage(null);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "create-call-room",
+        { body: { matchId } },
+      );
+
+      if (cancelledRef.current) return;
+
+      const status = (error as any)?.context?.status ?? (data as any)?.status;
+      const code = (data as any)?.code ?? (error as any)?.context?.code;
+
+      if (status === 403 || code === "PREMIUM_REQUIRED") {
+        setShowPremium(true);
+        return;
+      }
+
+      if (error) {
+        const msg = error.message || "Could not start call";
+        setErrorMessage(msg);
+        setCallStatus("error");
+        toast.error(msg);
+        return;
+      }
+
+      if (!data?.url) {
+        const msg = "Call service unavailable. Please try again.";
+        setErrorMessage(msg);
+        setCallStatus("error");
+        toast.error(msg);
+        return;
+      }
+
+      setCallStatus("connected");
+      if (mode === "rejoining") {
+        toast.success("Reconnected");
+      }
+    } catch (e) {
+      if (cancelledRef.current) return;
+      const msg = e instanceof Error ? e.message : "Could not start call";
+      setErrorMessage(msg);
+      setCallStatus("error");
+      toast.error(msg);
+    }
+  }, [matchId]);
 
   useEffect(() => {
     if (!open) {
-      setCallStatus("ringing");
+      setCallStatus("connecting");
+      setErrorMessage(null);
+      setRejoinAttempt(0);
       setDuration(0);
       setMuted(false);
       setVideoOff(callType === "voice");
@@ -34,50 +91,23 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       return;
     }
 
-    // Verify premium & provision call room via edge function
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke(
-          "create-call-room",
-          { body: { matchId } },
-        );
-
-        if (cancelled) return;
-
-        // supabase-js wraps non-2xx as FunctionsHttpError; inspect underlying response
-        const status = (error as any)?.context?.status ?? (data as any)?.status;
-        const code = (data as any)?.code ?? (error as any)?.context?.code;
-
-        if (status === 403 || code === "PREMIUM_REQUIRED") {
-          setShowPremium(true);
-          return;
-        }
-
-        if (error) {
-          toast.error(error.message || "Could not start call");
-          onClose();
-          return;
-        }
-
-        if (!data?.url) {
-          toast.error("Call service unavailable");
-          onClose();
-          return;
-        }
-
-        setCallStatus("connected");
-      } catch (e) {
-        if (cancelled) return;
-        toast.error(e instanceof Error ? e.message : "Could not start call");
-        onClose();
-      }
-    })();
+    cancelledRef.current = false;
+    provisionRoom("connecting");
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
-  }, [open, callType, matchId, onClose]);
+  }, [open, callType, provisionRoom]);
+
+  const handleRejoin = useCallback(() => {
+    if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {
+      toast.error("Unable to reconnect. Please try again later.");
+      return;
+    }
+    setRejoinAttempt((n) => n + 1);
+    toast("Rejoining call…");
+    provisionRoom("rejoining");
+  }, [rejoinAttempt, provisionRoom]);
 
   useEffect(() => {
     if (callStatus === "connected") {
@@ -95,6 +125,9 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const handleEndCall = () => {
     setCallStatus("ended");
     if (timerRef.current) clearInterval(timerRef.current);
+    if (callStatus === "connected" && duration > 0) {
+      toast.success(`Call ended · ${formatDuration(duration)}`);
+    }
     setTimeout(onClose, 800);
   };
 
@@ -170,14 +203,52 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               animate={{ opacity: 1, y: 0 }}
               className={`text-sm mt-1 ${
                 callStatus === "ringing" ? "text-accent animate-pulse" :
+                callStatus === "connecting" || callStatus === "rejoining" ? "text-accent" :
                 callStatus === "connected" ? "text-emerald-400" :
+                callStatus === "error" ? "text-destructive" :
                 "text-destructive"
               }`}
             >
+              {callStatus === "connecting" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Connecting…
+                </span>
+              )}
+              {callStatus === "rejoining" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Rejoining (attempt {rejoinAttempt}/{MAX_REJOIN_ATTEMPTS})…
+                </span>
+              )}
               {callStatus === "ringing" && (isIncoming ? "Incoming call..." : "Calling...")}
               {callStatus === "connected" && formatDuration(duration)}
+              {callStatus === "error" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  {errorMessage || "Call failed"}
+                </span>
+              )}
               {callStatus === "ended" && "Call ended"}
             </motion.p>
+
+            {callStatus === "error" && (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRejoin}
+                  disabled={rejoinAttempt >= MAX_REJOIN_ATTEMPTS}
+                  className="rounded-full"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  {rejoinAttempt >= MAX_REJOIN_ATTEMPTS ? "Try later" : "Rejoin"}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full text-muted-foreground">
+                  Dismiss
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Sound waves animation when connected */}

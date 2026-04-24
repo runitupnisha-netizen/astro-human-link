@@ -330,6 +330,8 @@ const Profile = () => {
             </CardContent>
           </Card>
 
+          <WelcomeChecklist onReplayTour={handlePreviewAsNewUser} />
+
           <ProfileChecklist profile={profile} photoCount={photoCount} />
 
           {/* Photo Gallery */}

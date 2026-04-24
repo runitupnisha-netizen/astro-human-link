@@ -113,6 +113,13 @@ const CheckConnection = () => {
         summary: data.summary,
         highlight: data.highlight,
         theirName: theirName.trim() || "Them",
+        userSun: data.userSun ?? null,
+        userMoon: data.userMoon ?? null,
+        userRising: data.userRising ?? null,
+        userHdType: data.userHdType ?? null,
+        userHdAuthority: data.userHdAuthority ?? null,
+        chartHighlights: Array.isArray(data.chartHighlights) ? data.chartHighlights : [],
+        humanDesignNotes: Array.isArray(data.humanDesignNotes) ? data.humanDesignNotes : [],
       });
       setMonthCount((c) => c + 1);
       setStep("result");

@@ -13,6 +13,8 @@ import {
   Ecliptic,
   SiderealTime,
 } from "astronomy-engine";
+import tzLookup from "tz-lookup";
+import { DateTime } from "luxon";
 
 const ZODIAC = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
@@ -27,23 +29,61 @@ function signFromLongitude(lonDeg: number): ZodiacSign {
 }
 
 /**
- * Build a UTC Date from local birth date/time + longitude.
- * If birthTime is missing, default to noon local (12:00).
- * Without a tz database we approximate local-to-UTC offset by longitude (lng/15 hours).
- * This gets us within ~1° on the Moon (≈ same sign in 99% of cases) and is fine for Sun/Venus.
+ * Resolve the IANA timezone for a coordinate.
+ * Returns null if coordinates are missing or invalid.
+ */
+export function resolveTimezone(
+  latitudeDeg: number | null,
+  longitudeDeg: number | null,
+): string | null {
+  if (latitudeDeg == null || longitudeDeg == null) return null;
+  if (!Number.isFinite(latitudeDeg) || !Number.isFinite(longitudeDeg)) return null;
+  try {
+    return tzLookup(latitudeDeg, longitudeDeg);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build a UTC Date from a local birth date/time at a specific lat/lng.
+ * Uses tz-lookup + luxon to honor real IANA zones, including DST and historical
+ * offset rules — so a 3:30 PM birth in New York on Jan 20 1990 maps to the
+ * correct EST UTC instant, and a July 4 1985 noon birth in LA maps to PDT.
+ *
+ * Fallbacks (in order):
+ *  1) IANA zone from (lat, lng) via tz-lookup
+ *  2) Longitude-based offset (lng / 15) when lat is missing
+ *  3) UTC when no coordinates are provided at all
+ * If birthTime is missing, defaults to local 12:00 (noon).
  */
 export function buildBirthDateUTC(
   birthDate: string,           // "YYYY-MM-DD"
   birthTime: string | null,    // "HH:MM" or null
   longitudeDeg: number | null, // birth longitude (east positive)
+  latitudeDeg: number | null = null,
 ): Date {
   const [y, m, d] = birthDate.split("-").map(Number);
   const [hh, mm] = (birthTime ?? "12:00").split(":").map(Number);
 
-  // Approximate UTC offset from longitude (hours).
-  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
+  const zone = resolveTimezone(latitudeDeg, longitudeDeg);
+  if (zone) {
+    const dt = DateTime.fromObject(
+      {
+        year: y,
+        month: (m ?? 1),
+        day: (d ?? 1),
+        hour: hh ?? 12,
+        minute: mm ?? 0,
+        second: 0,
+      },
+      { zone },
+    );
+    if (dt.isValid) return dt.toUTC().toJSDate();
+  }
 
-  // Local time as if it were UTC, then subtract offset to get true UTC.
+  // Fallback: longitude-based offset (no DST, but reasonable when lat is unknown).
+  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
   const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
   return new Date(asUTC - offsetHours * 3600 * 1000);
 }
@@ -125,7 +165,12 @@ export function calcChartPlacements(opts: {
   latitude: number | null;
   longitude: number | null;
 }): ChartPlacements {
-  const utc = buildBirthDateUTC(opts.birthDate, opts.birthTime, opts.longitude);
+  const utc = buildBirthDateUTC(
+    opts.birthDate,
+    opts.birthTime,
+    opts.longitude,
+    opts.latitude,
+  );
   const sun = calcSunSign(utc);
   const moon = calcMoonSign(utc);
   const venus = calcVenusSign(utc);

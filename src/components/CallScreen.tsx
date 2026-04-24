@@ -184,6 +184,14 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
     setCallStatus(mode);
     setErrorMessage(null);
+    // Client-side premium gate — skip edge function for non-subscribers.
+    // Wait until subscription status has loaded so we don't bounce subscribers
+    // to the upsell during a brief loading window.
+    if (premiumLoading) return;
+    if (!subscribed) {
+      setShowPremium(true);
+      return;
+    }
     try {
       const { data, error } = await supabase.functions.invoke(
         "create-call-room",

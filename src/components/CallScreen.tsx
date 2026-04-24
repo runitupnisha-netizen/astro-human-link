@@ -58,7 +58,7 @@ const isTransientCallServiceError = (
 };
 
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
-  const { subscribed, loading: premiumLoading } = usePremium();
+  const { subscribed, loading: premiumLoading, subscriptionEnd } = usePremium();
   const { user, session, loading: authLoading } = useAuth();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -471,6 +471,26 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
   if (!open) return null;
 
+  // Derive a more specific gate status so the upsell screen can explain
+  // *why* the user is blocked (never subscribed, expired, or temporarily
+  // inactive) instead of showing a generic message.
+  const derivePremiumGateStatus = ():
+    | "missing"
+    | "expired"
+    | "inactive"
+    | "unauthenticated"
+    | "unavailable" => {
+    if (!user || !session) return "unauthenticated";
+    if (subscriptionEnd) {
+      const end = new Date(subscriptionEnd);
+      if (!isNaN(end.getTime()) && end.getTime() < Date.now()) return "expired";
+      // Has a known end date but no active sub right now → inactive (e.g.
+      // canceled, payment failed, between renewals).
+      return "inactive";
+    }
+    return "missing";
+  };
+
   // Hard premium gate: non-subscribers can never see the call UI or trigger
   // a join. Show only the upsell once premium status has resolved.
   if (!premiumLoading && !subscribed) {
@@ -479,6 +499,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         open={open}
         onClose={onClose}
         feature={callType}
+        status={derivePremiumGateStatus()}
+        subscriptionEnd={subscriptionEnd}
       />
     );
   }
@@ -493,6 +515,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
             onClose();
           }}
           feature={callType}
+          status={derivePremiumGateStatus()}
+          subscriptionEnd={subscriptionEnd}
           onRetry={async () => {
             // Re-invoke create-call-room without closing the call flow.
             // If the user is now premium, the upsell will dismiss itself

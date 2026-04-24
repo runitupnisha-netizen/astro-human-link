@@ -280,6 +280,22 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         return;
       }
 
+      // Rate limit — surface the friendly message and a hint when to retry,
+      // never silently fall back to demo mode (the user is doing this on
+      // purpose and deserves the truth).
+      if (status === 429 || code === "RATE_LIMITED") {
+        const retryAfter = (data as any)?.retry_after;
+        const baseMsg = serverMessage ||
+          "You're starting calls a little too quickly. Take a breath and try again in a few seconds.";
+        const msg = retryAfter
+          ? `${baseMsg} (try again in ${retryAfter}s)`
+          : baseMsg;
+        setErrorMessage(msg);
+        setCallStatus("error");
+        toast.error(msg, { duration: 6000 });
+        return;
+      }
+
       if (error) {
         if (isTransientCallServiceError(error, data, status, code)) {
           startSimulatedCall(mode);

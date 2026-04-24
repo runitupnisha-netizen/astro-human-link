@@ -32,7 +32,7 @@ const OfflineIndicator = () => {
           className="fixed top-0 left-0 right-0 z-[60] bg-destructive text-destructive-foreground text-center py-2 text-sm font-medium flex items-center justify-center gap-2"
         >
           <WifiOff className="w-4 h-4" />
-          You're offline — some features may not work
+          Connect to the internet to reach Lyra. ✦
         </motion.div>
       )}
       {showReconnected && online && (

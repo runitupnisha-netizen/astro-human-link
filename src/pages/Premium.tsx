@@ -69,7 +69,7 @@ const tierDetails: Record<TierKey, {
     features: [
       "Everything in Monthly",
       "Unlimited Super Likes & Boosts",
-      "Inner World suite (AI Cosmic Guide, Dream Journal)",
+      "My Cosmos suite (AI Cosmic Guide, Dream Journal)",
       "Compatibility lookup for anyone",
       "Priority profile visibility",
       "Personal energy readings",
@@ -81,7 +81,7 @@ const tierDetails: Record<TierKey, {
     badge: "Best Price",
     features: [
       "Everything in VIP, billed yearly",
-      "Inner World suite included",
+      "My Cosmos suite included",
       "Save $99+ per year",
       "Locked-in price for 12 months",
     ],

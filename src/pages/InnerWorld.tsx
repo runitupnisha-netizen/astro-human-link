@@ -121,7 +121,7 @@ const InnerWorld = () => {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span className="text-xs font-medium text-amber-400 tracking-wide uppercase">
-              Inner World
+              My Cosmos
             </span>
           </div>
           <h1 className="font-display text-3xl md:text-4xl font-bold text-gradient-aurora mb-3">
@@ -248,7 +248,7 @@ const InnerWorld = () => {
             className="mt-8 text-center"
           >
             <p className="text-xs text-muted-foreground mb-3">
-              Unlock the full Inner World with VIP or Yearly.
+              Unlock the full My Cosmos suite with VIP or Yearly.
             </p>
             <Button
               onClick={() => navigate("/premium")}

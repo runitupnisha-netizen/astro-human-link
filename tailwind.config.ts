@@ -19,7 +19,12 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				display: ['"Cinzel Decorative"', 'serif'],
+				// Display headings & wordmark — Lora (loaded in index.html)
+				display: ['"Lora"', 'Georgia', 'serif'],
+				// Body copy — Poppins
+				body: ['"Poppins"', 'system-ui', 'sans-serif'],
+				// Mystical accents (legacy / opt-in)
+				cinzel: ['"Cinzel Decorative"', 'serif'],
 				serif: ['"Cormorant Garamond"', 'serif'],
 			},
 			colors: {

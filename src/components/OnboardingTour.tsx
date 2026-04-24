@@ -269,9 +269,9 @@ const TOUR_STEPS: TourStep[] = [
   {
     icon: Moon,
     iconWrapClass: "bg-indigo-400/15 text-indigo-300 border-indigo-400/30",
-    title: "Inner World",
+    title: "My Cosmos",
     body: "Your private sanctuary: daily briefings, reflections, weekly cosmic insights, the astro calendar & alignment journal.",
-    cta: { label: "Visit Inner World", path: "/inner-world", highlight: "inner-world-first-tool" },
+    cta: { label: "Visit My Cosmos", path: "/inner-world", highlight: "inner-world-first-tool" },
   },
   {
     icon: Crown,

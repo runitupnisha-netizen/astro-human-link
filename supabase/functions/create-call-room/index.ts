@@ -328,6 +328,20 @@ serve(async (req) => {
       if (!roomRes.ok) {
         const errText = await roomRes.text();
         log("Daily room creation failed", { status: roomRes.status, errText });
+        await recordProvisioningError(supabase, {
+          category: roomRes.status === 401 || roomRes.status === 403
+            ? "daily_api_key"
+            : "daily_room_create",
+          httpStatus: roomRes.status,
+          message: `Daily room creation failed (${roomRes.status})`,
+          userId: user.id,
+          matchId,
+          details: {
+            roomName,
+            providerStatus: roomRes.status,
+            providerBody: errText.slice(0, 500),
+          },
+        });
         if (roomRes.status === 401 || roomRes.status === 403) {
           return json(
             {

@@ -18,6 +18,7 @@ import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
+import SparkleLoader from "./components/SparkleLoader";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 
@@ -66,7 +67,7 @@ const queryClient = new QueryClient();
 
 const LoadingScreen = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    <SparkleLoader size={36} />
   </div>
 );
 
@@ -209,8 +210,11 @@ const AppRoutes = () => {
             <Route path="/achievements" element={<PageTransition><ProtectedRoute><Achievements /></ProtectedRoute></PageTransition>} />
             <Route path="/astro-events" element={<PageTransition><ProtectedRoute><AstroEvents /></ProtectedRoute></PageTransition>} />
             <Route path="/briefing" element={<PageTransition><ProtectedRoute><DailyBriefing /></ProtectedRoute></PageTransition>} />
-            <Route path="/inner-world" element={<PageTransition><ProtectedRoute><InnerWorld /></ProtectedRoute></PageTransition>} />
-            <Route path="/my-chart" element={<PageTransition><ProtectedRoute><MyChart /></ProtectedRoute></PageTransition>} />
+            {/* Legacy routes — redirected to /profile (My Cosmos merged screen) */}
+            <Route path="/inner-world" element={<Navigate to="/profile" replace />} />
+            <Route path="/my-chart" element={<Navigate to="/profile" replace />} />
+            <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
+            <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
             <Route path="/growth" element={<PageTransition><ProtectedRoute><Growth /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/ritual" element={<PageTransition><ProtectedRoute><DailyRitual /></ProtectedRoute></PageTransition>} />

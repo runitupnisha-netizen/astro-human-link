@@ -184,13 +184,20 @@ const SelfieVerification = () => {
   return (
     <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border overflow-hidden">
       <CardContent className="p-6">
-        <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
-          <BadgeCheck className="w-5 h-5 text-accent" />
-          Photo Verification
-        </h2>
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <BadgeCheck className="w-5 h-5 text-accent" />
+            Photo Verification
+          </h2>
+          <StatusPill status={status} />
+        </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Take a selfie to earn a verified badge on your profile. This helps others know you're real.
+          Take a quick selfie to earn a verified badge. It takes under a minute and helps others know you're real.
         </p>
+
+        {(status === "none" || status === "rejected") && (
+          <Stepper current={step} />
+        )}
 
         <AnimatePresence mode="wait">
           {status === "verified" ? (
@@ -222,9 +229,32 @@ const SelfieVerification = () => {
               <p className="text-sm text-muted-foreground text-center">
                 Your selfie is being reviewed. This usually takes just a few moments.
               </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 gap-2"
+                onClick={() => {
+                  setStatus("none");
+                  setStep(1);
+                }}
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Resubmit selfie
+              </Button>
             </motion.div>
           ) : (
             <motion.div key="capture" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {status === "rejected" && (
+                <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 flex gap-2">
+                  <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                  <div className="text-xs text-destructive-foreground/90">
+                    <p className="font-semibold text-destructive">Your last selfie wasn't accepted</p>
+                    <p className="text-muted-foreground mt-0.5">
+                      Try again with brighter lighting and a clear, unobstructed view of your face.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Camera viewfinder */}
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4">
                 {cameraActive && (
@@ -252,14 +282,36 @@ const SelfieVerification = () => {
                     <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
                   </div>
                 )}
+                {cameraActive && (
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-background/70 backdrop-blur-sm px-3 py-1 rounded-full text-[11px] text-foreground/90 pointer-events-none">
+                    Center your face inside the oval
+                  </div>
+                )}
               </div>
               <canvas ref={canvasRef} className="hidden" />
+
+              {/* Inline help — only when not yet captured */}
+              {!capturedImage && (
+                <div className="mb-4 rounded-xl bg-muted/40 border border-border/50 p-3">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <ShieldCheck className="w-3 h-3" /> For best results
+                  </p>
+                  <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                    {TIPS.map(({ icon: Icon, label, ok }) => (
+                      <li key={label} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${ok ? "text-accent" : "text-destructive/80"}`} />
+                        <span>{label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
                 {!cameraActive && !capturedImage && (
                   <Button onClick={startCamera} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
-                    <Camera className="w-4 h-4" /> Open Camera
+                    <Camera className="w-4 h-4" /> {status === "rejected" ? "Try Again" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && (
@@ -279,6 +331,10 @@ const SelfieVerification = () => {
                   </>
                 )}
               </div>
+
+              <p className="text-[10px] text-center text-muted-foreground mt-4">
+                Your selfie is private — used only to confirm you're a real person and never shown on your profile.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>

@@ -601,6 +601,26 @@ const CosmicGuide = () => {
                   </div>
                 </div>
               )}
+              {showVoicePrimer && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-start"
+                >
+                  <p
+                    className="text-[11px] px-4 py-2 rounded-full"
+                    style={{
+                      color: "#d0b4f7",
+                      backgroundColor: "rgba(77, 58, 92, 0.35)",
+                      border: "1px solid rgba(208, 180, 247, 0.18)",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    ✦ Want to hear Lyra? Tap the speaker icon to listen.
+                  </p>
+                </motion.div>
+              )}
             </>
           )}
         </div>

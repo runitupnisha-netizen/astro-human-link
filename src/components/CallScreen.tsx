@@ -353,6 +353,18 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     if (wasConnected) {
       toast.success(`Call ended · ${formatDuration(duration)}`);
     }
+    // Mark session as ended (best-effort — RLS only allows updating our own row).
+    const sid = sessionIdRef.current;
+    if (sid) {
+      sessionIdRef.current = null;
+      supabase
+        .from("call_sessions")
+        .update({ ended_at: new Date().toISOString() })
+        .eq("id", sid)
+        .then(({ error }) => {
+          if (error) console.warn("Failed to mark call session ended:", error.message);
+        });
+    }
     // Release camera/mic and Daily room immediately, don't wait for unmount
     teardownCallObject();
     setTimeout(onClose, 600);

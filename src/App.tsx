@@ -18,6 +18,7 @@ import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
+import SparkleLoader from "./components/SparkleLoader";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 
@@ -66,7 +67,7 @@ const queryClient = new QueryClient();
 
 const LoadingScreen = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    <SparkleLoader size={36} />
   </div>
 );
 

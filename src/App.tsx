@@ -49,6 +49,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
 const InnerWorld = lazy(() => import("./pages/InnerWorld"));
 const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
+const CosmicGuide = lazy(() => import("./pages/CosmicGuide"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));

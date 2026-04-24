@@ -498,9 +498,7 @@ const CosmicGuide = () => {
                         className="prose prose-sm max-w-none prose-p:my-2 prose-li:my-0.5"
                         style={{ color: "#c9b8f0" }}
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {m.content || "…"}
-                        </ReactMarkdown>
+                        <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
                       </div>
                     ) : (
                       <p className="whitespace-pre-wrap">{m.content}</p>

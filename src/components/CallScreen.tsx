@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
 import { toast } from "sonner";
 import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
+import { usePremium } from "@/hooks/usePremium";
 
 interface CallScreenProps {
   open: boolean;

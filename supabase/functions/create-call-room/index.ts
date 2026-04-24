@@ -223,6 +223,16 @@ serve(async (req) => {
       if (!roomRes.ok) {
         const errText = await roomRes.text();
         log("Daily room creation failed", { status: roomRes.status, errText });
+        if (roomRes.status === 401 || roomRes.status === 403) {
+          return json(
+            {
+              error:
+                "Calling service rejected our credentials. Please contact support.",
+              code: "DAILY_API_KEY_INVALID",
+            },
+            503,
+          );
+        }
         return json({ error: "Failed to create call room" }, 502);
       }
       room = await roomRes.json();
@@ -263,6 +273,16 @@ serve(async (req) => {
         status: tokenRes.status,
         errText,
       });
+      if (tokenRes.status === 401 || tokenRes.status === 403) {
+        return json(
+          {
+            error:
+              "Calling service rejected our credentials. Please contact support.",
+            code: "DAILY_API_KEY_INVALID",
+          },
+          503,
+        );
+      }
       return json({ error: "Failed to create call token" }, 502);
     }
 

@@ -145,11 +145,10 @@ const DailyRitual = () => {
     navigate("/growth");
   };
 
-  const handlePrimerAccept = async () => {
-    const ok = await subscribe();
+  const handlePrimerAccept = async (): Promise<void> => {
+    await subscribe();
     // Whether the OS dialog granted or denied, this is now resolved permanently.
     localStorage.setItem(PUSH_PRIMER_RESOLVED_KEY, "true");
-    return ok;
   };
 
   const handlePrimerClose = () => {

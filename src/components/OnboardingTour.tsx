@@ -19,6 +19,192 @@ import { Button } from "@/components/ui/button";
 const STORAGE_KEY = "stellara:full-tour:v1:dismissed";
 export const TOUR_HIGHLIGHT_PARAM = "tour";
 
+const LYRA_DEMO_PROMPTS = [
+  "What's my chart saying today?",
+  "How do I trust my Human Design strategy?",
+  "Send me a small love affirmation",
+];
+
+const LYRA_DEMO_REPLIES: Record<string, string> = {
+  "What's my chart saying today?":
+    "Your chart is humming softly today — Venus is asking you to receive, not chase. Open one door and let beauty walk in. ✨",
+  "How do I trust my Human Design strategy?":
+    "Strategy is your body whispering yes or wait. Trust the small clues — a breath, a pull, a hesitation. Your design is already wise. 🌙",
+  "Send me a small love affirmation":
+    "You are not behind. The love that's meant for you moves at the speed of your becoming — and you are right on time. 💗",
+};
+
+const LYRA_DEFAULT_REPLY =
+  "I hear you. The stars are listening too. When you're ready, open me up anytime — I'll have more space to walk through this with you in depth. 🌟";
+
+interface LyraDemoProps {
+  done: boolean;
+  onComplete: () => void;
+}
+
+const LyraDemo = ({ done, onComplete }: LyraDemoProps) => {
+  const [input, setInput] = useState("");
+  const [userMsg, setUserMsg] = useState<string | null>(null);
+  const [reply, setReply] = useState<string | null>(null);
+  const [typing, setTyping] = useState(false);
+
+  const send = (text: string) => {
+    const t = text.trim();
+    if (!t || typing || userMsg) return;
+    setUserMsg(t);
+    setInput("");
+    setTyping(true);
+    const answer = LYRA_DEMO_REPLIES[t] ?? LYRA_DEFAULT_REPLY;
+    window.setTimeout(() => {
+      setReply(answer);
+      setTyping(false);
+      onComplete();
+    }, 900);
+  };
+
+  return (
+    <div
+      className="mt-4 rounded-2xl border p-3 space-y-3"
+      style={{
+        backgroundColor: "rgba(12, 11, 19, 0.85)",
+        borderColor: "rgba(208, 180, 247, 0.22)",
+      }}
+    >
+      {/* Lyra mini header */}
+      <div className="flex items-center gap-2">
+        <div
+          className="relative w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+          style={{
+            background: "radial-gradient(circle at 35% 30%, #b89df5, #6d28d9 60%, #2a1740)",
+            boxShadow: "0 0 12px rgba(127, 119, 221, 0.5)",
+          }}
+        >
+          <Sparkles className="w-3.5 h-3.5" style={{ color: "#f9d697" }} />
+        </div>
+        <div className="leading-tight">
+          <p style={{ fontFamily: "Lora, Georgia, serif", color: "#e0d4ff" }} className="text-sm">
+            Lyra
+          </p>
+          <p className="text-[10px] tracking-wider" style={{ color: "#7a6a9a" }}>
+            demo · always here
+          </p>
+        </div>
+      </div>
+
+      {/* Conversation */}
+      <div className="space-y-2 min-h-[3.5rem]">
+        {!userMsg ? (
+          <p
+            className="text-xs leading-relaxed"
+            style={{ color: "#c9b8f0", fontFamily: "Lora, Georgia, serif" }}
+          >
+            Pick a prompt or write your own — I'll reply right here.
+          </p>
+        ) : (
+          <>
+            <div className="flex justify-end">
+              <div
+                className="max-w-[85%] rounded-2xl px-3 py-2 text-xs"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(127, 119, 221, 0.55), rgba(109, 40, 217, 0.45))",
+                  color: "#f5edff",
+                }}
+              >
+                {userMsg}
+              </div>
+            </div>
+            <div className="flex justify-start">
+              <div
+                className="max-w-[88%] rounded-2xl px-3 py-2 text-xs leading-relaxed"
+                style={{
+                  backgroundColor: "rgba(77, 58, 92, 0.55)",
+                  color: "#e0d4ff",
+                  fontFamily: "Lora, Georgia, serif",
+                }}
+              >
+                {typing ? (
+                  <span className="inline-flex gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9b8f0] animate-bounce" />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-[#c9b8f0] animate-bounce"
+                      style={{ animationDelay: "0.15s" }}
+                    />
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-[#c9b8f0] animate-bounce"
+                      style={{ animationDelay: "0.3s" }}
+                    />
+                  </span>
+                ) : (
+                  reply
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Prompt chips (only before first send) */}
+      {!userMsg && (
+        <div className="flex flex-wrap gap-1.5">
+          {LYRA_DEMO_PROMPTS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => send(p)}
+              className="rounded-full px-2.5 py-1 text-[11px] transition-colors"
+              style={{
+                backgroundColor: "rgba(77, 58, 92, 0.45)",
+                border: "1px solid rgba(208, 180, 247, 0.25)",
+                color: "#c9b8f0",
+              }}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          send(input);
+        }}
+        className="flex items-center gap-2 rounded-full px-3 py-1.5"
+        style={{
+          backgroundColor: "rgba(77, 58, 92, 0.35)",
+          border: "1px solid rgba(208, 180, 247, 0.22)",
+        }}
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={userMsg ? "Continue inside Lyra →" : "Ask Lyra anything..."}
+          disabled={!!userMsg || typing}
+          className="flex-1 bg-transparent outline-none text-xs placeholder:text-[#7a6a9a] disabled:opacity-60"
+          style={{ color: "#e0d4ff" }}
+        />
+        <button
+          type="submit"
+          disabled={!!userMsg || typing || !input.trim()}
+          aria-label="Send to Lyra"
+          className="flex h-7 w-7 items-center justify-center rounded-full disabled:opacity-40"
+          style={{ background: "linear-gradient(135deg, #7f77dd, #6d28d9)" }}
+        >
+          <Send className="h-3 w-3 text-white" />
+        </button>
+      </form>
+
+      {done && (
+        <p className="text-[10px] text-center" style={{ color: "#7a6a9a" }}>
+          Beautiful — you've met Lyra. Tap Next to continue.
+        </p>
+      )}
+    </div>
+  );
+};
+
 interface TourStep {
   icon: React.ComponentType<{ className?: string }>;
   iconWrapClass: string;

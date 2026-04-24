@@ -49,13 +49,35 @@ const TourHighlight = ({ targetId, children, className = "", label }: Props) => 
 
     // Scroll the highlighted region into view so the user can actually see
     // the pulse. Use a short timeout so any route transition settles first.
+    //
+    // Mobile (≤768px): the app uses a fixed top nav (pt-20 ≈ 80px) and a
+    //   fixed bottom tab bar (pb-20 ≈ 80px). `scrollIntoView({block:"center"})`
+    //   often parks the region behind the top nav on long pages, so we
+    //   compute a manual offset (header height + small breathing room) and
+    //   smooth-scroll the window directly.
+    // Desktop (>768px): center the region in the viewport — there's plenty
+    //   of vertical room and the nav is more compact.
     const scrollTimer = window.setTimeout(() => {
-      wrapperRef.current?.scrollIntoView({
-        behavior: reduceMotion ? "auto" : "smooth",
-        block: "center",
-      });
+      const el = wrapperRef.current;
+      if (!el) return;
+
+      const isSmallScreen =
+        typeof window !== "undefined" && window.innerWidth <= 768;
+      const behavior: ScrollBehavior = reduceMotion ? "auto" : "smooth";
+
+      if (isSmallScreen) {
+        // Account for the fixed top navigation (~80px) plus 16px of
+        // breathing room so the pulse outline isn't clipped by the header.
+        const HEADER_OFFSET = 96;
+        const top =
+          el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+        window.scrollTo({ top: Math.max(0, top), behavior });
+      } else {
+        el.scrollIntoView({ behavior, block: "center" });
+      }
+
       // Move focus without triggering another scroll jump.
-      wrapperRef.current?.focus({ preventScroll: true });
+      el.focus({ preventScroll: true });
     }, 150);
 
     return () => window.clearTimeout(scrollTimer);

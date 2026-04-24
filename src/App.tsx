@@ -64,6 +64,7 @@ const ShadowJournal = lazy(() => import("./pages/ShadowJournal"));
 const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 const queryClient = new QueryClient();
 
@@ -228,6 +229,7 @@ const AppRoutes = () => {
             <Route path="/soulmate-sketch" element={<PageTransition><ProtectedRoute><SoulmateSketch /></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<PageTransition><ProtectedRoute><CosmicGuide /></ProtectedRoute></PageTransition>} />
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
+            <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />

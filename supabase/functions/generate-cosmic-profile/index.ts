@@ -406,7 +406,12 @@ serve(async (req) => {
 
     // ── Real ephemeris (NASA-grade math, no AI guessing) ──
     const hasBirthTime = birthTime && birthTime.trim() !== "";
-    const utcDate = buildBirthUTC(birthDate, hasBirthTime ? birthTime : null, coords?.lng ?? null);
+    const utcDate = buildBirthUTC(
+      birthDate,
+      hasBirthTime ? birthTime : null,
+      coords?.lng ?? null,
+      coords?.lat ?? null,
+    );
     const sunSign = signFromLongitude(eclipticLon(Body.Sun, utcDate));
     const moonSign = signFromLongitude(eclipticLon(Body.Moon, utcDate));
     const venusSign = signFromLongitude(eclipticLon(Body.Venus, utcDate));

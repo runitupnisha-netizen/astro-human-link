@@ -117,31 +117,79 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       log("Missing STRIPE_SECRET_KEY");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 500,
+        message: "STRIPE_SECRET_KEY not configured",
+        userId: user.id,
+      });
       return json({ error: "Premium verification unavailable" }, 500);
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
+    let customers;
+    try {
+      customers = await stripe.customers.list({
+        email: user.email,
+        limit: 1,
+      });
+    } catch (stripeErr) {
+      const message = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+      log("Stripe customer lookup failed", { message });
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 502,
+        message: `Stripe customers.list failed: ${message}`,
+        userId: user.id,
+        details: { stage: "customers_list" },
+      });
+      return json({ error: "Premium verification temporarily unavailable" }, 502);
+    }
 
     if (customers.data.length === 0) {
       log("No Stripe customer for user");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 403,
+        message: "No Stripe customer for user",
+        userId: user.id,
+        details: { reason: "no_customer" },
+      });
       return json(
         { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
         403,
       );
     }
 
-    const subs = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
-    });
+    let subs;
+    try {
+      subs = await stripe.subscriptions.list({
+        customer: customers.data[0].id,
+        status: "active",
+        limit: 1,
+      });
+    } catch (stripeErr) {
+      const message = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+      log("Stripe subscriptions lookup failed", { message });
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 502,
+        message: `Stripe subscriptions.list failed: ${message}`,
+        userId: user.id,
+        details: { stage: "subscriptions_list", customerId: customers.data[0].id },
+      });
+      return json({ error: "Premium verification temporarily unavailable" }, 502);
+    }
 
     if (subs.data.length === 0) {
       log("No active subscription");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 403,
+        message: "No active subscription",
+        userId: user.id,
+        details: { reason: "no_active_sub", customerId: customers.data[0].id },
+      });
       return json(
         { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
         403,

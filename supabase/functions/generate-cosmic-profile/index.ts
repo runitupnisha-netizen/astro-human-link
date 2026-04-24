@@ -1,12 +1,61 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
+import {
+  Body,
+  GeoVector,
+  Ecliptic,
+  SiderealTime,
+} from "npm:astronomy-engine@2.1.19";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// ═══════════════════════════════════════════════════════════════
+// REAL EPHEMERIS — NASA-grade math via astronomy-engine
+// ═══════════════════════════════════════════════════════════════
+
+const ZODIAC_SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+] as const;
+
+function signFromLongitude(lonDeg: number): string {
+  const norm = ((lonDeg % 360) + 360) % 360;
+  return ZODIAC_SIGNS[Math.floor(norm / 30)];
+}
+
+function buildBirthUTC(birthDate: string, birthTime: string | null, longitudeDeg: number | null): Date {
+  const [y, m, d] = birthDate.split("-").map(Number);
+  const [hh, mm] = (birthTime ?? "12:00").split(":").map(Number);
+  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
+  const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
+  return new Date(asUTC - offsetHours * 3600 * 1000);
+}
+
+function eclipticLon(body: typeof Body[keyof typeof Body], date: Date): number {
+  const vec = GeoVector(body, date, true);
+  return Ecliptic(vec).elon;
+}
+
+function calcAscendant(date: Date, latDeg: number, lngDeg: number): string {
+  const gst = SiderealTime(date);
+  const lstHours = (gst + lngDeg / 15 + 24) % 24;
+  const lstDeg = lstHours * 15;
+  const epsilon = (23.4367 * Math.PI) / 180;
+  const phi = (latDeg * Math.PI) / 180;
+  const lst = (lstDeg * Math.PI) / 180;
+  const y = -Math.cos(lst);
+  const x = Math.sin(epsilon) * Math.tan(phi) + Math.cos(epsilon) * Math.sin(lst);
+  let asc = (Math.atan2(y, x) * 180) / Math.PI;
+  asc = ((asc % 360) + 360) % 360;
+  const diff = ((asc - lstDeg + 540) % 360) - 180;
+  if (diff < 0) asc = (asc + 180) % 360;
+  return signFromLongitude(asc);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // DETERMINISTIC CALCULATIONS — No AI guessing
@@ -312,7 +361,6 @@ serve(async (req) => {
     const lifePathNumber = calculateLifePathNumber(birthDate);
     const birthdayNumber = calculateBirthdayNumber(birthDate);
     const personalYearNumber = calculatePersonalYearNumber(birthDate);
-    const sunSign = calculateSunSign(birthDate);
     const lifePathContext = calculateExpressionContext(lifePathNumber);
     const birthdayContext = birthdayNumberMeaning(birthdayNumber);
     const personalYearContext = personalYearMeaning(personalYearNumber);
@@ -328,13 +376,23 @@ serve(async (req) => {
       ? `Latitude: ${coords.lat.toFixed(4)}, Longitude: ${coords.lng.toFixed(4)}`
       : "Coordinates unavailable";
 
+    // ── Real ephemeris (NASA-grade math, no AI guessing) ──
+    const hasBirthTime = birthTime && birthTime.trim() !== "";
+    const utcDate = buildBirthUTC(birthDate, hasBirthTime ? birthTime : null, coords?.lng ?? null);
+    const sunSign = signFromLongitude(eclipticLon(Body.Sun, utcDate));
+    const moonSign = signFromLongitude(eclipticLon(Body.Moon, utcDate));
+    const venusSign = signFromLongitude(eclipticLon(Body.Venus, utcDate));
+    const calculatedRising =
+      hasBirthTime && coords ? calcAscendant(utcDate, coords.lat, coords.lng) : null;
+
     console.log(`Birth data: ${birthDate} ${birthTime || "no time"} in ${birthPlace} (${latLng})`);
-    console.log(`Deterministic: Sun=${sunSign}, LifePath=${lifePathNumber}, Birthday=${birthdayNumber}, PersonalYear=${personalYearNumber}`);
+    console.log(
+      `Ephemeris: Sun=${sunSign}, Moon=${moonSign}, Venus=${venusSign}, Rising=${calculatedRising ?? "n/a (need birth time + coords)"}`
+    );
+    console.log(`Numerology: LifePath=${lifePathNumber}, Birthday=${birthdayNumber}, PersonalYear=${personalYearNumber}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    const hasBirthTime = birthTime && birthTime.trim() !== "";
 
     const timeContext = hasBirthTime
       ? `at exactly ${birthTime} local time`
@@ -343,14 +401,18 @@ serve(async (req) => {
     const systemPrompt = `You are an expert astrologer, Human Design analyst, Gene Keys guide, and Pythagorean numerologist with deep knowledge of ephemeris-based calculations.
 
 CRITICAL RULES:
-1. The Sun Sign has ALREADY been calculated deterministically and is: ${sunSign}. You MUST use this exact value. Do NOT recalculate it.
-2. For Moon sign: Use your knowledge of lunar ephemeris patterns to estimate as accurately as possible for the given date.
-3. For Rising sign: ${hasBirthTime ? "Estimate using birth time and location coordinates." : "State that rising sign requires exact birth time. Provide your best estimate using noon but clearly mark it as approximate."}
+1. The following placements have ALREADY been calculated using a real NASA-grade ephemeris (astronomy-engine). You MUST use these exact values. Do NOT recalculate or override them:
+   - Sun: ${sunSign}
+   - Moon: ${moonSign}
+   - Venus: ${venusSign}
+   - Rising/Ascendant: ${calculatedRising ?? "Unknown (birth time or location not provided)"}
+2. Speak about these placements as facts — write the astro_summary in a way that explicitly references at least the Sun, Moon, Venus, and Rising sign and what they mean for the person's love life, emotional world, and outward presentation.
+3. ${calculatedRising ? "" : "If Rising is unknown, say so in the summary and use 'unknown' as rising_sign value — do NOT guess."}
 4. For Human Design: Follow the type/authority/profile framework strictly. Use statistical distributions and birth data correlations.
 5. For Gene Keys: Map from the Sun's zodiacal position to the appropriate Gene Key number. Use the exact Shadow → Gift → Siddhi format.
 6. For Numerology: The core numbers have been calculated deterministically. You MUST provide a rich, insightful numerology_summary that weaves together the Life Path, Birthday Number, and Personal Year cycle into a cohesive narrative about the person's numerological blueprint.
 7. Be HONEST about confidence levels. If something requires an ephemeris for precision, say so.
-8. In summaries, distinguish between CALCULATED facts and ESTIMATED positions.
+8. Sun, Moon, Venus, and (if provided) Rising are ALL ephemeris-calculated facts. Treat them with full confidence.
 
 ${MOON_SIGN_REFERENCE}
 
@@ -370,15 +432,19 @@ You MUST respond using the provided tool/function call format. Do not respond wi
 - Birth Place: ${birthPlace}
 - Coordinates: ${latLng}
 - CONFIRMED Sun Sign: ${sunSign} (use this exactly)
+- CONFIRMED Moon Sign: ${moonSign} (ephemeris-calculated, use this exactly)
+- CONFIRMED Venus Sign: ${venusSign} (ephemeris-calculated, use this exactly)
+- CONFIRMED Rising Sign: ${calculatedRising ?? "unknown"} (${calculatedRising ? "ephemeris-calculated, use this exactly" : "not enough data — use 'unknown' as the value"})
 - Life Path Number: ${lifePathNumber} (${lifePathContext})
 - Birthday Number: ${birthdayNumber} (${birthdayContext})
 - Personal Year Number: ${personalYearNumber} (${personalYearContext})
 ${hasKarmicDebt ? `- Karmic Debt: Day ${rawDay} carries karmic debt energy (${rawDay}/${reduceToDigit(rawDay)})` : "- No karmic debt detected in birth day"}
 
 Provide:
-1. Moon sign (best estimate with confidence note)
-2. Rising sign (${hasBirthTime ? "estimate from birth time + coordinates" : "note as approximate, requires exact birth time"})
-3. Rich astrology summary (3-5 sentences, noting which positions are calculated vs estimated)
+1. Moon sign — MUST be exactly: ${moonSign}
+2. Rising sign — MUST be exactly: ${calculatedRising ?? "unknown"}
+3. Venus sign — MUST be exactly: ${venusSign}
+4. Rich astrology summary (3-5 sentences) that weaves together Sun ${sunSign}, Moon ${moonSign}, Venus ${venusSign}${calculatedRising ? `, and Rising ${calculatedRising}` : ""} into a cohesive picture of identity, emotion, love language${calculatedRising ? ", and outward expression" : ""}
 4. Human Design type, strategy, authority, profile with detailed summary
 5. Gene Keys Life's Work, Evolution, and Radiance paths in "Gene Key [N]: Shadow → Gift → Siddhi" format
 6. Gene Keys summary explaining their Golden Path activation
@@ -407,8 +473,9 @@ Provide:
                 type: "object",
                 properties: {
                   sun_sign: { type: "string", description: "Zodiac sun sign (MUST match the pre-calculated value)" },
-                  moon_sign: { type: "string", description: "Estimated zodiac moon sign" },
-                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign (note if approximate)" },
+                  moon_sign: { type: "string", description: "Zodiac moon sign (MUST match the pre-calculated value)" },
+                  rising_sign: { type: "string", description: "Zodiac rising/ascendant sign (MUST match the pre-calculated value, or 'unknown')" },
+                  venus_sign: { type: "string", description: "Zodiac venus sign (MUST match the pre-calculated value)" },
                   astro_summary: { type: "string", description: "Rich paragraph about their astrological blueprint (3-5 sentences). MUST note which positions are calculated vs estimated." },
                   human_design_type: { type: "string", enum: ["Generator", "Manifesting Generator", "Projector", "Manifestor", "Reflector"], description: "One of the 5 HD types" },
                   human_design_strategy: { type: "string", enum: ["To Respond", "To Respond & Inform", "Wait for the Invitation", "To Inform", "Wait a Lunar Cycle"], description: "Strategy matching the type" },
@@ -430,7 +497,7 @@ Provide:
                   },
                 },
                 required: [
-                  "sun_sign", "moon_sign", "rising_sign", "astro_summary",
+                  "sun_sign", "moon_sign", "rising_sign", "venus_sign", "astro_summary",
                   "human_design_type", "human_design_strategy", "human_design_authority",
                   "human_design_profile", "human_design_summary",
                   "gene_keys_life_purpose", "gene_keys_evolution", "gene_keys_radiance",
@@ -467,8 +534,11 @@ Provide:
 
     const cosmicData = JSON.parse(toolCall.function.arguments);
 
-    // ── Enforce deterministic sun sign (override AI if it deviated) ──
+    // ── Enforce deterministic placements (override AI if it deviated) ──
     cosmicData.sun_sign = sunSign;
+    cosmicData.moon_sign = moonSign;
+    cosmicData.venus_sign = venusSign;
+    if (calculatedRising) cosmicData.rising_sign = calculatedRising;
 
     // ── Save to profile ──
     const { error: updateError } = await supabase
@@ -484,8 +554,9 @@ Provide:
         personal_year_number: personalYearNumber,
         numerology_summary: cosmicData.numerology_summary,
         sun_sign: sunSign,
-        moon_sign: cosmicData.moon_sign,
-        rising_sign: cosmicData.rising_sign,
+        moon_sign: moonSign,
+        rising_sign: calculatedRising ?? cosmicData.rising_sign,
+        venus_sign: venusSign,
         astro_summary: cosmicData.astro_summary,
         human_design_type: cosmicData.human_design_type,
         human_design_strategy: cosmicData.human_design_strategy,

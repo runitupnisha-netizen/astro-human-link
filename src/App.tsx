@@ -19,6 +19,7 @@ import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import SparkleLoader from "./components/SparkleLoader";
+import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 
@@ -87,8 +88,11 @@ const hasRecoverySignal = (location: { search: string; hash: string }) => {
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
+  const { sessionExpired } = useAuth();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
+  // If a session expired mid-app, show the friendly screen instead of bouncing to /auth.
+  if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;

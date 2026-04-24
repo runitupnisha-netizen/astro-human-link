@@ -8,8 +8,8 @@
 
 @layer base {
   :root {
-    /* Deep cosmic background with teal undertone */
-    --background: 220 35% 7%;
+    /* Deep cosmic background — #0c0b13 (purple undertone, lets lavenders glow) */
+    --background: 248 27% 6%;
     --foreground: 45 80% 93%;
 
     /* Card system with depth */
@@ -22,7 +22,7 @@
 
     /* Primary — rich purple */
     --primary: 270 45% 58%;
-    --primary-foreground: 220 35% 7%;
+    --primary-foreground: 248 27% 6%;
 
     /* Secondary — deep teal */
     --secondary: 180 45% 22%;
@@ -34,7 +34,7 @@
 
     /* Accent — warm gold */
     --accent: 42 75% 62%;
-    --accent-foreground: 220 35% 7%;
+    --accent-foreground: 248 27% 6%;
 
     /* Destructive */
     --destructive: 0 70% 55%;
@@ -57,7 +57,7 @@
     --shadow-mystical: 0 10px 40px -5px hsl(195 50% 25% / 0.3);
     --shadow-glow: 0 0 30px hsl(270 45% 58% / 0.25);
     --shadow-golden: 0 0 40px hsl(42 75% 62% / 0.2);
-    --shadow-elevated: 0 8px 32px -4px hsl(220 35% 5% / 0.6), 0 2px 8px -2px hsl(220 35% 5% / 0.3);
+    --shadow-elevated: 0 8px 32px -4px hsl(248 27% 4% / 0.6), 0 2px 8px -2px hsl(248 27% 4% / 0.3);
 
     /* Smooth transitions */
     --transition-cosmic: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -104,6 +104,11 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html, body, #root {
+    background-color: #0c0b13;
+    overscroll-behavior: contain;
   }
 
   body {

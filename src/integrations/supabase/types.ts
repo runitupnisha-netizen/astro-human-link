@@ -844,6 +844,7 @@ export type Database = {
           birth_place: string | null
           birth_time: string | null
           birthday_number: number | null
+          bonus_pro_until: string | null
           boost_until: string | null
           briefing_email_reminder: boolean
           briefing_last_reminder_date: string | null
@@ -887,6 +888,8 @@ export type Database = {
           preferred_hd_types: string[] | null
           preferred_language: string | null
           push_primer_shown: boolean
+          referral_redeemed_at: string | null
+          referred_by_code: string | null
           relationship_goal: string | null
           rising_sign: string | null
           smoking: string | null
@@ -918,6 +921,7 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
+          bonus_pro_until?: string | null
           boost_until?: string | null
           briefing_email_reminder?: boolean
           briefing_last_reminder_date?: string | null
@@ -961,6 +965,8 @@ export type Database = {
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
           push_primer_shown?: boolean
+          referral_redeemed_at?: string | null
+          referred_by_code?: string | null
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
@@ -992,6 +998,7 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
+          bonus_pro_until?: string | null
           boost_until?: string | null
           briefing_email_reminder?: boolean
           briefing_last_reminder_date?: string | null
@@ -1035,6 +1042,8 @@ export type Database = {
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
           push_primer_shown?: boolean
+          referral_redeemed_at?: string | null
+          referred_by_code?: string | null
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
@@ -1098,6 +1107,33 @@ export type Database = {
           identifier?: string
           request_count?: number
           window_start?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          rewards_earned: number
+          user_id: string
+          uses_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          rewards_earned?: number
+          user_id: string
+          uses_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          rewards_earned?: number
+          user_id?: string
+          uses_count?: number
         }
         Relationships: []
       }
@@ -1565,6 +1601,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      generate_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1576,6 +1613,7 @@ export type Database = {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      lookup_referral_code: { Args: { _code: string }; Returns: Json }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1593,6 +1631,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      redeem_referral_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

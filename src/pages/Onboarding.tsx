@@ -339,6 +339,27 @@ const Onboarding = () => {
       const data = await response.json();
       setProfile(data.profile);
       setStep("reveal");
+
+      // Moment 3 — Friend B reaches the birth-chart reveal.
+      // If they signed up with a referral code, redeem it now (idempotent).
+      try {
+        const { getStoredReferralCode, clearStoredReferralCode } = await import("@/lib/referral");
+        const refCode = getStoredReferralCode();
+        if (refCode) {
+          const { data: redeemRes } = await supabase.rpc(
+            "redeem_referral_code" as never,
+            { _code: refCode } as never,
+          );
+          const result = redeemRes as { success?: boolean } | null;
+          if (result?.success) {
+            toast.success("Your invite unlocked +30 days of Pro ✦");
+          }
+          // Clear regardless — already_redeemed / invalid shouldn't keep retrying.
+          clearStoredReferralCode();
+        }
+      } catch (e) {
+        console.warn("[onboarding] referral redeem failed", e);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to generate your cosmic profile");
       setStep("input");

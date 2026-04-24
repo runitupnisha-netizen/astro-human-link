@@ -22,6 +22,7 @@ import SparkleLoader from "./components/SparkleLoader";
 import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
+import { captureReferralFromUrl } from "@/lib/referral";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -65,6 +66,7 @@ const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
+const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 
 const queryClient = new QueryClient();
 
@@ -120,6 +122,18 @@ const AnalyticsTracker = () => {
     trackPageView(location.pathname);
   }, [location.pathname, trackPageView]);
 
+  return null;
+};
+
+/**
+ * Captures ?ref=CODE from any URL the user lands on, stores it for 30 days,
+ * and lets the onboarding reveal step redeem it for both users.
+ */
+const ReferralCapture = () => {
+  const location = useLocation();
+  useEffect(() => {
+    captureReferralFromUrl();
+  }, [location.pathname, location.search]);
   return null;
 };
 
@@ -186,6 +200,7 @@ const AppRoutes = () => {
   return (
     <>
       <AnalyticsTracker />
+      <ReferralCapture />
       <RecoveryLinkRedirect />
       {!isRecoveryRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && user && onboardingComplete && <EmailVerificationReminder />}
@@ -230,6 +245,7 @@ const AppRoutes = () => {
             <Route path="/guide" element={<PageTransition><ProtectedRoute><CosmicGuide /></ProtectedRoute></PageTransition>} />
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
             <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
+            <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />

@@ -203,14 +203,52 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               animate={{ opacity: 1, y: 0 }}
               className={`text-sm mt-1 ${
                 callStatus === "ringing" ? "text-accent animate-pulse" :
+                callStatus === "connecting" || callStatus === "rejoining" ? "text-accent" :
                 callStatus === "connected" ? "text-emerald-400" :
+                callStatus === "error" ? "text-destructive" :
                 "text-destructive"
               }`}
             >
+              {callStatus === "connecting" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Connecting…
+                </span>
+              )}
+              {callStatus === "rejoining" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Rejoining (attempt {rejoinAttempt}/{MAX_REJOIN_ATTEMPTS})…
+                </span>
+              )}
               {callStatus === "ringing" && (isIncoming ? "Incoming call..." : "Calling...")}
               {callStatus === "connected" && formatDuration(duration)}
+              {callStatus === "error" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  {errorMessage || "Call failed"}
+                </span>
+              )}
               {callStatus === "ended" && "Call ended"}
             </motion.p>
+
+            {callStatus === "error" && (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRejoin}
+                  disabled={rejoinAttempt >= MAX_REJOIN_ATTEMPTS}
+                  className="rounded-full"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  {rejoinAttempt >= MAX_REJOIN_ATTEMPTS ? "Try later" : "Rejoin"}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full text-muted-foreground">
+                  Dismiss
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Sound waves animation when connected */}

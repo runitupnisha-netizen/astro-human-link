@@ -14,6 +14,48 @@ const log = (step: string, details?: unknown) => {
   console.log(`[CREATE-CALL-ROOM] ${step}${detailsStr}`);
 };
 
+// Server-side persistent error log. Best-effort — failures here must never
+// block call provisioning, but they give ops a durable trail for premium
+// verification problems and Daily.co API regressions.
+type ErrorCategory =
+  | "premium_verification"
+  | "daily_api_key"
+  | "daily_room_create"
+  | "daily_token_create"
+  | "auth"
+  | "validation"
+  | "internal";
+
+const recordProvisioningError = async (
+  supabase: ReturnType<typeof createClient>,
+  payload: {
+    category: ErrorCategory;
+    httpStatus: number;
+    message: string;
+    userId?: string | null;
+    matchId?: string | null;
+    details?: Record<string, unknown>;
+  },
+) => {
+  try {
+    const { error } = await supabase.from("call_provisioning_errors").insert({
+      user_id: payload.userId ?? null,
+      match_id: payload.matchId ?? null,
+      error_category: payload.category,
+      http_status: payload.httpStatus,
+      message: payload.message.slice(0, 500),
+      details: payload.details ?? {},
+    });
+    if (error) {
+      console.warn(`[CREATE-CALL-ROOM] Error log insert failed: ${error.message}`);
+    }
+  } catch (e) {
+    console.warn(
+      `[CREATE-CALL-ROOM] Error log threw: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+};
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -75,31 +117,79 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       log("Missing STRIPE_SECRET_KEY");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 500,
+        message: "STRIPE_SECRET_KEY not configured",
+        userId: user.id,
+      });
       return json({ error: "Premium verification unavailable" }, 500);
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
+    let customers;
+    try {
+      customers = await stripe.customers.list({
+        email: user.email,
+        limit: 1,
+      });
+    } catch (stripeErr) {
+      const message = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+      log("Stripe customer lookup failed", { message });
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 502,
+        message: `Stripe customers.list failed: ${message}`,
+        userId: user.id,
+        details: { stage: "customers_list" },
+      });
+      return json({ error: "Premium verification temporarily unavailable" }, 502);
+    }
 
     if (customers.data.length === 0) {
       log("No Stripe customer for user");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 403,
+        message: "No Stripe customer for user",
+        userId: user.id,
+        details: { reason: "no_customer" },
+      });
       return json(
         { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
         403,
       );
     }
 
-    const subs = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
-    });
+    let subs;
+    try {
+      subs = await stripe.subscriptions.list({
+        customer: customers.data[0].id,
+        status: "active",
+        limit: 1,
+      });
+    } catch (stripeErr) {
+      const message = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+      log("Stripe subscriptions lookup failed", { message });
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 502,
+        message: `Stripe subscriptions.list failed: ${message}`,
+        userId: user.id,
+        details: { stage: "subscriptions_list", customerId: customers.data[0].id },
+      });
+      return json({ error: "Premium verification temporarily unavailable" }, 502);
+    }
 
     if (subs.data.length === 0) {
       log("No active subscription");
+      await recordProvisioningError(supabase, {
+        category: "premium_verification",
+        httpStatus: 403,
+        message: "No active subscription",
+        userId: user.id,
+        details: { reason: "no_active_sub", customerId: customers.data[0].id },
+      });
       return json(
         { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
         403,
@@ -146,6 +236,13 @@ serve(async (req) => {
     const dailyApiKey = Deno.env.get("DAILY_API_KEY");
     if (!dailyApiKey || dailyApiKey.trim().length === 0) {
       log("Missing DAILY_API_KEY");
+      await recordProvisioningError(supabase, {
+        category: "daily_api_key",
+        httpStatus: 503,
+        message: "DAILY_API_KEY missing",
+        userId: user.id,
+        matchId,
+      });
       return json(
         {
           error:
@@ -160,6 +257,14 @@ serve(async (req) => {
     // making a network call.
     if (dailyApiKey.length < 20 || /\s/.test(dailyApiKey)) {
       log("DAILY_API_KEY appears malformed", { length: dailyApiKey.length });
+      await recordProvisioningError(supabase, {
+        category: "daily_api_key",
+        httpStatus: 503,
+        message: "DAILY_API_KEY appears malformed",
+        userId: user.id,
+        matchId,
+        details: { length: dailyApiKey.length },
+      });
       return json(
         {
           error:
@@ -223,6 +328,20 @@ serve(async (req) => {
       if (!roomRes.ok) {
         const errText = await roomRes.text();
         log("Daily room creation failed", { status: roomRes.status, errText });
+        await recordProvisioningError(supabase, {
+          category: roomRes.status === 401 || roomRes.status === 403
+            ? "daily_api_key"
+            : "daily_room_create",
+          httpStatus: roomRes.status,
+          message: `Daily room creation failed (${roomRes.status})`,
+          userId: user.id,
+          matchId,
+          details: {
+            roomName,
+            providerStatus: roomRes.status,
+            providerBody: errText.slice(0, 500),
+          },
+        });
         if (roomRes.status === 401 || roomRes.status === 403) {
           return json(
             {
@@ -247,6 +366,14 @@ serve(async (req) => {
       });
       if (insertErr) {
         log("call_rooms insert failed", { error: insertErr.message });
+        await recordProvisioningError(supabase, {
+          category: "internal",
+          httpStatus: 500,
+          message: `call_rooms insert failed: ${insertErr.message}`,
+          userId: user.id,
+          matchId,
+          details: { roomName },
+        });
       }
     }
 
@@ -272,6 +399,20 @@ serve(async (req) => {
       log("Daily token creation failed", {
         status: tokenRes.status,
         errText,
+      });
+      await recordProvisioningError(supabase, {
+        category: tokenRes.status === 401 || tokenRes.status === 403
+          ? "daily_api_key"
+          : "daily_token_create",
+        httpStatus: tokenRes.status,
+        message: `Daily meeting-token creation failed (${tokenRes.status})`,
+        userId: user.id,
+        matchId,
+        details: {
+          roomName,
+          providerStatus: tokenRes.status,
+          providerBody: errText.slice(0, 500),
+        },
       });
       if (tokenRes.status === 401 || tokenRes.status === 403) {
         return json(
@@ -326,6 +467,21 @@ serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     log("ERROR", { message });
+    try {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } },
+      );
+      await recordProvisioningError(supabase, {
+        category: "internal",
+        httpStatus: 500,
+        message,
+        details: {
+          stack: error instanceof Error ? error.stack?.slice(0, 1000) : undefined,
+        },
+      });
+    } catch {/* swallow — logging must not crash the handler */}
     return json({ error: message }, 500);
   }
 });

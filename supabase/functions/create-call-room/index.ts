@@ -96,9 +96,13 @@ serve(async (req) => {
 
     // 3. Parse body — matchId required, must belong to the caller
     let matchId: string | undefined;
+    let callType: "voice" | "video" = "video";
     try {
       const body = await req.json();
       if (body && typeof body.matchId === "string") matchId = body.matchId.trim();
+      if (body && (body.callType === "voice" || body.callType === "video")) {
+        callType = body.callType;
+      }
     } catch (_) {
       // body is optional
     }
@@ -216,16 +220,13 @@ serve(async (req) => {
     // 6. Record session metadata (best-effort — don't fail the call if logging fails)
     let sessionId: string | null = null;
     try {
-      const callType =
-        (typeof (await Promise.resolve())) && // no-op to keep TS happy in older builds
-        (room as any)?.callType;
       const { data: sessionRow, error: sessionError } = await supabase
         .from("call_sessions")
         .insert({
           match_id: matchId,
           user_id: user.id,
           room_name: roomName,
-          call_type: typeof (callType) === "string" ? callType : "video",
+          call_type: callType,
         })
         .select("id")
         .maybeSingle();

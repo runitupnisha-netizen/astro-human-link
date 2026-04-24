@@ -25,12 +25,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const rateLimitResponse = checkRateLimit(
+  // First-pass IP rate limit (cheap shield against unauthenticated floods).
+  const ipLimitResponse = checkRateLimit(
     getIdentifier(req),
     "create-call-room",
     corsHeaders,
   );
-  if (rateLimitResponse) return rateLimitResponse;
+  if (ipLimitResponse) return ipLimitResponse;
 
   try {
     log("Function started");
@@ -57,6 +58,18 @@ serve(async (req) => {
     }
     const user = userData.user;
     log("User authenticated", { userId: user.id });
+
+    // Per-user rate limit — prevents a single premium account from spamming
+    // room creation regardless of IP rotation.
+    const userLimitResponse = checkRateLimit(
+      getIdentifier(req, user.id),
+      "create-call-room",
+      corsHeaders,
+    );
+    if (userLimitResponse) {
+      log("Per-user rate limit hit", { userId: user.id });
+      return userLimitResponse;
+    }
 
     // 2. Premium check via Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");

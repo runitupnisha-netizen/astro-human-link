@@ -54,12 +54,17 @@ async function generateReading(args: {
   userSun: string | null;
   userMoon: string | null;
   userRising: string | null;
+  userHdType: string | null;
+  userHdAuthority: string | null;
   theirName: string;
   theirSun: string;
   theirBirthPlace: string;
   theirHasTime: boolean;
 }) {
-  const { userName, userSun, userMoon, userRising, theirName, theirSun, theirBirthPlace, theirHasTime } = args;
+  const {
+    userName, userSun, userMoon, userRising, userHdType, userHdAuthority,
+    theirName, theirSun, theirBirthPlace, theirHasTime,
+  } = args;
 
   // Baseline score from elemental compatibility
   const userElement = userSun ? signElements[userSun] : null;
@@ -70,18 +75,24 @@ async function generateReading(args: {
     ? `${userName} — Sun ${userSun}${userMoon ? `, Moon ${userMoon}` : ""}${userRising ? `, Rising ${userRising}` : ""}`
     : userName;
   const theirLine = `${theirName} — Sun ${theirSun}${theirHasTime ? "" : " (birth time unknown — Moon/Rising approximate)"}, born in ${theirBirthPlace}`;
+  const hdLine = userHdType
+    ? `${userName} is a Human Design ${userHdType}${userHdAuthority ? ` with ${userHdAuthority} authority` : ""}.`
+    : "";
 
   const prompt = `You are Lyra, a warm cosmic guide. Read the connection between two people. Return ONLY a JSON object with these exact keys, no markdown fences:
 {
   "score": number between 40 and 99,
   "summary": "3-4 sentences in Lyra's warm, personal voice — reference both people by name and at least one of their actual placements. Never generic.",
-  "highlight": "ONE short sentence — the single most important aspect of this connection."
+  "highlight": "ONE short sentence — the single most important aspect of this connection.",
+  "chartHighlights": ["3 short bullets (max 14 words each) on the natal-chart dynamics — Sun/element interplay, Moon emotional fit, and Rising first-impression chemistry. Reference the actual signs."],
+  "humanDesignNotes": ["2-3 short bullets (max 14 words each) on how ${userName}'s Human Design type and authority meet this person's energy. If HD info is missing, give grounded relational guidance instead."]
 }
 
 Person 1: ${userLine}
 Person 2: ${theirLine}
+${hdLine}
 
-Use ${baseScore} as a strong baseline for the score; nudge it up or down based on the placements. Be honest, never flatter.`;
+Use ${baseScore} as a strong baseline for the score; nudge it up or down based on the placements. Be honest, never flatter. Bullets must be specific, never generic filler.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -104,7 +115,13 @@ Use ${baseScore} as a strong baseline for the score; nudge it up or down based o
 
   const data = await resp.json();
   const content = data.choices?.[0]?.message?.content ?? "{}";
-  let parsed: { score?: number; summary?: string; highlight?: string };
+  let parsed: {
+    score?: number;
+    summary?: string;
+    highlight?: string;
+    chartHighlights?: string[];
+    humanDesignNotes?: string[];
+  };
   try {
     parsed = JSON.parse(content);
   } catch {
@@ -115,6 +132,24 @@ Use ${baseScore} as a strong baseline for the score; nudge it up or down based o
     score: Math.max(40, Math.min(99, Math.round(parsed.score ?? baseScore))),
     summary: parsed.summary ?? `${userName} and ${theirName} share a thoughtful connection worth exploring.`,
     highlight: parsed.highlight ?? `Your ${theirSun} energy meets ${userName} in unexpected ways.`,
+    chartHighlights: Array.isArray(parsed.chartHighlights) && parsed.chartHighlights.length
+      ? parsed.chartHighlights.slice(0, 3).map(String)
+      : [
+          `${theirSun} Sun brings a distinct flavor to your ${userSun ?? "energy"}.`,
+          userMoon ? `Your ${userMoon} Moon shapes how this lands emotionally.` : "Notice how each of you handles emotion when life slows down.",
+          userRising ? `Your ${userRising} Rising sets the tone of first impressions.` : "Pay attention to the first impression — it carries information.",
+        ],
+    humanDesignNotes: Array.isArray(parsed.humanDesignNotes) && parsed.humanDesignNotes.length
+      ? parsed.humanDesignNotes.slice(0, 3).map(String)
+      : userHdType
+        ? [
+            `As a ${userHdType}, lead this connection from your strategy, not urgency.`,
+            userHdAuthority ? `Trust your ${userHdAuthority} authority before saying yes.` : "Let your inner authority decide the pace.",
+          ]
+        : [
+            "Move at the speed of your nervous system, not theirs.",
+            "Notice when you feel expanded around them — that's information.",
+          ],
   };
 }
 
@@ -171,7 +206,7 @@ Deno.serve(async (req) => {
     // Pull user's profile to ground the reading
     const { data: profile } = await supabase
       .from("profiles")
-      .select("display_name,sun_sign,moon_sign,rising_sign")
+      .select("display_name,sun_sign,moon_sign,rising_sign,human_design_type,human_design_authority")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -184,6 +219,8 @@ Deno.serve(async (req) => {
       userSun: profile?.sun_sign ?? null,
       userMoon: profile?.moon_sign ?? null,
       userRising: profile?.rising_sign ?? null,
+      userHdType: profile?.human_design_type ?? null,
+      userHdAuthority: profile?.human_design_authority ?? null,
       theirName: cleanedTheirName,
       theirSun,
       theirBirthPlace: birthPlace,
@@ -215,6 +252,11 @@ Deno.serve(async (req) => {
       JSON.stringify({
         id: inserted?.id ?? null,
         theirSun,
+        userSun: profile?.sun_sign ?? null,
+        userMoon: profile?.moon_sign ?? null,
+        userRising: profile?.rising_sign ?? null,
+        userHdType: profile?.human_design_type ?? null,
+        userHdAuthority: profile?.human_design_authority ?? null,
         ...reading,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },

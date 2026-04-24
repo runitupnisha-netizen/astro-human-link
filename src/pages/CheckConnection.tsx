@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Heart, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import SparkleLoader from "@/components/SparkleLoader";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import SynastryChart from "@/components/SynastryChart";
 import { toast } from "sonner";
 
 type Reading = {
@@ -16,6 +17,13 @@ type Reading = {
   summary: string;
   highlight: string;
   theirName: string;
+  userSun: string | null;
+  userMoon: string | null;
+  userRising: string | null;
+  userHdType: string | null;
+  userHdAuthority: string | null;
+  chartHighlights: string[];
+  humanDesignNotes: string[];
 };
 
 type SavedCheck = {
@@ -105,6 +113,13 @@ const CheckConnection = () => {
         summary: data.summary,
         highlight: data.highlight,
         theirName: theirName.trim() || "Them",
+        userSun: data.userSun ?? null,
+        userMoon: data.userMoon ?? null,
+        userRising: data.userRising ?? null,
+        userHdType: data.userHdType ?? null,
+        userHdAuthority: data.userHdAuthority ?? null,
+        chartHighlights: Array.isArray(data.chartHighlights) ? data.chartHighlights : [],
+        humanDesignNotes: Array.isArray(data.humanDesignNotes) ? data.humanDesignNotes : [],
       });
       setMonthCount((c) => c + 1);
       setStep("result");
@@ -436,6 +451,131 @@ const CheckConnection = () => {
                   {reading.summary}
                 </p>
               </div>
+
+              {/* Synastry wheel — only renders if user has at least their Sun */}
+              {reading.userSun && (
+                <div
+                  className="rounded-2xl p-4"
+                  style={{
+                    backgroundColor: "rgba(77, 58, 92, 0.35)",
+                    border: "1px solid rgba(208, 180, 247, 0.18)",
+                  }}
+                >
+                  <p
+                    className="text-xs uppercase tracking-wider mb-3 text-center"
+                    style={{ color: "#d0b4f7" }}
+                  >
+                    ✦ Synastry wheel
+                  </p>
+                  <div className="flex justify-center">
+                    <SynastryChart
+                      mySigns={{
+                        sun: reading.userSun,
+                        moon: reading.userMoon,
+                        rising: reading.userRising,
+                      }}
+                      theirSigns={{ sun: reading.theirSun, moon: null, rising: null }}
+                      score={reading.score}
+                    />
+                  </div>
+                  <div
+                    className="mt-3 text-center text-[11px] space-y-0.5"
+                    style={{ color: "#a89ac8", fontFamily: "Poppins, sans-serif" }}
+                  >
+                    <p>
+                      <span style={{ color: "#d0b4f7" }}>You:</span> ☉ {reading.userSun}
+                      {reading.userMoon ? ` · ☽ ${reading.userMoon}` : ""}
+                      {reading.userRising ? ` · ↗ ${reading.userRising}` : ""}
+                    </p>
+                    <p>
+                      <span style={{ color: "#f9d697" }}>Them:</span> ☉ {reading.theirSun}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Natal chart highlights */}
+              {reading.chartHighlights.length > 0 && (
+                <div
+                  className="rounded-2xl p-4"
+                  style={{
+                    backgroundColor: "rgba(77, 58, 92, 0.35)",
+                    border: "1px solid rgba(208, 180, 247, 0.18)",
+                  }}
+                >
+                  <p
+                    className="text-xs uppercase tracking-wider mb-3"
+                    style={{ color: "#d0b4f7" }}
+                  >
+                    ✦ Natal chart highlights
+                  </p>
+                  <ul className="space-y-2.5">
+                    {reading.chartHighlights.map((line, i) => {
+                      const Icon = i === 0 ? Star : i === 1 ? Moon : Sunrise;
+                      return (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <Icon
+                            className="w-4 h-4 shrink-0 mt-0.5"
+                            style={{ color: "#d0b4f7" }}
+                          />
+                          <span
+                            className="text-sm leading-relaxed"
+                            style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                          >
+                            {line}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              {/* Human Design notes */}
+              {reading.humanDesignNotes.length > 0 && (
+                <div
+                  className="rounded-2xl p-4"
+                  style={{
+                    backgroundColor: "rgba(109, 40, 217, 0.14)",
+                    border: "1px solid rgba(208, 180, 247, 0.22)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Compass className="w-4 h-4" style={{ color: "#f9d697" }} />
+                    <p
+                      className="text-xs uppercase tracking-wider"
+                      style={{ color: "#f9d697" }}
+                    >
+                      Human Design notes
+                      {reading.userHdType ? ` · ${reading.userHdType}` : ""}
+                    </p>
+                  </div>
+                  <ul className="space-y-2">
+                    {reading.humanDesignNotes.map((line, i) => (
+                      <li
+                        key={i}
+                        className="text-sm leading-relaxed pl-3 border-l-2"
+                        style={{
+                          color: "#e0d4ff",
+                          fontFamily: "Lora, Georgia, serif",
+                          borderColor: "rgba(249, 214, 151, 0.4)",
+                        }}
+                      >
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                  {!reading.userHdType && (
+                    <button
+                      onClick={() => navigate("/profile")}
+                      className="mt-3 text-[11px] underline"
+                      style={{ color: "#d0b4f7" }}
+                    >
+                      Add your birth time in Profile for personalized HD insight →
+                    </button>
+                  )}
+                </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button

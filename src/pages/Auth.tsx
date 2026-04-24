@@ -47,12 +47,22 @@ const friendlyAuthError = (message: string): string => {
   if (m.includes("invalid login")) return "That email and password don't match. Try again or reset your password.";
   if (m.includes("email not confirmed")) return "Please verify your email first. Check your inbox for the confirmation link.";
   if (m.includes("user already registered") || m.includes("already been registered")) {
-    return "An account with this email already exists. Try signing in instead.";
+    return "This email already has a Stellara account. Sign in instead. ✦";
   }
   if (m.includes("rate") && m.includes("limit")) return "Too many attempts — please wait a moment and try again.";
   if (m.includes("pwned") || m.includes("compromised")) return "This password has been found in data breaches. Please choose a stronger one.";
-  if (m.includes("network") || m.includes("fetch")) return "Network error. Check your connection and try again.";
+  if (m.includes("network") || m.includes("fetch") || m.includes("failed to fetch")) return "Connection issue. Please try again. ✦";
+  if (m.includes("password") && (m.includes("short") || m.includes("8 characters") || m.includes("weak"))) return "Password must be at least 8 characters.";
+  if (m.includes("invalid") && m.includes("email")) return "Please enter a valid email address.";
   return message;
+};
+
+/** Map a friendly error message to the input field it should appear under. */
+const mapErrorToField = (friendly: string): "email" | "password" | "form" => {
+  const m = friendly.toLowerCase();
+  if (m.includes("email") || m.includes("account")) return "email";
+  if (m.includes("password")) return "password";
+  return "form";
 };
 
 const Auth = () => {
@@ -153,7 +163,14 @@ const Auth = () => {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong";
-      toast.error(friendlyAuthError(message));
+      const friendly = friendlyAuthError(message);
+      const field = mapErrorToField(friendly);
+      // Inline error under the relevant field — never a browser alert/toast-only path.
+      if (field === "form") {
+        toast.error(friendly);
+      } else {
+        setFieldErrors((prev) => ({ ...prev, [field]: friendly }));
+      }
     } finally {
       setLoading(false);
     }

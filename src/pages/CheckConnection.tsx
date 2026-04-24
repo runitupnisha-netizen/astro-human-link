@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -35,6 +36,42 @@ type SavedCheck = {
 
 const FREE_MONTHLY_LIMIT = 2;
 
+// 18+ guard — chart must belong to an adult
+const eighteenYearsAgo = (() => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d;
+})();
+const earliestBirthDate = new Date("1900-01-01");
+
+const checkSchema = z.object({
+  theirName: z
+    .string()
+    .trim()
+    .max(40, "Name must be 40 characters or fewer")
+    .regex(/^[\p{L}\p{M}'’\-\s.]*$/u, "Use letters, spaces, hyphens or apostrophes only"),
+  birthDate: z
+    .string()
+    .min(1, "Birth date is required")
+    .refine((v) => !isNaN(Date.parse(v)), "Enter a valid date")
+    .refine((v) => new Date(v) >= earliestBirthDate, "Date must be after 1900")
+    .refine((v) => new Date(v) <= eighteenYearsAgo, "Person must be 18 or older"),
+  birthTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (24-hour)")
+    .or(z.literal("")),
+  birthPlace: z
+    .string()
+    .trim()
+    .min(2, "City is required")
+    .max(120, "City must be 120 characters or fewer"),
+  confirmed: z.literal(true, {
+    errorMap: () => ({ message: "Please confirm whose chart you're reading" }),
+  }),
+});
+
+type FieldErrors = Partial<Record<"theirName" | "birthDate" | "birthTime" | "birthPlace" | "confirmed", string>>;
+
 const CheckConnection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -46,6 +83,8 @@ const CheckConnection = () => {
   const [birthTime, setBirthTime] = useState("");
   const [skipTime, setSkipTime] = useState(false);
   const [birthPlace, setBirthPlace] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [reading, setReading] = useState<Reading | null>(null);
   const [saved, setSaved] = useState<SavedCheck[]>([]);
   const [showSaved, setShowSaved] = useState(false);

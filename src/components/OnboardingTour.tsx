@@ -214,7 +214,10 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
                   type="button"
                   onClick={() => {
                     dismiss();
-                    navigate(step.cta!.path);
+                    const path = step.cta!.highlight
+                      ? `${step.cta!.path}?${TOUR_HIGHLIGHT_PARAM}=${step.cta!.highlight}`
+                      : step.cta!.path;
+                    navigate(path);
                   }}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent hover:bg-accent/20 transition-colors"
                 >

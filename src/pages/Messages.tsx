@@ -37,6 +37,8 @@ import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
 import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+import { usePremium } from "@/hooks/usePremium";
 
 interface Match {
   id: string;

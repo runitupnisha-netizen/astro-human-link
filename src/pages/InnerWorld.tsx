@@ -131,6 +131,17 @@ const InnerWorld = () => {
             A private suite of tools to explore your chart, your dreams, and the people in
             your orbit — guided by ancient wisdom and modern AI.
           </p>
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/my-chart")}
+              className="border-accent/30 text-accent hover:bg-accent/10"
+            >
+              <Star className="w-4 h-4 mr-1.5" />
+              View my full chart results
+            </Button>
+          </div>
         </motion.div>
 
         {/* Tools */}

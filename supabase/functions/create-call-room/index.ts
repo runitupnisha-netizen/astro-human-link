@@ -387,12 +387,9 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        {
-          error:
-            "Calling is temporarily unavailable. Our team has been notified — please try again shortly.",
-          code: "DAILY_API_KEY_MISSING",
-        },
+      return errorResponse(
+        "DAILY_API_KEY_MISSING",
+        "Calling is temporarily unavailable. Our team has been notified — please try again shortly.",
         503,
       );
     }
@@ -409,12 +406,9 @@ serve(async (req) => {
         matchId,
         details: { length: dailyApiKey.length },
       });
-      return json(
-        {
-          error:
-            "Calling service is misconfigured. Please contact support if this persists.",
-          code: "DAILY_API_KEY_INVALID",
-        },
+      return errorResponse(
+        "DAILY_API_KEY_INVALID",
+        "Calling service is misconfigured. Please contact support if this persists.",
         503,
       );
     }

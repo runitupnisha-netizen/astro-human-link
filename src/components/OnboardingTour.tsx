@@ -60,6 +60,13 @@ const TOUR_STEPS: TourStep[] = [
     cta: { label: "Message Lyra", path: "/guide", highlight: "lyra-input" },
   },
   {
+    icon: Wand2,
+    iconWrapClass: "bg-violet-500/15 text-violet-300 border-violet-400/30",
+    title: "Try Lyra · say hi 👋",
+    body: "Tap a prompt or type your own. Lyra will respond right here so you can feel how it works before diving in.",
+    lyraDemo: true,
+  },
+  {
     icon: Heart,
     iconWrapClass: "bg-pink-500/15 text-pink-300 border-pink-400/30",
     title: "Connections & Sacred Reveal",

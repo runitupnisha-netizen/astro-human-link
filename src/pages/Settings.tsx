@@ -303,9 +303,11 @@ const Settings = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
     toast.success("Signed out. See you next time! 🌙");
+    // signOut() now performs a hard reload to /auth, clearing ALL in-memory state
+    // (matches, messages, chart data, journal entries, react-query cache) so the
+    // previous user's data can never leak into the next session.
+    await signOut();
   };
 
   if (loadingProfile) {

@@ -36,6 +36,7 @@ const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
 
 const CosmicGuide = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const inputHighlight = useTourHighlight("lyra-input");
   const voice = useLyraVoice();
   const [showVoicePrimer, setShowVoicePrimer] = useState(false);
@@ -635,6 +636,22 @@ const CosmicGuide = () => {
         }}
       >
         <div className="max-w-2xl mx-auto">
+          {/* Check a Connection CTA */}
+          <div className="flex justify-center mb-3">
+            <button
+              onClick={() => navigate("/check-connection")}
+              className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full transition-colors"
+              style={{
+                backgroundColor: "rgba(208, 180, 247, 0.1)",
+                border: "0.5px solid rgba(208, 180, 247, 0.3)",
+                color: "#d0b4f7",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Check a Connection ✦
+            </button>
+          </div>
           <div
             className={`flex items-center gap-2 rounded-full px-2 py-2 transition-shadow duration-500 ${
               inputHighlight ? "ring-2 ring-accent/70 animate-pulse" : ""

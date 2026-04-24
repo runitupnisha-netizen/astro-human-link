@@ -62,6 +62,70 @@ const json = (body: unknown, status = 200) =>
     status,
   });
 
+/**
+ * Standardized error envelope. Every error response from this function
+ * follows this shape so the client can reliably branch on `code` without
+ * having to also check HTTP status, response body shape, or message text.
+ *
+ * Fields:
+ *   - code:    machine-readable identifier (e.g. "PREMIUM_REQUIRED").
+ *   - message: human-readable copy safe to show to the user.
+ *   - status:  echoed HTTP status — convenient when callers only have the
+ *              parsed JSON (Supabase functions.invoke wraps the Response).
+ *   - error:   alias of `message` kept for backward compatibility with
+ *              existing clients that still read `data.error`.
+ *   - details: optional, non-sensitive context (e.g. reason).
+ */
+type ErrorCode =
+  | "PREMIUM_REQUIRED"
+  | "PREMIUM_VERIFICATION_UNAVAILABLE"
+  | "MATCH_ID_REQUIRED"
+  | "MATCH_ID_INVALID"
+  | "MATCH_NOT_FOUND"
+  | "NOT_MATCH_PARTICIPANT"
+  | "INVALID_JSON"
+  | "MATCH_LOOKUP_FAILED"
+  | "DAILY_API_KEY_MISSING"
+  | "DAILY_API_KEY_INVALID"
+  | "DAILY_ROOM_FAILED"
+  | "DAILY_TOKEN_FAILED"
+  | "AUTH_REQUIRED"
+  | "INTERNAL_ERROR";
+
+const errorResponse = (
+  code: ErrorCode,
+  message: string,
+  status: number,
+  details?: Record<string, unknown>,
+) =>
+  json(
+    {
+      code,
+      message,
+      status,
+      error: message, // backward-compat with existing { error } readers
+      ...(details ? { details } : {}),
+    },
+    status,
+  );
+
+/**
+ * Reason the caller failed the premium gate. Surfaced in the response
+ * `details.reason` so the client can choose between "Upgrade" vs "Renew"
+ * copy without a second round-trip to check-subscription.
+ */
+type PremiumRequiredReason =
+  | "no_customer"        // Stripe has no customer record for this email
+  | "no_active_sub";     // customer exists but no active subscription
+
+const premiumRequiredResponse = (reason: PremiumRequiredReason) =>
+  errorResponse(
+    "PREMIUM_REQUIRED",
+    "Premium subscription required to start a call",
+    403,
+    { reason },
+  );
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -81,7 +145,7 @@ serve(async (req) => {
     // 1. Auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return json({ error: "Authentication required" }, 401);
+      return errorResponse("AUTH_REQUIRED", "Authentication required", 401);
     }
 
     const supabase = createClient(
@@ -96,7 +160,7 @@ serve(async (req) => {
     );
     if (userError || !userData.user?.email) {
       log("Auth failed", { error: userError?.message });
-      return json({ error: "Authentication required" }, 401);
+      return errorResponse("AUTH_REQUIRED", "Authentication required", 401);
     }
     const user = userData.user;
     log("User authenticated", { userId: user.id });
@@ -123,7 +187,11 @@ serve(async (req) => {
         message: "STRIPE_SECRET_KEY not configured",
         userId: user.id,
       });
-      return json({ error: "Premium verification unavailable" }, 500);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification unavailable",
+        500,
+      );
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
@@ -143,7 +211,11 @@ serve(async (req) => {
         userId: user.id,
         details: { stage: "customers_list" },
       });
-      return json({ error: "Premium verification temporarily unavailable" }, 502);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification temporarily unavailable",
+        502,
+      );
     }
 
     if (customers.data.length === 0) {
@@ -155,10 +227,7 @@ serve(async (req) => {
         userId: user.id,
         details: { reason: "no_customer" },
       });
-      return json(
-        { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
-        403,
-      );
+      return premiumRequiredResponse("no_customer");
     }
 
     let subs;
@@ -178,7 +247,11 @@ serve(async (req) => {
         userId: user.id,
         details: { stage: "subscriptions_list", customerId: customers.data[0].id },
       });
-      return json({ error: "Premium verification temporarily unavailable" }, 502);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification temporarily unavailable",
+        502,
+      );
     }
 
     if (subs.data.length === 0) {
@@ -190,10 +263,7 @@ serve(async (req) => {
         userId: user.id,
         details: { reason: "no_active_sub", customerId: customers.data[0].id },
       });
-      return json(
-        { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
-        403,
-      );
+      return premiumRequiredResponse("no_active_sub");
     }
     log("Premium verified");
 
@@ -210,7 +280,11 @@ serve(async (req) => {
         message: "Request body is not valid JSON",
         userId: user.id,
       });
-      return json({ error: "Request body must be valid JSON" }, 400);
+      return errorResponse(
+        "INVALID_JSON",
+        "Request body must be valid JSON",
+        400,
+      );
     }
 
     const rawMatchId = parsedBody.matchId;
@@ -224,10 +298,7 @@ serve(async (req) => {
         userId: user.id,
         details: { receivedType: typeof rawMatchId },
       });
-      return json(
-        { error: "matchId is required", code: "MATCH_ID_REQUIRED" },
-        400,
-      );
+      return errorResponse("MATCH_ID_REQUIRED", "matchId is required", 400);
     }
     const matchId = rawMatchId.trim();
 
@@ -241,8 +312,9 @@ serve(async (req) => {
         userId: user.id,
         details: { matchId: matchId.slice(0, 64) },
       });
-      return json(
-        { error: "matchId must be a valid UUID", code: "MATCH_ID_INVALID" },
+      return errorResponse(
+        "MATCH_ID_INVALID",
+        "matchId must be a valid UUID",
         400,
       );
     }
@@ -268,7 +340,11 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json({ error: "Could not validate match" }, 500);
+      return errorResponse(
+        "MATCH_LOOKUP_FAILED",
+        "Could not validate match",
+        500,
+      );
     }
 
     if (!match) {
@@ -280,10 +356,7 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        { error: "Match not found", code: "MATCH_NOT_FOUND" },
-        404,
-      );
+      return errorResponse("MATCH_NOT_FOUND", "Match not found", 404);
     }
 
     if (match.user_a !== user.id && match.user_b !== user.id) {
@@ -295,11 +368,9 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        {
-          error: "You are not a participant of this match",
-          code: "NOT_MATCH_PARTICIPANT",
-        },
+      return errorResponse(
+        "NOT_MATCH_PARTICIPANT",
+        "You are not a participant of this match",
         403,
       );
     }
@@ -316,12 +387,9 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        {
-          error:
-            "Calling is temporarily unavailable. Our team has been notified — please try again shortly.",
-          code: "DAILY_API_KEY_MISSING",
-        },
+      return errorResponse(
+        "DAILY_API_KEY_MISSING",
+        "Calling is temporarily unavailable. Our team has been notified — please try again shortly.",
         503,
       );
     }
@@ -338,12 +406,9 @@ serve(async (req) => {
         matchId,
         details: { length: dailyApiKey.length },
       });
-      return json(
-        {
-          error:
-            "Calling service is misconfigured. Please contact support if this persists.",
-          code: "DAILY_API_KEY_INVALID",
-        },
+      return errorResponse(
+        "DAILY_API_KEY_INVALID",
+        "Calling service is misconfigured. Please contact support if this persists.",
         503,
       );
     }
@@ -416,16 +481,17 @@ serve(async (req) => {
           },
         });
         if (roomRes.status === 401 || roomRes.status === 403) {
-          return json(
-            {
-              error:
-                "Calling service rejected our credentials. Please contact support.",
-              code: "DAILY_API_KEY_INVALID",
-            },
+          return errorResponse(
+            "DAILY_API_KEY_INVALID",
+            "Calling service rejected our credentials. Please contact support.",
             503,
           );
         }
-        return json({ error: "Failed to create call room" }, 502);
+        return errorResponse(
+          "DAILY_ROOM_FAILED",
+          "Failed to create call room",
+          502,
+        );
       }
       room = await roomRes.json();
 
@@ -488,16 +554,17 @@ serve(async (req) => {
         },
       });
       if (tokenRes.status === 401 || tokenRes.status === 403) {
-        return json(
-          {
-            error:
-              "Calling service rejected our credentials. Please contact support.",
-            code: "DAILY_API_KEY_INVALID",
-          },
+        return errorResponse(
+          "DAILY_API_KEY_INVALID",
+          "Calling service rejected our credentials. Please contact support.",
           503,
         );
       }
-      return json({ error: "Failed to create call token" }, 502);
+      return errorResponse(
+        "DAILY_TOKEN_FAILED",
+        "Failed to create call token",
+        502,
+      );
     }
 
     const { token: meetingToken } = await tokenRes.json();
@@ -555,6 +622,6 @@ serve(async (req) => {
         },
       });
     } catch {/* swallow — logging must not crash the handler */}
-    return json({ error: message }, 500);
+    return errorResponse("INTERNAL_ERROR", message, 500);
   }
 });

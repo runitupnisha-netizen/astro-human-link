@@ -222,6 +222,7 @@ const AppRoutes = () => {
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+            <Route path="/support" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />

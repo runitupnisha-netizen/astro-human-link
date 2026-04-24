@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw, WifiOff } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw, WifiOff, Plus } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -300,6 +300,19 @@ const Connections = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
+      {/* Top-right Check a Connection "+" — floats above content, 44px tap target */}
+      <button
+        onClick={() => navigate("/check-connection")}
+        aria-label="Check a Connection"
+        className="fixed z-30 top-[max(env(safe-area-inset-top),1rem)] right-4 inline-flex items-center justify-center w-11 h-11 rounded-full transition-transform active:scale-95 hover:scale-105"
+        style={{
+          background: "radial-gradient(circle at 35% 30%, #8b5cf6, #6d28d9)",
+          color: "#ffffff",
+          boxShadow: "0 0 18px rgba(127, 119, 221, 0.5)",
+        }}
+      >
+        <Plus className="w-5 h-5" strokeWidth={2.5} />
+      </button>
       <div ref={containerRef} {...pullHandlers} className="relative z-10 pt-20 pb-24 md:pb-12 overflow-y-auto">
         {pullIndicator}
         <div className="max-w-4xl mx-auto px-6">
@@ -341,23 +354,6 @@ const Connections = () => {
               )}
             </p>
           </motion.div>
-
-          {/* Check a Connection CTA — 44px min tap target */}
-          <div className="flex justify-center mb-8 -mt-4">
-            <button
-              onClick={() => navigate("/check-connection")}
-              className="inline-flex items-center justify-center gap-2 min-h-[44px] text-xs px-5 py-2.5 rounded-full transition-colors hover:bg-primary/10"
-              style={{
-                backgroundColor: "hsl(var(--primary) / 0.08)",
-                border: "0.5px solid hsl(var(--primary) / 0.3)",
-                color: "hsl(var(--primary))",
-                fontFamily: "Poppins, sans-serif",
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Check a Connection ✦
-            </button>
-          </div>
 
           {/* Recent Cosmic Checks — quick rerun of past Check a Connection readings */}
           {recentChecks.length > 0 && (

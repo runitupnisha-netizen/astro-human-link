@@ -285,6 +285,16 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* Preview as new user — replays first-time tour & verification gate */}
+          <button
+            type="button"
+            onClick={handlePreviewAsNewUser}
+            className="mb-4 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-accent/30 bg-accent/5 px-3 py-2 text-xs text-accent hover:bg-accent/10 transition-colors touch-manipulation"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Preview as a new user · replay welcome tour</span>
+          </button>
+
           {/* Quick links grid */}
           <div className="mb-6 grid grid-cols-5 gap-2">
             {[

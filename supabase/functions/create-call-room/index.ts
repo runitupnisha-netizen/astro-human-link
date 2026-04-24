@@ -62,6 +62,70 @@ const json = (body: unknown, status = 200) =>
     status,
   });
 
+/**
+ * Standardized error envelope. Every error response from this function
+ * follows this shape so the client can reliably branch on `code` without
+ * having to also check HTTP status, response body shape, or message text.
+ *
+ * Fields:
+ *   - code:    machine-readable identifier (e.g. "PREMIUM_REQUIRED").
+ *   - message: human-readable copy safe to show to the user.
+ *   - status:  echoed HTTP status — convenient when callers only have the
+ *              parsed JSON (Supabase functions.invoke wraps the Response).
+ *   - error:   alias of `message` kept for backward compatibility with
+ *              existing clients that still read `data.error`.
+ *   - details: optional, non-sensitive context (e.g. reason).
+ */
+type ErrorCode =
+  | "PREMIUM_REQUIRED"
+  | "PREMIUM_VERIFICATION_UNAVAILABLE"
+  | "MATCH_ID_REQUIRED"
+  | "MATCH_ID_INVALID"
+  | "MATCH_NOT_FOUND"
+  | "NOT_MATCH_PARTICIPANT"
+  | "INVALID_JSON"
+  | "MATCH_LOOKUP_FAILED"
+  | "DAILY_API_KEY_MISSING"
+  | "DAILY_API_KEY_INVALID"
+  | "DAILY_ROOM_FAILED"
+  | "DAILY_TOKEN_FAILED"
+  | "AUTH_REQUIRED"
+  | "INTERNAL_ERROR";
+
+const errorResponse = (
+  code: ErrorCode,
+  message: string,
+  status: number,
+  details?: Record<string, unknown>,
+) =>
+  json(
+    {
+      code,
+      message,
+      status,
+      error: message, // backward-compat with existing { error } readers
+      ...(details ? { details } : {}),
+    },
+    status,
+  );
+
+/**
+ * Reason the caller failed the premium gate. Surfaced in the response
+ * `details.reason` so the client can choose between "Upgrade" vs "Renew"
+ * copy without a second round-trip to check-subscription.
+ */
+type PremiumRequiredReason =
+  | "no_customer"        // Stripe has no customer record for this email
+  | "no_active_sub";     // customer exists but no active subscription
+
+const premiumRequiredResponse = (reason: PremiumRequiredReason) =>
+  errorResponse(
+    "PREMIUM_REQUIRED",
+    "Premium subscription required to start a call",
+    403,
+    { reason },
+  );
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

@@ -344,3 +344,60 @@ const SelfieVerification = () => {
 };
 
 export default SelfieVerification;
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+const StatusPill = ({ status }: { status: VerificationStatus }) => {
+  const config = {
+    none: { label: "Not started", classes: "bg-muted/60 text-muted-foreground border-border/60", Icon: Camera },
+    pending: { label: "Pending review", classes: "bg-primary/15 text-primary border-primary/30", Icon: Clock },
+    verified: { label: "Verified", classes: "bg-accent/15 text-accent border-accent/30", Icon: CheckCircle2 },
+    rejected: { label: "Retry needed", classes: "bg-destructive/15 text-destructive border-destructive/30", Icon: AlertTriangle },
+  }[status];
+  const Icon = config.Icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider border rounded-full px-2 py-0.5 ${config.classes}`}>
+      <Icon className="w-3 h-3" />
+      {config.label}
+    </span>
+  );
+};
+
+const Stepper = ({ current }: { current: Step }) => {
+  const steps = [
+    { n: 1 as Step, label: "Prepare" },
+    { n: 2 as Step, label: "Capture" },
+    { n: 3 as Step, label: "Submit" },
+  ];
+  return (
+    <div className="flex items-center justify-between mb-4 px-1" aria-label="Verification progress">
+      {steps.map((s, idx) => {
+        const isActive = current === s.n;
+        const isDone = current > s.n;
+        return (
+          <div key={s.n} className="flex items-center flex-1 last:flex-none">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold border transition-colors ${
+                  isDone
+                    ? "bg-accent text-accent-foreground border-accent"
+                    : isActive
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted text-muted-foreground border-border"
+                }`}
+              >
+                {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : s.n}
+              </div>
+              <span className={`text-[10px] ${isActive ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                {s.label}
+              </span>
+            </div>
+            {idx < steps.length - 1 && (
+              <div className={`flex-1 h-px mx-2 mb-4 ${current > s.n ? "bg-accent/60" : "bg-border"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};

@@ -78,7 +78,7 @@ interface ConversationData {
 const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [conversations, setConversations] = useState<ConversationData[]>([]);

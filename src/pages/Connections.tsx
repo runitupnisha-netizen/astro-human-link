@@ -303,6 +303,21 @@ const Connections = () => {
       <div ref={containerRef} {...pullHandlers} className="relative z-10 pt-20 pb-24 md:pb-12 overflow-y-auto">
         {pullIndicator}
         <div className="max-w-4xl mx-auto px-6">
+          {/* Offline cache notice — visible only when serving stale data */}
+          {servingFromCache && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-accent/30 bg-accent/5 text-xs text-accent"
+            >
+              <WifiOff className="w-3.5 h-3.5" />
+              <span>
+                Offline · Showing your saved connections
+                {cacheTimestamp ? ` from ${formatTime(cacheTimestamp)}` : ""}
+              </span>
+            </motion.div>
+          )}
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}

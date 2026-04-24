@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2 } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +86,14 @@ const Premium = () => {
   const canceled = searchParams.get("canceled");
   const redirectTo = searchParams.get("redirect") || "/discover";
   const [verifying, setVerifying] = useState(false);
+  // Tracks whether the post-checkout polling loop exhausted its attempts
+  // without ever observing an active subscription. When true we swap the
+  // overlay to a "Upgrade not confirmed yet" state with retry guidance,
+  // instead of leaving the user on an empty pricing page wondering what
+  // happened. Stripe webhooks usually settle within seconds, but card
+  // verification, 3DS, or webhook backlog can occasionally push it past
+  // our ~24s polling window.
+  const [pollingTimedOut, setPollingTimedOut] = useState(false);
 
   useEffect(() => {
     if (toastShown.current) return;
@@ -107,6 +116,7 @@ const Premium = () => {
     let attempts = 0;
     const maxAttempts = 12; // ~24s at 2s interval
     setVerifying(true);
+    setPollingTimedOut(false);
 
     const tick = async () => {
       if (cancelled) return;
@@ -125,6 +135,9 @@ const Premium = () => {
       if (attempts >= maxAttempts) {
         clearInterval(interval);
         setVerifying(false);
+        // Only flip to "timed out" if we still don't see an active sub.
+        // The other effect (success + subscribed) handles the happy path.
+        if (!subscribed) setPollingTimedOut(true);
         return;
       }
       await tick();
@@ -134,7 +147,7 @@ const Premium = () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [success, refreshSubscription]);
+  }, [success, refreshSubscription, subscribed]);
 
   // Once subscription is confirmed active after a successful checkout, redirect.
   useEffect(() => {
@@ -142,6 +155,7 @@ const Premium = () => {
     if (subscribed) {
       redirectTriggered.current = true;
       setVerifying(false);
+      setPollingTimedOut(false);
       const t = setTimeout(() => navigate(redirectTo, { replace: true }), 1200);
       return () => clearTimeout(t);
     }
@@ -149,6 +163,8 @@ const Premium = () => {
 
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);
+    // Dismiss the timeout overlay if the user is starting a new checkout.
+    setPollingTimedOut(false);
     try {
       await checkout(STELLARA_TIERS[tierKey].price_id, redirectTo);
     } catch {

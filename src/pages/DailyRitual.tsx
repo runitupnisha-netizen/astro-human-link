@@ -20,6 +20,8 @@ const CARD_BORDER = "rgba(208, 180, 247, 0.2)";
 const TITLE = "#e0d4ff";
 const BODY = "#c9b8f0";
 const ACCENT = "#d0b4f7";
+const COMPLETED_GREEN = "#1D9E75";
+const STEP_INACTIVE = "#4d3a5c";
 
 const STAR_FIELD = Array.from({ length: 22 }, (_, i) => {
   const x = (i * 53) % 100;
@@ -71,6 +73,7 @@ const DailyRitual = () => {
   const [firstName, setFirstName] = useState("");
   const [journal, setJournal] = useState("");
   const [primerOpen, setPrimerOpen] = useState(false);
+  const [primerShownInProfile, setPrimerShownInProfile] = useState<boolean | null>(null);
   const { subscribe, permission, isSupported } = usePushNotifications();
 
   const planet = getDailyPlanet();
@@ -81,11 +84,12 @@ const DailyRitual = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, push_primer_shown")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         setFirstName((data?.display_name || "").split(" ")[0] || "");
+        setPrimerShownInProfile(Boolean((data as { push_primer_shown?: boolean } | null)?.push_primer_shown));
       });
   }, [user]);
 
@@ -93,6 +97,8 @@ const DailyRitual = () => {
     if (!isSupported) return false;
     // Already granted or hard-denied at OS level → never re-ask
     if (permission === "granted" || permission === "denied") return false;
+    // Per spec: only ever show on the user's FIRST ritual completion
+    if (primerShownInProfile === true) return false;
     // Permanently resolved (granted, denied, or 3-dismiss cap reached)
     if (localStorage.getItem(PUSH_PRIMER_RESOLVED_KEY) === "true") return false;
 
@@ -112,13 +118,25 @@ const DailyRitual = () => {
     return ritualsSince >= 3;
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     const today = new Date().toISOString().slice(0, 10);
     localStorage.setItem("stellara:daily-ritual:done", today);
     if (journal.trim()) {
       // Persist optional journal entry locally — full backend tie-in is a follow-up
       const key = `stellara:ritual-journal:${today}`;
       localStorage.setItem(key, journal.trim());
+    }
+
+    // Save completion date to backend so Growth tab can read it across devices
+    if (user) {
+      const isFirstEver = primerShownInProfile === false;
+      const update: { daily_ritual_last_completed: string; push_primer_shown?: boolean } = {
+        daily_ritual_last_completed: today,
+      };
+      // On the very first ritual ever, also mark the primer as shown so it never re-fires
+      if (isFirstEver) update.push_primer_shown = true;
+      await supabase.from("profiles").update(update).eq("user_id", user.id);
+      if (isFirstEver) setPrimerShownInProfile(true);
     }
 
     if (shouldShowPrimer()) {
@@ -358,19 +376,41 @@ const DailyRitual = () => {
       </div>
 
       {/* Progress dots */}
-      <div className="relative z-10 pb-[max(env(safe-area-inset-bottom),1.5rem)] flex items-center justify-center gap-2">
-        {[1, 2, 3].map((s) => (
-          <button
-            key={s}
-            onClick={() => setStep(s as 1 | 2 | 3)}
-            aria-label={`Go to step ${s}`}
-            className="w-2 h-2 rounded-full transition-all"
-            style={{
-              backgroundColor: step === s ? ACCENT : "rgba(208,180,247,0.25)",
-              transform: step === s ? "scale(1.3)" : "scale(1)",
-            }}
-          />
-        ))}
+      <div className="relative z-10 pb-[max(env(safe-area-inset-bottom),1.5rem)] flex items-center justify-center gap-3">
+        {[1, 2, 3].map((s) => {
+          const isActive = step === s;
+          const isCompleted = s < step;
+          // Future steps not tappable; completed/active are
+          const tappable = s <= step;
+          const size = isActive ? 10 : 8;
+          return (
+            <button
+              key={s}
+              onClick={() => tappable && setStep(s as 1 | 2 | 3)}
+              disabled={!tappable}
+              aria-label={`Go to step ${s}`}
+              aria-current={isActive ? "step" : undefined}
+              className="rounded-full transition-all flex items-center justify-center"
+              style={{
+                width: size,
+                height: size,
+                backgroundColor: isCompleted
+                  ? COMPLETED_GREEN
+                  : isActive
+                  ? ACCENT
+                  : "transparent",
+                border: isActive || isCompleted ? "none" : `1px solid ${STEP_INACTIVE}`,
+                cursor: tappable ? "pointer" : "default",
+              }}
+            >
+              {isCompleted && (
+                <svg width="6" height="6" viewBox="0 0 6 6" fill="none" aria-hidden>
+                  <path d="M1 3L2.5 4.5L5 1.5" stroke="#0c0b13" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <PushPermissionPrimer

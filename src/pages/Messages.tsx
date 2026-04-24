@@ -1325,6 +1325,12 @@ const Messages = () => {
           score={selectedConvo.match.compatibility_score || 0}
         />
       )}
+      {/* Premium upsell for calls */}
+      <PremiumUpsellModal
+        open={showCallUpsell !== null}
+        onClose={() => setShowCallUpsell(null)}
+        feature={showCallUpsell ?? "video_call"}
+      />
     </div>
   );
 };

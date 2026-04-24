@@ -124,9 +124,10 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       toast.error(msg);
     });
     co.on("nonfatal-error", (ev?: DailyEventObjectNonFatalError) => {
-      // Surface permission issues
-      if (ev?.type === "permissions" || ev?.type === "input-settings-error") {
-        toast.error(ev.errorMsg || "Camera/Mic permission denied");
+      // Surface permission / device issues
+      const t = ev?.type as string | undefined;
+      if (t && /permission|camera|mic|input/i.test(t)) {
+        toast.error(ev?.errorMsg || "Camera/Mic permission denied");
       }
     });
     co.on("camera-error", () => {

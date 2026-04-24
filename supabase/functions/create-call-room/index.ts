@@ -144,9 +144,30 @@ serve(async (req) => {
 
     // 4. Create Daily.co room
     const dailyApiKey = Deno.env.get("DAILY_API_KEY");
-    if (!dailyApiKey) {
+    if (!dailyApiKey || dailyApiKey.trim().length === 0) {
       log("Missing DAILY_API_KEY");
-      return json({ error: "Calling service not configured" }, 500);
+      return json(
+        {
+          error:
+            "Calling is temporarily unavailable. Our team has been notified — please try again shortly.",
+          code: "DAILY_API_KEY_MISSING",
+        },
+        503,
+      );
+    }
+    // Basic sanity check on the key shape — Daily keys are long opaque strings.
+    // Catches obviously misconfigured values (e.g. placeholder text) without
+    // making a network call.
+    if (dailyApiKey.length < 20 || /\s/.test(dailyApiKey)) {
+      log("DAILY_API_KEY appears malformed", { length: dailyApiKey.length });
+      return json(
+        {
+          error:
+            "Calling service is misconfigured. Please contact support if this persists.",
+          code: "DAILY_API_KEY_INVALID",
+        },
+        503,
+      );
     }
 
     // Reuse an existing unexpired room for this match if one exists, otherwise
@@ -202,6 +223,16 @@ serve(async (req) => {
       if (!roomRes.ok) {
         const errText = await roomRes.text();
         log("Daily room creation failed", { status: roomRes.status, errText });
+        if (roomRes.status === 401 || roomRes.status === 403) {
+          return json(
+            {
+              error:
+                "Calling service rejected our credentials. Please contact support.",
+              code: "DAILY_API_KEY_INVALID",
+            },
+            503,
+          );
+        }
         return json({ error: "Failed to create call room" }, 502);
       }
       room = await roomRes.json();
@@ -242,6 +273,16 @@ serve(async (req) => {
         status: tokenRes.status,
         errText,
       });
+      if (tokenRes.status === 401 || tokenRes.status === 403) {
+        return json(
+          {
+            error:
+              "Calling service rejected our credentials. Please contact support.",
+            code: "DAILY_API_KEY_INVALID",
+          },
+          503,
+        );
+      }
       return json({ error: "Failed to create call token" }, 502);
     }
 

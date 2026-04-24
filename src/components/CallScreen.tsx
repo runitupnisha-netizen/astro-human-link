@@ -541,12 +541,12 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         </div>
 
         {/* Call controls */}
-        <div className="pb-16 pt-8 relative z-20">
-          <div className="flex items-center gap-6">
+        <div className="pb-8 sm:pb-12 pt-6 sm:pt-8 px-6 relative z-20 w-full flex justify-center">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Button
               size="icon"
               variant="outline"
-              className={`w-14 h-14 rounded-full border-2 ${muted ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
+              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 shrink-0 ${muted ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
               onClick={() => setMuted(!muted)}
             >
               {muted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -556,7 +556,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               <Button
                 size="icon"
                 variant="outline"
-                className={`w-14 h-14 rounded-full border-2 ${videoOff ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 shrink-0 ${videoOff ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
                 onClick={() => setVideoOff(!videoOff)}
               >
                 {videoOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
@@ -565,7 +565,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
             <Button
               size="icon"
-              className="w-16 h-16 rounded-full bg-destructive hover:bg-destructive/80 shadow-lg"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-destructive hover:bg-destructive/80 shadow-lg shrink-0"
               onClick={handleEndCall}
             >
               <PhoneOff className="w-6 h-6" />
@@ -578,7 +578,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="absolute bottom-32"
+            className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30"
           >
             <Button
               size="icon"

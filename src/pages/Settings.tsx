@@ -1004,6 +1004,32 @@ const Settings = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sign Out Confirmation Dialog */}
+      <Dialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogOut className="w-5 h-5 text-[#D85A30]" /> Sign out of Stellara?
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to sign out? You can sign back in anytime with your email or social account.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSignOutDialog(false)}>Cancel</Button>
+            <Button
+              onClick={async () => {
+                setShowSignOutDialog(false);
+                await handleSignOut();
+              }}
+              className="bg-[#D85A30] hover:bg-[#D85A30]/90 text-white"
+            >
+              Sign Out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

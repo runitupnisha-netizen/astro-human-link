@@ -822,13 +822,133 @@ const Settings = () => {
               </CardContent>
             </Card>
 
+            {/* Stellara Pro */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-400" />
+                  Stellara Pro
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {isPro ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      You're a Stellara Pro member. ✦ Manage your plan or restore a previous purchase below.
+                    </p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await manageSubscription();
+                        } catch {
+                          toast.error("Couldn't open subscription portal");
+                        }
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-amber-400/40 transition-all"
+                    >
+                      <span className="font-medium flex items-center gap-2">
+                        <Crown className="w-4 h-4 text-amber-400" /> Manage Subscription
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Unlock Lyra deep readings, Soulmate Sketch, who liked you, boosts, and more. ✦
+                    </p>
+                    <button
+                      onClick={() => navigate("/premium")}
+                      className="w-full flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-amber-500/15 to-amber-300/10 border border-amber-400/40 hover:border-amber-400/70 transition-all"
+                    >
+                      <span className="font-medium flex items-center gap-2 text-amber-300">
+                        <Crown className="w-4 h-4" /> Upgrade to Pro ✦
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-amber-300" />
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={async () => {
+                    toast.info("Checking for previous purchases…");
+                    try {
+                      await refreshSubscription();
+                      toast.success("Purchases restored if found ✦");
+                    } catch {
+                      toast.error("Couldn't restore purchases");
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-primary/40 transition-all"
+                >
+                  <span className="font-medium flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" /> Restore Purchases
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </CardContent>
+            </Card>
+
+            {/* About */}
+            <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  About
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <button
+                  onClick={() => navigate("/privacy")}
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-primary/40 transition-all"
+                >
+                  <span className="font-medium flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-muted-foreground" /> Privacy Policy
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <button
+                  onClick={() => navigate("/terms")}
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-primary/40 transition-all"
+                >
+                  <span className="font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-muted-foreground" /> Terms of Service
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <button
+                  onClick={() => navigate("/safety")}
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-primary/40 transition-all"
+                >
+                  <span className="font-medium flex items-center gap-2">
+                    <ScrollText className="w-4 h-4 text-muted-foreground" /> Community Guidelines
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <button
+                  onClick={() => {
+                    // Best-effort: opens iOS App Store review when app is published.
+                    window.open("https://apps.apple.com/app/stellara", "_blank");
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/50 hover:border-amber-400/40 transition-all"
+                >
+                  <span className="font-medium flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-400" /> Rate Stellara ✦
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <p className="text-center text-xs text-muted-foreground/70 pt-3">
+                  App Version {APP_VERSION}
+                </p>
+              </CardContent>
+            </Card>
+
             {/* Sign Out */}
             <div className="flex justify-center pt-2 pb-4">
               <Button
                 variant="outline"
                 size="lg"
-                onClick={handleSignOut}
-                className="border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/30 gap-2"
+                onClick={() => setShowSignOutDialog(true)}
+                className="border-[#D85A30]/40 text-[#D85A30] hover:bg-[#D85A30]/10 hover:text-[#D85A30] gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out

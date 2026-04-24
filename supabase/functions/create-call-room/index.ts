@@ -96,9 +96,13 @@ serve(async (req) => {
 
     // 3. Parse body — matchId required, must belong to the caller
     let matchId: string | undefined;
+    let callType: "voice" | "video" = "video";
     try {
       const body = await req.json();
       if (body && typeof body.matchId === "string") matchId = body.matchId.trim();
+      if (body && (body.callType === "voice" || body.callType === "video")) {
+        callType = body.callType;
+      }
     } catch (_) {
       // body is optional
     }
@@ -213,13 +217,38 @@ serve(async (req) => {
     const roomUrl = room.url ?? `https://stellara.daily.co/${roomName}`;
     const joinUrl = `${roomUrl}?t=${meetingToken}`;
 
-    log("Room ready", { roomName });
+    // 6. Record session metadata (best-effort — don't fail the call if logging fails)
+    let sessionId: string | null = null;
+    try {
+      const { data: sessionRow, error: sessionError } = await supabase
+        .from("call_sessions")
+        .insert({
+          match_id: matchId,
+          user_id: user.id,
+          room_name: roomName,
+          call_type: callType,
+        })
+        .select("id")
+        .maybeSingle();
+      if (sessionError) {
+        log("Session log insert failed", { error: sessionError.message });
+      } else {
+        sessionId = sessionRow?.id ?? null;
+      }
+    } catch (logErr) {
+      log("Session log threw", {
+        error: logErr instanceof Error ? logErr.message : String(logErr),
+      });
+    }
+
+    log("Room ready", { roomName, sessionId });
     return json({
       url: joinUrl, // prebuilt iframe URL with embedded token
       roomUrl, // bare room URL (for SDK use)
       roomName,
       token: meetingToken, // for client-side SDK joins
       expiresAt: new Date(expSeconds * 1000).toISOString(),
+      sessionId,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

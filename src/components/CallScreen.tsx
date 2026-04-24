@@ -48,6 +48,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const peerHasJoinedOnceRef = useRef(false);
+  const sessionIdRef = useRef<string | null>(null);
 
   const teardownCallObject = useCallback(async () => {
     const co = callObjectRef.current;
@@ -195,7 +196,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     try {
       const { data, error } = await supabase.functions.invoke(
         "create-call-room",
-        { body: { matchId } },
+        { body: { matchId, callType } },
       );
 
       if (cancelledRef.current) return;
@@ -218,6 +219,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
       const roomUrl: string | undefined = data?.roomUrl || data?.url;
       const token: string | undefined = data?.token;
+      const newSessionId: string | undefined = data?.sessionId;
       if (!roomUrl) {
         const msg = "Call service unavailable. Please try again.";
         setErrorMessage(msg);
@@ -225,6 +227,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         toast.error(msg);
         return;
       }
+      if (newSessionId) sessionIdRef.current = newSessionId;
 
       try {
         await joinDailyRoom(roomUrl, token);
@@ -267,6 +270,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setRemoteJoined(false);
       setNetworkQuality(null);
       peerHasJoinedOnceRef.current = false;
+      sessionIdRef.current = null;
       teardownCallObject();
       return;
     }
@@ -348,6 +352,18 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     const wasConnected = peerHasJoinedOnceRef.current && duration > 0;
     if (wasConnected) {
       toast.success(`Call ended · ${formatDuration(duration)}`);
+    }
+    // Mark session as ended (best-effort — RLS only allows updating our own row).
+    const sid = sessionIdRef.current;
+    if (sid) {
+      sessionIdRef.current = null;
+      supabase
+        .from("call_sessions")
+        .update({ ended_at: new Date().toISOString() })
+        .eq("id", sid)
+        .then(({ error }) => {
+          if (error) console.warn("Failed to mark call session ended:", error.message);
+        });
     }
     // Release camera/mic and Daily room immediately, don't wait for unmount
     teardownCallObject();

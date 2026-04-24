@@ -31,6 +31,7 @@ type CallStatus =
 const MAX_REJOIN_ATTEMPTS = 3;
 
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
+  const { subscribed, loading: premiumLoading } = usePremium();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejoinAttempt, setRejoinAttempt] = useState(0);

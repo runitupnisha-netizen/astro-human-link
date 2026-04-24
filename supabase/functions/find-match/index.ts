@@ -153,12 +153,16 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const id = getIdentifier(req);
-    const rl = await checkRateLimit({ identifier: id, functionName: "find-match", maxRequests: 10, windowMinutes: 5 });
-    if (!rl.allowed) {
-      return new Response(JSON.stringify({ error: "Slow down — try again in a few minutes." }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    try {
+      const id = getIdentifier(req);
+      const rl = await checkRateLimit({ identifier: id, functionName: "find-match", maxRequests: 10, windowMinutes: 5 });
+      if (rl && rl.allowed === false) {
+        return new Response(JSON.stringify({ error: "Slow down — try again in a few minutes." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch (rlErr) {
+      console.warn("rate-limit check skipped:", rlErr);
     }
 
     const { mySigns, theirBirthDate, theirName, myLifePath } = await req.json();

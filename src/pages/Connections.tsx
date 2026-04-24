@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -56,6 +56,9 @@ const Connections = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
+  const [recentChecks, setRecentChecks] = useState<
+    Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>
+  >([]);
 
   const otherIds = matches.map((m) => m.otherUserId);
   const verifiedUsers = useVerificationStatuses(otherIds);

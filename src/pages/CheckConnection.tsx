@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
 import { z } from "zod";
@@ -74,6 +74,7 @@ type FieldErrors = Partial<Record<"theirName" | "birthDate" | "birthTime" | "bir
 
 const CheckConnection = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { subscribed: isPremium } = usePremium();
 
@@ -89,6 +90,30 @@ const CheckConnection = () => {
   const [saved, setSaved] = useState<SavedCheck[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [monthCount, setMonthCount] = useState(0);
+
+  // Prefill from a saved check (?rerun=<id>) or shortcut params (?name=&date=&time=&place=)
+  useEffect(() => {
+    if (!user) return;
+    const rerunId = searchParams.get("rerun");
+    if (rerunId) {
+      (async () => {
+        const { data } = await supabase
+          .from("connection_checks")
+          .select("their_name,their_birth_date,their_birth_time,their_birth_place")
+          .eq("id", rerunId)
+          .maybeSingle();
+        if (data) {
+          setTheirName(data.their_name ?? "");
+          setBirthDate(data.their_birth_date ?? "");
+          setBirthTime(data.their_birth_time ?? "");
+          setSkipTime(!data.their_birth_time);
+          setBirthPlace(data.their_birth_place ?? "");
+          toast.success(`Loaded ${data.their_name || "previous check"} — review and confirm to rerun`);
+        }
+        setSearchParams({}, { replace: true });
+      })();
+    }
+  }, [user, searchParams, setSearchParams]);
 
   // Load saved readings + this month's usage
   useEffect(() => {

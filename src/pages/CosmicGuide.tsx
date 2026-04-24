@@ -2,14 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Sparkles, Send, Plus, Trash2, MessageSquare, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import CosmicBackground from "@/components/CosmicBackground";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -25,6 +21,16 @@ const STARTER_PROMPTS = [
   "What's my Human Design strategy trying to teach me today?",
 ];
 
+// Deterministic star field positions (so they don't reshuffle on re-render)
+const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
+  // Pseudo-random but stable
+  const x = ((i * 53) % 100);
+  const y = ((i * 37 + 13) % 100);
+  const size = ((i * 7) % 3) + 1; // 1-3px
+  const opacity = 0.25 + ((i * 11) % 60) / 100; // 0.25-0.85
+  return { x, y, size, opacity };
+});
+
 const CosmicGuide = () => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -33,7 +39,7 @@ const CosmicGuide = () => {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [loadingThread, setLoadingThread] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Load conversations
@@ -130,7 +136,6 @@ const CosmicGuide = () => {
     setInput("");
     setStreaming(true);
 
-    // Persist user message (fire-and-forget)
     void supabase.from("guide_messages").insert({
       conversation_id: convoId,
       user_id: user.id,
@@ -214,7 +219,6 @@ const CosmicGuide = () => {
         }
       }
 
-      // Persist assistant reply
       if (assistantSoFar) {
         await supabase.from("guide_messages").insert({
           conversation_id: convoId,
@@ -222,7 +226,6 @@ const CosmicGuide = () => {
           role: "assistant",
           content: assistantSoFar,
         });
-        // Refresh conversation order
         setConversations((prev) => {
           const idx = prev.findIndex((c) => c.id === convoId);
           if (idx === -1) return prev;
@@ -244,34 +247,43 @@ const CosmicGuide = () => {
 
   const isEmpty = messages.length === 0 && !streaming;
 
-  const sidebarContent = useMemo(
+  const historyDrawer = useMemo(
     () => (
       <div className="flex flex-col h-full">
-        <Button
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#d0b4f7]/15">
+          <h3 className="font-display text-base text-[#e0d4ff]">Conversations</h3>
+          <button
+            onClick={() => setShowHistory(false)}
+            className="p-1.5 rounded-full hover:bg-[#4d3a5c]/40 text-[#7a6a9a]"
+            aria-label="Close history"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <button
           onClick={() => {
             setActiveId(null);
             setMessages([]);
-            setShowSidebar(false);
+            setShowHistory(false);
           }}
-          variant="outline"
-          className="m-3 gap-2 border-primary/30 hover:bg-primary/10"
+          className="mx-3 mt-3 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-[#e0d4ff] border border-[#d0b4f7]/25 bg-[#4d3a5c]/30 hover:bg-[#4d3a5c]/50 transition-colors"
         >
           <Plus className="w-4 h-4" />
           New conversation
-        </Button>
-        <ScrollArea className="flex-1 px-2">
+        </button>
+        <div className="flex-1 overflow-y-auto px-2 mt-3">
           <div className="space-y-1 pb-4">
             {conversations.map((c) => (
               <div
                 key={c.id}
-                className={`group flex items-center gap-2 rounded-lg px-2 py-2 text-sm cursor-pointer transition-colors ${
+                className={`group flex items-center gap-2 rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors ${
                   activeId === c.id
-                    ? "bg-primary/15 text-foreground"
-                    : "text-muted-foreground hover:bg-muted/40"
+                    ? "bg-[#4d3a5c]/50 text-[#e0d4ff]"
+                    : "text-[#7a6a9a] hover:bg-[#4d3a5c]/25 hover:text-[#c9b8f0]"
                 }`}
                 onClick={() => {
                   setActiveId(c.id);
-                  setShowSidebar(false);
+                  setShowHistory(false);
                 }}
               >
                 <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
@@ -281,7 +293,7 @@ const CosmicGuide = () => {
                     e.stopPropagation();
                     deleteConversation(c.id);
                   }}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition"
+                  className="opacity-0 group-hover:opacity-100 text-[#7a6a9a] hover:text-destructive transition"
                   aria-label="Delete conversation"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -289,12 +301,12 @@ const CosmicGuide = () => {
               </div>
             ))}
             {conversations.length === 0 && (
-              <p className="text-xs text-muted-foreground px-2 py-4 text-center">
+              <p className="text-xs text-[#7a6a9a] px-2 py-4 text-center">
                 No conversations yet. Lyra is waiting.
               </p>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,167 +314,325 @@ const CosmicGuide = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background relative pt-16 pb-24 md:pb-6">
-      <CosmicBackground />
-      <div className="relative max-w-6xl mx-auto px-3 md:px-6 h-[calc(100vh-5rem)] md:h-[calc(100vh-5rem)] flex gap-4">
-        {/* Sidebar (desktop) */}
-        <aside className="hidden md:flex flex-col w-64 shrink-0 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40">
-          {sidebarContent}
-        </aside>
+    <div
+      className="fixed inset-0 flex flex-col overflow-hidden"
+      style={{ backgroundColor: "#0c0b13" }}
+    >
+      {/* Subtle radial wash */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% 20%, rgba(109, 40, 217, 0.18), transparent 60%), radial-gradient(ellipse 60% 40% at 50% 90%, rgba(77, 58, 92, 0.25), transparent 70%)",
+        }}
+      />
 
-        {/* Mobile sidebar overlay */}
-        <AnimatePresence>
-          {showSidebar && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowSidebar(false)}
-                className="md:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
+      {/* Static star particles */}
+      <div className="pointer-events-none absolute inset-0">
+        {STAR_FIELD.map((s, i) => (
+          <span
+            key={i}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              width: `${s.size}px`,
+              height: `${s.size}px`,
+              opacity: s.opacity,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Top bar with history trigger */}
+      <div className="relative z-10 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2">
+        <button
+          onClick={() => setShowHistory(true)}
+          className="p-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#7a6a9a] hover:text-[#c9b8f0] transition-colors"
+          aria-label="Open conversation history"
+        >
+          <MessageSquare className="w-5 h-5" />
+        </button>
+        <div className="w-9" />
+      </div>
+
+      {/* Lyra avatar header */}
+      <div className="relative z-10 flex flex-col items-center px-6 pt-2 pb-5">
+        <div className="relative w-20 h-20 flex items-center justify-center">
+          {/* Outer pulsing ring */}
+          <span
+            className="absolute inset-0 rounded-full border animate-pulse"
+            style={{ borderColor: "rgba(208, 180, 247, 0.4)", animationDuration: "3.5s" }}
+          />
+          <span
+            className="absolute inset-[-6px] rounded-full border animate-pulse"
+            style={{ borderColor: "rgba(208, 180, 247, 0.18)", animationDuration: "5s" }}
+          />
+          {/* Breathing glow when active */}
+          {streaming && (
+            <span
+              className="absolute inset-[-12px] rounded-full blur-2xl animate-pulse"
+              style={{ backgroundColor: "rgba(127, 119, 221, 0.45)", animationDuration: "2s" }}
+            />
+          )}
+          {/* Sparkle mark (Stellara-style) */}
+          <div
+            className="relative w-14 h-14 rounded-full flex items-center justify-center"
+            style={{
+              background: "radial-gradient(circle at 35% 30%, #b89df5, #6d28d9 60%, #2a1740)",
+              boxShadow: "0 0 30px rgba(127, 119, 221, 0.5), inset 0 0 12px rgba(255,255,255,0.15)",
+            }}
+          >
+            <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" aria-hidden>
+              <path
+                d="M12 2.5l1.6 5.4 5.4 1.6-5.4 1.6L12 16.5l-1.6-5.4L5 9.5l5.4-1.6L12 2.5z"
+                fill="#f9d697"
               />
-              <motion.aside
-                initial={{ x: -300 }}
-                animate={{ x: 0 }}
-                exit={{ x: -300 }}
-                transition={{ type: "spring", damping: 25, stiffness: 220 }}
-                className="md:hidden fixed left-0 top-16 bottom-20 z-50 w-72 bg-card/95 backdrop-blur-xl border-r border-border/40"
+              <circle cx="12" cy="9.5" r="1" fill="#0c0b13" />
+            </svg>
+          </div>
+          {/* Orbiting gold dot */}
+          <div
+            className="absolute inset-0 animate-spin"
+            style={{ animationDuration: "12s" }}
+          >
+            <span
+              className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 rounded-full"
+              style={{
+                backgroundColor: "#f9d697",
+                boxShadow: "0 0 8px rgba(249, 214, 151, 0.9)",
+              }}
+            />
+          </div>
+        </div>
+        <h1
+          className="mt-4 text-2xl tracking-wide"
+          style={{ fontFamily: "Lora, Georgia, serif", color: "#e0d4ff" }}
+        >
+          Lyra
+        </h1>
+        <p
+          className="mt-1 text-xs tracking-wider"
+          style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif", fontWeight: 300 }}
+        >
+          your cosmic guide · always here
+        </p>
+      </div>
+
+      {/* Messages area */}
+      <div
+        ref={scrollRef}
+        className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8"
+      >
+        <div className="max-w-2xl mx-auto space-y-3 pb-6">
+          {loadingThread ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#7a6a9a" }} />
+            </div>
+          ) : isEmpty ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center text-center py-4"
+            >
+              <p
+                className="text-base leading-relaxed max-w-md mb-8"
+                style={{ color: "#c9b8f0", fontFamily: "Lora, Georgia, serif" }}
               >
-                {sidebarContent}
-              </motion.aside>
+                I read your stars, your design, your numbers — and I listen.
+                Ask me anything about love, alignment, or what your soul is whispering today.
+              </p>
+              <div className="w-full grid grid-cols-1 gap-2 max-w-lg">
+                {STARTER_PROMPTS.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => send(p)}
+                    className="text-left px-4 py-3 rounded-2xl text-sm transition-colors"
+                    style={{
+                      backgroundColor: "rgba(77, 58, 92, 0.35)",
+                      border: "1px solid rgba(208, 180, 247, 0.18)",
+                      color: "#c9b8f0",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(77, 58, 92, 0.55)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(77, 58, 92, 0.35)";
+                    }}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <>
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className="max-w-[88%] md:max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
+                    style={
+                      m.role === "user"
+                        ? {
+                            backgroundColor: "rgba(109, 40, 217, 0.25)",
+                            color: "#a89ac8",
+                            fontFamily: "Poppins, sans-serif",
+                          }
+                        : {
+                            backgroundColor: "rgba(77, 58, 92, 0.5)",
+                            border: "1px solid rgba(208, 180, 247, 0.22)",
+                            color: "#c9b8f0",
+                            fontFamily: "Lora, Georgia, serif",
+                          }
+                    }
+                  >
+                    {m.role === "assistant" ? (
+                      <div
+                        className="prose prose-sm max-w-none prose-p:my-2 prose-li:my-0.5"
+                        style={{ color: "#c9b8f0" }}
+                      >
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {m.content || "…"}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap">{m.content}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+              {streaming && messages[messages.length - 1]?.role !== "assistant" && (
+                <div className="flex justify-start">
+                  <div
+                    className="rounded-2xl px-4 py-3 flex items-center gap-1.5"
+                    style={{
+                      backgroundColor: "rgba(77, 58, 92, 0.5)",
+                      border: "1px solid rgba(208, 180, 247, 0.22)",
+                    }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full animate-pulse"
+                      style={{ backgroundColor: "#7F77DD", animationDelay: "0ms" }}
+                    />
+                    <span
+                      className="w-2 h-2 rounded-full animate-pulse"
+                      style={{ backgroundColor: "#7F77DD", animationDelay: "200ms" }}
+                    />
+                    <span
+                      className="w-2 h-2 rounded-full animate-pulse"
+                      style={{ backgroundColor: "#7F77DD", animationDelay: "400ms" }}
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
-        </AnimatePresence>
-
-        {/* Chat panel */}
-        <main className="flex-1 flex flex-col rounded-2xl bg-card/30 backdrop-blur-xl border border-border/40 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40">
-            <button
-              onClick={() => setShowSidebar(true)}
-              className="md:hidden p-1.5 rounded-lg hover:bg-muted/40"
-              aria-label="Open conversations"
-            >
-              <MessageSquare className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/30 rounded-full blur-md animate-pulse" />
-              <div className="relative w-9 h-9 rounded-full bg-gradient-to-br from-primary via-accent to-primary flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-background" />
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="font-display text-base text-gradient-aurora truncate">Lyra</h1>
-              <p className="text-[11px] text-muted-foreground">Your cosmic guide</p>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 md:px-6 py-4 space-y-4">
-            {loadingThread ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : isEmpty ? (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center text-center py-8 md:py-16"
-              >
-                <div className="relative mb-5">
-                  <div className="absolute inset-0 bg-primary/40 rounded-full blur-2xl animate-pulse" />
-                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary via-accent to-primary flex items-center justify-center shadow-lg">
-                    <Sparkles className="w-7 h-7 text-background" />
-                  </div>
-                </div>
-                <h2 className="font-display text-2xl text-gradient-aurora mb-2">Hi, I'm Lyra ✨</h2>
-                <p className="text-sm text-muted-foreground max-w-md mb-8 leading-relaxed">
-                  I read your stars, your design, your numbers — and I listen.
-                  Ask me anything about love, alignment, or what your soul is whispering today.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-xl">
-                  {STARTER_PROMPTS.map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => send(p)}
-                      className="text-left px-4 py-3 rounded-xl bg-muted/30 hover:bg-muted/50 border border-border/40 hover:border-primary/40 text-sm text-foreground transition-all"
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            ) : (
-              <>
-                {messages.map((m, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                        m.role === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-muted/50 text-foreground rounded-bl-md border border-border/40"
-                      }`}
-                    >
-                      {m.role === "assistant" ? (
-                        <div className="prose prose-sm prose-invert max-w-none prose-p:my-2 prose-headings:text-foreground prose-strong:text-foreground prose-li:my-0.5">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content || "…"}</ReactMarkdown>
-                        </div>
-                      ) : (
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">{m.content}</p>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-                {streaming && messages[messages.length - 1]?.role !== "assistant" && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted/50 border border-border/40 rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse [animation-delay:150ms]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse [animation-delay:300ms]" />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Composer */}
-          <div className="border-t border-border/40 p-3 md:p-4">
-            <div className="flex items-end gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    send();
-                  }
-                }}
-                placeholder="Ask Lyra anything…"
-                rows={1}
-                className="min-h-[44px] max-h-32 resize-none bg-background/60 border-border/50 focus-visible:ring-primary/40"
-                disabled={streaming}
-              />
-              <Button
-                onClick={() => send()}
-                disabled={streaming || !input.trim()}
-                size="icon"
-                className="h-11 w-11 shrink-0 bg-gradient-to-br from-primary to-accent hover:opacity-90"
-              >
-                {streaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </Button>
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-2 text-center">
-              Lyra offers reflection, not prediction. For entertainment & insight only.
-            </p>
-          </div>
-        </main>
+        </div>
       </div>
+
+      {/* Composer (pill input) */}
+      <div
+        className="relative z-10 px-4 pt-3"
+        style={{
+          paddingBottom: "calc(max(env(safe-area-inset-bottom), 0.5rem) + 5.5rem)",
+        }}
+      >
+        <div className="max-w-2xl mx-auto">
+          <div
+            className="flex items-center gap-2 rounded-full px-2 py-2"
+            style={{
+              backgroundColor: "rgba(77, 58, 92, 0.3)",
+              border: "1px solid rgba(208, 180, 247, 0.2)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              placeholder="Ask Lyra anything..."
+              disabled={streaming}
+              className="flex-1 bg-transparent outline-none px-4 py-2 text-sm placeholder:text-[#7a6a9a] disabled:opacity-60"
+              style={{
+                color: "#e0d4ff",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            />
+            <button
+              onClick={() => send()}
+              disabled={streaming || !input.trim()}
+              aria-label="Send message"
+              className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-opacity disabled:opacity-40"
+              style={{
+                background: "radial-gradient(circle at 35% 30%, #8b5cf6, #6d28d9)",
+                boxShadow: "0 0 16px rgba(127, 119, 221, 0.4)",
+                color: "#ffffff",
+              }}
+            >
+              {streaming ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+          <p
+            className="text-[10px] mt-2 text-center"
+            style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+          >
+            Lyra offers reflection, not prediction. For entertainment & insight only.
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom nav darken layer (sits under the fixed Navigation) */}
+      <div
+        className="pointer-events-none fixed bottom-0 left-0 right-0 h-20 z-0"
+        style={{ backgroundColor: "#0a0910" }}
+      />
+
+      {/* History drawer */}
+      <AnimatePresence>
+        {showHistory && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowHistory(false)}
+              className="fixed inset-0 z-40"
+              style={{ backgroundColor: "rgba(12, 11, 19, 0.7)", backdropFilter: "blur(4px)" }}
+            />
+            <motion.aside
+              initial={{ x: -320 }}
+              animate={{ x: 0 }}
+              exit={{ x: -320 }}
+              transition={{ type: "spring", damping: 26, stiffness: 230 }}
+              className="fixed left-0 top-0 bottom-0 z-50 w-80 max-w-[85vw]"
+              style={{
+                backgroundColor: "#0c0b13",
+                borderRight: "1px solid rgba(208, 180, 247, 0.15)",
+              }}
+            >
+              {historyDrawer}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

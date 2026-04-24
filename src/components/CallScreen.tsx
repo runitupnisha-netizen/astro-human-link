@@ -535,6 +535,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           feature={callType}
           status={derivePremiumGateStatus()}
           subscriptionEnd={subscriptionEnd}
+          resumeContext={premiumResumeContext}
           onRetry={async () => {
             // Re-invoke create-call-room without closing the call flow.
             // If the user is now premium, the upsell will dismiss itself

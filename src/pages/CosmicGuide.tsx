@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import SparkleLoader from "@/components/SparkleLoader";
 import { toast } from "@/hooks/use-toast";
 import { useTourHighlight } from "@/hooks/useTourHighlight";
 
@@ -428,7 +429,7 @@ const CosmicGuide = () => {
         <div className="max-w-2xl mx-auto space-y-3 pb-6">
           {loadingThread ? (
             <div className="flex items-center justify-center py-10">
-              <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#7a6a9a" }} />
+              <SparkleLoader size={28} label="Lyra is reading your chart..." />
             </div>
           ) : isEmpty ? (
             <motion.div

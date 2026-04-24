@@ -197,40 +197,113 @@ serve(async (req) => {
     }
     log("Premium verified");
 
-    // 3. Parse body — matchId required, must belong to the caller
-    let matchId: string | undefined;
-    let callType: "voice" | "video" = "video";
+    // 3. Parse + validate body. matchId is REQUIRED and must reference a real
+    // match the caller participates in. Reject with structured 400/403/404 so
+    // the client can surface a clear message rather than silently degrading.
+    let parsedBody: Record<string, unknown> = {};
     try {
-      const body = await req.json();
-      if (body && typeof body.matchId === "string") matchId = body.matchId.trim();
-      if (body && (body.callType === "voice" || body.callType === "video")) {
-        callType = body.callType;
-      }
+      parsedBody = (await req.json()) ?? {};
     } catch (_) {
-      // body is optional
+      await recordProvisioningError(supabase, {
+        category: "validation",
+        httpStatus: 400,
+        message: "Request body is not valid JSON",
+        userId: user.id,
+      });
+      return json({ error: "Request body must be valid JSON" }, 400);
     }
+
+    const rawMatchId = parsedBody.matchId;
+    const rawCallType = parsedBody.callType;
+
+    if (typeof rawMatchId !== "string" || rawMatchId.trim().length === 0) {
+      await recordProvisioningError(supabase, {
+        category: "validation",
+        httpStatus: 400,
+        message: "matchId is required",
+        userId: user.id,
+        details: { receivedType: typeof rawMatchId },
+      });
+      return json(
+        { error: "matchId is required", code: "MATCH_ID_REQUIRED" },
+        400,
+      );
+    }
+    const matchId = rawMatchId.trim();
 
     const UUID_RE =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!matchId || !UUID_RE.test(matchId)) {
-      return json({ error: "Valid matchId is required" }, 400);
+    if (!UUID_RE.test(matchId)) {
+      await recordProvisioningError(supabase, {
+        category: "validation",
+        httpStatus: 400,
+        message: "matchId is not a valid UUID",
+        userId: user.id,
+        details: { matchId: matchId.slice(0, 64) },
+      });
+      return json(
+        { error: "matchId must be a valid UUID", code: "MATCH_ID_INVALID" },
+        400,
+      );
     }
 
+    const callType: "voice" | "video" =
+      rawCallType === "voice" ? "voice" : "video";
+
+    // Look up the match using the service role so RLS doesn't mask a real row,
+    // then enforce participation in code. This guarantees the call room is
+    // bound to a confirmed mutual match and the caller cannot guess/forge one.
     const { data: match, error: matchError } = await supabase
       .from("matches")
       .select("id, user_a, user_b")
       .eq("id", matchId)
       .maybeSingle();
 
-    if (matchError || !match) {
-      log("Match lookup failed", { matchError: matchError?.message });
-      return json({ error: "Match not found" }, 404);
+    if (matchError) {
+      log("Match lookup error", { error: matchError.message });
+      await recordProvisioningError(supabase, {
+        category: "validation",
+        httpStatus: 500,
+        message: `Match lookup failed: ${matchError.message}`,
+        userId: user.id,
+        matchId,
+      });
+      return json({ error: "Could not validate match" }, 500);
+    }
+
+    if (!match) {
+      log("Match not found", { matchId, userId: user.id });
+      await recordProvisioningError(supabase, {
+        category: "validation",
+        httpStatus: 404,
+        message: "Match not found",
+        userId: user.id,
+        matchId,
+      });
+      return json(
+        { error: "Match not found", code: "MATCH_NOT_FOUND" },
+        404,
+      );
     }
 
     if (match.user_a !== user.id && match.user_b !== user.id) {
       log("User not part of match", { matchId, userId: user.id });
-      return json({ error: "Not a participant of this match" }, 403);
+      await recordProvisioningError(supabase, {
+        category: "auth",
+        httpStatus: 403,
+        message: "User is not a participant of this match",
+        userId: user.id,
+        matchId,
+      });
+      return json(
+        {
+          error: "You are not a participant of this match",
+          code: "NOT_MATCH_PARTICIPANT",
+        },
+        403,
+      );
     }
+    log("Match validated", { matchId });
 
     // 4. Create Daily.co room
     const dailyApiKey = Deno.env.get("DAILY_API_KEY");

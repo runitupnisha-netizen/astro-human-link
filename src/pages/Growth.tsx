@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import LyraStrip from "@/components/lyra/LyraStrip";
+import TransitAlertCard from "@/components/TransitAlertCard";
 
 /** Background colour spec from Prompt 2: dark cosmic #0c0b13. */
 const BG = "#0c0b13";
@@ -126,6 +127,9 @@ const Growth = () => {
             Know yourself. Love yourself. Find your person.
           </p>
         </motion.div>
+
+        {/* Active planetary transit (auto-hides when none) */}
+        <TransitAlertCard userSun={chart.sun} userMoon={chart.moon} userId={user?.id} />
 
         {/* Card 1 — Daily Ritual (full width, hero) */}
         <motion.button

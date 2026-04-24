@@ -33,6 +33,7 @@ const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
 
 const CosmicGuide = () => {
   const { user } = useAuth();
+  const inputHighlight = useTourHighlight("lyra-input");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);

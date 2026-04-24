@@ -70,6 +70,13 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [remoteJoined, setRemoteJoined] = useState(false);
   const [networkQuality, setNetworkQuality] = useState<"good" | "low" | "very-low" | null>(null);
   const [simulated, setSimulated] = useState(false);
+  const [callStats, setCallStats] = useState<{
+    rttMs: number | null;
+    jitterMs: number | null;
+    packetLossPct: number | null;
+    videoRecvKbps: number | null;
+  }>({ rttMs: null, jitterMs: null, packetLossPct: null, videoRecvKbps: null });
+  const [statsExpanded, setStatsExpanded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
   const callObjectRef = useRef<DailyCall | null>(null);

@@ -358,17 +358,19 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   // Sync mute state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
+    if (simulated) return;
     if (!co || (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting")) return;
     co.setLocalAudio(!muted);
-  }, [muted, callStatus]);
+  }, [muted, callStatus, simulated]);
 
   // Sync video state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
-    if (!co || callType !== "video") return;
+    if (simulated || callType !== "video") return;
+    if (!co) return;
     if (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting") return;
     co.setLocalVideo(!videoOff);
-  }, [videoOff, callStatus, callType]);
+  }, [videoOff, callStatus, callType, simulated]);
 
   const handleRejoin = useCallback(() => {
     if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {

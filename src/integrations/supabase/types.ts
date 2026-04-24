@@ -855,6 +855,7 @@ export type Database = {
           current_city: string | null
           current_latitude: number | null
           current_longitude: number | null
+          daily_ritual_last_completed: string | null
           display_name: string | null
           drinking: string | null
           gender: string | null
@@ -885,6 +886,7 @@ export type Database = {
           preferred_genders: string[] | null
           preferred_hd_types: string[] | null
           preferred_language: string | null
+          push_primer_shown: boolean
           relationship_goal: string | null
           rising_sign: string | null
           smoking: string | null
@@ -926,6 +928,7 @@ export type Database = {
           current_city?: string | null
           current_latitude?: number | null
           current_longitude?: number | null
+          daily_ritual_last_completed?: string | null
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -956,6 +959,7 @@ export type Database = {
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
+          push_primer_shown?: boolean
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null
@@ -997,6 +1001,7 @@ export type Database = {
           current_city?: string | null
           current_latitude?: number | null
           current_longitude?: number | null
+          daily_ritual_last_completed?: string | null
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -1027,6 +1032,7 @@ export type Database = {
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
+          push_primer_shown?: boolean
           relationship_goal?: string | null
           rising_sign?: string | null
           smoking?: string | null

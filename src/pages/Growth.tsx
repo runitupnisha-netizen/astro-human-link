@@ -11,9 +11,11 @@ import TransitAlertCard from "@/components/TransitAlertCard";
 /** Background colour spec from Prompt 2: dark cosmic #0c0b13. */
 const BG = "#0c0b13";
 const CARD_BG = "rgba(77, 58, 92, 0.35)";
+const CARD_BG_COMPLETED = "rgba(77, 58, 92, 0.55)";
 const CARD_BORDER = "rgba(208, 180, 247, 0.2)";
 const TITLE = "#e0d4ff";
 const BODY = "#c9b8f0";
+const COMPLETED_GREEN = "#1D9E75";
 
 /** Static deterministic star field — no animation per spec. */
 const STAR_FIELD = Array.from({ length: 32 }, (_, i) => {
@@ -52,21 +54,21 @@ const Growth = () => {
 
   useEffect(() => {
     if (!user) return;
+    const today = new Date().toISOString().slice(0, 10);
     supabase
       .from("profiles")
-      .select("display_name, sun_sign, moon_sign")
+      .select("display_name, sun_sign, moon_sign, daily_ritual_last_completed")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         const name = (data?.display_name || "").split(" ")[0] || "";
         setFirstName(name);
         setChart({ sun: data?.sun_sign ?? null, moon: data?.moon_sign ?? null });
+        const lastBackend = (data as { daily_ritual_last_completed?: string | null } | null)?.daily_ritual_last_completed ?? null;
+        const lastLocal = localStorage.getItem("stellara:daily-ritual:done");
+        // Backend is source of truth; localStorage is fallback for offline-first UX
+        setRitualDoneToday(lastBackend === today || lastLocal === today);
       });
-
-    // Check today's ritual completion via localStorage (zero-backend)
-    const today = new Date().toISOString().slice(0, 10);
-    const last = localStorage.getItem("stellara:daily-ritual:done");
-    setRitualDoneToday(last === today);
   }, [user]);
 
   return (
@@ -136,36 +138,50 @@ const Growth = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          onClick={() => navigate("/growth/ritual")}
-          className="w-full text-left rounded-2xl p-5 mb-3 transition-all hover:brightness-110 active:scale-[0.99]"
+          onClick={() => !ritualDoneToday && navigate("/growth/ritual")}
+          disabled={ritualDoneToday}
+          aria-disabled={ritualDoneToday}
+          className="w-full text-left rounded-2xl p-5 mb-3 transition-all relative"
           style={{
-            backgroundColor: CARD_BG,
+            backgroundColor: ritualDoneToday ? CARD_BG_COMPLETED : CARD_BG,
             border: `0.5px solid ${CARD_BORDER}`,
             borderRadius: 16,
+            cursor: ritualDoneToday ? "default" : "pointer",
           }}
         >
+          {ritualDoneToday && (
+            <span
+              aria-label="Completed"
+              className="absolute top-3 right-3 inline-flex items-center justify-center rounded-full"
+              style={{
+                width: 24,
+                height: 24,
+                backgroundColor: COMPLETED_GREEN,
+              }}
+            >
+              <Check className="w-3.5 h-3.5" style={{ color: "#0c0b13" }} strokeWidth={3} />
+            </span>
+          )}
           <div className="flex items-start justify-between gap-3 mb-2">
             <h2 className="text-lg font-medium" style={{ color: TITLE, fontFamily: "Lora, Georgia, serif" }}>
-              Your Daily Ritual
+              {ritualDoneToday ? "Ritual complete ✦" : "Your Daily Ritual"}
             </h2>
-            {ritualDoneToday && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full" style={{ color: "#d0b4f7", backgroundColor: "rgba(208,180,247,0.12)" }}>
-                <Check className="w-3 h-3" /> Completed today ✦
-              </span>
-            )}
           </div>
           <p className="text-sm mb-4 leading-relaxed" style={{ color: BODY }}>
-            Three quiet moments — the planets, a card, and one prompt.
+            {ritualDoneToday
+              ? "Come back tomorrow."
+              : "Three quiet moments — the planets, a card, and one prompt."}
           </p>
           <span
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm"
             style={{
-              backgroundColor: "rgba(208, 180, 247, 0.15)",
-              color: "#e0d4ff",
-              border: "0.5px solid rgba(208, 180, 247, 0.35)",
+              backgroundColor: ritualDoneToday ? "rgba(208, 180, 247, 0.08)" : "rgba(208, 180, 247, 0.15)",
+              color: ritualDoneToday ? "rgba(224, 212, 255, 0.55)" : "#e0d4ff",
+              border: `0.5px solid ${ritualDoneToday ? "rgba(208, 180, 247, 0.18)" : "rgba(208, 180, 247, 0.35)"}`,
+              opacity: ritualDoneToday ? 0.75 : 1,
             }}
           >
-            {ritualDoneToday ? "Revisit today's ritual" : "Begin Today's Ritual"} ✦
+            {ritualDoneToday ? "See you tomorrow ✦" : "Begin Today's Ritual ✦"}
           </span>
         </motion.button>
 

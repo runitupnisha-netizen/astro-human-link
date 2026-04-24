@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Star, Heart, User, Loader2, Eye, MessageCircle, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import SparkleLoader from "@/components/SparkleLoader";
 
 interface RevealProfile {
   user_id: string;
@@ -176,9 +177,8 @@ const SacredReveal = () => {
         </motion.div>
 
         {loading ? (
-          <div className="flex flex-col items-center gap-4 py-16">
-            <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-muted-foreground text-sm font-serif">Finding someone great for you...</p>
+          <div className="py-16">
+            <SparkleLoader size={40} label="Finding someone great for you..." />
           </div>
         ) : !revealProfile ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-6">

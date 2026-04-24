@@ -1,12 +1,61 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
+import {
+  Body,
+  GeoVector,
+  Ecliptic,
+  SiderealTime,
+} from "npm:astronomy-engine@2.1.19";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// ═══════════════════════════════════════════════════════════════
+// REAL EPHEMERIS — NASA-grade math via astronomy-engine
+// ═══════════════════════════════════════════════════════════════
+
+const ZODIAC_SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+] as const;
+
+function signFromLongitude(lonDeg: number): string {
+  const norm = ((lonDeg % 360) + 360) % 360;
+  return ZODIAC_SIGNS[Math.floor(norm / 30)];
+}
+
+function buildBirthUTC(birthDate: string, birthTime: string | null, longitudeDeg: number | null): Date {
+  const [y, m, d] = birthDate.split("-").map(Number);
+  const [hh, mm] = (birthTime ?? "12:00").split(":").map(Number);
+  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
+  const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
+  return new Date(asUTC - offsetHours * 3600 * 1000);
+}
+
+function eclipticLon(body: typeof Body[keyof typeof Body], date: Date): number {
+  const vec = GeoVector(body, date, true);
+  return Ecliptic(vec).elon;
+}
+
+function calcAscendant(date: Date, latDeg: number, lngDeg: number): string {
+  const gst = SiderealTime(date);
+  const lstHours = (gst + lngDeg / 15 + 24) % 24;
+  const lstDeg = lstHours * 15;
+  const epsilon = (23.4367 * Math.PI) / 180;
+  const phi = (latDeg * Math.PI) / 180;
+  const lst = (lstDeg * Math.PI) / 180;
+  const y = -Math.cos(lst);
+  const x = Math.sin(epsilon) * Math.tan(phi) + Math.cos(epsilon) * Math.sin(lst);
+  let asc = (Math.atan2(y, x) * 180) / Math.PI;
+  asc = ((asc % 360) + 360) % 360;
+  const diff = ((asc - lstDeg + 540) % 360) - 180;
+  if (diff < 0) asc = (asc + 180) % 360;
+  return signFromLongitude(asc);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // DETERMINISTIC CALCULATIONS — No AI guessing

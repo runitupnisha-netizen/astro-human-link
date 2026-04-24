@@ -299,7 +299,11 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <TourHighlight targetId="swipe-deck" className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-180px)] max-h-[620px] [@media(max-height:700px)]:h-[calc(100svh-160px)] md:h-[600px]">
+        <TourHighlight
+          targetId="swipe-deck"
+          label="Discover swipe deck"
+          className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-180px)] max-h-[620px] [@media(max-height:700px)]:h-[calc(100svh-160px)] md:h-[600px]"
+        >
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <ProfileCardSkeleton />

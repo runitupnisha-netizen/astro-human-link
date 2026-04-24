@@ -236,7 +236,11 @@ const Connections = () => {
           {matches.length === 0 ? (
             <EmptyState type="connections" />
           ) : (
-            <TourHighlight targetId="connections-list" className="space-y-4">
+            <TourHighlight
+              targetId="connections-list"
+              label="Your connections"
+              className="space-y-4"
+            >
               {matches.map((match, i) => (
                 <motion.div
                   key={match.id}

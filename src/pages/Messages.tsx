@@ -787,6 +787,7 @@ const Messages = () => {
               {/* Conversations List */}
               <TourHighlight
                 targetId="messages-list"
+                label="Your conversations"
                 className={`lg:col-span-1 h-full ${showMobileChat ? "hidden lg:block" : ""}`}
               >
               <Card className="bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full">

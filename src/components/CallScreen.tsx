@@ -597,6 +597,22 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               {callStatus === "ended" && "Call ended"}
             </motion.p>
 
+            {/* Manual start CTA — visible before the call is live, when the
+                auto-provision didn't run (e.g. premium loading) or after an
+                error/dismissal. Re-runs the same provisionRoom flow. */}
+            {(callStatus === "connecting" || callStatus === "ringing") && !isIncoming && !simulated && (
+              <div className="mt-5 flex items-center justify-center">
+                <Button
+                  size="lg"
+                  onClick={() => provisionRoom("connecting")}
+                  className="rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:opacity-95"
+                >
+                  <PhoneCall className="w-4 h-4 mr-2" />
+                  Start 1-on-1 Call
+                </Button>
+              </div>
+            )}
+
             {callStatus === "error" && (
               <div className="mt-4 flex items-center justify-center gap-3">
                 <Button

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw } from "lucide-react";
+import { MessageCircle, Star, Clock, Sparkles, Users, User, Heart, Zap, Eye, Navigation, RotateCw, WifiOff } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import EmptyState from "@/components/EmptyState";
 import { ConnectionCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import TourHighlight from "@/components/TourHighlight";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 interface MatchWithProfile {
   id: string;
@@ -51,14 +52,48 @@ const sanitizeConnectionName = (name: string | null): string | null => {
   return trimmed;
 };
 
+// Offline cache helpers — keep recent connection history visible when network drops
+const CACHE_VERSION = 1;
+const cacheKey = (userId: string) => `stellara:connections-cache:v${CACHE_VERSION}:${userId}`;
+
+interface ConnectionsCache {
+  matches: MatchWithProfile[];
+  recentChecks: Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>;
+  cachedAt: string;
+}
+
+const readCache = (userId: string): ConnectionsCache | null => {
+  try {
+    const raw = localStorage.getItem(cacheKey(userId));
+    if (!raw) return null;
+    return JSON.parse(raw) as ConnectionsCache;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (userId: string, data: Omit<ConnectionsCache, "cachedAt">) => {
+  try {
+    localStorage.setItem(
+      cacheKey(userId),
+      JSON.stringify({ ...data, cachedAt: new Date().toISOString() })
+    );
+  } catch {
+    // Ignore quota / private mode errors
+  }
+};
+
 const Connections = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const online = useNetworkStatus();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [recentChecks, setRecentChecks] = useState<
     Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>
   >([]);
+  const [servingFromCache, setServingFromCache] = useState(false);
+  const [cacheTimestamp, setCacheTimestamp] = useState<string | null>(null);
 
   const otherIds = matches.map((m) => m.otherUserId);
   const verifiedUsers = useVerificationStatuses(otherIds);
@@ -74,6 +109,21 @@ const Connections = () => {
 
   const load = useCallback(async () => {
     if (!user) return;
+
+    // If offline, immediately serve cached data without hitting the network
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      const cached = readCache(user.id);
+      if (cached) {
+        setMatches(cached.matches);
+        setRecentChecks(cached.recentChecks);
+        setCacheTimestamp(cached.cachedAt);
+        setServingFromCache(true);
+      }
+      setLoading(false);
+      return;
+    }
+
+    try {
     const [matchResult, myProfileResult] = await Promise.all([
       supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
       supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
@@ -83,6 +133,15 @@ const Connections = () => {
     const myCoords = myProfileResult.data;
 
     if (!matchRows || matchRows.length === 0) {
+      // No matches but still cache empty state + recent checks
+      const { data: checks } = await supabase
+        .from("connection_checks")
+        .select("id,their_name,compatibility_score,created_at")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setRecentChecks(checks ?? []);
+      writeCache(user.id, { matches: [], recentChecks: checks ?? [] });
+      setServingFromCache(false);
       setLoading(false);
       return;
     }
@@ -162,10 +221,33 @@ const Connections = () => {
       .limit(5);
     setRecentChecks(checks ?? []);
 
+    // Persist for offline access
+    writeCache(user.id, { matches: results, recentChecks: checks ?? [] });
+    setServingFromCache(false);
+    setCacheTimestamp(null);
+
     setLoading(false);
+    } catch (err) {
+      // Network failure mid-fetch — fall back to cached data if we have it
+      const cached = readCache(user.id);
+      if (cached) {
+        setMatches(cached.matches);
+        setRecentChecks(cached.recentChecks);
+        setCacheTimestamp(cached.cachedAt);
+        setServingFromCache(true);
+      }
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => { load(); }, [load]);
+
+  // When network comes back online, silently refresh from server
+  useEffect(() => {
+    if (online && servingFromCache && user) {
+      load();
+    }
+  }, [online, servingFromCache, user, load]);
 
   const { containerRef, pullIndicator, handlers: pullHandlers } = usePullToRefresh({
     onRefresh: load,

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sun, Sparkles, Moon, Users, Lock, Crown, ArrowRight, Star } from "lucide-react";
+import { Sun, Sparkles, Moon, Users, Lock, Crown, ArrowRight, Star, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePremium } from "@/hooks/usePremium";
@@ -131,7 +131,7 @@ const InnerWorld = () => {
             A private suite of tools to explore your chart, your dreams, and the people in
             your orbit — guided by ancient wisdom and modern AI.
           </p>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -140,6 +140,14 @@ const InnerWorld = () => {
             >
               <Star className="w-4 h-4 mr-1.5" />
               View my full chart results
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => navigate("/find-match")}
+              className="bg-gradient-to-r from-amber-400 to-rose-400 text-background hover:opacity-90"
+            >
+              <Heart className="w-4 h-4 mr-1.5" />
+              Find my match
             </Button>
           </div>
         </motion.div>

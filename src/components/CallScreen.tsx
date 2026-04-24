@@ -270,6 +270,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setRemoteJoined(false);
       setNetworkQuality(null);
       peerHasJoinedOnceRef.current = false;
+      sessionIdRef.current = null;
       teardownCallObject();
       return;
     }

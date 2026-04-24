@@ -145,7 +145,7 @@ serve(async (req) => {
     // 1. Auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return json({ error: "Authentication required" }, 401);
+      return errorResponse("AUTH_REQUIRED", "Authentication required", 401);
     }
 
     const supabase = createClient(
@@ -160,7 +160,7 @@ serve(async (req) => {
     );
     if (userError || !userData.user?.email) {
       log("Auth failed", { error: userError?.message });
-      return json({ error: "Authentication required" }, 401);
+      return errorResponse("AUTH_REQUIRED", "Authentication required", 401);
     }
     const user = userData.user;
     log("User authenticated", { userId: user.id });
@@ -187,7 +187,11 @@ serve(async (req) => {
         message: "STRIPE_SECRET_KEY not configured",
         userId: user.id,
       });
-      return json({ error: "Premium verification unavailable" }, 500);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification unavailable",
+        500,
+      );
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
@@ -207,7 +211,11 @@ serve(async (req) => {
         userId: user.id,
         details: { stage: "customers_list" },
       });
-      return json({ error: "Premium verification temporarily unavailable" }, 502);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification temporarily unavailable",
+        502,
+      );
     }
 
     if (customers.data.length === 0) {
@@ -219,10 +227,7 @@ serve(async (req) => {
         userId: user.id,
         details: { reason: "no_customer" },
       });
-      return json(
-        { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
-        403,
-      );
+      return premiumRequiredResponse("no_customer");
     }
 
     let subs;
@@ -242,7 +247,11 @@ serve(async (req) => {
         userId: user.id,
         details: { stage: "subscriptions_list", customerId: customers.data[0].id },
       });
-      return json({ error: "Premium verification temporarily unavailable" }, 502);
+      return errorResponse(
+        "PREMIUM_VERIFICATION_UNAVAILABLE",
+        "Premium verification temporarily unavailable",
+        502,
+      );
     }
 
     if (subs.data.length === 0) {
@@ -254,10 +263,7 @@ serve(async (req) => {
         userId: user.id,
         details: { reason: "no_active_sub", customerId: customers.data[0].id },
       });
-      return json(
-        { error: "Premium subscription required", code: "PREMIUM_REQUIRED" },
-        403,
-      );
+      return premiumRequiredResponse("no_active_sub");
     }
     log("Premium verified");
 

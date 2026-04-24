@@ -58,6 +58,8 @@ const MyChart = lazy(() => import("./pages/MyChart"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));
+const ShadowJournal = lazy(() => import("./pages/ShadowJournal"));
+const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 
 const queryClient = new QueryClient();
 
@@ -211,6 +213,8 @@ const AppRoutes = () => {
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
             <Route path="/growth" element={<PageTransition><ProtectedRoute><Growth /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/ritual" element={<PageTransition><ProtectedRoute><DailyRitual /></ProtectedRoute></PageTransition>} />
+            <Route path="/growth/shadow" element={<PageTransition><ProtectedRoute><ShadowJournal /></ProtectedRoute></PageTransition>} />
+            <Route path="/growth/moon" element={<PageTransition><ProtectedRoute><MoonCycle /></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<PageTransition><ProtectedRoute><CosmicGuide /></ProtectedRoute></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />

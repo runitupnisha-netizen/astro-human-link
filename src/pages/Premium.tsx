@@ -9,6 +9,27 @@ import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * Lightweight tagged logger for the post-checkout verification flow.
+ * Centralized so every breadcrumb is grep-able as `[Premium:verify]` in
+ * the browser console and in shipped error reports. We intentionally avoid
+ * a heavier logger lib — these are dev/debug breadcrumbs, not telemetry.
+ */
+const verifyLog = (
+  step:
+    | "polling-start"
+    | "polling-tick"
+    | "polling-success"
+    | "polling-timeout"
+    | "polling-skip"
+    | "manual-recheck"
+    | "manual-recheck-result",
+  details?: Record<string, unknown>,
+) => {
+  // eslint-disable-next-line no-console
+  console.info(`[Premium:verify] ${step}`, details ?? {});
+};
+
 const tierDetails: Record<TierKey, {
   icon: React.ReactNode;
   features: string[];
@@ -113,6 +134,11 @@ const Premium = () => {
   // share one interval.
   const pollingActiveRef = useRef(false);
 
+  // Guards the success/timeout *toasts* so they fire exactly once per
+  // verification run, even if the polling effect re-evaluates or the user
+  // navigates back to /premium with `?success=1` still in the URL.
+  const verifyToastShownRef = useRef(false);
+
   useEffect(() => {
     if (toastShown.current) return;
     if (success) {
@@ -131,9 +157,15 @@ const Premium = () => {
     if (!success || redirectTriggered.current) return;
     // Already subscribed before polling even started — let the redirect
     // effect handle it, no interval needed.
-    if (subscribedRef.current) return;
+    if (subscribedRef.current) {
+      verifyLog("polling-skip", { reason: "already-subscribed" });
+      return;
+    }
     // Don't start a second interval if one is already running for this mount.
-    if (pollingActiveRef.current) return;
+    if (pollingActiveRef.current) {
+      verifyLog("polling-skip", { reason: "already-running" });
+      return;
+    }
     pollingActiveRef.current = true;
 
     let cancelled = false;
@@ -147,19 +179,49 @@ const Premium = () => {
         interval = null;
       }
       setVerifying(false);
-      if (timedOut && !subscribedRef.current) setPollingTimedOut(true);
+      if (timedOut && !subscribedRef.current) {
+        setPollingTimedOut(true);
+        verifyLog("polling-timeout", { attempts, maxAttempts });
+        if (!verifyToastShownRef.current) {
+          verifyToastShownRef.current = true;
+          toast({
+            title: "Still confirming your upgrade…",
+            description:
+              "Stripe is taking a moment longer than usual. You can check again or retry checkout.",
+            variant: "destructive",
+          });
+        }
+      } else if (!timedOut && subscribedRef.current) {
+        verifyLog("polling-success", { attempts });
+        if (!verifyToastShownRef.current) {
+          verifyToastShownRef.current = true;
+          toast({
+            title: "Premium verified ✨",
+            description: "Your subscription is active. Enjoy Stellara Premium.",
+          });
+        }
+      }
     };
 
     setVerifying(true);
     setPollingTimedOut(false);
+    verifyLog("polling-start", { maxAttempts, intervalMs: 2000 });
 
     const tick = async () => {
       if (cancelled) return;
       attempts += 1;
       try {
         await refreshSubscription();
+        verifyLog("polling-tick", {
+          attempt: attempts,
+          subscribed: subscribedRef.current,
+        });
       } catch {
         // swallow — we'll retry
+        verifyLog("polling-tick", {
+          attempt: attempts,
+          error: "refresh-failed",
+        });
       }
       // Bail as soon as the subscription is confirmed so we don't fire one
       // more (wasteful) check-subscription call after the happy path lands.
@@ -279,13 +341,29 @@ const Premium = () => {
                     onClick={async () => {
                       setPollingTimedOut(false);
                       setVerifying(true);
+                      verifyLog("manual-recheck");
                       try {
                         await refreshSubscription();
                       } finally {
                         setVerifying(false);
                         // If still not subscribed, surface the timeout state again
                         // so the user isn't stuck on a hidden overlay.
-                        if (!subscribed) setPollingTimedOut(true);
+                        const ok = subscribedRef.current;
+                        verifyLog("manual-recheck-result", { subscribed: ok });
+                        if (ok) {
+                          toast({
+                            title: "Premium verified ✨",
+                            description: "Your subscription is now active.",
+                          });
+                        } else {
+                          setPollingTimedOut(true);
+                          toast({
+                            title: "Still not confirmed",
+                            description:
+                              "Stripe hasn't reported your subscription yet. Please try again in a moment.",
+                            variant: "destructive",
+                          });
+                        }
                       }
                     }}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 min-h-[44px]"

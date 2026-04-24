@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
 import { toast } from "sonner";
+import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
 
 interface CallScreenProps {
   open: boolean;
@@ -28,8 +29,116 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [muted, setMuted] = useState(false);
   const [videoOff, setVideoOff] = useState(callType === "voice");
   const [showPremium, setShowPremium] = useState(false);
+  const [remoteJoined, setRemoteJoined] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
+  const callObjectRef = useRef<DailyCall | null>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  const teardownCallObject = useCallback(async () => {
+    const co = callObjectRef.current;
+    callObjectRef.current = null;
+    if (!co) return;
+    try {
+      await co.leave();
+    } catch {/* ignore */}
+    try {
+      await co.destroy();
+    } catch {/* ignore */}
+  }, []);
+
+  const attachParticipantTracks = useCallback(() => {
+    const co = callObjectRef.current;
+    if (!co) return;
+    const participants = co.participants();
+    const remote = Object.values(participants).find((p) => !p.local);
+
+    // Local self-view (video only)
+    const localVideoTrack = participants.local?.tracks?.video?.persistentTrack;
+    if (localVideoRef.current) {
+      if (localVideoTrack) {
+        const stream = new MediaStream([localVideoTrack]);
+        if (localVideoRef.current.srcObject !== stream) {
+          localVideoRef.current.srcObject = stream;
+        }
+      } else {
+        localVideoRef.current.srcObject = null;
+      }
+    }
+
+    // Remote audio/video
+    const remoteVideoTrack = remote?.tracks?.video?.persistentTrack;
+    const remoteAudioTrack = remote?.tracks?.audio?.persistentTrack;
+
+    if (remoteVideoRef.current) {
+      if (remoteVideoTrack) {
+        const stream = new MediaStream([remoteVideoTrack]);
+        if (remoteVideoRef.current.srcObject !== stream) {
+          remoteVideoRef.current.srcObject = stream;
+        }
+      } else {
+        remoteVideoRef.current.srcObject = null;
+      }
+    }
+
+    if (remoteAudioRef.current) {
+      if (remoteAudioTrack) {
+        const stream = new MediaStream([remoteAudioTrack]);
+        if (remoteAudioRef.current.srcObject !== stream) {
+          remoteAudioRef.current.srcObject = stream;
+          remoteAudioRef.current.play().catch(() => {/* autoplay blocked */});
+        }
+      } else {
+        remoteAudioRef.current.srcObject = null;
+      }
+    }
+
+    setRemoteJoined(Boolean(remote));
+  }, []);
+
+  const joinDailyRoom = useCallback(async (roomUrl: string, token?: string) => {
+    await teardownCallObject();
+
+    const co = DailyIframe.createCallObject({
+      audioSource: true,
+      videoSource: callType === "video",
+    });
+    callObjectRef.current = co;
+
+    co.on("participant-joined", attachParticipantTracks);
+    co.on("participant-updated", attachParticipantTracks);
+    co.on("participant-left", attachParticipantTracks);
+    co.on("track-started", attachParticipantTracks);
+    co.on("track-stopped", attachParticipantTracks);
+    co.on("left-meeting", () => {
+      if (cancelledRef.current) return;
+      setRemoteJoined(false);
+    });
+    co.on("error", (ev?: DailyEventObjectFatalError) => {
+      if (cancelledRef.current) return;
+      const msg = ev?.errorMsg || "Call connection error";
+      setErrorMessage(msg);
+      setCallStatus("error");
+      toast.error(msg);
+    });
+    co.on("nonfatal-error", (ev?: DailyEventObjectNonFatalError) => {
+      // Surface permission issues
+      if (ev?.type === "permissions" || ev?.type === "input-settings-error") {
+        toast.error(ev.errorMsg || "Camera/Mic permission denied");
+      }
+    });
+    co.on("camera-error", () => {
+      toast.error("Camera unavailable. Check your browser permissions.");
+    });
+
+    await co.join({ url: roomUrl, token, startVideoOff: callType === "voice" });
+    if (callType === "voice") {
+      await co.setLocalVideo(false);
+    }
+    attachParticipantTracks();
+  }, [callType, attachParticipantTracks, teardownCallObject]);
 
   const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
     setCallStatus(mode);
@@ -58,7 +167,9 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         return;
       }
 
-      if (!data?.url) {
+      const roomUrl: string | undefined = data?.roomUrl || data?.url;
+      const token: string | undefined = data?.token;
+      if (!roomUrl) {
         const msg = "Call service unavailable. Please try again.";
         setErrorMessage(msg);
         setCallStatus("error");
@@ -66,7 +177,18 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         return;
       }
 
-      setCallStatus("connected");
+      try {
+        await joinDailyRoom(roomUrl, token);
+        if (cancelledRef.current) return;
+        setCallStatus("connected");
+      } catch (joinErr) {
+        if (cancelledRef.current) return;
+        const msg = joinErr instanceof Error ? joinErr.message : "Failed to join call";
+        setErrorMessage(msg);
+        setCallStatus("error");
+        toast.error(msg);
+        return;
+      }
       if (mode === "rejoining") {
         toast.success("Reconnected");
       }
@@ -77,7 +199,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId]);
+  }, [matchId, joinDailyRoom]);
 
   useEffect(() => {
     if (!open) {
@@ -88,6 +210,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setMuted(false);
       setVideoOff(callType === "voice");
       setShowPremium(false);
+      setRemoteJoined(false);
+      teardownCallObject();
       return;
     }
 
@@ -96,8 +220,23 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
     return () => {
       cancelledRef.current = true;
+      teardownCallObject();
     };
-  }, [open, callType, provisionRoom]);
+  }, [open, callType, provisionRoom, teardownCallObject]);
+
+  // Sync mute state with Daily
+  useEffect(() => {
+    const co = callObjectRef.current;
+    if (!co || callStatus !== "connected") return;
+    co.setLocalAudio(!muted);
+  }, [muted, callStatus]);
+
+  // Sync video state with Daily
+  useEffect(() => {
+    const co = callObjectRef.current;
+    if (!co || callStatus !== "connected" || callType !== "video") return;
+    co.setLocalVideo(!videoOff);
+  }, [videoOff, callStatus, callType]);
 
   const handleRejoin = useCallback(() => {
     if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {

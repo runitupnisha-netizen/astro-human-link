@@ -209,9 +209,29 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     attachParticipantTracks();
   }, [callType, attachParticipantTracks, teardownCallObject]);
 
+  const startSimulatedCall = useCallback((mode: "connecting" | "rejoining") => {
+    if (cancelledRef.current) return;
+    setSimulated(true);
+    setErrorMessage(null);
+    setCallStatus("ringing");
+    if (mode === "rejoining") {
+      toast("Reconnected in demo mode");
+    } else {
+      toast("Live calling is offline — running demo mode");
+    }
+    // Auto-advance to connected after a short ring
+    window.setTimeout(() => {
+      if (cancelledRef.current) return;
+      peerHasJoinedOnceRef.current = true;
+      setRemoteJoined(true);
+      setCallStatus("connected");
+    }, isIncoming ? 0 : 1800);
+  }, [isIncoming]);
+
   const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
     setCallStatus(mode);
     setErrorMessage(null);
+    setSimulated(false);
     // Client-side premium gate — skip edge function for non-subscribers.
     // Wait until subscription status has loaded so we don't bounce subscribers
     // to the upsell during a brief loading window.
@@ -237,6 +257,10 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       }
 
       if (error) {
+        if (isTransientCallServiceError(error, data, status, code)) {
+          startSimulatedCall(mode);
+          return;
+        }
         const msg = error.message || "Could not start call";
         setErrorMessage(msg);
         setCallStatus("error");
@@ -248,10 +272,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       const token: string | undefined = data?.token;
       const newSessionId: string | undefined = data?.sessionId;
       if (!roomUrl) {
-        const msg = "Call service unavailable. Please try again.";
-        setErrorMessage(msg);
-        setCallStatus("error");
-        toast.error(msg);
+        startSimulatedCall(mode);
         return;
       }
       if (newSessionId) sessionIdRef.current = newSessionId;
@@ -267,10 +288,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         setCallStatus(others.length > 0 ? "connected" : "waiting");
       } catch (joinErr) {
         if (cancelledRef.current) return;
-        const msg = joinErr instanceof Error ? joinErr.message : "Failed to join call";
-        setErrorMessage(msg);
-        setCallStatus("error");
-        toast.error(msg);
+        // Daily SDK couldn't establish — surface a graceful fallback too.
+        startSimulatedCall(mode);
         return;
       }
       if (mode === "rejoining") {
@@ -278,12 +297,16 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       }
     } catch (e) {
       if (cancelledRef.current) return;
+      if (isTransientCallServiceError(e, null, undefined, undefined)) {
+        startSimulatedCall(mode);
+        return;
+      }
       const msg = e instanceof Error ? e.message : "Could not start call";
       setErrorMessage(msg);
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId, joinDailyRoom, subscribed, premiumLoading]);
+  }, [matchId, callType, joinDailyRoom, subscribed, premiumLoading, startSimulatedCall]);
 
   useEffect(() => {
     if (!open) {

@@ -7,6 +7,7 @@ import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import { useState } from "react";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+import TourHighlight from "@/components/TourHighlight";
 
 type Tool = {
   id: string;
@@ -133,7 +134,7 @@ const InnerWorld = () => {
         </motion.div>
 
         {/* Tools */}
-        <div className="grid gap-4">
+        <TourHighlight targetId="inner-world-hub" className="grid gap-4">
           {TOOLS.map((tool, i) => {
             const Icon = tool.icon;
             const locked = isLocked(tool);
@@ -201,7 +202,7 @@ const InnerWorld = () => {
               </motion.div>
             );
           })}
-        </div>
+        </TourHighlight>
 
         {/* Footer CTA */}
         {!isVipOrYearly && (

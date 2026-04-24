@@ -5,6 +5,7 @@ import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { useTourHighlight } from "@/hooks/useTourHighlight";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {

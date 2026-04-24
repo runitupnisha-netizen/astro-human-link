@@ -494,6 +494,15 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           </div>
         )}
 
+        {/* Demo mode pill — shown whenever we fall back from the live call service */}
+        {simulated && callStatus !== "ended" && (
+          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div className="px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm bg-accent/20 text-accent">
+              Demo mode · live calling unavailable
+            </div>
+          </div>
+        )}
+
         {/* Caller info */}
         <div className={`flex-1 w-full max-w-md mx-auto px-6 flex flex-col items-center justify-center gap-5 sm:gap-6 z-10 min-h-0 ${callType === "video" && callStatus === "connected" && remoteJoined ? "opacity-0 pointer-events-none" : ""}`}>
           {/* Pulsing avatar */}

@@ -197,15 +197,22 @@ const PremiumRequiredScreen = ({
           </div>
         </div>
 
+        {/* Status chip */}
+        <div className="flex justify-center mb-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-300/30 text-amber-200 text-xs font-medium">
+            <BadgeIcon className="w-3.5 h-3.5" />
+            {content.badge.label}
+          </span>
+        </div>
+
         <h2
           id="premium-required-title"
           className="font-display text-2xl font-bold text-foreground mb-2"
         >
-          {featureLabel} are a Premium Ritual
+          {content.title}
         </h2>
         <p className="text-sm text-foreground/70 leading-relaxed mb-6">
-          Connect heart-to-heart with your matches through secure, end-to-end
-          calls. Unlock with Stellara Premium and meet the soul behind the stars.
+          {content.description}
         </p>
 
         {/* Bullets */}
@@ -231,7 +238,7 @@ const PremiumRequiredScreen = ({
             className="w-full h-12 bg-gradient-golden text-background font-semibold shadow-golden hover:opacity-95"
           >
             <Crown className="w-4 h-4 mr-2" />
-            Upgrade to Premium
+            {content.upgradeLabel}
           </Button>
           {onRetry && (
             <Button

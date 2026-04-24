@@ -463,6 +463,30 @@ const CosmicGuide = () => {
         >
           your cosmic guide · always here
         </p>
+        {voice.speaking && (
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <div className="flex items-end gap-[3px] h-3">
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "60%", animationDuration: "0.7s" }}
+              />
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "100%", animationDuration: "0.5s", animationDelay: "0.1s" }}
+              />
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "70%", animationDuration: "0.6s", animationDelay: "0.2s" }}
+              />
+            </div>
+            <span
+              className="text-[11px]"
+              style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+            >
+              Lyra is speaking…
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Messages area */}

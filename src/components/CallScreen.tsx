@@ -30,6 +30,32 @@ type CallStatus =
 
 const MAX_REJOIN_ATTEMPTS = 3;
 
+// When the edge function can't be reached (offline, deploy hiccup, 5xx),
+// we transparently fall back to a *simulated* call so the UX never dead-ends.
+// No real media is exchanged; the local UI runs the same ringing → connected
+// flow with a synthetic timer. A subtle "Demo mode" pill keeps it honest.
+const isTransientCallServiceError = (
+  err: unknown,
+  data: any,
+  status: number | undefined,
+  code: string | undefined,
+): boolean => {
+  if (code === "PREMIUM_REQUIRED" || status === 403) return false;
+  if (status && status >= 400 && status < 500 && status !== 408 && status !== 429) {
+    // 4xx other than timeout/rate-limit are real client errors, don't sim.
+    return false;
+  }
+  // Treat network errors, 5xx, function-not-found, and missing roomUrl as transient.
+  if (status && status >= 500) return true;
+  if (err) {
+    const msg = (err as any)?.message?.toLowerCase?.() || "";
+    if (/failed to fetch|network|timeout|fetch failed|load failed/i.test(msg)) return true;
+    if (/not found|404/i.test(msg)) return true;
+  }
+  if (!data?.roomUrl && !data?.url) return true;
+  return false;
+};
+
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
   const { subscribed, loading: premiumLoading } = usePremium();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
@@ -41,6 +67,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [showPremium, setShowPremium] = useState(false);
   const [remoteJoined, setRemoteJoined] = useState(false);
   const [networkQuality, setNetworkQuality] = useState<"good" | "low" | "very-low" | null>(null);
+  const [simulated, setSimulated] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
   const callObjectRef = useRef<DailyCall | null>(null);

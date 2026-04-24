@@ -280,7 +280,11 @@ serve(async (req) => {
         message: "Request body is not valid JSON",
         userId: user.id,
       });
-      return json({ error: "Request body must be valid JSON" }, 400);
+      return errorResponse(
+        "INVALID_JSON",
+        "Request body must be valid JSON",
+        400,
+      );
     }
 
     const rawMatchId = parsedBody.matchId;
@@ -294,10 +298,7 @@ serve(async (req) => {
         userId: user.id,
         details: { receivedType: typeof rawMatchId },
       });
-      return json(
-        { error: "matchId is required", code: "MATCH_ID_REQUIRED" },
-        400,
-      );
+      return errorResponse("MATCH_ID_REQUIRED", "matchId is required", 400);
     }
     const matchId = rawMatchId.trim();
 
@@ -311,8 +312,9 @@ serve(async (req) => {
         userId: user.id,
         details: { matchId: matchId.slice(0, 64) },
       });
-      return json(
-        { error: "matchId must be a valid UUID", code: "MATCH_ID_INVALID" },
+      return errorResponse(
+        "MATCH_ID_INVALID",
+        "matchId must be a valid UUID",
         400,
       );
     }
@@ -338,7 +340,11 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json({ error: "Could not validate match" }, 500);
+      return errorResponse(
+        "MATCH_LOOKUP_FAILED",
+        "Could not validate match",
+        500,
+      );
     }
 
     if (!match) {
@@ -350,10 +356,7 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        { error: "Match not found", code: "MATCH_NOT_FOUND" },
-        404,
-      );
+      return errorResponse("MATCH_NOT_FOUND", "Match not found", 404);
     }
 
     if (match.user_a !== user.id && match.user_b !== user.id) {
@@ -365,11 +368,9 @@ serve(async (req) => {
         userId: user.id,
         matchId,
       });
-      return json(
-        {
-          error: "You are not a participant of this match",
-          code: "NOT_MATCH_PARTICIPANT",
-        },
+      return errorResponse(
+        "NOT_MATCH_PARTICIPANT",
+        "You are not a participant of this match",
         403,
       );
     }

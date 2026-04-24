@@ -481,16 +481,17 @@ serve(async (req) => {
           },
         });
         if (roomRes.status === 401 || roomRes.status === 403) {
-          return json(
-            {
-              error:
-                "Calling service rejected our credentials. Please contact support.",
-              code: "DAILY_API_KEY_INVALID",
-            },
+          return errorResponse(
+            "DAILY_API_KEY_INVALID",
+            "Calling service rejected our credentials. Please contact support.",
             503,
           );
         }
-        return json({ error: "Failed to create call room" }, 502);
+        return errorResponse(
+          "DAILY_ROOM_FAILED",
+          "Failed to create call room",
+          502,
+        );
       }
       room = await roomRes.json();
 
@@ -553,16 +554,17 @@ serve(async (req) => {
         },
       });
       if (tokenRes.status === 401 || tokenRes.status === 403) {
-        return json(
-          {
-            error:
-              "Calling service rejected our credentials. Please contact support.",
-            code: "DAILY_API_KEY_INVALID",
-          },
+        return errorResponse(
+          "DAILY_API_KEY_INVALID",
+          "Calling service rejected our credentials. Please contact support.",
           503,
         );
       }
-      return json({ error: "Failed to create call token" }, 502);
+      return errorResponse(
+        "DAILY_TOKEN_FAILED",
+        "Failed to create call token",
+        502,
+      );
     }
 
     const { token: meetingToken } = await tokenRes.json();

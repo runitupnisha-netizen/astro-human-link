@@ -476,7 +476,7 @@ const CheckConnection = () => {
                 ) : (
                   <button
                     type="submit"
-                    disabled={!birthDate || !birthPlace}
+                    disabled={!birthDate || !birthPlace || !confirmed}
                     className="w-full rounded-full py-3.5 text-sm font-medium transition-opacity disabled:opacity-50"
                     style={{
                       background: "radial-gradient(circle at 35% 30%, #8b5cf6, #6d28d9)",

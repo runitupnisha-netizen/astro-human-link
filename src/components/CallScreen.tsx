@@ -427,6 +427,76 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     co.setLocalVideo(!videoOff);
   }, [videoOff, callStatus, callType, simulated]);
 
+  // Poll Daily for connection-quality stats (RTT, jitter, packet loss).
+  // Daily exposes getNetworkStats() which aggregates the underlying
+  // RTCStatsReport for us. We sample every 2s while the call is live.
+  useEffect(() => {
+    if (simulated) return;
+    const co = callObjectRef.current;
+    if (!co) return;
+    if (callStatus !== "connected" && callStatus !== "reconnecting") return;
+
+    let cancelled = false;
+    const sample = async () => {
+      const co2 = callObjectRef.current;
+      if (!co2 || cancelled) return;
+      try {
+        const stats: any = await co2.getNetworkStats();
+        if (cancelled) return;
+        const latest = stats?.stats?.latest ?? stats?.latest ?? {};
+        const worst = stats?.stats?.worstNetworkQuality ?? null;
+
+        // Daily reports timers in seconds; convert to ms for display.
+        const rttSec =
+          typeof latest.videoRecvLatestRoundTripTime === "number"
+            ? latest.videoRecvLatestRoundTripTime
+            : typeof latest.audioRecvLatestRoundTripTime === "number"
+              ? latest.audioRecvLatestRoundTripTime
+              : null;
+        const jitterSec =
+          typeof latest.videoRecvJitter === "number"
+            ? latest.videoRecvJitter
+            : typeof latest.audioRecvJitter === "number"
+              ? latest.audioRecvJitter
+              : null;
+        const lossPct =
+          typeof latest.videoRecvPacketLoss === "number"
+            ? latest.videoRecvPacketLoss * 100
+            : typeof latest.audioRecvPacketLoss === "number"
+              ? latest.audioRecvPacketLoss * 100
+              : null;
+        const kbps =
+          typeof latest.videoRecvBitsPerSecond === "number"
+            ? latest.videoRecvBitsPerSecond / 1000
+            : null;
+
+        setCallStats({
+          rttMs: rttSec != null ? Math.round(rttSec * 1000) : null,
+          jitterMs: jitterSec != null ? Math.round(jitterSec * 1000) : null,
+          packetLossPct: lossPct != null ? Math.max(0, Math.round(lossPct * 10) / 10) : null,
+          videoRecvKbps: kbps != null ? Math.round(kbps) : null,
+        });
+
+        // Daily also reports a coarse worstNetworkQuality (1=best, 5=worst);
+        // map it to our existing "good/low/very-low" pill if no event has fired.
+        if (typeof worst === "number") {
+          const mapped: "good" | "low" | "very-low" =
+            worst >= 4 ? "very-low" : worst >= 3 ? "low" : "good";
+          setNetworkQuality((prev) => prev ?? mapped);
+        }
+      } catch {
+        // getNetworkStats can throw early in the call; ignore and try again.
+      }
+    };
+
+    sample();
+    const id = window.setInterval(sample, 2000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [callStatus, simulated]);
+
   const handleRejoin = useCallback(() => {
     if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {
       toast.error("Unable to reconnect. Please try again later.");

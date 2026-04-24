@@ -887,6 +887,16 @@ const Settings = () => {
                   </span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
+                <button
+                  onClick={() => navigate("/referral")}
+                  className="w-full flex items-center justify-between p-3 rounded-lg border transition-all"
+                  style={{ background: "rgba(208, 180, 247, 0.06)", borderColor: "rgba(208, 180, 247, 0.3)" }}
+                >
+                  <span className="font-medium flex items-center gap-2" style={{ color: "#d0b4f7" }}>
+                    <Gift className="w-4 h-4" /> Invite your cosmic twin ✦
+                  </span>
+                  <ChevronRight className="w-4 h-4" style={{ color: "#d0b4f7" }} />
+                </button>
               </CardContent>
             </Card>
 

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Heart, Zap, Star, Sun, Moon, User, Flame, Droplets, Wind, Mountain, ChevronDown, MessageCircle, Loader2, Lock, Crown } from "lucide-react";
 import SynastryChart from "@/components/SynastryChart";
 import EnergyAttractionMap from "@/components/EnergyAttractionMap";
+import SparkleLoader from "@/components/SparkleLoader";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
 import soulConnectionImg from "@/assets/soul-connection.jpg";
 import { Button } from "@/components/ui/button";
@@ -233,20 +234,7 @@ const Compatibility = () => {
       <div className="min-h-screen bg-background relative">
         <CosmicBackground />
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen gap-6">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl scale-150 animate-pulse" />
-            <div className="relative w-20 h-20 rounded-full bg-gradient-mystical flex items-center justify-center shadow-mystical">
-              <Sparkles className="w-10 h-10 text-accent" />
-            </div>
-          </motion.div>
-          <div className="text-center">
-            <h2 className="font-display text-xl font-bold text-foreground mb-2">Getting to Know Your Match</h2>
-            <p className="text-muted-foreground text-sm font-serif">Crunching the cosmic numbers…</p>
-          </div>
+          <SparkleLoader size={48} label="Mapping your synastry..." />
         </div>
       </div>
     );

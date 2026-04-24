@@ -137,6 +137,21 @@ const PremiumRequiredScreen = ({
             <Crown className="w-4 h-4 mr-2" />
             Upgrade to Premium
           </Button>
+          {onRetry && (
+            <Button
+              variant="outline"
+              onClick={handleRetry}
+              disabled={retrying}
+              className="w-full h-11 border-amber-300/40 text-amber-200 hover:text-amber-100 hover:bg-amber-400/10"
+            >
+              {retrying ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              {retrying ? "Retrying…" : retryLabel}
+            </Button>
+          )}
           <Button
             variant="ghost"
             onClick={onClose}

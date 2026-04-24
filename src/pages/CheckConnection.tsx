@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -35,6 +36,42 @@ type SavedCheck = {
 
 const FREE_MONTHLY_LIMIT = 2;
 
+// 18+ guard — chart must belong to an adult
+const eighteenYearsAgo = (() => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d;
+})();
+const earliestBirthDate = new Date("1900-01-01");
+
+const checkSchema = z.object({
+  theirName: z
+    .string()
+    .trim()
+    .max(40, "Name must be 40 characters or fewer")
+    .regex(/^[\p{L}\p{M}'’\-\s.]*$/u, "Use letters, spaces, hyphens or apostrophes only"),
+  birthDate: z
+    .string()
+    .min(1, "Birth date is required")
+    .refine((v) => !isNaN(Date.parse(v)), "Enter a valid date")
+    .refine((v) => new Date(v) >= earliestBirthDate, "Date must be after 1900")
+    .refine((v) => new Date(v) <= eighteenYearsAgo, "Person must be 18 or older"),
+  birthTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (24-hour)")
+    .or(z.literal("")),
+  birthPlace: z
+    .string()
+    .trim()
+    .min(2, "City is required")
+    .max(120, "City must be 120 characters or fewer"),
+  confirmed: z.literal(true, {
+    message: "Please confirm whose chart you're reading",
+  }),
+});
+
+type FieldErrors = Partial<Record<"theirName" | "birthDate" | "birthTime" | "birthPlace" | "confirmed", string>>;
+
 const CheckConnection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -46,6 +83,8 @@ const CheckConnection = () => {
   const [birthTime, setBirthTime] = useState("");
   const [skipTime, setSkipTime] = useState(false);
   const [birthPlace, setBirthPlace] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [reading, setReading] = useState<Reading | null>(null);
   const [saved, setSaved] = useState<SavedCheck[]>([]);
   const [showSaved, setShowSaved] = useState(false);
@@ -77,10 +116,27 @@ const CheckConnection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!birthDate || !birthPlace) {
-      toast.error("Birth date and city are required");
+    setErrors({});
+
+    const result = checkSchema.safeParse({
+      theirName,
+      birthDate,
+      birthTime: skipTime ? "" : birthTime,
+      birthPlace,
+      confirmed,
+    });
+
+    if (!result.success) {
+      const fieldErrors: FieldErrors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof FieldErrors;
+        if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Please fix the highlighted fields");
       return;
     }
+
     if (limitReached) {
       toast.error("You've used your 2 free connections this month");
       return;
@@ -145,6 +201,8 @@ const CheckConnection = () => {
     setBirthTime("");
     setSkipTime(false);
     setBirthPlace("");
+    setConfirmed(false);
+    setErrors({});
     setStep("form");
   };
 
@@ -208,7 +266,7 @@ const CheckConnection = () => {
                 className="text-sm text-center mt-3 leading-relaxed"
                 style={{ color: "#a89ac8", fontFamily: "Poppins, sans-serif" }}
               >
-                Enter their birth details to see your cosmic compatibility — they don't need to be on Stellara.
+                Enter the birth details of <span style={{ color: "#d0b4f7" }}>the person you're curious about</span> — they don't need to be on Stellara.
               </p>
 
               <div
@@ -221,7 +279,7 @@ const CheckConnection = () => {
                 <Sparkles className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#d0b4f7" }} />
                 <p className="text-sm" style={{ color: "#d0b4f7", fontFamily: "Lora, Georgia, serif" }}>
                   <span className="opacity-70">Lyra: </span>
-                  I can read any chart. Who are you curious about?
+                  Whose chart am I reading? Make sure these details are <em>theirs</em>, not yours — I'll use your own chart automatically.
                 </p>
               </div>
 
@@ -233,46 +291,71 @@ const CheckConnection = () => {
                   <input
                     type="text"
                     value={theirName}
-                    onChange={(e) => setTheirName(e.target.value)}
-                    placeholder="A name helps personalize the reading"
+                    onChange={(e) => {
+                      setTheirName(e.target.value);
+                      if (errors.theirName) setErrors((p) => ({ ...p, theirName: undefined }));
+                    }}
+                    placeholder="e.g. Jordan — a name personalizes the reading"
                     maxLength={40}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none"
                     style={{
                       backgroundColor: "rgba(77, 58, 92, 0.35)",
-                      border: "1px solid rgba(208, 180, 247, 0.2)",
+                      border: errors.theirName
+                        ? "1px solid rgba(251, 113, 133, 0.6)"
+                        : "1px solid rgba(208, 180, 247, 0.2)",
                       color: "#e0d4ff",
                       fontFamily: "Poppins, sans-serif",
                     }}
                   />
+                  {errors.theirName && (
+                    <p className="text-[11px] mt-1.5" style={{ color: "#fda4af" }}>
+                      {errors.theirName}
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="text-xs block mb-1.5" style={{ color: "#a89ac8" }}>
-                    Date of birth <span className="text-rose-300">*</span>
+                    Their date of birth <span className="text-rose-300">*</span>
                   </label>
                   <input
                     type="date"
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                    max={eighteenYearsAgo.toISOString().slice(0, 10)}
+                    min="1900-01-01"
+                    onChange={(e) => {
+                      setBirthDate(e.target.value);
+                      if (errors.birthDate) setErrors((p) => ({ ...p, birthDate: undefined }));
+                    }}
                     required
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none"
                     style={{
                       backgroundColor: "rgba(77, 58, 92, 0.35)",
-                      border: "1px solid rgba(208, 180, 247, 0.2)",
+                      border: errors.birthDate
+                        ? "1px solid rgba(251, 113, 133, 0.6)"
+                        : "1px solid rgba(208, 180, 247, 0.2)",
                       color: "#e0d4ff",
                       fontFamily: "Poppins, sans-serif",
                     }}
                   />
+                  {errors.birthDate && (
+                    <p className="text-[11px] mt-1.5" style={{ color: "#fda4af" }}>
+                      {errors.birthDate}
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs" style={{ color: "#a89ac8" }}>
-                      Time of birth
+                      Their time of birth
                     </label>
                     <button
                       type="button"
-                      onClick={() => setSkipTime((v) => !v)}
+                      onClick={() => {
+                        setSkipTime((v) => !v);
+                        setErrors((p) => ({ ...p, birthTime: undefined }));
+                      }}
                       className="text-xs underline"
                       style={{ color: "#d0b4f7" }}
                     >
@@ -280,18 +363,30 @@ const CheckConnection = () => {
                     </button>
                   </div>
                   {!skipTime ? (
-                    <input
-                      type="time"
-                      value={birthTime}
-                      onChange={(e) => setBirthTime(e.target.value)}
-                      className="w-full rounded-xl px-4 py-3 text-sm outline-none"
-                      style={{
-                        backgroundColor: "rgba(77, 58, 92, 0.35)",
-                        border: "1px solid rgba(208, 180, 247, 0.2)",
-                        color: "#e0d4ff",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    />
+                    <>
+                      <input
+                        type="time"
+                        value={birthTime}
+                        onChange={(e) => {
+                          setBirthTime(e.target.value);
+                          if (errors.birthTime) setErrors((p) => ({ ...p, birthTime: undefined }));
+                        }}
+                        className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                        style={{
+                          backgroundColor: "rgba(77, 58, 92, 0.35)",
+                          border: errors.birthTime
+                            ? "1px solid rgba(251, 113, 133, 0.6)"
+                            : "1px solid rgba(208, 180, 247, 0.2)",
+                          color: "#e0d4ff",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      />
+                      {errors.birthTime && (
+                        <p className="text-[11px] mt-1.5" style={{ color: "#fda4af" }}>
+                          {errors.birthTime}
+                        </p>
+                      )}
+                    </>
                   ) : (
                     <p className="text-[11px] px-1" style={{ color: "#7a6a9a" }}>
                       Without birth time, Moon and Rising are approximate.
@@ -301,14 +396,58 @@ const CheckConnection = () => {
 
                 <div>
                   <label className="text-xs block mb-1.5" style={{ color: "#a89ac8" }}>
-                    City of birth <span className="text-rose-300">*</span>
+                    Their city of birth <span className="text-rose-300">*</span>
                   </label>
                   <LocationAutocomplete
                     value={birthPlace}
-                    onChange={setBirthPlace}
+                    onChange={(v) => {
+                      setBirthPlace(v);
+                      if (errors.birthPlace) setErrors((p) => ({ ...p, birthPlace: undefined }));
+                    }}
                     placeholder="City, country"
                   />
+                  {errors.birthPlace && (
+                    <p className="text-[11px] mt-1.5" style={{ color: "#fda4af" }}>
+                      {errors.birthPlace}
+                    </p>
+                  )}
                 </div>
+
+                {/* Confirmation — prevents accidentally reading your own chart twice */}
+                <label
+                  className="flex items-start gap-2.5 rounded-xl p-3 cursor-pointer select-none"
+                  style={{
+                    backgroundColor: "rgba(77, 58, 92, 0.3)",
+                    border: errors.confirmed
+                      ? "1px solid rgba(251, 113, 133, 0.55)"
+                      : "1px solid rgba(208, 180, 247, 0.18)",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={confirmed}
+                    onChange={(e) => {
+                      setConfirmed(e.target.checked);
+                      if (errors.confirmed) setErrors((p) => ({ ...p, confirmed: undefined }));
+                    }}
+                    className="mt-0.5 h-4 w-4 rounded accent-[#d0b4f7] shrink-0"
+                  />
+                  <span
+                    className="text-[12px] leading-relaxed"
+                    style={{ color: "#c9b8f0", fontFamily: "Poppins, sans-serif" }}
+                  >
+                    I confirm these details belong to{" "}
+                    <strong style={{ color: "#e0d4ff" }}>
+                      {theirName.trim() || "the person I'm checking"}
+                    </strong>
+                    , not me, and I have a real-world reason to read their chart.
+                  </span>
+                </label>
+                {errors.confirmed && (
+                  <p className="text-[11px] -mt-2" style={{ color: "#fda4af" }}>
+                    {errors.confirmed}
+                  </p>
+                )}
 
                 {limitReached ? (
                   <div
@@ -337,7 +476,7 @@ const CheckConnection = () => {
                 ) : (
                   <button
                     type="submit"
-                    disabled={!birthDate || !birthPlace}
+                    disabled={!birthDate || !birthPlace || !confirmed}
                     className="w-full rounded-full py-3.5 text-sm font-medium transition-opacity disabled:opacity-50"
                     style={{
                       background: "radial-gradient(circle at 35% 30%, #8b5cf6, #6d28d9)",

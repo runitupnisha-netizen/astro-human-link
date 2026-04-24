@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
 import { toast } from "sonner";
 import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
+import { usePremium } from "@/hooks/usePremium";
 
 interface CallScreenProps {
   open: boolean;
@@ -30,6 +31,7 @@ type CallStatus =
 const MAX_REJOIN_ATTEMPTS = 3;
 
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
+  const { subscribed, loading: premiumLoading } = usePremium();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejoinAttempt, setRejoinAttempt] = useState(0);
@@ -182,6 +184,14 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
     setCallStatus(mode);
     setErrorMessage(null);
+    // Client-side premium gate — skip edge function for non-subscribers.
+    // Wait until subscription status has loaded so we don't bounce subscribers
+    // to the upsell during a brief loading window.
+    if (premiumLoading) return;
+    if (!subscribed) {
+      setShowPremium(true);
+      return;
+    }
     try {
       const { data, error } = await supabase.functions.invoke(
         "create-call-room",
@@ -243,7 +253,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId, joinDailyRoom]);
+  }, [matchId, joinDailyRoom, subscribed, premiumLoading]);
 
   useEffect(() => {
     if (!open) {
@@ -262,7 +272,10 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     }
 
     cancelledRef.current = false;
-    provisionRoom("connecting");
+    // Don't fire until subscription state is known
+    if (!premiumLoading) {
+      provisionRoom("connecting");
+    }
 
     // Hang up cleanly if the user navigates away or closes the tab
     const handleBeforeUnload = () => {
@@ -277,7 +290,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handleBeforeUnload);
     };
-  }, [open, callType, provisionRoom, teardownCallObject]);
+  }, [open, callType, provisionRoom, teardownCallObject, premiumLoading]);
 
   // Promote waiting → connected as soon as a remote participant arrives
   useEffect(() => {

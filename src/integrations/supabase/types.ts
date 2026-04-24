@@ -168,6 +168,39 @@ export type Database = {
           },
         ]
       }
+      call_provisioning_errors: {
+        Row: {
+          created_at: string
+          details: Json
+          error_category: string
+          http_status: number | null
+          id: string
+          match_id: string | null
+          message: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          error_category: string
+          http_status?: number | null
+          id?: string
+          match_id?: string | null
+          message?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          error_category?: string
+          http_status?: number | null
+          id?: string
+          match_id?: string | null
+          message?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       call_rooms: {
         Row: {
           created_at: string

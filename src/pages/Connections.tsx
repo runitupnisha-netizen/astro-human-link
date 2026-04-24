@@ -429,7 +429,7 @@ const Connections = () => {
                   </Card>
                 </motion.div>
               ))}
-            </div>
+            </TourHighlight>
           )}
         </div>
       </div>

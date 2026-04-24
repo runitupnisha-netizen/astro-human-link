@@ -341,13 +341,29 @@ const Premium = () => {
                     onClick={async () => {
                       setPollingTimedOut(false);
                       setVerifying(true);
+                      verifyLog("manual-recheck");
                       try {
                         await refreshSubscription();
                       } finally {
                         setVerifying(false);
                         // If still not subscribed, surface the timeout state again
                         // so the user isn't stuck on a hidden overlay.
-                        if (!subscribed) setPollingTimedOut(true);
+                        const ok = subscribedRef.current;
+                        verifyLog("manual-recheck-result", { subscribed: ok });
+                        if (ok) {
+                          toast({
+                            title: "Premium verified ✨",
+                            description: "Your subscription is now active.",
+                          });
+                        } else {
+                          setPollingTimedOut(true);
+                          toast({
+                            title: "Still not confirmed",
+                            description:
+                              "Stripe hasn't reported your subscription yet. Please try again in a moment.",
+                            variant: "destructive",
+                          });
+                        }
                       }
                     }}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 min-h-[44px]"

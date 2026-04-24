@@ -913,10 +913,16 @@ const Messages = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => { setCallType("voice"); setShowCallScreen(true); }}>
+                            <DropdownMenuItem onClick={() => {
+                              if (!isPremium) { setShowCallUpsell("voice_call"); return; }
+                              setCallType("voice"); setShowCallScreen(true);
+                            }}>
                               <Phone className="w-4 h-4 mr-2" /> Voice Call
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setCallType("video"); setShowCallScreen(true); }}>
+                            <DropdownMenuItem onClick={() => {
+                              if (!isPremium) { setShowCallUpsell("video_call"); return; }
+                              setCallType("video"); setShowCallScreen(true);
+                            }}>
                               <span className="mr-2">📹</span> Video Call
                             </DropdownMenuItem>
                           </DropdownMenuContent>

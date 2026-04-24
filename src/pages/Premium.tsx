@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2 } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +86,14 @@ const Premium = () => {
   const canceled = searchParams.get("canceled");
   const redirectTo = searchParams.get("redirect") || "/discover";
   const [verifying, setVerifying] = useState(false);
+  // Tracks whether the post-checkout polling loop exhausted its attempts
+  // without ever observing an active subscription. When true we swap the
+  // overlay to a "Upgrade not confirmed yet" state with retry guidance,
+  // instead of leaving the user on an empty pricing page wondering what
+  // happened. Stripe webhooks usually settle within seconds, but card
+  // verification, 3DS, or webhook backlog can occasionally push it past
+  // our ~24s polling window.
+  const [pollingTimedOut, setPollingTimedOut] = useState(false);
 
   useEffect(() => {
     if (toastShown.current) return;
@@ -107,6 +116,7 @@ const Premium = () => {
     let attempts = 0;
     const maxAttempts = 12; // ~24s at 2s interval
     setVerifying(true);
+    setPollingTimedOut(false);
 
     const tick = async () => {
       if (cancelled) return;
@@ -125,6 +135,9 @@ const Premium = () => {
       if (attempts >= maxAttempts) {
         clearInterval(interval);
         setVerifying(false);
+        // Only flip to "timed out" if we still don't see an active sub.
+        // The other effect (success + subscribed) handles the happy path.
+        if (!subscribed) setPollingTimedOut(true);
         return;
       }
       await tick();
@@ -134,7 +147,7 @@ const Premium = () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [success, refreshSubscription]);
+  }, [success, refreshSubscription, subscribed]);
 
   // Once subscription is confirmed active after a successful checkout, redirect.
   useEffect(() => {
@@ -142,6 +155,7 @@ const Premium = () => {
     if (subscribed) {
       redirectTriggered.current = true;
       setVerifying(false);
+      setPollingTimedOut(false);
       const t = setTimeout(() => navigate(redirectTo, { replace: true }), 1200);
       return () => clearTimeout(t);
     }
@@ -149,6 +163,8 @@ const Premium = () => {
 
   const handleCheckout = async (tierKey: TierKey) => {
     setCheckoutLoading(tierKey);
+    // Dismiss the timeout overlay if the user is starting a new checkout.
+    setPollingTimedOut(false);
     try {
       await checkout(STELLARA_TIERS[tierKey].price_id, redirectTo);
     } catch {
@@ -177,9 +193,9 @@ const Premium = () => {
   return (
     <div className="min-h-screen bg-background pt-16 pb-24">
       {/* Post-checkout verification overlay */}
-      {success && (verifying || subscribed) && (
+      {success && (verifying || subscribed || pollingTimedOut) && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-md">
-          <div className="text-center max-w-xs px-6">
+          <div className="text-center max-w-sm px-6">
             {subscribed ? (
               <>
                 <Crown className="w-12 h-12 text-accent mx-auto mb-4" />
@@ -187,6 +203,70 @@ const Premium = () => {
                 <p className="text-sm text-muted-foreground font-body">
                   Redirecting you back to the app…
                 </p>
+              </>
+            ) : pollingTimedOut ? (
+              <>
+                <AlertCircle className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h2 className="font-display text-xl text-foreground mb-2">
+                  Upgrade not confirmed yet
+                </h2>
+                <p className="text-sm text-muted-foreground font-body mb-4 leading-relaxed">
+                  Your payment may still be processing on Stripe's end. This
+                  usually clears within a minute. You can:
+                </p>
+                <ul className="text-left text-sm text-muted-foreground font-body space-y-2 mb-5 mx-auto max-w-[280px]">
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Wait a moment and tap{" "}
+                    <span className="text-foreground font-semibold">Check again</span>
+                  </li>
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Re-open checkout if your card was declined or 3DS was canceled
+                  </li>
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Contact support if your card was charged but Premium isn't active
+                  </li>
+                </ul>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={async () => {
+                      setPollingTimedOut(false);
+                      setVerifying(true);
+                      try {
+                        await refreshSubscription();
+                      } finally {
+                        setVerifying(false);
+                        // If still not subscribed, surface the timeout state again
+                        // so the user isn't stuck on a hidden overlay.
+                        if (!subscribed) setPollingTimedOut(true);
+                      }
+                    }}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 min-h-[44px]"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Check again
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPollingTimedOut(false);
+                      // Scroll the user to the plan picker so they can retry checkout.
+                      document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="border-accent/30 text-accent hover:bg-accent/10 min-h-[44px]"
+                  >
+                    Retry checkout
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/contact")}
+                    className="text-muted-foreground hover:text-foreground text-sm min-h-[40px]"
+                  >
+                    Contact support
+                  </Button>
+                </div>
               </>
             ) : (
               <>

@@ -883,6 +883,7 @@ const Messages = () => {
                   </div>
                 </CardContent>
               </Card>
+              </TourHighlight>
 
               {/* Chat Area */}
               <Card className={`bg-card/80 backdrop-blur-sm border-border/50 lg:col-span-2 overflow-hidden ${!showMobileChat ? "hidden lg:block" : ""}`}>

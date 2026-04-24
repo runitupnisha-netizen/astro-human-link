@@ -167,6 +167,7 @@ const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isSupported, permission, subscribe } = usePushNotifications();
+  const { subscribed: isPro, manageSubscription, refreshSubscription } = usePremium();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");

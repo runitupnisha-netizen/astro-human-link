@@ -134,11 +134,11 @@ const InnerWorld = () => {
         </motion.div>
 
         {/* Tools */}
-        <TourHighlight targetId="inner-world-hub" className="grid gap-4">
+        <div className="grid gap-4">
           {TOOLS.map((tool, i) => {
             const Icon = tool.icon;
             const locked = isLocked(tool);
-            return (
+            const card = (
               <motion.div
                 key={tool.id}
                 initial={{ opacity: 0, y: 12 }}
@@ -201,8 +201,20 @@ const InnerWorld = () => {
                 </Card>
               </motion.div>
             );
+
+            // Highlight ONLY the first tool (Daily Briefing) when arriving
+            // from the onboarding tour — it's the canonical entry point and
+            // the only tool any subscriber tier can open.
+            if (i === 0) {
+              return (
+                <TourHighlight key={tool.id} targetId="inner-world-first-tool">
+                  {card}
+                </TourHighlight>
+              );
+            }
+            return card;
           })}
-        </TourHighlight>
+        </div>
 
         {/* Footer CTA */}
         {!isVipOrYearly && (

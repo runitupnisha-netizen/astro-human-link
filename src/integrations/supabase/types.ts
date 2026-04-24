@@ -872,6 +872,7 @@ export type Database = {
           interests: string[] | null
           is_incognito: boolean
           is_paused: boolean
+          is_suspended: boolean
           kids_preference: string | null
           last_seen_at: string | null
           life_path_number: number | null
@@ -942,6 +943,7 @@ export type Database = {
           interests?: string[] | null
           is_incognito?: boolean
           is_paused?: boolean
+          is_suspended?: boolean
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
@@ -1012,6 +1014,7 @@ export type Database = {
           interests?: string[] | null
           is_incognito?: boolean
           is_paused?: boolean
+          is_suspended?: boolean
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
@@ -1124,6 +1127,9 @@ export type Database = {
           reason: string
           reported_id: string
           reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
         }
         Insert: {
           created_at?: string
@@ -1132,6 +1138,9 @@ export type Database = {
           reason: string
           reported_id: string
           reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Update: {
           created_at?: string
@@ -1140,6 +1149,9 @@ export type Database = {
           reason?: string
           reported_id?: string
           reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -1274,6 +1286,27 @@ export type Database = {
           created_at?: string
           id?: string
           target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -1523,6 +1556,13 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_match_participant: {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
@@ -1546,7 +1586,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1673,6 +1713,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

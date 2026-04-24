@@ -129,12 +129,13 @@ export const usePremium = () => {
         );
       }
       const result = await purchaseProduct(planKey);
-      if (result.ok) {
+      if (result.ok === true) {
         await checkSubscription();
         return;
+      } else {
+        if (result.userCancelled) return;
+        throw new Error(result.error ?? "Purchase failed");
       }
-      if (result.userCancelled) return;
-      throw new Error(result.error ?? "Purchase failed");
     }
 
     try {

@@ -146,10 +146,10 @@ const FindMatch = () => {
       <CosmicBackground />
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-24 pb-32 md:pt-32">
         <button
-          onClick={() => navigate("/inner-world")}
+          onClick={() => navigate("/profile")}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
-          <ArrowLeft className="w-4 h-4" /> Inner World
+          <ArrowLeft className="w-4 h-4" /> My Cosmos
         </button>
 
         <motion.div

@@ -135,7 +135,7 @@ const InnerWorld = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate("/my-chart")}
+              onClick={() => navigate("/profile")}
               className="border-accent/30 text-accent hover:bg-accent/10"
             >
               <Star className="w-4 h-4 mr-1.5" />

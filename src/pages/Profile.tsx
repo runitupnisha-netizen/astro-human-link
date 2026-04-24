@@ -599,7 +599,7 @@ const Profile = () => {
                     variant="outline"
                     size="sm"
                     className="border-border/60 hover:bg-muted/30"
-                    onClick={() => navigate("/my-chart")}
+                    onClick={() => navigate("/profile")}
                   >
                     Full results
                   </Button>

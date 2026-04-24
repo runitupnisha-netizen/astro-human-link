@@ -112,11 +112,13 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
+  const [lyraDemoComplete, setLyraDemoComplete] = useState(false);
 
   useEffect(() => {
     if (forceOpen) {
       setStepIdx(0);
       setOpen(true);
+      setLyraDemoComplete(false);
       return;
     }
     try {

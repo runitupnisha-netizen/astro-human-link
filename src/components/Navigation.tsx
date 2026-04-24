@@ -19,7 +19,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -142,8 +142,8 @@ const Navigation = () => {
               <NotificationBell />
               <button
                 onClick={async () => {
-                  await supabase.auth.signOut();
-                  window.location.href = "/auth";
+                  // Centralized signOut: marks explicit + hard-reloads to /auth
+                  await signOut();
                 }}
                 className="hidden md:flex items-center gap-1 px-2 py-2 lg:px-2.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
                 title="Sign Out"
@@ -246,8 +246,7 @@ const Navigation = () => {
                     <button
                       onClick={async () => {
                         setIsOpen(false);
-                        await supabase.auth.signOut();
-                        window.location.href = "/auth";
+                        await signOut();
                       }}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-destructive/10 transition-colors text-left"
                     >

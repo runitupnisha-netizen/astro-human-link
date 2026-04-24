@@ -7,6 +7,8 @@ import {
   Ecliptic,
   SiderealTime,
 } from "npm:astronomy-engine@2.1.19";
+import tzLookup from "npm:tz-lookup@6.1.25";
+import { DateTime } from "npm:luxon@3.7.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,9 +30,35 @@ function signFromLongitude(lonDeg: number): string {
   return ZODIAC_SIGNS[Math.floor(norm / 30)];
 }
 
-function buildBirthUTC(birthDate: string, birthTime: string | null, longitudeDeg: number | null): Date {
+function resolveTz(latDeg: number | null, lngDeg: number | null): string | null {
+  if (latDeg == null || lngDeg == null) return null;
+  if (!Number.isFinite(latDeg) || !Number.isFinite(lngDeg)) return null;
+  try { return tzLookup(latDeg, lngDeg); } catch { return null; }
+}
+
+/**
+ * Convert local birth date/time → exact UTC Date using the IANA zone for the
+ * birth coordinates. Honors DST + historical offsets (e.g. NYC 1990 EST,
+ * LA 1985 PDT). Falls back to longitude/15 if lat is missing.
+ */
+function buildBirthUTC(
+  birthDate: string,
+  birthTime: string | null,
+  longitudeDeg: number | null,
+  latitudeDeg: number | null = null,
+): Date {
   const [y, m, d] = birthDate.split("-").map(Number);
   const [hh, mm] = (birthTime ?? "12:00").split(":").map(Number);
+
+  const zone = resolveTz(latitudeDeg, longitudeDeg);
+  if (zone) {
+    const dt = DateTime.fromObject(
+      { year: y, month: (m ?? 1), day: (d ?? 1), hour: hh ?? 12, minute: mm ?? 0, second: 0 },
+      { zone },
+    );
+    if (dt.isValid) return dt.toUTC().toJSDate();
+  }
+
   const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
   const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
   return new Date(asUTC - offsetHours * 3600 * 1000);

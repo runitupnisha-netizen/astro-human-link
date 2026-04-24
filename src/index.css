@@ -224,6 +224,20 @@
   }
 }
 
+/* Soft outline pulse used by <TourHighlight> when the user is deep-linked
+   into a feature from the onboarding tour. Animates only the outline color
+   so children opacity / layout are never affected. */
+@keyframes tourPulse {
+  0%, 100% {
+    outline-color: hsl(var(--accent) / 0.7);
+    box-shadow: 0 0 0 6px hsl(var(--accent) / 0.12);
+  }
+  50% {
+    outline-color: hsl(var(--accent) / 0.25);
+    box-shadow: 0 0 0 10px hsl(var(--accent) / 0.04);
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

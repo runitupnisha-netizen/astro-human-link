@@ -238,6 +238,14 @@
   }
 }
 
+/* Respect users who've requested reduced motion: keep the static outline
+   so the highlight is still visible, but stop the pulsing animation. */
+@media (prefers-reduced-motion: reduce) {
+  [data-tour-highlight] {
+    animation: none !important;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

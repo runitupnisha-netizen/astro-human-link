@@ -103,6 +103,8 @@ const Messages = () => {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showCallScreen, setShowCallScreen] = useState(false);
   const [callType, setCallType] = useState<"voice" | "video">("voice");
+  const [showCallUpsell, setShowCallUpsell] = useState<null | "voice_call" | "video_call">(null);
+  const { subscribed: isPremium } = usePremium();
   const [searchQuery, setSearchQuery] = useState("");
   const [pinnedMatchIds, setPinnedMatchIds] = useState<Set<string>>(new Set());
   const [showBirthChart, setShowBirthChart] = useState(false);

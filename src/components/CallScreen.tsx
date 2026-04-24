@@ -432,7 +432,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         </div>
 
         {/* Call controls */}
-        <div className="pb-16 pt-8">
+        <div className="pb-16 pt-8 relative z-20">
           <div className="flex items-center gap-6">
             <Button
               size="icon"

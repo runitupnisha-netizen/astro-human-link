@@ -209,8 +209,11 @@ const AppRoutes = () => {
             <Route path="/achievements" element={<PageTransition><ProtectedRoute><Achievements /></ProtectedRoute></PageTransition>} />
             <Route path="/astro-events" element={<PageTransition><ProtectedRoute><AstroEvents /></ProtectedRoute></PageTransition>} />
             <Route path="/briefing" element={<PageTransition><ProtectedRoute><DailyBriefing /></ProtectedRoute></PageTransition>} />
-            <Route path="/inner-world" element={<PageTransition><ProtectedRoute><InnerWorld /></ProtectedRoute></PageTransition>} />
-            <Route path="/my-chart" element={<PageTransition><ProtectedRoute><MyChart /></ProtectedRoute></PageTransition>} />
+            {/* Legacy routes — redirected to /profile (My Cosmos merged screen) */}
+            <Route path="/inner-world" element={<Navigate to="/profile" replace />} />
+            <Route path="/my-chart" element={<Navigate to="/profile" replace />} />
+            <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
+            <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
             <Route path="/growth" element={<PageTransition><ProtectedRoute><Growth /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/ritual" element={<PageTransition><ProtectedRoute><DailyRitual /></ProtectedRoute></PageTransition>} />

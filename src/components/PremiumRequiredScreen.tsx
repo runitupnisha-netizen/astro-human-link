@@ -1,21 +1,34 @@
 import { motion } from "framer-motion";
-import { Crown, X, Sparkles, Phone, Video } from "lucide-react";
+import { Crown, X, Sparkles, Phone, Video, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 interface PremiumRequiredScreenProps {
   open: boolean;
   onClose: () => void;
   feature?: "voice" | "video" | "generic";
+  /**
+   * Optional retry handler. When provided, a "Retry" button appears that
+   * lets the user re-invoke the gated action (e.g. create-call-room) without
+   * closing the call flow. Useful right after upgrading to premium.
+   * Should resolve when the retry attempt is complete; throw/reject to keep
+   * this screen visible.
+   */
+  onRetry?: () => void | Promise<void>;
+  retryLabel?: string;
 }
 
 const PremiumRequiredScreen = ({
   open,
   onClose,
   feature = "video",
+  onRetry,
+  retryLabel = "Retry call",
 }: PremiumRequiredScreenProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [retrying, setRetrying] = useState(false);
 
   if (!open) return null;
 
@@ -31,6 +44,16 @@ const PremiumRequiredScreen = ({
     onClose();
     const back = `${location.pathname}${location.search}`;
     navigate(`/premium?redirect=${encodeURIComponent(back)}`);
+  };
+
+  const handleRetry = async () => {
+    if (!onRetry || retrying) return;
+    try {
+      setRetrying(true);
+      await onRetry();
+    } finally {
+      setRetrying(false);
+    }
   };
 
   return (
@@ -114,6 +137,21 @@ const PremiumRequiredScreen = ({
             <Crown className="w-4 h-4 mr-2" />
             Upgrade to Premium
           </Button>
+          {onRetry && (
+            <Button
+              variant="outline"
+              onClick={handleRetry}
+              disabled={retrying}
+              className="w-full h-11 border-amber-300/40 text-amber-200 hover:text-amber-100 hover:bg-amber-400/10"
+            >
+              {retrying ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              {retrying ? "Retrying…" : retryLabel}
+            </Button>
+          )}
           <Button
             variant="ghost"
             onClick={onClose}

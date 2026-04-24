@@ -187,6 +187,22 @@ const Navigation = () => {
                       <span>{t("nav.settings")}</span>
                     </Link>
                     <Link
+                      to="/guide"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Wand2 className="w-5 h-5" />
+                      <span>Ask Lyra</span>
+                    </Link>
+                    <Link
+                      to="/inner-world"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Moon className="w-5 h-5" />
+                      <span>Inner World</span>
+                    </Link>
+                    <Link
                       to="/achievements"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"

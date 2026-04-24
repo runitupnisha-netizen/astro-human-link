@@ -2,7 +2,21 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Camera, RotateCcw, Upload, CheckCircle2, Clock, Loader2, BadgeCheck } from "lucide-react";
+import {
+  Camera,
+  RotateCcw,
+  Upload,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  BadgeCheck,
+  AlertTriangle,
+  Sun,
+  Smile,
+  Glasses,
+  EyeOff,
+  ShieldCheck,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +24,14 @@ import { markSessionVerified } from "@/hooks/useVerificationGate";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";
+type Step = 1 | 2 | 3;
+
+const TIPS: { icon: typeof Sun; label: string; ok: boolean }[] = [
+  { icon: Sun, label: "Bright, even lighting", ok: true },
+  { icon: Smile, label: "Face the camera, neutral expression", ok: true },
+  { icon: EyeOff, label: "No hats, masks, or filters", ok: false },
+  { icon: Glasses, label: "Remove sunglasses", ok: false },
+];
 
 const SelfieVerification = () => {
   const { user } = useAuth();
@@ -24,6 +46,7 @@ const SelfieVerification = () => {
   const [cameraActive, setCameraActive] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState<Step>(1);
 
   // Check existing verification status
   useEffect(() => {

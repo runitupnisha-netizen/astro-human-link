@@ -590,6 +590,33 @@ export type Database = {
           },
         ]
       }
+      moon_journal_entries: {
+        Row: {
+          content: string
+          created_at: string
+          entry_type: string
+          id: string
+          phase: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          entry_type: string
+          id?: string
+          phase: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entry_type?: string
+          id?: string
+          phase?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -1065,6 +1092,57 @@ export type Database = {
           reason?: string
           reported_id?: string
           reporter_id?: string
+        }
+        Relationships: []
+      }
+      shadow_journal_entries: {
+        Row: {
+          created_at: string
+          entry: string
+          id: string
+          prompt: string
+          prompt_index: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry: string
+          id?: string
+          prompt: string
+          prompt_index?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry?: string
+          id?: string
+          prompt?: string
+          prompt_index?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      soulmate_sketches: {
+        Row: {
+          generated_at: string
+          id: string
+          sketch_text: string
+          user_id: string
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          sketch_text: string
+          user_id: string
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          sketch_text?: string
+          user_id?: string
         }
         Relationships: []
       }

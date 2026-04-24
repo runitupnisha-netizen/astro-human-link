@@ -20,6 +20,9 @@ import SpotifyConnect from "@/components/SpotifyConnect";
 import SelfieVerification from "@/components/SelfieVerification";
 import { hasSkippedVerification, clearVerificationSkip } from "@/hooks/useVerificationGate";
 import { useAccessibility } from "@/hooks/useAccessibility";
+import { usePremium } from "@/hooks/usePremium";
+
+const APP_VERSION = "1.0.0";
 
 const LanguageCard = () => {
   const { language, setLanguage, languages } = useTranslation();

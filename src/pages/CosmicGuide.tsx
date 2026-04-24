@@ -377,7 +377,29 @@ const CosmicGuide = () => {
         >
           <MessageSquare className="w-5 h-5" />
         </button>
-        <div className="w-9" />
+        {voice.supported ? (
+          <button
+            onClick={() => {
+              if (voice.speaking) {
+                voice.stop();
+              } else {
+                const next = !voice.enabled;
+                voice.setEnabled(next);
+                if (!next) voice.stop();
+                voice.dismissPrimer();
+                setShowVoicePrimer(false);
+              }
+            }}
+            className="p-2 rounded-full hover:bg-[#4d3a5c]/40 transition-colors"
+            aria-label={voice.enabled ? "Mute Lyra" : "Hear Lyra speak"}
+            title={voice.enabled ? "Lyra voice is on — tap to mute" : "Hear Lyra speak"}
+            style={{ color: voice.enabled ? "#d0b4f7" : "#7a6a9a" }}
+          >
+            {voice.enabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </button>
+        ) : (
+          <div className="w-9" />
+        )}
       </div>
 
       {/* Lyra avatar header */}

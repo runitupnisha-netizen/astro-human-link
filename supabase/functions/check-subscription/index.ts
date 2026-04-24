@@ -53,6 +53,23 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Demo / reviewer accounts get permanent Pro (App Store + Play Store reviewers)
+    const DEMO_PRO_EMAILS = new Set([
+      "demo@stellara.app",
+    ]);
+    if (user.email && DEMO_PRO_EMAILS.has(user.email.toLowerCase())) {
+      logStep("Demo reviewer account, granting Pro", { email: user.email });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: "prod_U9mYrOjy0ezljw", // yearly tier
+        price_id: "price_1TBSzeGjQT3v2NNSSd7TLkPn",
+        subscription_end: "2027-12-31T23:59:59.000Z",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 

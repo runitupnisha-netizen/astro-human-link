@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   ArrowRight,
   X as XIcon,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +26,8 @@ interface TourStep {
   body: string;
   hint?: string;
   cta?: { label: string; path: string; highlight?: string };
+  /** When true, renders the interactive Lyra demo below the body. */
+  lyraDemo?: boolean;
 }
 
 const TOUR_STEPS: TourStep[] = [

@@ -66,7 +66,7 @@ const checkSchema = z.object({
     .min(2, "City is required")
     .max(120, "City must be 120 characters or fewer"),
   confirmed: z.literal(true, {
-    errorMap: () => ({ message: "Please confirm whose chart you're reading" }),
+    message: "Please confirm whose chart you're reading",
   }),
 });
 

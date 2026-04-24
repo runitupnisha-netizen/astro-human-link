@@ -594,15 +594,25 @@ const Profile = () => {
                   <Sparkles className="w-5 h-5 text-accent" />
                   Soul Blueprint Card
                 </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-accent/30 text-accent hover:bg-accent/10"
-                  onClick={handleShareBlueprint}
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-border/60 hover:bg-muted/30"
+                    onClick={() => navigate("/my-chart")}
+                  >
+                    Full results
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-accent/30 text-accent hover:bg-accent/10"
+                    onClick={handleShareBlueprint}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground mb-4 font-serif">A snapshot of your profile you can share</p>
               <div ref={blueprintRef}>

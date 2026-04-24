@@ -282,6 +282,10 @@ const Onboarding = () => {
   const [preferredLanguage, setPreferredLanguage] = useState<string>("");
   const [aboutMe, setAboutMe] = useState<string>("");
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
+  // Privacy & Safety consent (final step)
+  const [consentVerification, setConsentVerification] = useState(false);
+  const [consentDataUsage, setConsentDataUsage] = useState(false);
+  const [consentSafetyTools, setConsentSafetyTools] = useState(false);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();

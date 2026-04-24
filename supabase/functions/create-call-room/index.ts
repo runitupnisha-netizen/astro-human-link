@@ -392,6 +392,20 @@ serve(async (req) => {
         status: tokenRes.status,
         errText,
       });
+      await recordProvisioningError(supabase, {
+        category: tokenRes.status === 401 || tokenRes.status === 403
+          ? "daily_api_key"
+          : "daily_token_create",
+        httpStatus: tokenRes.status,
+        message: `Daily meeting-token creation failed (${tokenRes.status})`,
+        userId: user.id,
+        matchId,
+        details: {
+          roomName,
+          providerStatus: tokenRes.status,
+          providerBody: errText.slice(0, 500),
+        },
+      });
       if (tokenRes.status === 401 || tokenRes.status === 403) {
         return json(
           {

@@ -546,7 +546,9 @@ const CosmicGuide = () => {
       >
         <div className="max-w-2xl mx-auto">
           <div
-            className="flex items-center gap-2 rounded-full px-2 py-2"
+            className={`flex items-center gap-2 rounded-full px-2 py-2 transition-shadow duration-500 ${
+              inputHighlight ? "ring-2 ring-accent/70 animate-pulse" : ""
+            }`}
             style={{
               backgroundColor: "rgba(77, 58, 92, 0.3)",
               border: "1px solid rgba(208, 180, 247, 0.2)",

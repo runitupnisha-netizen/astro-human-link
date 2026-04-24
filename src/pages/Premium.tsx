@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2 } from "lucide-react";
+import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X } from "lucide-react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -300,6 +300,18 @@ const Premium = () => {
 
   return (
     <div className="min-h-screen bg-background pt-16 pb-24">
+      {/* Always-visible close button so users can exit the paywall */}
+      <button
+        onClick={() => {
+          if (window.history.length > 1) navigate(-1);
+          else navigate("/growth", { replace: true });
+        }}
+        aria-label="Close"
+        className="fixed top-3 right-3 z-[110] w-11 h-11 rounded-full bg-background/70 backdrop-blur border border-border/50 hover:bg-background/90 active:scale-95 transition-all flex items-center justify-center touch-manipulation"
+      >
+        <X className="w-5 h-5 text-foreground/80" />
+      </button>
+
       {/* Post-checkout verification overlay */}
       {success && (verifying || subscribed || pollingTimedOut) && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-md">

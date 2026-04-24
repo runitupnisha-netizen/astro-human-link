@@ -3,7 +3,7 @@ import { Crown, Heart, Eye, Sparkles, Shield, Star, X, Undo2, Rocket, EyeOff } f
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 
-type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes" | "boost" | "incognito";
+type FeatureKey = "super_like" | "who_liked_me" | "synastry" | "filters" | "unlimited_swipes" | "undo" | "daily_likes" | "boost" | "incognito" | "video_call" | "voice_call";
 
 interface PremiumUpsellModalProps {
   open: boolean;
@@ -56,6 +56,16 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     title: "Incognito Mode",
     description: "Browse profiles invisibly — only appear to people you like",
     icon: <EyeOff className="w-6 h-6" />,
+  },
+  video_call: {
+    title: "Video Calls",
+    description: "Meet face-to-face before meeting in person — premium only",
+    icon: <Sparkles className="w-6 h-6" />,
+  },
+  voice_call: {
+    title: "Voice Calls",
+    description: "Hear their voice and feel the connection — premium only",
+    icon: <Sparkles className="w-6 h-6" />,
   },
 };
 

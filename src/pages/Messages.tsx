@@ -37,6 +37,8 @@ import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
 import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
+import { usePremium } from "@/hooks/usePremium";
 
 interface Match {
   id: string;
@@ -101,6 +103,8 @@ const Messages = () => {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showCallScreen, setShowCallScreen] = useState(false);
   const [callType, setCallType] = useState<"voice" | "video">("voice");
+  const [showCallUpsell, setShowCallUpsell] = useState<null | "voice_call" | "video_call">(null);
+  const { subscribed: isPremium } = usePremium();
   const [searchQuery, setSearchQuery] = useState("");
   const [pinnedMatchIds, setPinnedMatchIds] = useState<Set<string>>(new Set());
   const [showBirthChart, setShowBirthChart] = useState(false);
@@ -909,10 +913,16 @@ const Messages = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => { setCallType("voice"); setShowCallScreen(true); }}>
+                            <DropdownMenuItem onClick={() => {
+                              if (!isPremium) { setShowCallUpsell("voice_call"); return; }
+                              setCallType("voice"); setShowCallScreen(true);
+                            }}>
                               <Phone className="w-4 h-4 mr-2" /> Voice Call
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setCallType("video"); setShowCallScreen(true); }}>
+                            <DropdownMenuItem onClick={() => {
+                              if (!isPremium) { setShowCallUpsell("video_call"); return; }
+                              setCallType("video"); setShowCallScreen(true);
+                            }}>
                               <span className="mr-2">📹</span> Video Call
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -1315,6 +1325,12 @@ const Messages = () => {
           score={selectedConvo.match.compatibility_score || 0}
         />
       )}
+      {/* Premium upsell for calls */}
+      <PremiumUpsellModal
+        open={showCallUpsell !== null}
+        onClose={() => setShowCallUpsell(null)}
+        feature={showCallUpsell ?? "video_call"}
+      />
     </div>
   );
 };

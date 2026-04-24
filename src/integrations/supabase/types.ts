@@ -275,6 +275,54 @@ export type Database = {
         }
         Relationships: []
       }
+      connection_checks: {
+        Row: {
+          compatibility_score: number | null
+          created_at: string
+          highlight: string | null
+          id: string
+          summary: string | null
+          their_birth_date: string
+          their_birth_place: string
+          their_birth_time: string | null
+          their_moon_sign: string | null
+          their_name: string | null
+          their_rising_sign: string | null
+          their_sun_sign: string | null
+          user_id: string
+        }
+        Insert: {
+          compatibility_score?: number | null
+          created_at?: string
+          highlight?: string | null
+          id?: string
+          summary?: string | null
+          their_birth_date: string
+          their_birth_place: string
+          their_birth_time?: string | null
+          their_moon_sign?: string | null
+          their_name?: string | null
+          their_rising_sign?: string | null
+          their_sun_sign?: string | null
+          user_id: string
+        }
+        Update: {
+          compatibility_score?: number | null
+          created_at?: string
+          highlight?: string | null
+          id?: string
+          summary?: string | null
+          their_birth_date?: string
+          their_birth_place?: string
+          their_birth_time?: string | null
+          their_moon_sign?: string | null
+          their_name?: string | null
+          their_rising_sign?: string | null
+          their_sun_sign?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_briefings: {
         Row: {
           affirmation: string | null

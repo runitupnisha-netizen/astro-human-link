@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
+import { Send, Plus, Trash2, MessageSquare, Loader2, X, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import SparkleLoader from "@/components/SparkleLoader";
 import { toast } from "@/hooks/use-toast";
 import { useTourHighlight } from "@/hooks/useTourHighlight";
+import { useLyraVoice } from "@/hooks/useLyraVoice";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -35,6 +36,9 @@ const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
 const CosmicGuide = () => {
   const { user } = useAuth();
   const inputHighlight = useTourHighlight("lyra-input");
+  const voice = useLyraVoice();
+  const [showVoicePrimer, setShowVoicePrimer] = useState(false);
+  const lastSpokenRef = useRef<string>("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -87,6 +91,24 @@ const CosmicGuide = () => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, streaming]);
+
+  // When streaming finishes, speak the latest assistant message (if voice on)
+  // and trigger the first-time primer hint after Lyra's first reply ever.
+  useEffect(() => {
+    if (streaming) return;
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "assistant" || !last.content) return;
+    if (lastSpokenRef.current === last.content) return;
+    lastSpokenRef.current = last.content;
+
+    if (voice.enabled) {
+      voice.speak(last.content);
+    } else if (voice.firstTimePrimerPending) {
+      setShowVoicePrimer(true);
+      voice.dismissPrimer();
+      window.setTimeout(() => setShowVoicePrimer(false), 5000);
+    }
+  }, [streaming, messages, voice]);
 
   const createConversation = async (firstMessage?: string): Promise<string | null> => {
     if (!user) return null;
@@ -355,7 +377,29 @@ const CosmicGuide = () => {
         >
           <MessageSquare className="w-5 h-5" />
         </button>
-        <div className="w-9" />
+        {voice.supported ? (
+          <button
+            onClick={() => {
+              if (voice.speaking) {
+                voice.stop();
+              } else {
+                const next = !voice.enabled;
+                voice.setEnabled(next);
+                if (!next) voice.stop();
+                voice.dismissPrimer();
+                setShowVoicePrimer(false);
+              }
+            }}
+            className="p-2 rounded-full hover:bg-[#4d3a5c]/40 transition-colors"
+            aria-label={voice.enabled ? "Mute Lyra" : "Hear Lyra speak"}
+            title={voice.enabled ? "Lyra voice is on — tap to mute" : "Hear Lyra speak"}
+            style={{ color: voice.enabled ? "#d0b4f7" : "#7a6a9a" }}
+          >
+            {voice.enabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          </button>
+        ) : (
+          <div className="w-9" />
+        )}
       </div>
 
       {/* Lyra avatar header */}
@@ -419,6 +463,30 @@ const CosmicGuide = () => {
         >
           your cosmic guide · always here
         </p>
+        {voice.speaking && (
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <div className="flex items-end gap-[3px] h-3">
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "60%", animationDuration: "0.7s" }}
+              />
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "100%", animationDuration: "0.5s", animationDelay: "0.1s" }}
+              />
+              <span
+                className="w-[3px] rounded-full animate-pulse"
+                style={{ backgroundColor: "#7F77DD", height: "70%", animationDuration: "0.6s", animationDelay: "0.2s" }}
+              />
+            </div>
+            <span
+              className="text-[11px]"
+              style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+            >
+              Lyra is speaking…
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Messages area */}
@@ -532,6 +600,26 @@ const CosmicGuide = () => {
                     />
                   </div>
                 </div>
+              )}
+              {showVoicePrimer && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-start"
+                >
+                  <p
+                    className="text-[11px] px-4 py-2 rounded-full"
+                    style={{
+                      color: "#d0b4f7",
+                      backgroundColor: "rgba(77, 58, 92, 0.35)",
+                      border: "1px solid rgba(208, 180, 247, 0.18)",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    ✦ Want to hear Lyra? Tap the speaker icon to listen.
+                  </p>
+                </motion.div>
               )}
             </>
           )}

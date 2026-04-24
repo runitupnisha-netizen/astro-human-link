@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
+import { Send, Plus, Trash2, MessageSquare, Loader2, X, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import SparkleLoader from "@/components/SparkleLoader";
 import { toast } from "@/hooks/use-toast";
 import { useTourHighlight } from "@/hooks/useTourHighlight";
+import { useLyraVoice } from "@/hooks/useLyraVoice";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {

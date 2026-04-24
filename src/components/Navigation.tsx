@@ -64,7 +64,7 @@ const Navigation = () => {
     { path: "/", label: t("nav.profile"), icon: User },
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
-    { path: "/inner-world", label: "Inner World", icon: Moon },
+    { path: "/inner-world", label: "My Cosmos", icon: Moon },
     { path: "/guide", label: "Lyra", icon: Wand2 },
     { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
@@ -200,7 +200,7 @@ const Navigation = () => {
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
                     >
                       <Moon className="w-5 h-5" />
-                      <span>Inner World</span>
+                      <span>My Cosmos</span>
                     </Link>
                     <Link
                       to="/achievements"

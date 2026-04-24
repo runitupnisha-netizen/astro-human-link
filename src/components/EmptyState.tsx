@@ -45,7 +45,7 @@ const emptyStates = {
     icon: Compass,
     title: "The cosmos is aligning your matches. ✦",
     description: "A complete birth chart attracts the most aligned connections.",
-    cta: "Complete My Chart",
+    cta: "Complete My Cosmos",
     route: "/my-cosmos",
     gradient: "from-primary/20 via-accent/10 to-secondary/20",
   },

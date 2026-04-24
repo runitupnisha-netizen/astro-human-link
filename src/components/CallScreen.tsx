@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall } from "lucide-react";
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall, Activity, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
@@ -70,6 +70,13 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [remoteJoined, setRemoteJoined] = useState(false);
   const [networkQuality, setNetworkQuality] = useState<"good" | "low" | "very-low" | null>(null);
   const [simulated, setSimulated] = useState(false);
+  const [callStats, setCallStats] = useState<{
+    rttMs: number | null;
+    jitterMs: number | null;
+    packetLossPct: number | null;
+    videoRecvKbps: number | null;
+  }>({ rttMs: null, jitterMs: null, packetLossPct: null, videoRecvKbps: null });
+  const [statsExpanded, setStatsExpanded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
   const callObjectRef = useRef<DailyCall | null>(null);
@@ -366,6 +373,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setRemoteJoined(false);
       setNetworkQuality(null);
       setSimulated(false);
+      setCallStats({ rttMs: null, jitterMs: null, packetLossPct: null, videoRecvKbps: null });
+      setStatsExpanded(false);
       peerHasJoinedOnceRef.current = false;
       sessionIdRef.current = null;
       teardownCallObject();
@@ -417,6 +426,76 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     if (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting") return;
     co.setLocalVideo(!videoOff);
   }, [videoOff, callStatus, callType, simulated]);
+
+  // Poll Daily for connection-quality stats (RTT, jitter, packet loss).
+  // Daily exposes getNetworkStats() which aggregates the underlying
+  // RTCStatsReport for us. We sample every 2s while the call is live.
+  useEffect(() => {
+    if (simulated) return;
+    const co = callObjectRef.current;
+    if (!co) return;
+    if (callStatus !== "connected" && callStatus !== "reconnecting") return;
+
+    let cancelled = false;
+    const sample = async () => {
+      const co2 = callObjectRef.current;
+      if (!co2 || cancelled) return;
+      try {
+        const stats: any = await co2.getNetworkStats();
+        if (cancelled) return;
+        const latest = stats?.stats?.latest ?? stats?.latest ?? {};
+        const worst = stats?.stats?.worstNetworkQuality ?? null;
+
+        // Daily reports timers in seconds; convert to ms for display.
+        const rttSec =
+          typeof latest.videoRecvLatestRoundTripTime === "number"
+            ? latest.videoRecvLatestRoundTripTime
+            : typeof latest.audioRecvLatestRoundTripTime === "number"
+              ? latest.audioRecvLatestRoundTripTime
+              : null;
+        const jitterSec =
+          typeof latest.videoRecvJitter === "number"
+            ? latest.videoRecvJitter
+            : typeof latest.audioRecvJitter === "number"
+              ? latest.audioRecvJitter
+              : null;
+        const lossPct =
+          typeof latest.videoRecvPacketLoss === "number"
+            ? latest.videoRecvPacketLoss * 100
+            : typeof latest.audioRecvPacketLoss === "number"
+              ? latest.audioRecvPacketLoss * 100
+              : null;
+        const kbps =
+          typeof latest.videoRecvBitsPerSecond === "number"
+            ? latest.videoRecvBitsPerSecond / 1000
+            : null;
+
+        setCallStats({
+          rttMs: rttSec != null ? Math.round(rttSec * 1000) : null,
+          jitterMs: jitterSec != null ? Math.round(jitterSec * 1000) : null,
+          packetLossPct: lossPct != null ? Math.max(0, Math.round(lossPct * 10) / 10) : null,
+          videoRecvKbps: kbps != null ? Math.round(kbps) : null,
+        });
+
+        // Daily also reports a coarse worstNetworkQuality (1=best, 5=worst);
+        // map it to our existing "good/low/very-low" pill if no event has fired.
+        if (typeof worst === "number") {
+          const mapped: "good" | "low" | "very-low" =
+            worst >= 4 ? "very-low" : worst >= 3 ? "low" : "good";
+          setNetworkQuality((prev) => prev ?? mapped);
+        }
+      } catch {
+        // getNetworkStats can throw early in the call; ignore and try again.
+      }
+    };
+
+    sample();
+    const id = window.setInterval(sample, 2000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [callStatus, simulated]);
 
   const handleRejoin = useCallback(() => {
     if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {
@@ -590,16 +669,70 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           </Button>
         </div>
 
-        {/* Network quality pill (visible during connected/reconnecting) */}
-        {(callStatus === "connected" || callStatus === "reconnecting") && networkQuality && networkQuality !== "good" && (
-          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <div className={`px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm ${
-              networkQuality === "very-low"
-                ? "bg-destructive/20 text-destructive"
-                : "bg-accent/20 text-accent"
-            }`}>
-              {networkQuality === "very-low" ? "Poor connection" : "Weak connection"}
-            </div>
+        {/* Connection-health indicator (visible during connected/reconnecting).
+            Tap to expand for latency / jitter / packet-loss detail. */}
+        {(callStatus === "connected" || callStatus === "reconnecting") && !simulated && (
+          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20">
+            <button
+              type="button"
+              onClick={() => setStatsExpanded((v) => !v)}
+              aria-expanded={statsExpanded}
+              aria-label="Toggle connection stats"
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm transition-colors ${
+                networkQuality === "very-low"
+                  ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
+                  : networkQuality === "low"
+                    ? "bg-accent/20 text-accent hover:bg-accent/30"
+                    : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+              }`}
+            >
+              <Activity className="w-3 h-3" />
+              <span>
+                {networkQuality === "very-low"
+                  ? "Poor connection"
+                  : networkQuality === "low"
+                    ? "Weak connection"
+                    : "Good connection"}
+              </span>
+              {statsExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+            <AnimatePresence>
+              {statsExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="mt-2 mx-auto w-max min-w-[180px] rounded-xl bg-background/70 backdrop-blur-md border border-border/40 px-3 py-2 text-[11px] text-foreground/90 shadow-lg"
+                >
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">Latency</span>
+                    <span className="font-mono">{callStats.rttMs != null ? `${callStats.rttMs} ms` : "—"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4 mt-0.5">
+                    <span className="text-muted-foreground">Jitter</span>
+                    <span className="font-mono">{callStats.jitterMs != null ? `${callStats.jitterMs} ms` : "—"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4 mt-0.5">
+                    <span className="text-muted-foreground">Packet loss</span>
+                    <span className={`font-mono ${
+                      callStats.packetLossPct != null && callStats.packetLossPct >= 5
+                        ? "text-destructive"
+                        : callStats.packetLossPct != null && callStats.packetLossPct >= 2
+                          ? "text-accent"
+                          : ""
+                    }`}>
+                      {callStats.packetLossPct != null ? `${callStats.packetLossPct}%` : "—"}
+                    </span>
+                  </div>
+                  {callType === "video" && (
+                    <div className="flex justify-between gap-4 mt-0.5">
+                      <span className="text-muted-foreground">Video bitrate</span>
+                      <span className="font-mono">{callStats.videoRecvKbps != null ? `${callStats.videoRecvKbps} kbps` : "—"}</span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 

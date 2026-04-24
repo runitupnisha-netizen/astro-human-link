@@ -589,7 +589,7 @@ const Premium = () => {
             </Button>
           </motion.div>
         )}
-      </div>
+      </TourHighlight>
     </div>
   );
 };

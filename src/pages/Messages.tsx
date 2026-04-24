@@ -40,6 +40,7 @@ import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import { usePremium } from "@/hooks/usePremium";
+import TourHighlight from "@/components/TourHighlight";
 
 interface Match {
   id: string;

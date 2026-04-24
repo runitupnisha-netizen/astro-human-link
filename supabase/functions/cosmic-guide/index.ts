@@ -19,6 +19,7 @@ function buildSystemPrompt(profile: Record<string, unknown> | null): string {
   if (p.sun_sign) bits.push(`Sun ${p.sun_sign}`);
   if (p.moon_sign) bits.push(`Moon ${p.moon_sign}`);
   if (p.rising_sign) bits.push(`Rising ${p.rising_sign}`);
+  if (p.venus_sign) bits.push(`Venus ${p.venus_sign}`);
   if (p.human_design_type) bits.push(`Human Design ${p.human_design_type}`);
   if (p.human_design_authority) bits.push(`${p.human_design_authority} authority`);
   if (p.human_design_profile) bits.push(`Profile ${p.human_design_profile}`);
@@ -91,7 +92,7 @@ Deno.serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "display_name,sun_sign,moon_sign,rising_sign,human_design_type,human_design_authority,human_design_profile,life_path_number,personal_year_number,gene_keys_life_purpose,astro_summary,human_design_summary,numerology_summary"
+        "display_name,sun_sign,moon_sign,rising_sign,venus_sign,human_design_type,human_design_authority,human_design_profile,life_path_number,personal_year_number,gene_keys_life_purpose,astro_summary,human_design_summary,numerology_summary"
       )
       .eq("user_id", userId)
       .maybeSingle();

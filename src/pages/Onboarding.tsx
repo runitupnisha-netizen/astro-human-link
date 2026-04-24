@@ -1328,10 +1328,10 @@ const Onboarding = () => {
                   <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                   Back
                 </Button>
-                <Button onClick={() => setShowFinishConfirm(true)} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
+                <Button onClick={() => setStep("safety")} className="flex-1 h-12 text-base font-semibold group relative overflow-hidden" style={{ background: "var(--gradient-aurora)" }}>
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    Complete My Profile
+                    Continue to Safety
                   </span>
                 </Button>
               </motion.div>

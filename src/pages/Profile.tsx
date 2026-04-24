@@ -116,6 +116,23 @@ const Profile = () => {
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState("");
   const [editUsername, setEditUsername] = useState("");
+  const [forceTour, setForceTour] = useState(false);
+
+  const handlePreviewAsNewUser = () => {
+    try {
+      // Clear all first-time-user gates so the experience replays
+      localStorage.removeItem("stellara:full-tour:v1:dismissed");
+      localStorage.removeItem("stellara:swipe-tutorial:v1:dismissed");
+      clearVerificationSkip();
+    } catch {
+      /* ignore */
+    }
+    toast({
+      title: "Preview mode ✨",
+      description: "Replaying the first-time-user experience. Visit /verify to see selfie verification.",
+    });
+    setForceTour(true);
+  };
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");
@@ -215,6 +232,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
+      <OnboardingTour forceOpen={forceTour} onClose={() => setForceTour(false)} />
       
       <div className="relative z-10 pt-24 pb-24 md:pb-12">
         <div className="max-w-lg mx-auto px-4">

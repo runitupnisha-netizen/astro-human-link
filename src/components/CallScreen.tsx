@@ -491,6 +491,23 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     return "missing";
   };
 
+  // Resume context handed to PremiumRequiredScreen so that after Stripe
+  // checkout the user lands back on Messages with the same matchId/callType
+  // and the call modal auto-reopens. Skipped when there's no matchId
+  // (e.g. demo / incoming-only flows).
+  const premiumResumeContext = matchId
+    ? {
+        type: "call",
+        returnPath: `/messages?match=${encodeURIComponent(matchId)}`,
+        payload: {
+          matchId,
+          callType,
+          callerName,
+          callerAvatar,
+        },
+      }
+    : undefined;
+
   // Hard premium gate: non-subscribers can never see the call UI or trigger
   // a join. Show only the upsell once premium status has resolved.
   if (!premiumLoading && !subscribed) {
@@ -501,6 +518,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         feature={callType}
         status={derivePremiumGateStatus()}
         subscriptionEnd={subscriptionEnd}
+        resumeContext={premiumResumeContext}
       />
     );
   }
@@ -517,6 +535,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           feature={callType}
           status={derivePremiumGateStatus()}
           subscriptionEnd={subscriptionEnd}
+          resumeContext={premiumResumeContext}
           onRetry={async () => {
             // Re-invoke create-call-room without closing the call flow.
             // If the user is now premium, the upsell will dismiss itself

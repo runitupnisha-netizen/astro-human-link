@@ -35,6 +35,7 @@ import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
+import { consumePremiumResumeContext } from "@/components/PremiumRequiredScreen";
 import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
@@ -77,7 +78,7 @@ interface ConversationData {
 const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [conversations, setConversations] = useState<ConversationData[]>([]);
@@ -305,6 +306,36 @@ const Messages = () => {
 
     loadConversations();
   }, [user, searchParams]);
+
+  // Resume an in-flight call after the user returns from /premium upgrade.
+  // PremiumRequiredScreen stashed the call context (matchId, callType, ...)
+  // in sessionStorage and tagged the redirect with `?resumeCall=<key>`.
+  // We consume it once, restore CallScreen state, and strip the param so
+  // a refresh doesn't re-trigger the modal.
+  useEffect(() => {
+    const resumeKey = searchParams.get("resumeCall");
+    if (!resumeKey || conversations.length === 0) return;
+    const ctx = consumePremiumResumeContext(resumeKey);
+    // Always strip the param so refreshes don't loop.
+    const next = new URLSearchParams(searchParams);
+    next.delete("resumeCall");
+    setSearchParams(next, { replace: true });
+    if (!ctx || ctx.type !== "call") return;
+    const payload = ctx.payload as {
+      matchId?: string;
+      callType?: "voice" | "video";
+    };
+    if (!payload.matchId) return;
+    // Make sure the conversation actually exists for this user (RLS / unmatched).
+    const found = conversations.find((c) => c.match.id === payload.matchId);
+    if (!found) return;
+    setSelectedMatchId(payload.matchId);
+    setShowMobileChat(true);
+    if (payload.callType === "voice" || payload.callType === "video") {
+      setCallType(payload.callType);
+    }
+    setShowCallScreen(true);
+  }, [conversations, searchParams, setSearchParams]);
 
   // Load pinned matches
   useEffect(() => {
@@ -1308,6 +1339,7 @@ const Messages = () => {
           callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
           callerAvatar={selectedConvo.otherProfile.avatar_url}
           callType={callType}
+          matchId={selectedConvo.match.id}
         />
       )}
       {/* Birth Chart Overlay */}

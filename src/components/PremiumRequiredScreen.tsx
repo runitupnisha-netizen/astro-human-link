@@ -18,6 +18,74 @@ export type PremiumGateStatus =
   | "unavailable"       // Stripe not configured / edge function error
   | "generic";
 
+/**
+ * Context that lets the gated flow resume after the user completes upgrade.
+ * Persisted in sessionStorage under a single-use key; the resuming page
+ * (e.g. Messages) reads `payload` and reopens the original UI (e.g. CallScreen).
+ * Keep payloads small and free of secrets — sessionStorage is per-tab plaintext.
+ */
+export interface PremiumResumeContext {
+  /** Discriminator the resuming page checks (e.g. "call"). */
+  type: string;
+  /** Path + query to navigate back to after a successful upgrade. */
+  returnPath: string;
+  /** Arbitrary state needed to rehydrate the gated UI (e.g. matchId, callType). */
+  payload: Record<string, unknown>;
+}
+
+const RESUME_STORAGE_PREFIX = "stellara:premium-resume:";
+
+/**
+ * Persists a PremiumResumeContext for handoff through the Stripe checkout
+ * round-trip. Returns the key used to look it up later. Older entries from
+ * the same tab are pruned to avoid sessionStorage growth.
+ */
+const storeResumeContext = (ctx: PremiumResumeContext): string => {
+  try {
+    const key = `${Date.now().toString(36)}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    sessionStorage.setItem(
+      `${RESUME_STORAGE_PREFIX}${key}`,
+      JSON.stringify({ ...ctx, savedAt: Date.now() }),
+    );
+    return key;
+  } catch {
+    return "";
+  }
+};
+
+/**
+ * Reads (and removes) a previously stored resume context. The resuming page
+ * should call this once on mount when it sees `?resumeCall=<key>` in the URL
+ * and act on the returned `payload` (e.g. reopen CallScreen).
+ * Returns null if the key is unknown, malformed, or older than 30 minutes
+ * (we don't want to spring open a call modal hours later).
+ */
+export const consumePremiumResumeContext = (
+  key: string,
+): PremiumResumeContext | null => {
+  if (!key) return null;
+  try {
+    const storageKey = `${RESUME_STORAGE_PREFIX}${key}`;
+    const raw = sessionStorage.getItem(storageKey);
+    if (!raw) return null;
+    sessionStorage.removeItem(storageKey);
+    const parsed = JSON.parse(raw) as PremiumResumeContext & { savedAt?: number };
+    if (parsed.savedAt && Date.now() - parsed.savedAt > 30 * 60 * 1000) {
+      return null;
+    }
+    if (!parsed.type || !parsed.payload) return null;
+    return {
+      type: parsed.type,
+      returnPath: parsed.returnPath,
+      payload: parsed.payload,
+    };
+  } catch {
+    return null;
+  }
+};
+
 interface PremiumRequiredScreenProps {
   open: boolean;
   onClose: () => void;
@@ -41,6 +109,12 @@ interface PremiumRequiredScreenProps {
    * "expired" copy so the user knows when their access lapsed.
    */
   subscriptionEnd?: string | null;
+  /**
+   * Resume context persisted before redirecting to /premium so the user
+   * lands back in the exact same gated state (e.g. CallScreen with the
+   * original matchId) after upgrade.
+   */
+  resumeContext?: PremiumResumeContext;
 }
 
 const PremiumRequiredScreen = ({
@@ -51,6 +125,7 @@ const PremiumRequiredScreen = ({
   retryLabel = "Retry call",
   status = "missing",
   subscriptionEnd = null,
+  resumeContext,
 }: PremiumRequiredScreenProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -138,7 +213,17 @@ const PremiumRequiredScreen = ({
 
   const handleUpgrade = () => {
     onClose();
-    const back = `${location.pathname}${location.search}`;
+    // Default redirect = current page. If a resume context is provided,
+    // tag the return URL with `?resumeCall=<key>` so the destination page
+    // can rehydrate the gated UI (e.g. reopen CallScreen with the same matchId).
+    let back = resumeContext?.returnPath || `${location.pathname}${location.search}`;
+    if (resumeContext) {
+      const key = storeResumeContext(resumeContext);
+      if (key) {
+        const sep = back.includes("?") ? "&" : "?";
+        back = `${back}${sep}resumeCall=${encodeURIComponent(key)}`;
+      }
+    }
     navigate(`/premium?redirect=${encodeURIComponent(back)}`);
   };
 

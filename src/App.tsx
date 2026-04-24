@@ -62,6 +62,7 @@ const DailyRitual = lazy(() => import("./pages/DailyRitual"));
 const ShadowJournal = lazy(() => import("./pages/ShadowJournal"));
 const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
+const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 
 const queryClient = new QueryClient();
 

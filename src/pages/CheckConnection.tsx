@@ -30,7 +30,7 @@ const FREE_MONTHLY_LIMIT = 2;
 const CheckConnection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium } = usePremium();
+  const { subscribed: isPremium } = usePremium();
 
   const [step, setStep] = useState<"form" | "loading" | "result">("form");
   const [theirName, setTheirName] = useState("");

@@ -1339,6 +1339,7 @@ const Messages = () => {
           callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
           callerAvatar={selectedConvo.otherProfile.avatar_url}
           callType={callType}
+          matchId={selectedConvo.match.id}
         />
       )}
       {/* Birth Chart Overlay */}

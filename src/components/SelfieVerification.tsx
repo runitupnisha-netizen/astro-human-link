@@ -87,6 +87,7 @@ const SelfieVerification = () => {
       }
       setCameraActive(true);
       setCapturedImage(null);
+      setStep(2);
     } catch {
       toast({ title: "Camera access denied", description: "Please allow camera access to verify your profile.", variant: "destructive" });
     }
@@ -119,6 +120,7 @@ const SelfieVerification = () => {
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     setCapturedImage(dataUrl);
     stopCamera();
+    setStep(3);
   }, [stopCamera]);
 
   const submitSelfie = useCallback(async () => {

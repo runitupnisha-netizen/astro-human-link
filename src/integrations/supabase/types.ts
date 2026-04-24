@@ -127,6 +127,47 @@ export type Database = {
           },
         ]
       }
+      call_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          occurred_at: string
+          participant_id: string | null
+          payload: Json
+          room_name: string
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          participant_id?: string | null
+          payload?: Json
+          room_name: string
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          participant_id?: string | null
+          payload?: Json
+          room_name?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "call_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       call_rooms: {
         Row: {
           created_at: string

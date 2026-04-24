@@ -159,6 +159,7 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
   const step = TOUR_STEPS[stepIdx];
   const Icon = step.icon;
   const isLast = stepIdx === TOUR_STEPS.length - 1;
+  const nextDisabled = !!step.lyraDemo && !lyraDemoComplete;
 
   return (
     <AnimatePresence>
@@ -237,6 +238,12 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
                   <ArrowRight className="h-3 w-3" />
                 </button>
               )}
+              {step.lyraDemo && (
+                <LyraDemo
+                  done={lyraDemoComplete}
+                  onComplete={() => setLyraDemoComplete(true)}
+                />
+              )}
             </div>
 
             <div className="flex items-center justify-center gap-1.5 pb-3">
@@ -264,8 +271,9 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
                 onClick={next}
                 className="gap-1.5 min-w-[6.5rem]"
                 style={isLast ? { background: "var(--gradient-aurora)" } : undefined}
+                disabled={nextDisabled}
               >
-                {isLast ? "Begin journey" : "Next"}
+                {isLast ? "Begin journey" : nextDisabled ? "Try Lyra first" : "Next"}
                 {!isLast && <ArrowRight className="h-3.5 w-3.5" />}
               </Button>
             </div>

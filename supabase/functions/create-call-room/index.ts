@@ -236,6 +236,13 @@ serve(async (req) => {
     const dailyApiKey = Deno.env.get("DAILY_API_KEY");
     if (!dailyApiKey || dailyApiKey.trim().length === 0) {
       log("Missing DAILY_API_KEY");
+      await recordProvisioningError(supabase, {
+        category: "daily_api_key",
+        httpStatus: 503,
+        message: "DAILY_API_KEY missing",
+        userId: user.id,
+        matchId,
+      });
       return json(
         {
           error:
@@ -250,6 +257,14 @@ serve(async (req) => {
     // making a network call.
     if (dailyApiKey.length < 20 || /\s/.test(dailyApiKey)) {
       log("DAILY_API_KEY appears malformed", { length: dailyApiKey.length });
+      await recordProvisioningError(supabase, {
+        category: "daily_api_key",
+        httpStatus: 503,
+        message: "DAILY_API_KEY appears malformed",
+        userId: user.id,
+        matchId,
+        details: { length: dailyApiKey.length },
+      });
       return json(
         {
           error:

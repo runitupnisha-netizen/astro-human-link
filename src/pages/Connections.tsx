@@ -245,11 +245,11 @@ const Connections = () => {
             </p>
           </motion.div>
 
-          {/* Check a Connection CTA — works for any name, even outside matches */}
+          {/* Check a Connection CTA — 44px min tap target */}
           <div className="flex justify-center mb-8 -mt-4">
             <button
               onClick={() => navigate("/check-connection")}
-              className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full transition-colors hover:bg-primary/10"
+              className="inline-flex items-center justify-center gap-2 min-h-[44px] text-xs px-5 py-2.5 rounded-full transition-colors hover:bg-primary/10"
               style={{
                 backgroundColor: "hsl(var(--primary) / 0.08)",
                 border: "0.5px solid hsl(var(--primary) / 0.3)",
@@ -271,22 +271,22 @@ const Connections = () => {
                 </h3>
                 <button
                   onClick={() => navigate("/check-connection")}
-                  className="text-xs text-primary hover:underline underline-offset-2"
+                  className="inline-flex items-center justify-center min-h-[36px] px-2 -mr-2 text-xs text-primary hover:underline underline-offset-2 rounded"
                 >
                   View all
                 </button>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
                 {recentChecks.map((c) => (
                   <button
                     key={c.id}
                     onClick={() => navigate(`/check-connection?rerun=${c.id}`)}
-                    className="group shrink-0 flex flex-col items-start gap-1.5 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="group shrink-0 flex flex-col items-start justify-center gap-1.5 px-4 py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[60px]"
                     style={{
                       backgroundColor: "hsl(var(--primary) / 0.06)",
                       border: "0.5px solid hsl(var(--primary) / 0.2)",
-                      minWidth: "140px",
-                      maxWidth: "180px",
+                      minWidth: "150px",
+                      maxWidth: "190px",
                     }}
                     aria-label={`Rerun cosmic check for ${c.their_name || "previous connection"}`}
                   >
@@ -452,33 +452,33 @@ const Connections = () => {
                             </p>
                           )}
 
-                          {/* Action buttons — wrap on small screens, hover on desktop */}
-                          <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                          {/* Action buttons — 44×44 min tap targets on mobile, hover-reveal on desktop */}
+                          <div className="flex flex-wrap items-center gap-2 mt-3">
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-9 px-3 text-xs border-border/50 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="min-h-[44px] h-11 md:h-9 px-3.5 text-xs border-border/50 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              <User className="w-3 h-3 mr-1" />
+                              <User className="w-3.5 h-3.5 mr-1.5" />
                               Profile
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-9 px-3 text-xs border-accent/30 text-accent md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="min-h-[44px] h-11 md:h-9 px-3.5 text-xs border-accent/30 text-accent md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/compatibility/${match.id}`); }}
                             >
-                              <Eye className="w-3 h-3 mr-1" />
+                              <Eye className="w-3.5 h-3.5 mr-1.5" />
                               Synastry
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-9 px-3 text-xs border-primary/30 text-primary md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                              className="min-h-[44px] h-11 md:h-9 px-3.5 text-xs border-primary/30 text-primary md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                               onClick={(e) => { e.stopPropagation(); navigate(`/messages?match=${match.id}`); }}
                             >
-                              <MessageCircle className="w-3 h-3 mr-1" />
+                              <MessageCircle className="w-3.5 h-3.5 mr-1.5" />
                               Chat
                             </Button>
                           </div>

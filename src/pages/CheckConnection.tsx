@@ -250,18 +250,18 @@ const CheckConnection = () => {
         }}
       />
 
-      {/* Header */}
+      {/* Header — min 44×44 tap targets per Apple HIG */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#7a6a9a] hover:text-[#c9b8f0] transition-colors"
+          className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full hover:bg-[#4d3a5c]/40 text-[#7a6a9a] hover:text-[#c9b8f0] transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <button
           onClick={() => setShowSaved(true)}
-          className="text-xs px-3 py-1.5 rounded-full transition-colors"
+          className="inline-flex items-center justify-center min-h-[44px] text-xs px-4 py-2.5 rounded-full transition-colors"
           style={{
             color: "#c9b8f0",
             backgroundColor: "rgba(77, 58, 92, 0.4)",
@@ -273,7 +273,8 @@ const CheckConnection = () => {
         </button>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center px-4 pb-32">
+      {/* Bottom padding clears the 72px mobile tab bar + safe area */}
+      <div className="relative z-10 flex-1 flex flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+96px)] md:pb-12">
         <div className="w-full max-w-md mt-4">
           {step === "form" && (
             <motion.div
@@ -381,7 +382,7 @@ const CheckConnection = () => {
                         setSkipTime((v) => !v);
                         setErrors((p) => ({ ...p, birthTime: undefined }));
                       }}
-                      className="text-xs underline"
+                      className="inline-flex items-center justify-center min-h-[36px] px-2 -mr-2 text-xs underline rounded"
                       style={{ color: "#d0b4f7" }}
                     >
                       {skipTime ? "I know it" : "I don't know"}
@@ -744,7 +745,7 @@ const CheckConnection = () => {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={reset}
-                  className="flex-1 rounded-full py-3 text-sm"
+                  className="flex-1 rounded-full min-h-[48px] py-3 text-sm"
                   style={{
                     backgroundColor: "rgba(77, 58, 92, 0.4)",
                     border: "1px solid rgba(208, 180, 247, 0.2)",
@@ -768,7 +769,7 @@ const CheckConnection = () => {
                       toast.success("Copied to clipboard ✦");
                     }
                   }}
-                  className="flex-1 rounded-full py-3 text-sm font-medium"
+                  className="flex-1 rounded-full min-h-[48px] py-3 text-sm font-medium"
                   style={{
                     background: "radial-gradient(circle at 35% 30%, #8b5cf6, #6d28d9)",
                     color: "#ffffff",
@@ -806,15 +807,16 @@ const CheckConnection = () => {
                 borderLeft: "1px solid rgba(208, 180, 247, 0.15)",
               }}
             >
-              <div className="p-4">
+              <div className="p-4 pt-[max(env(safe-area-inset-top),1rem)]">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base" style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}>
                     My Connections
                   </h3>
                   <button
                     onClick={() => setShowSaved(false)}
-                    className="text-xs"
+                    className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] -mr-2 text-xs rounded-full"
                     style={{ color: "#7a6a9a" }}
+                    aria-label="Close drawer"
                   >
                     Close
                   </button>
@@ -828,26 +830,33 @@ const CheckConnection = () => {
                     saved.map((c) => (
                       <div
                         key={c.id}
-                        className="rounded-xl px-3 py-2.5 flex items-center justify-between"
+                        className="rounded-xl px-3 py-2 flex items-center justify-between min-h-[56px]"
                         style={{
                           backgroundColor: "rgba(77, 58, 92, 0.3)",
                           border: "1px solid rgba(208, 180, 247, 0.15)",
                         }}
                       >
-                        <div>
+                        <button
+                          onClick={() => {
+                            setShowSaved(false);
+                            navigate(`/check-connection?rerun=${c.id}`);
+                          }}
+                          className="flex-1 text-left min-h-[44px] flex flex-col justify-center pr-2"
+                          aria-label={`Rerun reading for ${c.their_name || "Someone"}`}
+                        >
                           <p className="text-sm" style={{ color: "#e0d4ff" }}>
                             {c.their_name || "Someone"}
                           </p>
                           <p className="text-[10px]" style={{ color: "#7a6a9a" }}>
                             {new Date(c.created_at).toLocaleDateString()} · {c.compatibility_score ?? "—"}%
                           </p>
-                        </div>
+                        </button>
                         <button
                           onClick={() => deleteCheck(c.id)}
-                          className="p-1.5 text-[#7a6a9a] hover:text-rose-300"
-                          aria-label="Delete reading"
+                          className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] text-[#7a6a9a] hover:text-rose-300 rounded-full"
+                          aria-label={`Delete reading for ${c.their_name || "Someone"}`}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     ))

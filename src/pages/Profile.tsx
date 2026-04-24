@@ -33,6 +33,7 @@ import ProfileCompletionScore from "@/components/ProfileCompletionScore";
 import VoiceIntro from "@/components/VoiceIntro";
 import OnboardingTour from "@/components/OnboardingTour";
 import { clearVerificationSkip } from "@/hooks/useVerificationGate";
+import WelcomeChecklist from "@/components/WelcomeChecklist";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -328,6 +329,8 @@ const Profile = () => {
               <SpotifyConnect />
             </CardContent>
           </Card>
+
+          <WelcomeChecklist onReplayTour={handlePreviewAsNewUser} />
 
           <ProfileChecklist profile={profile} photoCount={photoCount} />
 

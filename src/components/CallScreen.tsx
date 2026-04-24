@@ -7,6 +7,7 @@ import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
 import { toast } from "sonner";
 import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
 import { usePremium } from "@/hooks/usePremium";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CallScreenProps {
   open: boolean;
@@ -58,6 +59,7 @@ const isTransientCallServiceError = (
 
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
   const { subscribed, loading: premiumLoading } = usePremium();
+  const { user, session, loading: authLoading } = useAuth();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejoinAttempt, setRejoinAttempt] = useState(0);

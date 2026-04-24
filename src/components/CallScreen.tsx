@@ -234,6 +234,15 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     setCallStatus(mode);
     setErrorMessage(null);
     setSimulated(false);
+    // Auth gate — never call the edge function without a verified session.
+    if (authLoading) return;
+    if (!user || !session) {
+      const msg = "Please sign in to start a call";
+      setErrorMessage(msg);
+      setCallStatus("error");
+      toast.error(msg);
+      return;
+    }
     // Client-side premium gate — skip edge function for non-subscribers.
     // Wait until subscription status has loaded so we don't bounce subscribers
     // to the upsell during a brief loading window.
@@ -252,9 +261,22 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
       const status = (error as any)?.context?.status ?? (data as any)?.status;
       const code = (data as any)?.code ?? (error as any)?.context?.code;
+      const serverMessage: string | undefined =
+        (data as any)?.error ||
+        (data as any)?.message ||
+        (error as any)?.context?.body?.error ||
+        (error as any)?.context?.body?.message;
 
       if (status === 403 || code === "PREMIUM_REQUIRED") {
         setShowPremium(true);
+        return;
+      }
+
+      if (status === 401) {
+        const msg = serverMessage || "Your session expired. Please sign in again.";
+        setErrorMessage(msg);
+        setCallStatus("error");
+        toast.error(msg);
         return;
       }
 
@@ -263,7 +285,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           startSimulatedCall(mode);
           return;
         }
-        const msg = error.message || "Could not start call";
+        const msg = serverMessage || error.message || "Could not start call";
         setErrorMessage(msg);
         setCallStatus("error");
         toast.error(msg);
@@ -274,6 +296,12 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       const token: string | undefined = data?.token;
       const newSessionId: string | undefined = data?.sessionId;
       if (!roomUrl) {
+        if (serverMessage) {
+          setErrorMessage(serverMessage);
+          setCallStatus("error");
+          toast.error(serverMessage);
+          return;
+        }
         startSimulatedCall(mode);
         return;
       }
@@ -308,7 +336,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId, callType, joinDailyRoom, subscribed, premiumLoading, startSimulatedCall]);
+  }, [matchId, callType, joinDailyRoom, subscribed, premiumLoading, startSimulatedCall, user, session, authLoading]);
 
   useEffect(() => {
     if (!open) {
@@ -329,8 +357,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     }
 
     cancelledRef.current = false;
-    // Don't fire until subscription state is known
-    if (!premiumLoading) {
+    // Don't fire until both auth and subscription state are known
+    if (!premiumLoading && !authLoading) {
       provisionRoom("connecting");
     }
 
@@ -347,7 +375,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handleBeforeUnload);
     };
-  }, [open, callType, provisionRoom, teardownCallObject, premiumLoading]);
+  }, [open, callType, provisionRoom, teardownCallObject, premiumLoading, authLoading]);
 
   // Promote waiting → connected as soon as a remote participant arrives
   useEffect(() => {

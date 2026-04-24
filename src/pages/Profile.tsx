@@ -31,6 +31,8 @@ import { useVerificationStatus } from "@/hooks/useVerification";
 import ProfilePreview from "@/components/ProfilePreview";
 import ProfileCompletionScore from "@/components/ProfileCompletionScore";
 import VoiceIntro from "@/components/VoiceIntro";
+import OnboardingTour from "@/components/OnboardingTour";
+import { clearVerificationSkip } from "@/hooks/useVerificationGate";
 
 const LIFESTYLE_LABELS: Record<string, Record<string, string>> = {
   kids_preference: {
@@ -114,6 +116,23 @@ const Profile = () => {
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState("");
   const [editUsername, setEditUsername] = useState("");
+  const [forceTour, setForceTour] = useState(false);
+
+  const handlePreviewAsNewUser = () => {
+    try {
+      // Clear all first-time-user gates so the experience replays
+      localStorage.removeItem("stellara:full-tour:v1:dismissed");
+      localStorage.removeItem("stellara:swipe-tutorial:v1:dismissed");
+      clearVerificationSkip();
+    } catch {
+      /* ignore */
+    }
+    toast({
+      title: "Preview mode ✨",
+      description: "Replaying the first-time-user experience. Visit /verify to see selfie verification.",
+    });
+    setForceTour(true);
+  };
 
   const openEditDialog = () => {
     setEditBirthDate(profile?.birth_date || "");
@@ -213,6 +232,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
+      <OnboardingTour forceOpen={forceTour} onClose={() => setForceTour(false)} />
       
       <div className="relative z-10 pt-24 pb-24 md:pb-12">
         <div className="max-w-lg mx-auto px-4">
@@ -264,6 +284,16 @@ const Profile = () => {
               </Button>
             </div>
           </div>
+
+          {/* Preview as new user — replays first-time tour & verification gate */}
+          <button
+            type="button"
+            onClick={handlePreviewAsNewUser}
+            className="mb-4 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-accent/30 bg-accent/5 px-3 py-2 text-xs text-accent hover:bg-accent/10 transition-colors touch-manipulation"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Preview as a new user · replay welcome tour</span>
+          </button>
 
           {/* Quick links grid */}
           <div className="mb-6 grid grid-cols-5 gap-2">

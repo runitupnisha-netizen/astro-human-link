@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -499,9 +498,7 @@ const CosmicGuide = () => {
                         className="prose prose-sm max-w-none prose-p:my-2 prose-li:my-0.5"
                         style={{ color: "#c9b8f0" }}
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {m.content || "…"}
-                        </ReactMarkdown>
+                        <ReactMarkdown>{m.content || "…"}</ReactMarkdown>
                       </div>
                     ) : (
                       <p className="whitespace-pre-wrap">{m.content}</p>

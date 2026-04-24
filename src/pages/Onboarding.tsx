@@ -179,10 +179,10 @@ const DATING_PREFERENCE_OPTIONS: LifestyleOption[] = [
   { value: "everyone", label: "Everyone", emoji: "💖" },
 ];
 
-type OnboardingStep = "input" | "generating" | "reveal" | "identity" | "lifestyle" | "interests";
+type OnboardingStep = "input" | "generating" | "reveal" | "identity" | "lifestyle" | "interests" | "safety";
 
-const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "identity", "lifestyle", "interests"];
-const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Identity", "Lifestyle", "Interests"];
+const STEPS_ORDER: OnboardingStep[] = ["input", "generating", "reveal", "identity", "lifestyle", "interests", "safety"];
+const STEP_LABELS = ["Birth Data", "Generating", "Your Blueprint", "Identity", "Lifestyle", "Interests", "Safety"];
 
 const LifestyleOptionButton = ({ option, selected, onSelect }: { option: LifestyleOption; selected: boolean; onSelect: () => void }) => (
   <motion.button

@@ -193,9 +193,9 @@ const Premium = () => {
   return (
     <div className="min-h-screen bg-background pt-16 pb-24">
       {/* Post-checkout verification overlay */}
-      {success && (verifying || subscribed) && (
+      {success && (verifying || subscribed || pollingTimedOut) && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-background/90 backdrop-blur-md">
-          <div className="text-center max-w-xs px-6">
+          <div className="text-center max-w-sm px-6">
             {subscribed ? (
               <>
                 <Crown className="w-12 h-12 text-accent mx-auto mb-4" />
@@ -203,6 +203,70 @@ const Premium = () => {
                 <p className="text-sm text-muted-foreground font-body">
                   Redirecting you back to the app…
                 </p>
+              </>
+            ) : pollingTimedOut ? (
+              <>
+                <AlertCircle className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h2 className="font-display text-xl text-foreground mb-2">
+                  Upgrade not confirmed yet
+                </h2>
+                <p className="text-sm text-muted-foreground font-body mb-4 leading-relaxed">
+                  Your payment may still be processing on Stripe's end. This
+                  usually clears within a minute. You can:
+                </p>
+                <ul className="text-left text-sm text-muted-foreground font-body space-y-2 mb-5 mx-auto max-w-[280px]">
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Wait a moment and tap{" "}
+                    <span className="text-foreground font-semibold">Check again</span>
+                  </li>
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Re-open checkout if your card was declined or 3DS was canceled
+                  </li>
+                  <li>
+                    <span className="text-foreground font-semibold">•</span>{" "}
+                    Contact support if your card was charged but Premium isn't active
+                  </li>
+                </ul>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={async () => {
+                      setPollingTimedOut(false);
+                      setVerifying(true);
+                      try {
+                        await refreshSubscription();
+                      } finally {
+                        setVerifying(false);
+                        // If still not subscribed, surface the timeout state again
+                        // so the user isn't stuck on a hidden overlay.
+                        if (!subscribed) setPollingTimedOut(true);
+                      }
+                    }}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 min-h-[44px]"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Check again
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPollingTimedOut(false);
+                      // Scroll the user to the plan picker so they can retry checkout.
+                      document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="border-accent/30 text-accent hover:bg-accent/10 min-h-[44px]"
+                  >
+                    Retry checkout
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/contact")}
+                    className="text-muted-foreground hover:text-foreground text-sm min-h-[40px]"
+                  >
+                    Contact support
+                  </Button>
+                </div>
               </>
             ) : (
               <>

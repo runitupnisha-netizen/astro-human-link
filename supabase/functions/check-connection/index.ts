@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
     // Pull user's profile to ground the reading
     const { data: profile } = await supabase
       .from("profiles")
-      .select("display_name,sun_sign,moon_sign,rising_sign")
+      .select("display_name,sun_sign,moon_sign,rising_sign,human_design_type,human_design_authority")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -219,6 +219,8 @@ Deno.serve(async (req) => {
       userSun: profile?.sun_sign ?? null,
       userMoon: profile?.moon_sign ?? null,
       userRising: profile?.rising_sign ?? null,
+      userHdType: profile?.human_design_type ?? null,
+      userHdAuthority: profile?.human_design_authority ?? null,
       theirName: cleanedTheirName,
       theirSun,
       theirBirthPlace: birthPlace,
@@ -250,6 +252,11 @@ Deno.serve(async (req) => {
       JSON.stringify({
         id: inserted?.id ?? null,
         theirSun,
+        userSun: profile?.sun_sign ?? null,
+        userMoon: profile?.moon_sign ?? null,
+        userRising: profile?.rising_sign ?? null,
+        userHdType: profile?.human_design_type ?? null,
+        userHdAuthority: profile?.human_design_authority ?? null,
         ...reading,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },

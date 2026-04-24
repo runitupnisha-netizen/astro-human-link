@@ -7,8 +7,8 @@ import {
   Ecliptic,
   SiderealTime,
 } from "npm:astronomy-engine@2.1.19";
-import tzLookup from "npm:tz-lookup@6.1.25";
-import { DateTime } from "npm:luxon@3.7.2";
+import tzLookup from "https://esm.sh/tz-lookup@6.1.25";
+import { DateTime } from "https://esm.sh/luxon@3.7.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

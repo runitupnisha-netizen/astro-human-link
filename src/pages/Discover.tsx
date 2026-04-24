@@ -398,6 +398,22 @@ const Discover = () => {
         onClose={() => setShowUpsell(false)}
         feature={upsellFeature as any}
       />
+
+      {/* Soulmate Sketch persistent entry — floats just above the bottom nav */}
+      <button
+        onClick={() => navigate("/soulmate-sketch")}
+        className="fixed left-1/2 -translate-x-1/2 z-40 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all active:scale-95 shadow-lg"
+        style={{
+          bottom: "calc(76px + env(safe-area-inset-bottom, 0px))",
+          backgroundColor: "rgba(77, 58, 92, 0.85)",
+          color: "#d0b4f7",
+          border: "0.5px solid rgba(208,180,247,0.35)",
+          backdropFilter: "blur(8px)",
+        }}
+        aria-label="Open Soulmate Sketch"
+      >
+        <span aria-hidden>✦</span> Soulmate Sketch
+      </button>
     </div>
   );
 };

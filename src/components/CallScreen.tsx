@@ -17,7 +17,15 @@ interface CallScreenProps {
   matchId?: string;
 }
 
-type CallStatus = "connecting" | "ringing" | "connected" | "rejoining" | "error" | "ended";
+type CallStatus =
+  | "connecting"
+  | "ringing"
+  | "waiting"      // joined the room, waiting for the other person
+  | "connected"   // both participants present
+  | "reconnecting" // network blip, Daily auto-recovering
+  | "rejoining"    // we're re-running provision flow after a hard error
+  | "error"
+  | "ended";
 
 const MAX_REJOIN_ATTEMPTS = 3;
 
@@ -30,12 +38,14 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [videoOff, setVideoOff] = useState(callType === "voice");
   const [showPremium, setShowPremium] = useState(false);
   const [remoteJoined, setRemoteJoined] = useState(false);
+  const [networkQuality, setNetworkQuality] = useState<"good" | "low" | "very-low" | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
   const callObjectRef = useRef<DailyCall | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  const peerHasJoinedOnceRef = useRef(false);
 
   const teardownCallObject = useCallback(async () => {
     const co = callObjectRef.current;
@@ -95,7 +105,9 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       }
     }
 
-    setRemoteJoined(Boolean(remote));
+    const hasRemote = Boolean(remote);
+    setRemoteJoined(hasRemote);
+    if (hasRemote) peerHasJoinedOnceRef.current = true;
   }, []);
 
   const joinDailyRoom = useCallback(async (roomUrl: string, token?: string) => {
@@ -109,12 +121,38 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
     co.on("participant-joined", attachParticipantTracks);
     co.on("participant-updated", attachParticipantTracks);
-    co.on("participant-left", attachParticipantTracks);
+    co.on("participant-left", () => {
+      attachParticipantTracks();
+      // If the *other* person hangs up, end the call gracefully on our side
+      const co2 = callObjectRef.current;
+      if (!co2 || cancelledRef.current) return;
+      const others = Object.values(co2.participants()).filter((p) => !p.local);
+      if (others.length === 0 && peerHasJoinedOnceRef.current) {
+        toast(`${callerName} left the call`);
+        handleEndCall();
+      }
+    });
     co.on("track-started", attachParticipantTracks);
     co.on("track-stopped", attachParticipantTracks);
     co.on("left-meeting", () => {
       if (cancelledRef.current) return;
       setRemoteJoined(false);
+    });
+    // Network quality / reconnection events
+    co.on("network-connection", (ev: any) => {
+      if (cancelledRef.current) return;
+      if (ev?.event === "interrupted") {
+        setCallStatus("reconnecting");
+        toast("Reconnecting…", { id: "call-network" });
+      } else if (ev?.event === "connected") {
+        toast.success("Back online", { id: "call-network" });
+        // Daily reconnects automatically; flip back to connected/waiting
+        setCallStatus(peerHasJoinedOnceRef.current ? "connected" : "waiting");
+      }
+    });
+    co.on("network-quality-change", (ev: any) => {
+      const t = ev?.threshold as "good" | "low" | "very-low" | undefined;
+      if (t) setNetworkQuality(t);
     });
     co.on("error", (ev?: DailyEventObjectFatalError) => {
       if (cancelledRef.current) return;
@@ -181,7 +219,12 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       try {
         await joinDailyRoom(roomUrl, token);
         if (cancelledRef.current) return;
-        setCallStatus("connected");
+        // Decide initial post-join state: waiting if alone, connected if peer already there
+        const co = callObjectRef.current;
+        const others = co
+          ? Object.values(co.participants()).filter((p) => !p.local)
+          : [];
+        setCallStatus(others.length > 0 ? "connected" : "waiting");
       } catch (joinErr) {
         if (cancelledRef.current) return;
         const msg = joinErr instanceof Error ? joinErr.message : "Failed to join call";
@@ -212,6 +255,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setVideoOff(callType === "voice");
       setShowPremium(false);
       setRemoteJoined(false);
+      setNetworkQuality(null);
+      peerHasJoinedOnceRef.current = false;
       teardownCallObject();
       return;
     }
@@ -219,23 +264,41 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     cancelledRef.current = false;
     provisionRoom("connecting");
 
+    // Hang up cleanly if the user navigates away or closes the tab
+    const handleBeforeUnload = () => {
+      teardownCallObject();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("pagehide", handleBeforeUnload);
+
     return () => {
       cancelledRef.current = true;
       teardownCallObject();
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handleBeforeUnload);
     };
   }, [open, callType, provisionRoom, teardownCallObject]);
+
+  // Promote waiting → connected as soon as a remote participant arrives
+  useEffect(() => {
+    if (callStatus === "waiting" && remoteJoined) {
+      setCallStatus("connected");
+      toast.success(`${callerName} joined`);
+    }
+  }, [callStatus, remoteJoined, callerName]);
 
   // Sync mute state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
-    if (!co || callStatus !== "connected") return;
+    if (!co || (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting")) return;
     co.setLocalAudio(!muted);
   }, [muted, callStatus]);
 
   // Sync video state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
-    if (!co || callStatus !== "connected" || callType !== "video") return;
+    if (!co || callType !== "video") return;
+    if (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting") return;
     co.setLocalVideo(!videoOff);
   }, [videoOff, callStatus, callType]);
 
@@ -250,8 +313,12 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   }, [rejoinAttempt, provisionRoom]);
 
   useEffect(() => {
+    // Run the timer once a peer is connected; pause during reconnect blips
     if (callStatus === "connected") {
       timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = undefined;
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [callStatus]);
@@ -262,14 +329,17 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const handleEndCall = () => {
+  const handleEndCall = useCallback(() => {
     setCallStatus("ended");
     if (timerRef.current) clearInterval(timerRef.current);
-    if (callStatus === "connected" && duration > 0) {
+    const wasConnected = peerHasJoinedOnceRef.current && duration > 0;
+    if (wasConnected) {
       toast.success(`Call ended · ${formatDuration(duration)}`);
     }
-    setTimeout(onClose, 800);
-  };
+    // Release camera/mic and Daily room immediately, don't wait for unmount
+    teardownCallObject();
+    setTimeout(onClose, 600);
+  }, [duration, onClose, teardownCallObject]);
 
   if (!open) return null;
 

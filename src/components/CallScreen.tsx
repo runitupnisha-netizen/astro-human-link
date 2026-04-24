@@ -393,6 +393,19 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           </Button>
         </div>
 
+        {/* Network quality pill (visible during connected/reconnecting) */}
+        {(callStatus === "connected" || callStatus === "reconnecting") && networkQuality && networkQuality !== "good" && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+            <div className={`px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm ${
+              networkQuality === "very-low"
+                ? "bg-destructive/20 text-destructive"
+                : "bg-accent/20 text-accent"
+            }`}>
+              {networkQuality === "very-low" ? "Poor connection" : "Weak connection"}
+            </div>
+          </div>
+        )}
+
         {/* Caller info */}
         <div className={`flex-1 flex flex-col items-center justify-center gap-6 z-10 ${callType === "video" && callStatus === "connected" && remoteJoined ? "opacity-0 pointer-events-none" : ""}`}>
           {/* Pulsing avatar */}
@@ -421,6 +434,14 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                 style={{ margin: "-8px" }}
               />
             )}
+            {(callStatus === "waiting" || callStatus === "reconnecting") && (
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ duration: 1.8, repeat: Infinity }}
+                className="absolute inset-0 rounded-full bg-accent/30"
+                style={{ margin: "-16px" }}
+              />
+            )}
             <div className="w-28 h-28 rounded-full bg-gradient-mystical flex items-center justify-center ring-4 ring-primary/30 overflow-hidden">
               {callerAvatar ? (
                 <img src={callerAvatar} alt="" className="w-full h-full object-cover" />
@@ -438,7 +459,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               animate={{ opacity: 1, y: 0 }}
               className={`text-sm mt-1 ${
                 callStatus === "ringing" ? "text-accent animate-pulse" :
-                callStatus === "connecting" || callStatus === "rejoining" ? "text-accent" :
+                callStatus === "connecting" || callStatus === "rejoining" || callStatus === "waiting" || callStatus === "reconnecting" ? "text-accent" :
                 callStatus === "connected" ? "text-emerald-400" :
                 callStatus === "error" ? "text-destructive" :
                 "text-destructive"
@@ -448,6 +469,18 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                 <span className="inline-flex items-center gap-1.5">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   Connecting…
+                </span>
+              )}
+              {callStatus === "waiting" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Waiting for {callerName}…
+                </span>
+              )}
+              {callStatus === "reconnecting" && (
+                <span className="inline-flex items-center gap-1.5">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Reconnecting…
                 </span>
               )}
               {callStatus === "rejoining" && (

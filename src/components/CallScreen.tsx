@@ -359,7 +359,13 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex flex-col items-center justify-between bg-gradient-to-b from-[hsl(270,45%,12%)] via-[hsl(220,35%,7%)] to-[hsl(195,50%,8%)]"
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-between overflow-hidden bg-gradient-to-b from-[hsl(270,45%,12%)] via-[hsl(220,35%,7%)] to-[hsl(195,50%,8%)]"
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+        }}
       >
         {/* Remote video (full-screen background for video calls) */}
         {callType === "video" && callStatus === "connected" && (
@@ -375,7 +381,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
         {/* Local self-view (picture-in-picture, video calls only) */}
         {callType === "video" && callStatus === "connected" && !videoOff && (
-          <div className="absolute top-4 left-4 w-24 h-32 sm:w-28 sm:h-40 rounded-2xl overflow-hidden border border-border/40 bg-background/40 backdrop-blur-sm shadow-lg z-10">
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-20 h-28 sm:w-28 sm:h-40 md:w-32 md:h-44 rounded-2xl overflow-hidden border border-border/40 bg-background/40 backdrop-blur-sm shadow-lg z-10">
             <video
               ref={localVideoRef}
               autoPlay
@@ -387,7 +393,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         )}
 
         {/* Close button */}
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
           <Button size="icon" variant="ghost" onClick={handleEndCall} className="text-foreground/60 hover:text-foreground">
             <X className="w-5 h-5" />
           </Button>
@@ -395,7 +401,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
         {/* Network quality pill (visible during connected/reconnecting) */}
         {(callStatus === "connected" || callStatus === "reconnecting") && networkQuality && networkQuality !== "good" && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
             <div className={`px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm ${
               networkQuality === "very-low"
                 ? "bg-destructive/20 text-destructive"
@@ -407,7 +413,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         )}
 
         {/* Caller info */}
-        <div className={`flex-1 flex flex-col items-center justify-center gap-6 z-10 ${callType === "video" && callStatus === "connected" && remoteJoined ? "opacity-0 pointer-events-none" : ""}`}>
+        <div className={`flex-1 w-full max-w-md mx-auto px-6 flex flex-col items-center justify-center gap-5 sm:gap-6 z-10 min-h-0 ${callType === "video" && callStatus === "connected" && remoteJoined ? "opacity-0 pointer-events-none" : ""}`}>
           {/* Pulsing avatar */}
           <div className="relative">
             {callStatus === "ringing" && (
@@ -442,17 +448,17 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                 style={{ margin: "-16px" }}
               />
             )}
-            <div className="w-28 h-28 rounded-full bg-gradient-mystical flex items-center justify-center ring-4 ring-primary/30 overflow-hidden">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-mystical flex items-center justify-center ring-4 ring-primary/30 overflow-hidden">
               {callerAvatar ? (
                 <img src={callerAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-14 h-14 text-foreground/60" />
+                <User className="w-12 h-12 sm:w-14 sm:h-14 text-foreground/60" />
               )}
             </div>
           </div>
 
-          <div className="text-center">
-            <h2 className="font-display text-2xl font-bold text-foreground">{callerName}</h2>
+          <div className="text-center w-full">
+            <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground truncate">{callerName}</h2>
             <motion.p
               key={callStatus}
               initial={{ opacity: 0, y: 5 }}
@@ -535,12 +541,12 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         </div>
 
         {/* Call controls */}
-        <div className="pb-16 pt-8 relative z-20">
-          <div className="flex items-center gap-6">
+        <div className="pb-8 sm:pb-12 pt-6 sm:pt-8 px-6 relative z-20 w-full flex justify-center">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Button
               size="icon"
               variant="outline"
-              className={`w-14 h-14 rounded-full border-2 ${muted ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
+              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 shrink-0 ${muted ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
               onClick={() => setMuted(!muted)}
             >
               {muted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -550,7 +556,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
               <Button
                 size="icon"
                 variant="outline"
-                className={`w-14 h-14 rounded-full border-2 ${videoOff ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 shrink-0 ${videoOff ? "bg-destructive/20 border-destructive/50" : "border-border/50"}`}
                 onClick={() => setVideoOff(!videoOff)}
               >
                 {videoOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
@@ -559,7 +565,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
             <Button
               size="icon"
-              className="w-16 h-16 rounded-full bg-destructive hover:bg-destructive/80 shadow-lg"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-destructive hover:bg-destructive/80 shadow-lg shrink-0"
               onClick={handleEndCall}
             >
               <PhoneOff className="w-6 h-6" />
@@ -572,7 +578,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="absolute bottom-32"
+            className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30"
           >
             <Button
               size="icon"

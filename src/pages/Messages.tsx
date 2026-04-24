@@ -35,6 +35,7 @@ import { useVerificationStatuses } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import GifPicker from "@/components/GifPicker";
 import CallScreen from "@/components/CallScreen";
+import { consumePremiumResumeContext } from "@/components/PremiumRequiredScreen";
 import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";

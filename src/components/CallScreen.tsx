@@ -669,16 +669,70 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
           </Button>
         </div>
 
-        {/* Network quality pill (visible during connected/reconnecting) */}
-        {(callStatus === "connected" || callStatus === "reconnecting") && networkQuality && networkQuality !== "good" && (
-          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <div className={`px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm ${
-              networkQuality === "very-low"
-                ? "bg-destructive/20 text-destructive"
-                : "bg-accent/20 text-accent"
-            }`}>
-              {networkQuality === "very-low" ? "Poor connection" : "Weak connection"}
-            </div>
+        {/* Connection-health indicator (visible during connected/reconnecting).
+            Tap to expand for latency / jitter / packet-loss detail. */}
+        {(callStatus === "connected" || callStatus === "reconnecting") && !simulated && (
+          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20">
+            <button
+              type="button"
+              onClick={() => setStatsExpanded((v) => !v)}
+              aria-expanded={statsExpanded}
+              aria-label="Toggle connection stats"
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm transition-colors ${
+                networkQuality === "very-low"
+                  ? "bg-destructive/20 text-destructive hover:bg-destructive/30"
+                  : networkQuality === "low"
+                    ? "bg-accent/20 text-accent hover:bg-accent/30"
+                    : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+              }`}
+            >
+              <Activity className="w-3 h-3" />
+              <span>
+                {networkQuality === "very-low"
+                  ? "Poor connection"
+                  : networkQuality === "low"
+                    ? "Weak connection"
+                    : "Good connection"}
+              </span>
+              {statsExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+            <AnimatePresence>
+              {statsExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="mt-2 mx-auto w-max min-w-[180px] rounded-xl bg-background/70 backdrop-blur-md border border-border/40 px-3 py-2 text-[11px] text-foreground/90 shadow-lg"
+                >
+                  <div className="flex justify-between gap-4">
+                    <span className="text-muted-foreground">Latency</span>
+                    <span className="font-mono">{callStats.rttMs != null ? `${callStats.rttMs} ms` : "—"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4 mt-0.5">
+                    <span className="text-muted-foreground">Jitter</span>
+                    <span className="font-mono">{callStats.jitterMs != null ? `${callStats.jitterMs} ms` : "—"}</span>
+                  </div>
+                  <div className="flex justify-between gap-4 mt-0.5">
+                    <span className="text-muted-foreground">Packet loss</span>
+                    <span className={`font-mono ${
+                      callStats.packetLossPct != null && callStats.packetLossPct >= 5
+                        ? "text-destructive"
+                        : callStats.packetLossPct != null && callStats.packetLossPct >= 2
+                          ? "text-accent"
+                          : ""
+                    }`}>
+                      {callStats.packetLossPct != null ? `${callStats.packetLossPct}%` : "—"}
+                    </span>
+                  </div>
+                  {callType === "video" && (
+                    <div className="flex justify-between gap-4 mt-0.5">
+                      <span className="text-muted-foreground">Video bitrate</span>
+                      <span className="font-mono">{callStats.videoRecvKbps != null ? `${callStats.videoRecvKbps} kbps` : "—"}</span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 

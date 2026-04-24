@@ -83,7 +83,7 @@ export const getCustomerInfo = async (): Promise<CustomerInfo | null> => {
 
 /** Find a package matching the given product identifier. */
 const findPackage = async (productId: string): Promise<PurchasesPackage | null> => {
-  const { offerings } = await Purchases.getOfferings();
+  const offerings = await Purchases.getOfferings();
   const offeringList: NonNullable<typeof offerings.current>[] = [];
   if (offerings.current) offeringList.push(offerings.current);
   for (const key of Object.keys(offerings.all ?? {})) {

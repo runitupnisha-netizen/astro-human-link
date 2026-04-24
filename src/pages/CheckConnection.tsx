@@ -201,6 +201,8 @@ const CheckConnection = () => {
     setBirthTime("");
     setSkipTime(false);
     setBirthPlace("");
+    setConfirmed(false);
+    setErrors({});
     setStep("form");
   };
 

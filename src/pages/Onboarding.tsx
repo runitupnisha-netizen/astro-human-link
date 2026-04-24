@@ -1365,6 +1365,150 @@ const Onboarding = () => {
               </AnimatePresence>
             </motion.div>
           )}
+
+          {/* STEP 6: Privacy & Safety Consent */}
+          {step === "safety" && (
+            <motion.div
+              key="safety"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-6"
+            >
+              <motion.div {...staggerCard(0)} className="text-center space-y-2">
+                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/30 bg-primary/15 text-primary mb-1">
+                  <ShieldCheck className="h-7 w-7" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Your safety, your boundaries</h2>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Before you enter Stellara, here's exactly how we keep this space sacred — and the tools you have to protect yourself.
+                </p>
+              </motion.div>
+
+              {/* Photo verification */}
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent border border-accent/30">
+                    <Camera className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-foreground">Photo verification</h3>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                      We ask for one quick selfie to confirm you're a real person. Your selfie is private — only used to issue your verified badge, and never shown on your profile.
+                    </p>
+                    <ul className="mt-2 text-xs text-muted-foreground/90 space-y-1">
+                      <li>• Stored in a private bucket, accessible only to you</li>
+                      <li>• Auto-deleted if you delete your account</li>
+                      <li>• You can verify now or skip and complete it later</li>
+                    </ul>
+                  </div>
+                </div>
+                <label className="flex items-start gap-2 cursor-pointer rounded-xl border border-border/40 bg-background/40 p-3">
+                  <Checkbox checked={consentVerification} onCheckedChange={(v) => setConsentVerification(!!v)} className="mt-0.5" />
+                  <span className="text-sm text-foreground">
+                    I understand how photo verification works and that it's optional but recommended.
+                  </span>
+                </label>
+              </motion.div>
+
+              {/* Data usage */}
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary border border-primary/30">
+                    <Database className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-foreground">How we use your data</h3>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                      Your birth data and answers power your cosmic blueprint and compatibility matching. We never sell your data — ever.
+                    </p>
+                    <ul className="mt-2 text-xs text-muted-foreground/90 space-y-1">
+                      <li>• Birth details → astrology, Human Design, numerology readings</li>
+                      <li>• Location → distance to potential matches (approximate, never exact)</li>
+                      <li>• Messages → encrypted in transit & at rest, visible only to you and your match</li>
+                      <li>• You can pause your profile, go incognito, or delete everything anytime</li>
+                    </ul>
+                    <p className="mt-2 text-xs">
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline text-accent hover:text-accent/80">
+                        Read our full Privacy Policy
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <label className="flex items-start gap-2 cursor-pointer rounded-xl border border-border/40 bg-background/40 p-3">
+                  <Checkbox checked={consentDataUsage} onCheckedChange={(v) => setConsentDataUsage(!!v)} className="mt-0.5" />
+                  <span className="text-sm text-foreground">
+                    I consent to Stellara using my data to generate my blueprint and surface compatible matches.
+                  </span>
+                </label>
+              </motion.div>
+
+              {/* Block / report */}
+              <motion.div {...staggerCard(0.3)} className="glass-card glow-border p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/15 text-destructive border border-destructive/30">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-foreground">You're always in control</h3>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                      Anyone who crosses a line can be removed from your space — instantly and silently.
+                    </p>
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex items-start gap-2 rounded-lg border border-border/40 bg-background/30 p-3">
+                        <Ban className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-semibold text-foreground">Block</p>
+                          <p className="text-[11px] text-muted-foreground">Hides them from you forever — they're never told.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 rounded-lg border border-border/40 bg-background/30 p-3">
+                        <Flag className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-semibold text-foreground">Report</p>
+                          <p className="text-[11px] text-muted-foreground">Sends details to our moderation team for review.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-[11px] text-muted-foreground">
+                      You'll find these tools on every profile and inside every chat. Plus, our{" "}
+                      <a href="/safety" target="_blank" rel="noopener noreferrer" className="underline text-accent hover:text-accent/80">
+                        Safety Center
+                      </a>{" "}
+                      has resources, red flags & crisis lines.
+                    </p>
+                  </div>
+                </div>
+                <label className="flex items-start gap-2 cursor-pointer rounded-xl border border-border/40 bg-background/40 p-3">
+                  <Checkbox checked={consentSafetyTools} onCheckedChange={(v) => setConsentSafetyTools(!!v)} className="mt-0.5" />
+                  <span className="text-sm text-foreground">
+                    I'll respect Stellara's community guidelines and use block/report if anyone makes me feel unsafe.
+                  </span>
+                </label>
+              </motion.div>
+
+              <motion.div {...staggerCard(0.4)} className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep("interests")} className="h-12 px-6 group">
+                  <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+                  Back
+                </Button>
+                <Button
+                  onClick={() => setShowFinishConfirm(true)}
+                  disabled={!consentVerification || !consentDataUsage || !consentSafetyTools}
+                  className="flex-1 h-12 text-base font-semibold group relative overflow-hidden disabled:opacity-50"
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <ShieldCheck className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    {!consentVerification || !consentDataUsage || !consentSafetyTools
+                      ? "Acknowledge all 3 to continue"
+                      : "Enter Stellara"}
+                  </span>
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>

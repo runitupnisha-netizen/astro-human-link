@@ -127,6 +127,47 @@ export type Database = {
           },
         ]
       }
+      call_rooms: {
+        Row: {
+          created_at: string
+          created_by: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          match_id: string
+          room_name: string
+          room_url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          ended_at?: string | null
+          expires_at: string
+          id?: string
+          match_id: string
+          room_name: string
+          room_url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          match_id?: string
+          room_name?: string
+          room_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_rooms_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       call_sessions: {
         Row: {
           call_type: string
@@ -1219,6 +1260,10 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      is_match_participant: {
+        Args: { _match_id: string; _user_id: string }
+        Returns: boolean
       }
       move_to_dlq: {
         Args: {

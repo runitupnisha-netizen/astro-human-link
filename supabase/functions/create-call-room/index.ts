@@ -149,55 +149,74 @@ serve(async (req) => {
       return json({ error: "Calling service not configured" }, 500);
     }
 
-    // Deterministic room per match within a 30-minute bucket so both
-    // participants land in the same room without coordination.
-    const bucket = Math.floor(Date.now() / (30 * 60 * 1000));
-    const roomName = `stellara-${matchId.replace(/-/g, "").slice(0, 16)}-${bucket
-      .toString(36)}`;
-    const expSeconds = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hour
+    // Reuse an existing unexpired room for this match if one exists, otherwise
+    // create a fresh one with a CRYPTOGRAPHICALLY RANDOM name so URLs cannot
+    // be guessed from matchId/time. Both participants land in the same room
+    // because we look it up by match_id (RLS-restricted to the two of them).
+    const ROOM_TTL_MS = 60 * 60 * 1000; // 1 hour
+    const expSeconds = Math.floor((Date.now() + ROOM_TTL_MS) / 1000);
 
-    // Try to create the room; if it already exists (other participant created
-    // it first this bucket), fall through and just mint a token for it.
-    const roomRes = await fetch("https://api.daily.co/v1/rooms", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${dailyApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: roomName,
-        privacy: "private",
-        properties: {
-          exp: expSeconds,
-          enable_screenshare: true,
-          enable_chat: false,
-          start_video_off: false,
-          start_audio_off: false,
-          eject_at_room_exp: true,
-          max_participants: 2,
-        },
-      }),
-    });
+    const { data: existingRow } = await supabase
+      .from("call_rooms")
+      .select("room_name, room_url, expires_at")
+      .eq("match_id", matchId)
+      .is("ended_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .order("expires_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
+    let roomName: string;
     let room: { url?: string; name?: string };
-    if (roomRes.ok) {
-      room = await roomRes.json();
-    } else if (roomRes.status === 409) {
-      // Room already exists — fetch it
-      const existing = await fetch(
-        `https://api.daily.co/v1/rooms/${roomName}`,
-        { headers: { Authorization: `Bearer ${dailyApiKey}` } },
-      );
-      if (!existing.ok) {
-        const errText = await existing.text();
-        log("Daily room fetch failed", { status: existing.status, errText });
-        return json({ error: "Failed to retrieve call room" }, 502);
-      }
-      room = await existing.json();
+
+    if (existingRow) {
+      roomName = existingRow.room_name;
+      room = { name: roomName, url: existingRow.room_url };
+      log("Reusing existing room for match", { roomName });
     } else {
-      const errText = await roomRes.text();
-      log("Daily room creation failed", { status: roomRes.status, errText });
-      return json({ error: "Failed to create call room" }, 502);
+      // Random unguessable name. Daily room names allow [a-z0-9-_].
+      const rand = crypto.randomUUID().replace(/-/g, "");
+      roomName = `stellara-${rand}`;
+
+      const roomRes = await fetch("https://api.daily.co/v1/rooms", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${dailyApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: roomName,
+          privacy: "private",
+          properties: {
+            exp: expSeconds,
+            enable_screenshare: true,
+            enable_chat: false,
+            start_video_off: false,
+            start_audio_off: false,
+            eject_at_room_exp: true,
+            max_participants: 2,
+          },
+        }),
+      });
+
+      if (!roomRes.ok) {
+        const errText = await roomRes.text();
+        log("Daily room creation failed", { status: roomRes.status, errText });
+        return json({ error: "Failed to create call room" }, 502);
+      }
+      room = await roomRes.json();
+
+      // Persist the binding so the other participant can find & reuse it.
+      const { error: insertErr } = await supabase.from("call_rooms").insert({
+        match_id: matchId,
+        room_name: roomName,
+        room_url: room.url ?? `https://stellara.daily.co/${roomName}`,
+        created_by: user.id,
+        expires_at: new Date(expSeconds * 1000).toISOString(),
+      });
+      if (insertErr) {
+        log("call_rooms insert failed", { error: insertErr.message });
+      }
     }
 
     // 5. Create meeting token scoped to this user

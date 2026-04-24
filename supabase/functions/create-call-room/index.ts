@@ -366,6 +366,14 @@ serve(async (req) => {
       });
       if (insertErr) {
         log("call_rooms insert failed", { error: insertErr.message });
+        await recordProvisioningError(supabase, {
+          category: "internal",
+          httpStatus: 500,
+          message: `call_rooms insert failed: ${insertErr.message}`,
+          userId: user.id,
+          matchId,
+          details: { roomName },
+        });
       }
     }
 
@@ -459,6 +467,21 @@ serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     log("ERROR", { message });
+    try {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } },
+      );
+      await recordProvisioningError(supabase, {
+        category: "internal",
+        httpStatus: 500,
+        message,
+        details: {
+          stack: error instanceof Error ? error.stack?.slice(0, 1000) : undefined,
+        },
+      });
+    } catch {/* swallow — logging must not crash the handler */}
     return json({ error: message }, 500);
   }
 });

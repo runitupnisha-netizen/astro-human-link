@@ -92,6 +92,24 @@ const CosmicGuide = () => {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, streaming]);
 
+  // When streaming finishes, speak the latest assistant message (if voice on)
+  // and trigger the first-time primer hint after Lyra's first reply ever.
+  useEffect(() => {
+    if (streaming) return;
+    const last = messages[messages.length - 1];
+    if (!last || last.role !== "assistant" || !last.content) return;
+    if (lastSpokenRef.current === last.content) return;
+    lastSpokenRef.current = last.content;
+
+    if (voice.enabled) {
+      voice.speak(last.content);
+    } else if (voice.firstTimePrimerPending) {
+      setShowVoicePrimer(true);
+      voice.dismissPrimer();
+      window.setTimeout(() => setShowVoicePrimer(false), 5000);
+    }
+  }, [streaming, messages, voice]);
+
   const createConversation = async (firstMessage?: string): Promise<string | null> => {
     if (!user) return null;
     const title = firstMessage

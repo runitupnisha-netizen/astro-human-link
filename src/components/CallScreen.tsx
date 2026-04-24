@@ -196,7 +196,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     try {
       const { data, error } = await supabase.functions.invoke(
         "create-call-room",
-        { body: { matchId } },
+        { body: { matchId, callType } },
       );
 
       if (cancelledRef.current) return;
@@ -219,6 +219,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
       const roomUrl: string | undefined = data?.roomUrl || data?.url;
       const token: string | undefined = data?.token;
+      const newSessionId: string | undefined = data?.sessionId;
       if (!roomUrl) {
         const msg = "Call service unavailable. Please try again.";
         setErrorMessage(msg);
@@ -226,6 +227,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         toast.error(msg);
         return;
       }
+      if (newSessionId) sessionIdRef.current = newSessionId;
 
       try {
         await joinDailyRoom(roomUrl, token);

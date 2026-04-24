@@ -207,7 +207,11 @@ const InnerWorld = () => {
             // the only tool any subscriber tier can open.
             if (i === 0) {
               return (
-                <TourHighlight key={tool.id} targetId="inner-world-first-tool">
+                <TourHighlight
+                  key={tool.id}
+                  targetId="inner-world-first-tool"
+                  label="Daily Cosmic Briefing"
+                >
                   {card}
                 </TourHighlight>
               );

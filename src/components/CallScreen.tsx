@@ -493,6 +493,14 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
             onClose();
           }}
           feature={callType}
+          onRetry={async () => {
+            // Re-invoke create-call-room without closing the call flow.
+            // If the user is now premium, the upsell will dismiss itself
+            // when provisionRoom succeeds (it sets callStatus !== error).
+            setShowPremium(false);
+            await provisionRoom("connecting");
+          }}
+          retryLabel={callType === "voice" ? "Retry voice call" : "Retry video call"}
         />
       )}
       <motion.div

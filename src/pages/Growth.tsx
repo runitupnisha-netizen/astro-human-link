@@ -171,7 +171,7 @@ const Growth = () => {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            onClick={() => navigate("/growth/journal")}
+            onClick={() => navigate("/growth/shadow")}
             className="text-left rounded-2xl p-4 transition-all hover:brightness-110 active:scale-[0.99] flex flex-col h-full"
             style={{ backgroundColor: CARD_BG, border: `0.5px solid ${CARD_BORDER}`, borderRadius: 16 }}
           >

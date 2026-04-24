@@ -291,15 +291,40 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] flex flex-col items-center justify-between bg-gradient-to-b from-[hsl(270,45%,12%)] via-[hsl(220,35%,7%)] to-[hsl(195,50%,8%)]"
       >
+        {/* Remote video (full-screen background for video calls) */}
+        {callType === "video" && callStatus === "connected" && (
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500 ${remoteJoined ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
+        {/* Hidden audio sink for remote participant */}
+        <audio ref={remoteAudioRef} autoPlay playsInline className="hidden" />
+
+        {/* Local self-view (picture-in-picture, video calls only) */}
+        {callType === "video" && callStatus === "connected" && !videoOff && (
+          <div className="absolute top-4 left-4 w-24 h-32 sm:w-28 sm:h-40 rounded-2xl overflow-hidden border border-border/40 bg-background/40 backdrop-blur-sm shadow-lg z-10">
+            <video
+              ref={localVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover scale-x-[-1]"
+            />
+          </div>
+        )}
+
         {/* Close button */}
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-20">
           <Button size="icon" variant="ghost" onClick={handleEndCall} className="text-foreground/60 hover:text-foreground">
             <X className="w-5 h-5" />
           </Button>
         </div>
 
         {/* Caller info */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-6">
+        <div className={`flex-1 flex flex-col items-center justify-center gap-6 z-10 ${callType === "video" && callStatus === "connected" && remoteJoined ? "opacity-0 pointer-events-none" : ""}`}>
           {/* Pulsing avatar */}
           <div className="relative">
             {callStatus === "ringing" && (

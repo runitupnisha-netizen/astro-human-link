@@ -55,6 +55,7 @@ const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MyChart = lazy(() => import("./pages/MyChart"));
+const FindMatch = lazy(() => import("./pages/FindMatch"));
 
 const queryClient = new QueryClient();
 
@@ -205,6 +206,7 @@ const AppRoutes = () => {
             <Route path="/briefing" element={<PageTransition><ProtectedRoute><DailyBriefing /></ProtectedRoute></PageTransition>} />
             <Route path="/inner-world" element={<PageTransition><ProtectedRoute><InnerWorld /></ProtectedRoute></PageTransition>} />
             <Route path="/my-chart" element={<PageTransition><ProtectedRoute><MyChart /></ProtectedRoute></PageTransition>} />
+            <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<PageTransition><ProtectedRoute><CosmicGuide /></ProtectedRoute></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />

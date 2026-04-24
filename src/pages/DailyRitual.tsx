@@ -6,6 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import LyraStrip from "@/components/lyra/LyraStrip";
 import { getDailyTarotCard } from "@/data/tarotDeck";
+import PushPermissionPrimer from "@/components/PushPermissionPrimer";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import {
+  PUSH_PRIMER_RESOLVED_KEY,
+  PUSH_PRIMER_DISMISS_COUNT_KEY,
+  PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY,
+} from "@/lib/notificationCopy";
 
 const BG = "#0c0b13";
 const CARD_BG = "rgba(77, 58, 92, 0.35)";
@@ -63,6 +70,8 @@ const DailyRitual = () => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [firstName, setFirstName] = useState("");
   const [journal, setJournal] = useState("");
+  const [primerOpen, setPrimerOpen] = useState(false);
+  const { subscribe, permission, isSupported } = usePushNotifications();
 
   const planet = getDailyPlanet();
   const card = getDailyTarotCard();
@@ -80,6 +89,29 @@ const DailyRitual = () => {
       });
   }, [user]);
 
+  const shouldShowPrimer = () => {
+    if (!isSupported) return false;
+    // Already granted or hard-denied at OS level → never re-ask
+    if (permission === "granted" || permission === "denied") return false;
+    // Permanently resolved (granted, denied, or 3-dismiss cap reached)
+    if (localStorage.getItem(PUSH_PRIMER_RESOLVED_KEY) === "true") return false;
+
+    const dismissCount = Number(
+      localStorage.getItem(PUSH_PRIMER_DISMISS_COUNT_KEY) || "0"
+    );
+    if (dismissCount >= 3) {
+      localStorage.setItem(PUSH_PRIMER_RESOLVED_KEY, "true");
+      return false;
+    }
+
+    // First time → show immediately. Subsequent times → wait for 3 more rituals.
+    if (dismissCount === 0) return true;
+    const ritualsSince = Number(
+      localStorage.getItem(PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY) || "0"
+    );
+    return ritualsSince >= 3;
+  };
+
   const handleComplete = () => {
     const today = new Date().toISOString().slice(0, 10);
     localStorage.setItem("stellara:daily-ritual:done", today);
@@ -87,6 +119,51 @@ const DailyRitual = () => {
       // Persist optional journal entry locally — full backend tie-in is a follow-up
       const key = `stellara:ritual-journal:${today}`;
       localStorage.setItem(key, journal.trim());
+    }
+
+    if (shouldShowPrimer()) {
+      // Reset the post-dismiss counter; opening the primer is a fresh ask.
+      localStorage.setItem(PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY, "0");
+      setPrimerOpen(true);
+      return;
+    }
+
+    // Increment ritual counter (used to re-trigger primer after dismissal)
+    const dismissCount = Number(
+      localStorage.getItem(PUSH_PRIMER_DISMISS_COUNT_KEY) || "0"
+    );
+    if (dismissCount > 0 && dismissCount < 3) {
+      const ritualsSince = Number(
+        localStorage.getItem(PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY) || "0"
+      );
+      localStorage.setItem(
+        PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY,
+        String(ritualsSince + 1)
+      );
+    }
+
+    navigate("/growth");
+  };
+
+  const handlePrimerAccept = async (): Promise<void> => {
+    await subscribe();
+    // Whether the OS dialog granted or denied, this is now resolved permanently.
+    localStorage.setItem(PUSH_PRIMER_RESOLVED_KEY, "true");
+  };
+
+  const handlePrimerClose = () => {
+    setPrimerOpen(false);
+    // If permission is now granted, mark resolved; otherwise this counted as a dismissal.
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      localStorage.setItem(PUSH_PRIMER_RESOLVED_KEY, "true");
+    } else if (localStorage.getItem(PUSH_PRIMER_RESOLVED_KEY) !== "true") {
+      const next =
+        Number(localStorage.getItem(PUSH_PRIMER_DISMISS_COUNT_KEY) || "0") + 1;
+      localStorage.setItem(PUSH_PRIMER_DISMISS_COUNT_KEY, String(next));
+      localStorage.setItem(PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY, "0");
+      if (next >= 3) {
+        localStorage.setItem(PUSH_PRIMER_RESOLVED_KEY, "true");
+      }
     }
     navigate("/growth");
   };
@@ -295,6 +372,12 @@ const DailyRitual = () => {
           />
         ))}
       </div>
+
+      <PushPermissionPrimer
+        open={primerOpen}
+        onClose={handlePrimerClose}
+        onAccept={handlePrimerAccept}
+      />
     </div>
   );
 };

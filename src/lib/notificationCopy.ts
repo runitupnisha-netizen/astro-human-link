@@ -57,3 +57,22 @@ export const PUSH_PERMISSION_PRIMER = {
  * Used by the Daily Ritual completion handler to avoid re-prompting.
  */
 export const PUSH_PRIMER_SHOWN_KEY = "stellara_push_primer_shown";
+
+/**
+ * Tracks how many times the user has dismissed the primer with "Maybe later".
+ * After 3 dismissals, the primer is never shown again.
+ */
+export const PUSH_PRIMER_DISMISS_COUNT_KEY = "stellara_push_primer_dismiss_count";
+
+/**
+ * Tracks Daily Ritual completions since the last "Maybe later" dismissal.
+ * The primer re-shows once this counter reaches 3.
+ */
+export const PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY =
+  "stellara_push_primer_rituals_since_dismiss";
+
+/**
+ * Permanent terminal state — set when the user has either granted, hard-denied,
+ * or hit the 3-dismissal cap. The primer must never appear again after this.
+ */
+export const PUSH_PRIMER_RESOLVED_KEY = "stellara_push_primer_resolved";

@@ -30,6 +30,32 @@ type CallStatus =
 
 const MAX_REJOIN_ATTEMPTS = 3;
 
+// When the edge function can't be reached (offline, deploy hiccup, 5xx),
+// we transparently fall back to a *simulated* call so the UX never dead-ends.
+// No real media is exchanged; the local UI runs the same ringing → connected
+// flow with a synthetic timer. A subtle "Demo mode" pill keeps it honest.
+const isTransientCallServiceError = (
+  err: unknown,
+  data: any,
+  status: number | undefined,
+  code: string | undefined,
+): boolean => {
+  if (code === "PREMIUM_REQUIRED" || status === 403) return false;
+  if (status && status >= 400 && status < 500 && status !== 408 && status !== 429) {
+    // 4xx other than timeout/rate-limit are real client errors, don't sim.
+    return false;
+  }
+  // Treat network errors, 5xx, function-not-found, and missing roomUrl as transient.
+  if (status && status >= 500) return true;
+  if (err) {
+    const msg = (err as any)?.message?.toLowerCase?.() || "";
+    if (/failed to fetch|network|timeout|fetch failed|load failed/i.test(msg)) return true;
+    if (/not found|404/i.test(msg)) return true;
+  }
+  if (!data?.roomUrl && !data?.url) return true;
+  return false;
+};
+
 const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
   const { subscribed, loading: premiumLoading } = usePremium();
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
@@ -41,6 +67,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const [showPremium, setShowPremium] = useState(false);
   const [remoteJoined, setRemoteJoined] = useState(false);
   const [networkQuality, setNetworkQuality] = useState<"good" | "low" | "very-low" | null>(null);
+  const [simulated, setSimulated] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const cancelledRef = useRef(false);
   const callObjectRef = useRef<DailyCall | null>(null);
@@ -182,9 +209,29 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     attachParticipantTracks();
   }, [callType, attachParticipantTracks, teardownCallObject]);
 
+  const startSimulatedCall = useCallback((mode: "connecting" | "rejoining") => {
+    if (cancelledRef.current) return;
+    setSimulated(true);
+    setErrorMessage(null);
+    setCallStatus("ringing");
+    if (mode === "rejoining") {
+      toast("Reconnected in demo mode");
+    } else {
+      toast("Live calling is offline — running demo mode");
+    }
+    // Auto-advance to connected after a short ring
+    window.setTimeout(() => {
+      if (cancelledRef.current) return;
+      peerHasJoinedOnceRef.current = true;
+      setRemoteJoined(true);
+      setCallStatus("connected");
+    }, isIncoming ? 0 : 1800);
+  }, [isIncoming]);
+
   const provisionRoom = useCallback(async (mode: "connecting" | "rejoining") => {
     setCallStatus(mode);
     setErrorMessage(null);
+    setSimulated(false);
     // Client-side premium gate — skip edge function for non-subscribers.
     // Wait until subscription status has loaded so we don't bounce subscribers
     // to the upsell during a brief loading window.
@@ -210,6 +257,10 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       }
 
       if (error) {
+        if (isTransientCallServiceError(error, data, status, code)) {
+          startSimulatedCall(mode);
+          return;
+        }
         const msg = error.message || "Could not start call";
         setErrorMessage(msg);
         setCallStatus("error");
@@ -221,10 +272,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       const token: string | undefined = data?.token;
       const newSessionId: string | undefined = data?.sessionId;
       if (!roomUrl) {
-        const msg = "Call service unavailable. Please try again.";
-        setErrorMessage(msg);
-        setCallStatus("error");
-        toast.error(msg);
+        startSimulatedCall(mode);
         return;
       }
       if (newSessionId) sessionIdRef.current = newSessionId;
@@ -240,10 +288,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
         setCallStatus(others.length > 0 ? "connected" : "waiting");
       } catch (joinErr) {
         if (cancelledRef.current) return;
-        const msg = joinErr instanceof Error ? joinErr.message : "Failed to join call";
-        setErrorMessage(msg);
-        setCallStatus("error");
-        toast.error(msg);
+        // Daily SDK couldn't establish — surface a graceful fallback too.
+        startSimulatedCall(mode);
         return;
       }
       if (mode === "rejoining") {
@@ -251,12 +297,16 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       }
     } catch (e) {
       if (cancelledRef.current) return;
+      if (isTransientCallServiceError(e, null, undefined, undefined)) {
+        startSimulatedCall(mode);
+        return;
+      }
       const msg = e instanceof Error ? e.message : "Could not start call";
       setErrorMessage(msg);
       setCallStatus("error");
       toast.error(msg);
     }
-  }, [matchId, joinDailyRoom, subscribed, premiumLoading]);
+  }, [matchId, callType, joinDailyRoom, subscribed, premiumLoading, startSimulatedCall]);
 
   useEffect(() => {
     if (!open) {
@@ -269,6 +319,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setShowPremium(false);
       setRemoteJoined(false);
       setNetworkQuality(null);
+      setSimulated(false);
       peerHasJoinedOnceRef.current = false;
       sessionIdRef.current = null;
       teardownCallObject();
@@ -307,17 +358,19 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   // Sync mute state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
+    if (simulated) return;
     if (!co || (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting")) return;
     co.setLocalAudio(!muted);
-  }, [muted, callStatus]);
+  }, [muted, callStatus, simulated]);
 
   // Sync video state with Daily
   useEffect(() => {
     const co = callObjectRef.current;
-    if (!co || callType !== "video") return;
+    if (simulated || callType !== "video") return;
+    if (!co) return;
     if (callStatus !== "connected" && callStatus !== "waiting" && callStatus !== "reconnecting") return;
     co.setLocalVideo(!videoOff);
-  }, [videoOff, callStatus, callType]);
+  }, [videoOff, callStatus, callType, simulated]);
 
   const handleRejoin = useCallback(() => {
     if (rejoinAttempt >= MAX_REJOIN_ATTEMPTS) {
@@ -437,6 +490,15 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                 : "bg-accent/20 text-accent"
             }`}>
               {networkQuality === "very-low" ? "Poor connection" : "Weak connection"}
+            </div>
+          </div>
+        )}
+
+        {/* Demo mode pill — shown whenever we fall back from the live call service */}
+        {simulated && callStatus !== "ended" && (
+          <div className="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div className="px-3 py-1 rounded-full text-[11px] font-medium backdrop-blur-sm bg-accent/20 text-accent">
+              Demo mode · live calling unavailable
             </div>
           </div>
         )}

@@ -14,6 +14,48 @@ const log = (step: string, details?: unknown) => {
   console.log(`[CREATE-CALL-ROOM] ${step}${detailsStr}`);
 };
 
+// Server-side persistent error log. Best-effort — failures here must never
+// block call provisioning, but they give ops a durable trail for premium
+// verification problems and Daily.co API regressions.
+type ErrorCategory =
+  | "premium_verification"
+  | "daily_api_key"
+  | "daily_room_create"
+  | "daily_token_create"
+  | "auth"
+  | "validation"
+  | "internal";
+
+const recordProvisioningError = async (
+  supabase: ReturnType<typeof createClient>,
+  payload: {
+    category: ErrorCategory;
+    httpStatus: number;
+    message: string;
+    userId?: string | null;
+    matchId?: string | null;
+    details?: Record<string, unknown>;
+  },
+) => {
+  try {
+    const { error } = await supabase.from("call_provisioning_errors").insert({
+      user_id: payload.userId ?? null,
+      match_id: payload.matchId ?? null,
+      error_category: payload.category,
+      http_status: payload.httpStatus,
+      message: payload.message.slice(0, 500),
+      details: payload.details ?? {},
+    });
+    if (error) {
+      console.warn(`[CREATE-CALL-ROOM] Error log insert failed: ${error.message}`);
+    }
+  } catch (e) {
+    console.warn(
+      `[CREATE-CALL-ROOM] Error log threw: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+};
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },

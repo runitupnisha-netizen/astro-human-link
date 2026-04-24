@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number; // in milliseconds
+  message?: string;
 }
 
 const DEFAULT_LIMITS: Record<string, RateLimitConfig> = {
@@ -19,7 +20,15 @@ const DEFAULT_LIMITS: Record<string, RateLimitConfig> = {
   "push-vapid-key": { maxRequests: 10, windowMs: 60_000 },
   "search-gifs": { maxRequests: 30, windowMs: 60_000 },
   "spotify-auth": { maxRequests: 30, windowMs: 60_000 },
-  "create-call-room": { maxRequests: 5, windowMs: 60_000 },
+  // Calls realistically need a few retries (network blip → rejoin, peer
+  // hangup + redial). Allow a generous short burst, then a slower long
+  // window to discourage abuse without punishing normal usage.
+  "create-call-room": {
+    maxRequests: 10,
+    windowMs: 60_000,
+    message:
+      "You're starting calls a little too quickly. Take a breath and try again in a few seconds.",
+  },
 };
 
 // In-memory rate limiter (resets per cold start, ~5 min window)
@@ -43,9 +52,12 @@ export function checkRateLimit(
 
   if (entry.count >= config.maxRequests) {
     const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
+    const friendly =
+      config.message ?? "Too many requests. Please try again in a moment.";
     return new Response(
       JSON.stringify({
-        error: "Too many requests. Please try again later.",
+        error: friendly,
+        code: "RATE_LIMITED",
         retry_after: retryAfter,
       }),
       {

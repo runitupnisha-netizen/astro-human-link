@@ -223,6 +223,7 @@ const AppRoutes = () => {
             <Route path="/growth/moon" element={<PageTransition><ProtectedRoute><MoonCycle /></ProtectedRoute></PageTransition>} />
             <Route path="/soulmate-sketch" element={<PageTransition><ProtectedRoute><SoulmateSketch /></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<PageTransition><ProtectedRoute><CosmicGuide /></ProtectedRoute></PageTransition>} />
+            <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />

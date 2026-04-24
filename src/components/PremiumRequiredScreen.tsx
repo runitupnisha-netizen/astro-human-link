@@ -1,8 +1,22 @@
 import { motion } from "framer-motion";
-import { Crown, X, Sparkles, Phone, Video, RefreshCw, Loader2 } from "lucide-react";
+import { Crown, X, Sparkles, Phone, Video, RefreshCw, Loader2, Clock, AlertCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+
+/**
+ * Why the gate is showing — drives the headline and explanation copy so the
+ * user knows whether they never had premium, it lapsed, or it's temporarily
+ * unavailable. Mirrors the `reason` field returned by the
+ * `get-premium-status` / `create-call-room` edge functions.
+ */
+export type PremiumGateStatus =
+  | "missing"           // no Stripe customer / never subscribed
+  | "expired"           // subscription_end is in the past
+  | "inactive"          // customer exists but no active subscription right now
+  | "unauthenticated"   // session not available
+  | "unavailable"       // Stripe not configured / edge function error
+  | "generic";
 
 interface PremiumRequiredScreenProps {
   open: boolean;
@@ -17,6 +31,16 @@ interface PremiumRequiredScreenProps {
    */
   onRetry?: () => void | Promise<void>;
   retryLabel?: string;
+  /**
+   * Specific reason the user hit this gate, used to tailor the message
+   * (e.g. "Your Premium has expired" vs. "Premium is required").
+   */
+  status?: PremiumGateStatus;
+  /**
+   * ISO timestamp of when the previous subscription ended — surfaced in the
+   * "expired" copy so the user knows when their access lapsed.
+   */
+  subscriptionEnd?: string | null;
 }
 
 const PremiumRequiredScreen = ({
@@ -25,6 +49,8 @@ const PremiumRequiredScreen = ({
   feature = "video",
   onRetry,
   retryLabel = "Retry call",
+  status = "missing",
+  subscriptionEnd = null,
 }: PremiumRequiredScreenProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +65,76 @@ const PremiumRequiredScreen = ({
       : feature === "video"
       ? "Video Calls"
       : "This Feature";
+
+  const formatDate = (iso: string | null) => {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const endedOn = formatDate(subscriptionEnd);
+
+  const statusContent: Record<
+    PremiumGateStatus,
+    {
+      badge: { label: string; icon: typeof Crown };
+      title: string;
+      description: string;
+      upgradeLabel: string;
+    }
+  > = {
+    missing: {
+      badge: { label: "Premium required", icon: Lock },
+      title: `${featureLabel} are a Premium Ritual`,
+      description:
+        "Connect heart-to-heart with your matches through secure, end-to-end calls. Unlock with Stellara Premium and meet the soul behind the stars.",
+      upgradeLabel: "Upgrade to Premium",
+    },
+    expired: {
+      badge: { label: "Premium expired", icon: Clock },
+      title: "Your Premium has expired",
+      description: endedOn
+        ? `Your subscription ended on ${endedOn}. Renew to keep starting ${featureLabel.toLowerCase()} and access every premium ritual.`
+        : `Your subscription has ended. Renew to keep starting ${featureLabel.toLowerCase()} and access every premium ritual.`,
+      upgradeLabel: "Renew Premium",
+    },
+    inactive: {
+      badge: { label: "Premium inactive", icon: AlertCircle },
+      title: "Premium isn't active right now",
+      description:
+        "We couldn't find an active subscription on your account. If you just upgraded, give it a moment and tap Retry — or reactivate below to start your call.",
+      upgradeLabel: "Reactivate Premium",
+    },
+    unauthenticated: {
+      badge: { label: "Sign in required", icon: Lock },
+      title: "Sign in to start a call",
+      description:
+        "Your session expired. Sign back in to verify your Premium status and reconnect with your match.",
+      upgradeLabel: "Go to Premium",
+    },
+    unavailable: {
+      badge: { label: "Status unavailable", icon: AlertCircle },
+      title: "We couldn't verify your Premium",
+      description:
+        "Something temporarily blocked us from confirming your subscription. Tap Retry to try again, or open Premium to manage your plan.",
+      upgradeLabel: "Open Premium",
+    },
+    generic: {
+      badge: { label: "Premium required", icon: Crown },
+      title: `${featureLabel} are a Premium Ritual`,
+      description:
+        "Unlock with Stellara Premium to meet the soul behind the stars.",
+      upgradeLabel: "Upgrade to Premium",
+    },
+  };
+
+  const content = statusContent[status];
+  const BadgeIcon = content.badge.icon;
 
   const handleUpgrade = () => {
     onClose();

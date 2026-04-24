@@ -48,6 +48,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const peerHasJoinedOnceRef = useRef(false);
+  const sessionIdRef = useRef<string | null>(null);
 
   const teardownCallObject = useCallback(async () => {
     const co = callObjectRef.current;

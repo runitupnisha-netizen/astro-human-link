@@ -14,6 +14,7 @@ import { useVerificationStatuses } from "@/hooks/useVerification";
 import EmptyState from "@/components/EmptyState";
 import { ConnectionCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import TourHighlight from "@/components/TourHighlight";
 
 interface MatchWithProfile {
   id: string;
@@ -233,9 +234,11 @@ const Connections = () => {
           </motion.div>
 
           {matches.length === 0 ? (
-            <EmptyState type="connections" />
+            <TourHighlight targetId="connections-list">
+              <EmptyState type="connections" />
+            </TourHighlight>
           ) : (
-            <div className="space-y-4">
+            <TourHighlight targetId="connections-list" className="block space-y-4">
               {matches.map((match, i) => (
                 <motion.div
                   key={match.id}
@@ -426,7 +429,7 @@ const Connections = () => {
                   </Card>
                 </motion.div>
               ))}
-            </div>
+            </TourHighlight>
           )}
         </div>
       </div>

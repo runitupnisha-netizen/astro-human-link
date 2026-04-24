@@ -7,6 +7,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import AdvancedFilters, { AdvancedFilterState } from "@/components/AdvancedFilters";
 import { Sparkles, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
+import TourHighlight from "@/components/TourHighlight";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -298,7 +299,7 @@ const Discover = () => {
         </AnimatePresence>
 
         {/* Card stack */}
-        <div className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-180px)] max-h-[620px] [@media(max-height:700px)]:h-[calc(100svh-160px)] md:h-[600px]">
+        <TourHighlight targetId="swipe-deck" className="relative w-full max-w-sm mx-auto px-4 h-[calc(100svh-180px)] max-h-[620px] [@media(max-height:700px)]:h-[calc(100svh-160px)] md:h-[600px]">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <ProfileCardSkeleton />
@@ -350,7 +351,7 @@ const Discover = () => {
               ))}
             </AnimatePresence>
           )}
-        </div>
+        </TourHighlight>
 
         {/* Premium upsell — only after significant use */}
         {!isPremium && swipeCount >= 8 && profiles.length > 0 && (

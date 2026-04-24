@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const STORAGE_KEY = "stellara:full-tour:v1:dismissed";
+export const TOUR_HIGHLIGHT_PARAM = "tour";
 
 interface TourStep {
   icon: React.ComponentType<{ className?: string }>;
@@ -23,7 +24,7 @@ interface TourStep {
   title: string;
   body: string;
   hint?: string;
-  cta?: { label: string; path: string };
+  cta?: { label: string; path: string; highlight?: string };
 }
 
 const TOUR_STEPS: TourStep[] = [
@@ -46,38 +47,42 @@ const TOUR_STEPS: TourStep[] = [
     iconWrapClass: "bg-green-400/15 text-green-400 border-green-400/30",
     title: "Discover · swipe with intention",
     body: "Swipe through soul-matched profiles curated by your cosmic compatibility. Right to like, left to pass, up to super-like.",
-    cta: { label: "Open Discover", path: "/discover" },
+    cta: { label: "Open Discover", path: "/discover", highlight: "swipe-deck" },
   },
   {
     icon: Wand2,
     iconWrapClass: "bg-violet-500/15 text-violet-300 border-violet-400/30",
     title: "Meet Lyra · your AI cosmic guide",
     body: "Lyra is your personal cosmic confidante. Ask her about your chart, a connection, your week, or anything weighing on your heart — she knows you.",
-    cta: { label: "Talk to Lyra", path: "/guide" },
+    cta: { label: "Message Lyra", path: "/guide", highlight: "lyra-input" },
   },
   {
     icon: Heart,
     iconWrapClass: "bg-pink-500/15 text-pink-300 border-pink-400/30",
     title: "Connections & Sacred Reveal",
     body: "Mutual likes appear in Connections. Each day, one curated soul is unveiled to you in the Sacred Reveal — slow dating, the cosmic way.",
+    cta: { label: "Find Connections", path: "/connections", highlight: "connections-list" },
   },
   {
     icon: MessageCircle,
     iconWrapClass: "bg-blue-500/15 text-blue-300 border-blue-400/30",
     title: "Conversations that flow",
     body: "Send voice notes, GIFs, photos & AI icebreakers. Open a shared synastry chart inside any chat to see your energy together.",
+    cta: { label: "Open Messages", path: "/messages", highlight: "messages-list" },
   },
   {
     icon: Moon,
     iconWrapClass: "bg-indigo-400/15 text-indigo-300 border-indigo-400/30",
     title: "Inner World",
     body: "Your private sanctuary: daily briefings, reflections, weekly cosmic insights, the astro calendar & alignment journal.",
+    cta: { label: "Visit Inner World", path: "/inner-world", highlight: "inner-world-hub" },
   },
   {
     icon: Crown,
     iconWrapClass: "text-background border-amber-300/40 [background:var(--gradient-golden)]",
     title: "Stellara Premium (optional)",
     body: "Unlock unlimited likes, see who liked you, profile boosts, incognito mode and full synastry deep-dives whenever you're ready.",
+    cta: { label: "Explore Premium", path: "/premium", highlight: "premium-tiers" },
   },
   {
     icon: Sparkles,
@@ -209,7 +214,10 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
                   type="button"
                   onClick={() => {
                     dismiss();
-                    navigate(step.cta!.path);
+                    const path = step.cta!.highlight
+                      ? `${step.cta!.path}?${TOUR_HIGHLIGHT_PARAM}=${step.cta!.highlight}`
+                      : step.cta!.path;
+                    navigate(path);
                   }}
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent hover:bg-accent/20 transition-colors"
                 >

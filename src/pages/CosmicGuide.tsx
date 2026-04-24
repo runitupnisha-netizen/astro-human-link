@@ -5,6 +5,7 @@ import { Send, Plus, Trash2, MessageSquare, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { useTourHighlight } from "@/hooks/useTourHighlight";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -32,6 +33,7 @@ const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
 
 const CosmicGuide = () => {
   const { user } = useAuth();
+  const inputHighlight = useTourHighlight("lyra-input");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -544,7 +546,9 @@ const CosmicGuide = () => {
       >
         <div className="max-w-2xl mx-auto">
           <div
-            className="flex items-center gap-2 rounded-full px-2 py-2"
+            className={`flex items-center gap-2 rounded-full px-2 py-2 transition-shadow duration-500 ${
+              inputHighlight ? "ring-2 ring-accent/70 animate-pulse" : ""
+            }`}
             style={{
               backgroundColor: "rgba(77, 58, 92, 0.3)",
               border: "1px solid rgba(208, 180, 247, 0.2)",

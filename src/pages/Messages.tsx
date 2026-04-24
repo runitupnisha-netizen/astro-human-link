@@ -40,6 +40,7 @@ import BirthChartOverlay from "@/components/BirthChartOverlay";
 import { validateImage } from "@/lib/imageValidation";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import { usePremium } from "@/hooks/usePremium";
+import TourHighlight from "@/components/TourHighlight";
 
 interface Match {
   id: string;
@@ -784,7 +785,11 @@ const Messages = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
               {/* Conversations List */}
-              <Card className={`bg-card/80 backdrop-blur-sm border-border/50 lg:col-span-1 overflow-hidden ${showMobileChat ? "hidden lg:block" : ""}`}>
+              <TourHighlight
+                targetId="messages-list"
+                className={`lg:col-span-1 ${showMobileChat ? "hidden lg:block" : ""}`}
+              >
+              <Card className="bg-card/80 backdrop-blur-sm border-border/50 overflow-hidden h-full">
                 <CardContent className="p-0 h-full flex flex-col">
                   <div className="p-4 border-b border-border space-y-2">
                     <h2 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
@@ -878,6 +883,7 @@ const Messages = () => {
                   </div>
                 </CardContent>
               </Card>
+              </TourHighlight>
 
               {/* Chat Area */}
               <Card className={`bg-card/80 backdrop-blur-sm border-border/50 lg:col-span-2 overflow-hidden ${!showMobileChat ? "hidden lg:block" : ""}`}>

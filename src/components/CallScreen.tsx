@@ -373,6 +373,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setRemoteJoined(false);
       setNetworkQuality(null);
       setSimulated(false);
+      setCallStats({ rttMs: null, jitterMs: null, packetLossPct: null, videoRecvKbps: null });
+      setStatsExpanded(false);
       peerHasJoinedOnceRef.current = false;
       sessionIdRef.current = null;
       teardownCallObject();

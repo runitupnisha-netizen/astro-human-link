@@ -96,7 +96,7 @@ const premiumPerks = [
 ];
 
 const Premium = () => {
-  const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription } = usePremium();
+  const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription, restorePurchases } = usePremium();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -582,9 +582,14 @@ const Premium = () => {
               variant="ghost"
               onClick={async () => {
                 try {
-                  await manageSubscription();
+                  const result = await restorePurchases();
+                  if (result.subscribed) {
+                    toast({ title: "Purchases restored ✦", description: "Your subscription has been restored." });
+                  } else {
+                    toast({ title: "No active subscription found", description: "If you believe this is an error, please contact support." });
+                  }
                 } catch {
-                  toast({ title: "No subscription found", description: "If you believe this is an error, please contact support.", variant: "destructive" });
+                  toast({ title: "Could not restore", description: "Please try again or contact support.", variant: "destructive" });
                 }
               }}
               className="text-muted-foreground hover:text-foreground text-sm min-h-[44px]"

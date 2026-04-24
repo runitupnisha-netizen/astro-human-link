@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Heart, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
 import SparkleLoader from "@/components/SparkleLoader";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import SynastryChart from "@/components/SynastryChart";
 import { toast } from "sonner";
 
 type Reading = {
@@ -16,6 +17,13 @@ type Reading = {
   summary: string;
   highlight: string;
   theirName: string;
+  userSun: string | null;
+  userMoon: string | null;
+  userRising: string | null;
+  userHdType: string | null;
+  userHdAuthority: string | null;
+  chartHighlights: string[];
+  humanDesignNotes: string[];
 };
 
 type SavedCheck = {

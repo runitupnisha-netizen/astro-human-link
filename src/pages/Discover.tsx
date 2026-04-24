@@ -7,6 +7,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import SwipeCard, { DiscoverProfile } from "@/components/SwipeCard";
 import AdvancedFilters, { AdvancedFilterState } from "@/components/AdvancedFilters";
 import { Sparkles, RefreshCw, MessageCircle, SlidersHorizontal, Crown } from "lucide-react";
+import TourHighlight from "@/components/TourHighlight";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";

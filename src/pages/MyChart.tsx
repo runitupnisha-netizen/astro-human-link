@@ -8,6 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
 
@@ -236,137 +242,149 @@ const MyChart = () => {
             </Card>
           </motion.div>
 
-          {/* Card 2 — Human Design */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          {/* Layer 2 — Deeper details in accordion */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
             <Card className="bg-card/70 backdrop-blur-sm border-border/50">
-              <CardContent className="p-5 md:p-6">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-primary" />
-                    <h2 className="font-display text-lg font-semibold">Human Design Snapshot</h2>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-primary/30 text-primary hover:bg-primary/10"
-                    onClick={() =>
-                      share(
-                        "My Human Design — Stellara",
-                        `⚡ Type: ${profile.human_design_type ?? "—"}\n🧭 Strategy: ${profile.human_design_strategy ?? "—"}\n🔑 Authority: ${profile.human_design_authority ?? "—"}\n📐 Profile: ${profile.human_design_profile ?? "—"}`
-                      )
-                    }
-                  >
-                    <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
-                  </Button>
-                </div>
+              <CardContent className="p-2 md:p-3">
+                <Accordion type="multiple" className="w-full">
+                  {/* Human Design */}
+                  <AccordionItem value="human-design" className="border-border/40">
+                    <AccordionTrigger className="px-3 md:px-4 hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-primary" />
+                        <span className="font-display text-base font-semibold">Human Design Snapshot</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-3 md:px-4 pb-4">
+                      <div className="flex justify-end mb-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-primary/30 text-primary hover:bg-primary/10"
+                          onClick={() =>
+                            share(
+                              "My Human Design — Stellara",
+                              `⚡ Type: ${profile.human_design_type ?? "—"}\n🧭 Strategy: ${profile.human_design_strategy ?? "—"}\n🔑 Authority: ${profile.human_design_authority ?? "—"}\n📐 Profile: ${profile.human_design_profile ?? "—"}`
+                            )
+                          }
+                        >
+                          <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
+                        </Button>
+                      </div>
+                      {profile.human_design_type ? (
+                        <>
+                          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
+                            {hdInterp ?? "A unique energetic blueprint guiding how you make aligned decisions."}
+                          </p>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            {[
+                              { label: "Type", value: profile.human_design_type },
+                              { label: "Strategy", value: profile.human_design_strategy },
+                              { label: "Authority", value: profile.human_design_authority },
+                              { label: "Profile", value: profile.human_design_profile },
+                            ].map((cell) => (
+                              <div key={cell.label} className="rounded-lg border border-border/40 bg-background/40 p-2.5">
+                                <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">{cell.label}</div>
+                                <div className="text-sm font-medium text-foreground truncate">{cell.value ?? "—"}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">Your Human Design will appear here once your chart is generated.</p>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
 
-                {profile.human_design_type ? (
-                  <>
-                    <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-                      {hdInterp ?? "A unique energetic blueprint guiding how you make aligned decisions."}
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {[
-                        { label: "Type", value: profile.human_design_type },
-                        { label: "Strategy", value: profile.human_design_strategy },
-                        { label: "Authority", value: profile.human_design_authority },
-                        { label: "Profile", value: profile.human_design_profile },
-                      ].map((cell) => (
-                        <div key={cell.label} className="rounded-lg border border-border/40 bg-background/40 p-2.5">
-                          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">{cell.label}</div>
-                          <div className="text-sm font-medium text-foreground truncate">{cell.value ?? "—"}</div>
+                  {/* Numerology */}
+                  <AccordionItem value="numerology" className="border-border/40">
+                    <AccordionTrigger className="px-3 md:px-4 hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <Hash className="w-5 h-5 text-foreground/80" />
+                        <span className="font-display text-base font-semibold">Numerology Highlights</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-3 md:px-4 pb-4">
+                      <div className="flex justify-end mb-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-border/60 hover:bg-muted/30"
+                          onClick={() =>
+                            share(
+                              "My Numerology — Stellara",
+                              `🔢 Life Path: ${profile.life_path_number ?? "—"}\n🎂 Birthday: ${profile.birthday_number ?? "—"}\n📅 Personal Year: ${profile.personal_year_number ?? "—"}`
+                            )
+                          }
+                        >
+                          <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
+                        </Button>
+                      </div>
+                      <div className="grid sm:grid-cols-3 gap-3">
+                        {[
+                          { label: "Life Path", value: profile.life_path_number },
+                          { label: "Birthday", value: profile.birthday_number },
+                          { label: "Personal Year", value: profile.personal_year_number },
+                        ].map((n) => (
+                          <div key={n.label} className="rounded-xl border border-border/40 bg-background/30 p-4 text-center">
+                            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">{n.label}</div>
+                            <div className="font-display text-3xl font-bold text-foreground mb-2">{n.value ?? "—"}</div>
+                            <p className="text-xs text-foreground/70 leading-relaxed">{numberMeaning(n.value)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Compatibility Tags */}
+                  <AccordionItem value="tags" className="border-b-0">
+                    <AccordionTrigger className="px-3 md:px-4 hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-accent" />
+                        <span className="font-display text-base font-semibold">Compatibility Tags</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-3 md:px-4 pb-4">
+                      <div className="flex justify-end mb-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-accent/30 text-accent hover:bg-accent/10"
+                          disabled={tags.length === 0}
+                          onClick={() =>
+                            share(
+                              "My Compatibility Tags — Stellara",
+                              `My energy reads as:\n${tags.map((t) => `• ${t}`).join("\n")}`
+                            )
+                          }
+                        >
+                          <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
+                        </Button>
+                      </div>
+                      {tags.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {tags.map((tag, i) => (
+                            <Badge
+                              key={`${tag}-${i}`}
+                              variant="outline"
+                              className="border-accent/30 bg-accent/5 text-accent text-xs py-1 px-2.5"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic">Your Human Design will appear here once your chart is generated.</p>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Card 3 — Numerology */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card className="bg-card/70 backdrop-blur-sm border-border/50">
-              <CardContent className="p-5 md:p-6">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Hash className="w-5 h-5 text-foreground/80" />
-                    <h2 className="font-display text-lg font-semibold">Numerology Highlights</h2>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-border/60 hover:bg-muted/30"
-                    onClick={() =>
-                      share(
-                        "My Numerology — Stellara",
-                        `🔢 Life Path: ${profile.life_path_number ?? "—"}\n🎂 Birthday: ${profile.birthday_number ?? "—"}\n📅 Personal Year: ${profile.personal_year_number ?? "—"}`
-                      )
-                    }
-                  >
-                    <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
-                  </Button>
-                </div>
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {[
-                    { label: "Life Path", value: profile.life_path_number },
-                    { label: "Birthday", value: profile.birthday_number },
-                    { label: "Personal Year", value: profile.personal_year_number },
-                  ].map((n) => (
-                    <div key={n.label} className="rounded-xl border border-border/40 bg-background/30 p-4 text-center">
-                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">{n.label}</div>
-                      <div className="font-display text-3xl font-bold text-foreground mb-2">{n.value ?? "—"}</div>
-                      <p className="text-xs text-foreground/70 leading-relaxed">{numberMeaning(n.value)}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Card 4 — Compatibility tags */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-            <Card className="bg-card/70 backdrop-blur-sm border-border/50">
-              <CardContent className="p-5 md:p-6">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-accent" />
-                    <h2 className="font-display text-lg font-semibold">Compatibility Tags</h2>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-accent/30 text-accent hover:bg-accent/10"
-                    disabled={tags.length === 0}
-                    onClick={() =>
-                      share(
-                        "My Compatibility Tags — Stellara",
-                        `My energy reads as:\n${tags.map((t) => `• ${t}`).join("\n")}`
-                      )
-                    }
-                  >
-                    <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
-                  </Button>
-                </div>
-                {tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag, i) => (
-                      <Badge
-                        key={`${tag}-${i}`}
-                        variant="outline"
-                        className="border-accent/30 bg-accent/5 text-accent text-xs py-1 px-2.5"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic">
-                    Your compatibility tags will appear here once your cosmic profile finishes generating.
-                  </p>
-                )}
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">
+                          Your compatibility tags will appear here once your cosmic profile finishes generating.
+                        </p>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
           </motion.div>

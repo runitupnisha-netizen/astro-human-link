@@ -622,6 +622,6 @@ serve(async (req) => {
         },
       });
     } catch {/* swallow — logging must not crash the handler */}
-    return json({ error: message }, 500);
+    return errorResponse("INTERNAL_ERROR", message, 500);
   }
 });

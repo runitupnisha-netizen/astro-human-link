@@ -95,6 +95,24 @@ const Premium = () => {
   // our ~24s polling window.
   const [pollingTimedOut, setPollingTimedOut] = useState(false);
 
+  // Mirrors `subscribed` for use inside the polling interval without putting
+  // it in the effect deps (which would tear down and recreate the interval
+  // every time the value changes — defeating the "single interval" guarantee).
+  const subscribedRef = useRef(subscribed);
+  useEffect(() => {
+    subscribedRef.current = subscribed;
+  }, [subscribed]);
+
+  // Guards the polling loop against duplicate starts caused by:
+  //   - StrictMode double-invoking effects in dev,
+  //   - the user navigating away from /premium and back while the redirect
+  //     timer hasn't fired yet,
+  //   - `usePremium` returning a new `refreshSubscription` reference.
+  // Component-scoped (not module-scoped) so a fresh page load after a real
+  // navigation can poll again, but multiple mounts within the same instance
+  // share one interval.
+  const pollingActiveRef = useRef(false);
+
   useEffect(() => {
     if (toastShown.current) return;
     if (success) {
@@ -111,10 +129,27 @@ const Premium = () => {
   // becomes active, then redirect the user back into the app.
   useEffect(() => {
     if (!success || redirectTriggered.current) return;
+    // Already subscribed before polling even started — let the redirect
+    // effect handle it, no interval needed.
+    if (subscribedRef.current) return;
+    // Don't start a second interval if one is already running for this mount.
+    if (pollingActiveRef.current) return;
+    pollingActiveRef.current = true;
 
     let cancelled = false;
     let attempts = 0;
     const maxAttempts = 12; // ~24s at 2s interval
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const stop = (timedOut: boolean) => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+      setVerifying(false);
+      if (timedOut && !subscribedRef.current) setPollingTimedOut(true);
+    };
+
     setVerifying(true);
     setPollingTimedOut(false);
 
@@ -126,18 +161,23 @@ const Premium = () => {
       } catch {
         // swallow — we'll retry
       }
+      // Bail as soon as the subscription is confirmed so we don't fire one
+      // more (wasteful) check-subscription call after the happy path lands.
+      if (subscribedRef.current) {
+        stop(false);
+      }
     };
 
     // Kick off an immediate check, then poll.
     tick();
-    const interval = setInterval(async () => {
+    interval = setInterval(async () => {
       if (cancelled) return;
+      if (subscribedRef.current) {
+        stop(false);
+        return;
+      }
       if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        setVerifying(false);
-        // Only flip to "timed out" if we still don't see an active sub.
-        // The other effect (success + subscribed) handles the happy path.
-        if (!subscribed) setPollingTimedOut(true);
+        stop(true);
         return;
       }
       await tick();
@@ -145,9 +185,14 @@ const Premium = () => {
 
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      if (interval !== null) clearInterval(interval);
+      pollingActiveRef.current = false;
     };
-  }, [success, refreshSubscription, subscribed]);
+    // Intentionally exclude `subscribed` and `refreshSubscription` from deps:
+    // we read the live value through `subscribedRef`, and the function ref
+    // is stable enough that re-running would only spawn duplicate intervals.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [success]);
 
   // Once subscription is confirmed active after a successful checkout, redirect.
   useEffect(() => {

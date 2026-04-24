@@ -425,6 +425,18 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
   if (!open) return null;
 
+  // Hard premium gate: non-subscribers can never see the call UI or trigger
+  // a join. Show only the upsell once premium status has resolved.
+  if (!premiumLoading && !subscribed) {
+    return (
+      <PremiumRequiredScreen
+        open={open}
+        onClose={onClose}
+        feature={callType}
+      />
+    );
+  }
+
   return (
     <AnimatePresence>
       {showPremium && (

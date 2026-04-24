@@ -116,10 +116,27 @@ const CheckConnection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!birthDate || !birthPlace) {
-      toast.error("Birth date and city are required");
+    setErrors({});
+
+    const result = checkSchema.safeParse({
+      theirName,
+      birthDate,
+      birthTime: skipTime ? "" : birthTime,
+      birthPlace,
+      confirmed,
+    });
+
+    if (!result.success) {
+      const fieldErrors: FieldErrors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof FieldErrors;
+        if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Please fix the highlighted fields");
       return;
     }
+
     if (limitReached) {
       toast.error("You've used your 2 free connections this month");
       return;

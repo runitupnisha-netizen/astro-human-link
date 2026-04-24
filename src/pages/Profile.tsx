@@ -391,6 +391,17 @@ const Profile = () => {
             </CardContent>
           </Card>
 
+          {/* Invite cosmic twin — referral entry below bio (per spec) */}
+          <button
+            type="button"
+            onClick={() => navigate("/referral")}
+            className="mb-8 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed px-3 py-3 text-sm transition-colors touch-manipulation"
+            style={{ borderColor: "rgba(208, 180, 247, 0.35)", background: "rgba(208, 180, 247, 0.06)", color: "#d0b4f7" }}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Invite ✦ — share your code, both get a free month of Pro</span>
+          </button>
+
           {/* Bio Prompts */}
           <Card data-section="bio-prompts" className="mb-8 bg-card/80 backdrop-blur-sm border-border/50 glow-border">
             <CardContent className="p-6">

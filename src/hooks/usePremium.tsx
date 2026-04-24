@@ -79,19 +79,35 @@ export const usePremium = () => {
     }
 
     try {
+      // Bonus Pro from referral rewards — counts as Pro regardless of Stripe/RC.
+      let bonusActive = false;
+      let bonusUntil: string | null = null;
+      if (user?.id) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("bonus_pro_until")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        const bp = (prof as { bonus_pro_until?: string | null } | null)?.bonus_pro_until ?? null;
+        if (bp && new Date(bp).getTime() > Date.now()) {
+          bonusActive = true;
+          bonusUntil = bp;
+        }
+      }
+
       // On native iOS/Android, the source of truth is RevenueCat.
       if (isNativePurchasePlatform()) {
         const info = await getCustomerInfo();
         if (info) {
           const isPro = hasProEntitlement(info);
-          setSubscribed(isPro);
+          setSubscribed(isPro || bonusActive);
           // Map active product back to a tier key (monthly / yearly).
           const activeProductId = Object.values(info.entitlements?.active ?? {})[0]?.productIdentifier;
           if (activeProductId === RC_PRODUCT_IDS.monthly) setCurrentTier("monthly");
           else if (activeProductId === RC_PRODUCT_IDS.annual) setCurrentTier("yearly");
           else setCurrentTier(null);
           const expiry = Object.values(info.entitlements?.active ?? {})[0]?.expirationDate;
-          setSubscriptionEnd(expiry ?? null);
+          setSubscriptionEnd(expiry ?? bonusUntil);
           setLoading(false);
           return;
         }
@@ -101,15 +117,15 @@ export const usePremium = () => {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
 
-      setSubscribed(data.subscribed);
+      setSubscribed(Boolean(data.subscribed) || bonusActive);
       setCurrentTier(data.product_id ? getTierKeyByProductId(data.product_id) : null);
-      setSubscriptionEnd(data.subscription_end || null);
+      setSubscriptionEnd(data.subscription_end || bonusUntil);
     } catch (err) {
       console.error("Error checking subscription:", err);
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [session, user?.id]);
 
   useEffect(() => {
     checkSubscription();

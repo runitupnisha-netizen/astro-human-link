@@ -74,7 +74,6 @@ const Navigation = () => {
 
   // Bottom tab bar items — 5 key tabs for mobile (Settings accessible from Profile)
   const bottomTabs = [
-    { path: "/", label: t("nav.profile"), icon: User },
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
     { path: "/guide", label: "Lyra", icon: Wand2 },
@@ -263,7 +262,7 @@ const Navigation = () => {
 
       {/* Mobile Bottom Tab Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom" role="navigation" aria-label="Bottom navigation">
-        <div className="grid grid-cols-5 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="grid grid-cols-4 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
             const isActive = item.path === "/profile"

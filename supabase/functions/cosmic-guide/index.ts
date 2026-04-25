@@ -30,7 +30,7 @@ function currentMoonPhase(): string {
   return "New Moon";
 }
 
-function buildSystemPrompt(profile: Record<string, unknown> | null): string {
+export function buildSystemPrompt(profile: Record<string, unknown> | null): string {
   const p = profile ?? {};
   const name = (p.display_name as string) || "friend";
   const bits: string[] = [];

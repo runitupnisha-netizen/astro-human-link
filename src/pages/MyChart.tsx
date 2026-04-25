@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
+import { resolveTimezone, buildBirthDateUTC } from "@/lib/ephemeris";
+import { DateTime } from "luxon";
 
 type ProfileRow = {
   display_name: string | null;
@@ -32,6 +34,11 @@ type ProfileRow = {
   birthday_number: number | null;
   personal_year_number: number | null;
   compatibility_tags: string[] | null;
+  birth_date: string | null;
+  birth_time: string | null;
+  birth_place: string | null;
+  birth_latitude: number | null;
+  birth_longitude: number | null;
 };
 
 const SIGN_INTERPRETATIONS: Record<string, { sun: string; moon: string; rising: string }> = {
@@ -88,7 +95,7 @@ const MyChart = () => {
       const { data } = await supabase
         .from("profiles")
         .select(
-          "display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_profile, human_design_strategy, human_design_authority, gene_keys_life_purpose, life_path_number, birthday_number, personal_year_number, compatibility_tags"
+          "display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_profile, human_design_strategy, human_design_authority, gene_keys_life_purpose, life_path_number, birthday_number, personal_year_number, compatibility_tags, birth_date, birth_time, birth_place, birth_latitude, birth_longitude"
         )
         .eq("user_id", user.id)
         .maybeSingle();
@@ -153,6 +160,36 @@ const MyChart = () => {
   const hdInterp = profile.human_design_type ? HD_INTERPRETATIONS[profile.human_design_type] : null;
 
   const tags = profile.compatibility_tags ?? [];
+
+  // Timezone preview: show the IANA zone resolved from birth coords and the
+  // exact UTC instant fed into the ephemeris. Useful for verifying chart inputs.
+  const tzZone = resolveTimezone(profile.birth_latitude, profile.birth_longitude);
+  const utcInstant =
+    profile.birth_date
+      ? buildBirthDateUTC(
+          profile.birth_date,
+          profile.birth_time,
+          profile.birth_longitude,
+          profile.birth_latitude,
+        )
+      : null;
+  const localPretty =
+    profile.birth_date && tzZone
+      ? DateTime.fromObject(
+          {
+            year: Number(profile.birth_date.slice(0, 4)),
+            month: Number(profile.birth_date.slice(5, 7)),
+            day: Number(profile.birth_date.slice(8, 10)),
+            hour: Number((profile.birth_time ?? "12:00").slice(0, 2)),
+            minute: Number((profile.birth_time ?? "12:00").slice(3, 5)),
+          },
+          { zone: tzZone },
+        ).toFormat("LLL d, yyyy · h:mm a 'local' (ZZZZ)")
+      : null;
+  const utcPretty = utcInstant
+    ? DateTime.fromJSDate(utcInstant).toUTC().toFormat("LLL d, yyyy · HH:mm 'UTC'")
+    : null;
+  const utcIso = utcInstant ? utcInstant.toISOString() : null;
 
   return (
     <div className="relative min-h-screen pt-24 pb-28 md:pb-12">
@@ -238,6 +275,83 @@ const MyChart = () => {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Birth-time timezone preview — shows IANA zone + UTC instant fed to the ephemeris */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+          >
+            <Card className="bg-card/60 backdrop-blur-sm border-border/40">
+              <CardContent className="p-4 md:p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe2 className="w-4 h-4 text-accent" />
+                  <h3 className="font-display text-sm font-semibold text-foreground">
+                    Timezone &amp; UTC instant
+                  </h3>
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground ml-auto">
+                    Ephemeris input
+                  </span>
+                </div>
+
+                {profile.birth_date ? (
+                  <div className="grid sm:grid-cols-2 gap-2.5 text-xs">
+                    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                        Birth (local)
+                      </div>
+                      <div className="text-foreground font-medium">
+                        {localPretty ?? `${profile.birth_date}${profile.birth_time ? ` · ${profile.birth_time}` : ""}`}
+                      </div>
+                      {profile.birth_place && (
+                        <div className="text-muted-foreground mt-1 truncate">{profile.birth_place}</div>
+                      )}
+                    </div>
+
+                    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 flex items-center gap-1">
+                        <Globe2 className="w-3 h-3" /> IANA timezone
+                      </div>
+                      <div className="text-foreground font-mono text-[12px]">
+                        {tzZone ?? "—"}
+                      </div>
+                      {profile.birth_latitude != null && profile.birth_longitude != null && (
+                        <div className="text-muted-foreground mt-1 font-mono text-[10px]">
+                          {profile.birth_latitude.toFixed(4)}, {profile.birth_longitude.toFixed(4)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-lg border border-accent/20 bg-accent/5 p-3 sm:col-span-2">
+                      <div className="text-[10px] uppercase tracking-wide text-accent mb-1 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> UTC instant sent to ephemeris
+                      </div>
+                      <div className="text-foreground font-medium">{utcPretty ?? "—"}</div>
+                      {utcIso && (
+                        <div className="text-muted-foreground mt-1 font-mono text-[10px] break-all">
+                          {utcIso}
+                        </div>
+                      )}
+                      {!profile.birth_time && (
+                        <div className="text-accent/80 mt-2 text-[11px]">
+                          No birth time on file — defaulting to local 12:00. Moon &amp; Rising may be off.
+                        </div>
+                      )}
+                      {!tzZone && profile.birth_longitude != null && (
+                        <div className="text-accent/80 mt-2 text-[11px]">
+                          No IANA zone resolved — falling back to longitude/15 offset (no DST).
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">
+                    Add your birth date, time, and place to see the exact UTC instant used for your chart.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </motion.div>

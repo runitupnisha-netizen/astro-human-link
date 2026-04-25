@@ -23,6 +23,7 @@ import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
+import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -122,6 +123,11 @@ const AnalyticsTracker = () => {
     trackPageView(location.pathname);
   }, [location.pathname, trackPageView]);
 
+  return null;
+};
+
+const KeyboardInsetTracker = () => {
+  useKeyboardInsets();
   return null;
 };
 

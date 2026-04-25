@@ -591,6 +591,144 @@ const ChartParity = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Fixture Editor — pick a canonical case, override DST, edit expected */}
+        <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-accent" />
+                  Fixture editor
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Toggle DST and edit expected placements live. Useful for
+                  diagnosing "Astro.com vs us" disagreements caused by a wrong
+                  Daylight-Saving choice on the source side.
+                </p>
+              </div>
+              <Pill ok={fxPassed === FIELD_ORDER.length} label={`${fxPassed}/${FIELD_ORDER.length}`} />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Selectors row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Fixture</Label>
+                <Select
+                  value={fxId}
+                  onValueChange={(id) => {
+                    setFxId(id);
+                    const c = CASES.find((x) => x.id === id);
+                    if (c) setFxExpected({ ...c.expected });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CASES.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">DST mode</Label>
+                <Select value={fxDst} onValueChange={(v) => setFxDst(v as typeof fxDst)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">
+                      Auto (IANA history) — {fxZoneInfo.inDst ? "DST in effect" : "Standard time"}
+                    </SelectItem>
+                    <SelectItem value="standard">Force Standard ({offsetLabel(fxZoneInfo.stdOffsetMin)})</SelectItem>
+                    <SelectItem value="dst">Force DST ({offsetLabel(fxZoneInfo.dstOffsetMin)})</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Resolved meta */}
+            <div className="rounded-lg border border-border/40 bg-background/40 p-3 text-[11px] font-mono space-y-0.5">
+              <div className="text-muted-foreground">
+                Local: {fxCase.birthDate} {fxCase.birthTime} · {fxCase.latitude.toFixed(3)}, {fxCase.longitude.toFixed(3)}
+              </div>
+              <div className="text-muted-foreground">
+                Zone: {fxBuild.zone ?? "no-tz"} · auto-offset {offsetLabel(fxAutoOffset)} → applied {offsetLabel(fxBuild.effectiveOffsetMin)}
+              </div>
+              <div className="text-foreground">UTC instant: {fxBuild.utc.toISOString()}</div>
+            </div>
+
+            {/* Diff table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/50">
+                    <th className="py-2 pr-2 font-medium">Field</th>
+                    <th className="py-2 px-2 font-medium">Expected (editable)</th>
+                    <th className="py-2 px-2 font-medium">Computed</th>
+                    <th className="py-2 pl-2 font-medium text-right">Match</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fxRows.map((r) => (
+                    <tr key={r.field} className="border-b border-border/20 last:border-0">
+                      <td className="py-2 pr-2 text-muted-foreground">{FIELD_LABELS[r.field]}</td>
+                      <td className="py-2 px-2">
+                        <Select
+                          value={r.expected ?? ""}
+                          onValueChange={(v) =>
+                            setFxExpected((p) => ({ ...p, [r.field]: v as ZodiacSign }))
+                          }
+                        >
+                          <SelectTrigger className="h-8 text-xs font-mono w-[140px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ZODIAC_SIGNS.map((s) => (
+                              <SelectItem key={s} value={s} className="font-mono text-xs">
+                                {s}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className={`py-2 px-2 font-mono ${r.pass ? "text-emerald-300" : "text-rose-300"}`}>
+                        {r.computed ?? "—"}
+                      </td>
+                      <td className="py-2 pl-2 text-right">
+                        {r.pass ? (
+                          <Check className="inline w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <X className="inline w-4 h-4 text-rose-400" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-[11px] text-muted-foreground">
+                Edits stay local to this session. Update{" "}
+                <span className="font-mono">CASES</span> in this file (and the
+                test fixtures) to persist a new expected value.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFxExpected({ ...fxCase.expected })}
+              >
+                Reset expected
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

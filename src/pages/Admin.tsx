@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2 } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X } from "lucide-react";
 
 type Report = {
   id: string;
@@ -300,6 +300,204 @@ const UserLookupSection = () => {
   );
 };
 
+type LyraProbeResult = {
+  ok: true;
+  demo_user_id: string;
+  demo_email: string;
+  question: string;
+  match_word: string;
+  first_sentence: string;
+  full_response: string;
+  contains_match_word: boolean;
+  first_sentence_contains_match_word: boolean;
+  profile_signs: {
+    sun: string | null;
+    moon: string | null;
+    rising: string | null;
+    venus: string | null;
+    mars: string | null;
+    mercury: string | null;
+  };
+};
+
+const DEFAULT_LYRA_QUESTION =
+  "What's my Sun sign and what does it say about how I love?";
+
+const LyraProbeSection = () => {
+  const [question, setQuestion] = useState(DEFAULT_LYRA_QUESTION);
+  const [matchWord, setMatchWord] = useState("Sagittarius");
+  const [running, setRunning] = useState(false);
+  const [result, setResult] = useState<LyraProbeResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async () => {
+    setRunning(true);
+    setError(null);
+    try {
+      const { data, error: invokeErr } = await supabase.functions.invoke(
+        "admin-lyra-probe",
+        { body: { question, matchWord } },
+      );
+      if (invokeErr) throw invokeErr;
+      const payload = data as LyraProbeResult | { error: string };
+      if ("error" in payload) throw new Error(payload.error);
+      setResult(payload);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      toast.error(`Lyra probe failed: ${msg}`);
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <Card className="bg-white border-slate-200 p-5 space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-md bg-violet-100 text-violet-700">
+          <MessageCircleQuestion className="w-4 h-4" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-slate-900">
+            Run as demo · Lyra question probe
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Calls the cosmic-guide AI prompt server-side using the demo
+            account's saved blueprint, then surfaces the first sentence and
+            checks for an expected keyword (e.g. <code>Sagittarius</code>).
+            Preview-only — admin role required.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-[1fr,180px] gap-3">
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-slate-700">Question</label>
+          <Input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Ask Lyra anything…"
+            disabled={running}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-slate-700">
+            Expect keyword
+          </label>
+          <Input
+            value={matchWord}
+            onChange={(e) => setMatchWord(e.target.value)}
+            placeholder="Sagittarius"
+            disabled={running}
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button size="sm" onClick={run} disabled={running || !question.trim()}>
+          {running ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+              Asking Lyra…
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+              Run as demo
+            </>
+          )}
+        </Button>
+        <button
+          type="button"
+          className="text-xs text-slate-500 hover:text-slate-800"
+          onClick={() => {
+            setQuestion(DEFAULT_LYRA_QUESTION);
+            setMatchWord("Sagittarius");
+            setResult(null);
+            setError(null);
+          }}
+        >
+          Reset
+        </button>
+      </div>
+
+      {error && (
+        <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+          {error}
+        </div>
+      )}
+
+      {result && (
+        <div className="space-y-3 pt-2 border-t border-slate-100">
+          <div className="grid sm:grid-cols-2 gap-2 text-xs">
+            <div className="text-slate-600">
+              <span className="text-slate-400">Demo user:</span>{" "}
+              <code className="text-slate-800">{result.demo_email}</code>
+            </div>
+            <div className="text-slate-600">
+              <span className="text-slate-400">Signs used:</span>{" "}
+              <code className="text-slate-800">
+                ☉ {result.profile_signs.sun ?? "—"} · ☽{" "}
+                {result.profile_signs.moon ?? "—"} · ↗{" "}
+                {result.profile_signs.rising ?? "—"}
+              </code>
+            </div>
+          </div>
+
+          <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+              First sentence
+            </div>
+            <p className="text-sm text-slate-900 leading-relaxed">
+              {result.first_sentence || "(empty)"}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border ${
+                result.first_sentence_contains_match_word
+                  ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                  : "border-amber-300 bg-amber-50 text-amber-800"
+              }`}
+            >
+              {result.first_sentence_contains_match_word ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <X className="w-3 h-3" />
+              )}
+              "{result.match_word}" in 1st sentence
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border ${
+                result.contains_match_word
+                  ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                  : "border-rose-300 bg-rose-50 text-rose-800"
+              }`}
+            >
+              {result.contains_match_word ? (
+                <Check className="w-3 h-3" />
+              ) : (
+                <X className="w-3 h-3" />
+              )}
+              "{result.match_word}" anywhere in response
+            </span>
+          </div>
+
+          <details className="text-xs">
+            <summary className="cursor-pointer text-slate-500 hover:text-slate-800">
+              Full response
+            </summary>
+            <pre className="mt-2 whitespace-pre-wrap text-slate-700 bg-slate-50 rounded-md p-3 border border-slate-200 max-h-96 overflow-auto">
+              {result.full_response}
+            </pre>
+          </details>
+        </div>
+      )}
+    </Card>
+  );
+};
+
 const Admin = () => {
   const { isAdmin, loading } = useIsAdmin();
   const [recomputing, setRecomputing] = useState(false);
@@ -381,6 +579,7 @@ const Admin = () => {
           <TabsList className="bg-white border border-slate-200">
             <TabsTrigger value="reports">Reports Queue</TabsTrigger>
             <TabsTrigger value="users">User Lookup</TabsTrigger>
+            <TabsTrigger value="lyra">Lyra Probe</TabsTrigger>
           </TabsList>
           <TabsContent value="reports" className="mt-4">
             <Card className="bg-white border-slate-200">
@@ -389,6 +588,9 @@ const Admin = () => {
           </TabsContent>
           <TabsContent value="users" className="mt-4">
             <UserLookupSection />
+          </TabsContent>
+          <TabsContent value="lyra" className="mt-4">
+            <LyraProbeSection />
           </TabsContent>
         </Tabs>
       </main>

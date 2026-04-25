@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2 } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X } from "lucide-react";
 
 type Report = {
   id: string;
@@ -381,6 +381,7 @@ const Admin = () => {
           <TabsList className="bg-white border border-slate-200">
             <TabsTrigger value="reports">Reports Queue</TabsTrigger>
             <TabsTrigger value="users">User Lookup</TabsTrigger>
+            <TabsTrigger value="lyra">Lyra Probe</TabsTrigger>
           </TabsList>
           <TabsContent value="reports" className="mt-4">
             <Card className="bg-white border-slate-200">
@@ -389,6 +390,9 @@ const Admin = () => {
           </TabsContent>
           <TabsContent value="users" className="mt-4">
             <UserLookupSection />
+          </TabsContent>
+          <TabsContent value="lyra" className="mt-4">
+            <LyraProbeSection />
           </TabsContent>
         </Tabs>
       </main>

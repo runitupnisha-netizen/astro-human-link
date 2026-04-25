@@ -14,6 +14,7 @@ import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
+import BuildInfoBadge from "./components/BuildInfoBadge";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
@@ -289,6 +290,7 @@ const App = () => (
             <BrowserRouter>
               <AppRoutes />
             </BrowserRouter>
+            <BuildInfoBadge />
           </TooltipProvider>
         </QueryClientProvider>
       </TranslationProvider>

@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
+import DstShiftWarning from "@/components/DstShiftWarning";
 import BioPrompts from "@/components/BioPrompts";
 import ProfileChecklist from "@/components/ProfileChecklist";
 import SelfieVerification from "@/components/SelfieVerification";
@@ -824,6 +825,12 @@ const Profile = () => {
                 value={editBirthTime}
                 onChange={(e) => setEditBirthTime(e.target.value)}
                 className="bg-muted/50 border-border"
+              />
+              <DstShiftWarning
+                birthDate={editBirthDate || null}
+                birthTime={editBirthTime || null}
+                latitude={(profile as any)?.birth_latitude ?? null}
+                longitude={(profile as any)?.birth_longitude ?? null}
               />
             </div>
 

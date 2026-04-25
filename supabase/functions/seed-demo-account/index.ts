@@ -65,7 +65,11 @@ serve(async (req) => {
       log.push(`Created demo user: ${demoUserId}`);
     }
 
-    // 2) Upsert demo profile (Capricorn / Aries / Libra)
+    // 2) Upsert demo profile.
+    // Birth: Jan 15 1990, 10:00 local (PST, UTC−8) in Los Angeles.
+    // Verified placements (Astro-Seek + astronomy-engine, locked by
+    // ephemeris-regression.test.ts): Sun Capricorn, Moon Virgo, Rising Pisces,
+    // Mercury Capricorn, Venus Aquarius, Mars Sagittarius.
     const demoProfile = {
       user_id: demoUserId,
       display_name: "Stellara Demo",
@@ -79,9 +83,9 @@ serve(async (req) => {
       current_latitude: 34.0522,
       current_longitude: -118.2437,
       sun_sign: "Capricorn",
-      moon_sign: "Aries",
-      rising_sign: "Libra",
-      venus_sign: "Sagittarius",
+      moon_sign: "Virgo",
+      rising_sign: "Pisces",
+      venus_sign: "Aquarius",
       mars_sign: "Sagittarius",
       mercury_sign: "Capricorn",
       human_design_type: "Generator",
@@ -93,7 +97,7 @@ serve(async (req) => {
       birthday_number: 6,
       personal_year_number: 1,
       numerology_summary: "Life Path 8: building lasting structures of love and legacy.",
-      astro_summary: "A Capricorn Sun gives you grounded ambition; Aries Moon fuels passionate emotion; Libra Rising softens it all with grace.",
+      astro_summary: "A Capricorn Sun gives you grounded ambition; Virgo Moon brings devoted, precise emotion; Pisces Rising softens your edges with quiet, dreamy grace.",
       gender: "Woman",
       preferred_genders: ["Man", "Woman", "Non-binary"],
       age_min: 24,

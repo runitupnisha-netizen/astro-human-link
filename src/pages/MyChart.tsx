@@ -279,6 +279,83 @@ const MyChart = () => {
             </Card>
           </motion.div>
 
+          {/* Birth-time timezone preview — shows IANA zone + UTC instant fed to the ephemeris */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+          >
+            <Card className="bg-card/60 backdrop-blur-sm border-border/40">
+              <CardContent className="p-4 md:p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe2 className="w-4 h-4 text-accent" />
+                  <h3 className="font-display text-sm font-semibold text-foreground">
+                    Timezone &amp; UTC instant
+                  </h3>
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground ml-auto">
+                    Ephemeris input
+                  </span>
+                </div>
+
+                {profile.birth_date ? (
+                  <div className="grid sm:grid-cols-2 gap-2.5 text-xs">
+                    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
+                        Birth (local)
+                      </div>
+                      <div className="text-foreground font-medium">
+                        {localPretty ?? `${profile.birth_date}${profile.birth_time ? ` · ${profile.birth_time}` : ""}`}
+                      </div>
+                      {profile.birth_place && (
+                        <div className="text-muted-foreground mt-1 truncate">{profile.birth_place}</div>
+                      )}
+                    </div>
+
+                    <div className="rounded-lg border border-border/40 bg-background/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 flex items-center gap-1">
+                        <Globe2 className="w-3 h-3" /> IANA timezone
+                      </div>
+                      <div className="text-foreground font-mono text-[12px]">
+                        {tzZone ?? "—"}
+                      </div>
+                      {profile.birth_latitude != null && profile.birth_longitude != null && (
+                        <div className="text-muted-foreground mt-1 font-mono text-[10px]">
+                          {profile.birth_latitude.toFixed(4)}, {profile.birth_longitude.toFixed(4)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-lg border border-accent/20 bg-accent/5 p-3 sm:col-span-2">
+                      <div className="text-[10px] uppercase tracking-wide text-accent mb-1 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> UTC instant sent to ephemeris
+                      </div>
+                      <div className="text-foreground font-medium">{utcPretty ?? "—"}</div>
+                      {utcIso && (
+                        <div className="text-muted-foreground mt-1 font-mono text-[10px] break-all">
+                          {utcIso}
+                        </div>
+                      )}
+                      {!profile.birth_time && (
+                        <div className="text-amber-300/80 mt-2 text-[11px]">
+                          No birth time on file — defaulting to local 12:00. Moon &amp; Rising may be off.
+                        </div>
+                      )}
+                      {!tzZone && profile.birth_longitude != null && (
+                        <div className="text-amber-300/80 mt-2 text-[11px]">
+                          No IANA zone resolved — falling back to longitude/15 offset (no DST).
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">
+                    Add your birth date, time, and place to see the exact UTC instant used for your chart.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* Layer 2 — Deeper details in accordion */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}

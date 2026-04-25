@@ -5,6 +5,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface BirthTimeHelpTooltipProps {
   /** Optional tone hint — uses muted color by default. */
@@ -20,8 +27,10 @@ interface BirthTimeHelpTooltipProps {
  */
 const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
   const [open, setOpen] = useState(false);
+  const [observedOpen, setObservedOpen] = useState(false);
 
   return (
+    <>
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
@@ -86,6 +95,18 @@ const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
               DST, just enter the clock time. Our timezone database knows
               whether DST was active on your birth date.
             </p>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(false);
+                setObservedOpen(true);
+              }}
+              className="mt-2 text-[11px] font-medium text-accent hover:text-accent/80 underline-offset-2 hover:underline transition-colors"
+            >
+              What does "Observed" mean? →
+            </button>
           </div>
 
           <div className="rounded-lg border border-accent/40 bg-accent/5 p-2.5">
@@ -114,6 +135,66 @@ const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
         </div>
       </PopoverContent>
     </Popover>
+
+    <Dialog open={observedOpen} onOpenChange={setObservedOpen}>
+      <DialogContent className="bg-card/95 backdrop-blur-xl border-border/50 max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-display text-lg">
+            What "Observed" means for your natal chart
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            A quick primer on Daylight Saving and why it matters here.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            Your natal chart is cast for the exact <span className="text-foreground/90 font-medium">UTC instant</span>{" "}
+            of your birth — not the local clock time. To convert, we need to
+            know the offset between your birth city and UTC at that moment.
+          </p>
+
+          <div className="rounded-lg border border-border/40 bg-background/40 p-3 space-y-1.5">
+            <p className="text-foreground/90 font-medium">Observed</p>
+            <p>
+              The location follows Daylight Saving Time and clocks were{" "}
+              <span className="text-foreground/90 font-medium">moved forward</span>{" "}
+              by one hour during the warmer months. Most of the US, Canada
+              (except Saskatchewan), and Europe observe DST.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border/40 bg-background/40 p-3 space-y-1.5">
+            <p className="text-foreground/90 font-medium">Not Observed</p>
+            <p>
+              The location keeps standard time year-round — the clock never
+              jumps. Examples: Arizona (except the Navajo Nation), Hawaii,
+              most of Indiana before 2006, Saskatchewan, Japan, China, India.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-accent/40 bg-accent/5 p-3 space-y-1">
+            <p className="text-foreground/90 font-medium">Why it matters</p>
+            <p>
+              A 1-hour error shifts the{" "}
+              <span className="text-foreground/90 font-medium">Ascendant (Rising sign)</span>{" "}
+              by roughly 15°, which is often a full sign change. The Moon
+              moves about 0.5° in an hour, and the Midheaven moves the same
+              amount as the Ascendant.
+            </p>
+          </div>
+
+          <p className="text-xs">
+            ✦ Good news: you don't have to figure this out yourself. We resolve
+            your birth city's IANA timezone (e.g.{" "}
+            <span className="font-mono text-[11px]">America/New_York</span>) and
+            apply the historical DST rules in effect on your birth date —
+            even for births before 1970.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 

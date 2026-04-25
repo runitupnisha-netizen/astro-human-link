@@ -348,6 +348,29 @@ const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
   </span>
 );
 
+const MappingRow = ({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+      {label}
+    </span>
+    <span
+      className={`font-mono text-xs ${
+        accent ? "text-amber-300" : "text-foreground"
+      }`}
+    >
+      {value}
+    </span>
+  </div>
+);
+
 const CaseTable = ({ result }: { result: CaseResult }) => {
   const { rows, passed, total } = result;
   const ok = passed === total;

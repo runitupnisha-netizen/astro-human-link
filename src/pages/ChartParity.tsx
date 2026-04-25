@@ -391,6 +391,68 @@ const ChartParity = () => {
     setCustomMeta({ zone: resolveTimezone(lat, lng), utc: utc.toISOString() });
   };
 
+  // ----- Fixture editor: live computation -----
+  const fxCase = CASES.find((c) => c.id === fxId) ?? CASES[0];
+  const fxBuild = useMemo(
+    () =>
+      buildUtcWithDst(
+        fxCase.birthDate,
+        fxCase.birthTime,
+        fxCase.latitude,
+        fxCase.longitude,
+        fxDst,
+      ),
+    [fxCase, fxDst],
+  );
+  const fxAutoOffset = useMemo(() => {
+    const zone = resolveTimezone(fxCase.latitude, fxCase.longitude);
+    if (!zone) return null;
+    const dt = DateTime.fromObject(
+      parseLocal(fxCase.birthDate, fxCase.birthTime),
+      { zone },
+    );
+    return dt.isValid ? dt.offset : null;
+  }, [fxCase]);
+  const fxZoneInfo = useMemo(
+    () => inspectZone(fxBuild.zone, fxCase.birthDate),
+    [fxBuild.zone, fxCase.birthDate],
+  );
+  const fxPlacements: Placements = useMemo(() => {
+    // Re-compute by passing the (potentially DST-shifted) UTC instant in via
+    // a synthetic local time + longitude/lat that buildBirthDateUTC will
+    // round-trip back to the same UTC. Easiest path: call calcChartPlacements
+    // with a virtual local time derived from the UTC + the forced offset.
+    // For simplicity we just recompute placements from the resulting UTC by
+    // shifting the local birthTime by the (auto - forced) delta in minutes.
+    const targetUtc = fxBuild.utc;
+    // Convert targetUtc back to fxCase's IANA zone clock time so
+    // calcChartPlacements (which itself runs the IANA pipeline) lines up.
+    if (!fxBuild.zone) {
+      return calcChartPlacements({
+        birthDate: fxCase.birthDate,
+        birthTime: fxCase.birthTime || null,
+        latitude: fxCase.latitude,
+        longitude: fxCase.longitude,
+      });
+    }
+    const local = DateTime.fromJSDate(targetUtc).setZone(fxBuild.zone);
+    const isoDate = local.toFormat("yyyy-LL-dd");
+    const isoTime = local.toFormat("HH:mm");
+    return calcChartPlacements({
+      birthDate: isoDate,
+      birthTime: isoTime,
+      latitude: fxCase.latitude,
+      longitude: fxCase.longitude,
+    });
+  }, [fxBuild, fxCase]);
+  const fxRows = FIELD_ORDER.map((f) => ({
+    field: f,
+    expected: fxExpected[f],
+    computed: fxPlacements[f] ?? ("—" as ZodiacSign),
+    pass: fxPlacements[f] === fxExpected[f],
+  }));
+  const fxPassed = fxRows.filter((r) => r.pass).length;
+
   return (
     <div className="min-h-screen bg-background pt-20 md:pt-24 pb-24 px-4">
       <div className="max-w-5xl mx-auto space-y-6">

@@ -60,6 +60,7 @@ const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MyChart = lazy(() => import("./pages/MyChart"));
 const ChartParity = lazy(() => import("./pages/ChartParity"));
+const ChartWizard = lazy(() => import("./pages/ChartWizard"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));

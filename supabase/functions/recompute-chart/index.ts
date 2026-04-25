@@ -250,6 +250,12 @@ serve(async (req) => {
     .from("profiles")
     .update({
       ...after,
+      // Roll the demo Daily Ritual forward so it reads as
+      // "completed yesterday" — keeps the ritual available for
+      // App Store / Play reviewers without manual SQL.
+      daily_ritual_last_completed: new Date(Date.now() - 86400000)
+        .toISOString()
+        .slice(0, 10),
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", targetUserId);

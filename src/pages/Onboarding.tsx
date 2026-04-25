@@ -14,6 +14,7 @@ import numerologyMandala from "@/assets/numerology-mandala.png";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 import AvatarUpload from "@/components/AvatarUpload";
 import PhotoGallery from "@/components/PhotoGallery";
 
@@ -602,7 +603,10 @@ const Onboarding = () => {
                   transition={{ delay: 0.4 }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-sm font-medium text-foreground">Birth Time</label>
+                    <div className="flex items-center gap-1.5">
+                      <label className="text-sm font-medium text-foreground">Birth Time</label>
+                      <BirthTimeHelpTooltip />
+                    </div>
                     <label className="flex items-center gap-2 cursor-pointer group">
                       <Checkbox checked={!knowsBirthTime} onCheckedChange={(checked) => { setKnowsBirthTime(!checked); if (checked) setBirthTime(""); }} />
                       <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">I don't know my birth time</span>

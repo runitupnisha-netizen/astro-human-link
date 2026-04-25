@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Card } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope } from "lucide-react";
 
 type Report = {
   id: string;
@@ -315,9 +315,18 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <Shield className="w-5 h-5 text-slate-700" />
-          <h1 className="text-xl font-semibold">Stellara Admin</h1>
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-slate-700" />
+            <h1 className="text-xl font-semibold">Stellara Admin</h1>
+          </div>
+          <Link
+            to="/admin/chart-parity"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            <Telescope className="w-3.5 h-3.5" />
+            Chart Parity
+          </Link>
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-6 py-6">

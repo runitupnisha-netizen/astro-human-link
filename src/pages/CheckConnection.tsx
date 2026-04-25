@@ -9,6 +9,7 @@ import { usePremium } from "@/hooks/usePremium";
 import SparkleLoader from "@/components/SparkleLoader";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import SynastryChart from "@/components/SynastryChart";
+import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 import { toast } from "sonner";
 
 type Reading = {

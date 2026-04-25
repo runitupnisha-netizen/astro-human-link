@@ -632,7 +632,9 @@ const CosmicGuide = () => {
       <div
         className="relative z-10 px-4 pt-3"
         style={{
-          paddingBottom: "calc(max(env(safe-area-inset-bottom), 0.5rem) + 5.5rem)",
+          paddingBottom:
+            "calc(var(--keyboard-inset, 0px) + max(env(safe-area-inset-bottom), 0.5rem) + 5.5rem)",
+          transition: "padding-bottom 180ms ease-out",
         }}
       >
         <div className="max-w-2xl mx-auto">

@@ -12,11 +12,101 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DateTime } from "luxon";
+import { resolveTimezone } from "@/lib/ephemeris";
 
 interface BirthTimeHelpTooltipProps {
   /** Optional tone hint — uses muted color by default. */
   className?: string;
+  /** Local birth date as "YYYY-MM-DD" — enables the worked example. */
+  birthDate?: string | null;
+  /** Local birth time as "HH:MM" — enables the worked example. */
+  birthTime?: string | null;
+  /** Birth latitude — used to resolve IANA zone for the worked example. */
+  latitude?: number | null;
+  /** Birth longitude — used to resolve IANA zone for the worked example. */
+  longitude?: number | null;
 }
+
+/** Format a Luxon offset (in minutes) as "UTC±HH:MM". */
+const fmtOffset = (mins: number) => {
+  const sign = mins >= 0 ? "+" : "-";
+  const abs = Math.abs(mins);
+  return `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+};
+
+interface WorkedExample {
+  zone: string;
+  localLabel: string;
+  observedOffset: string;
+  observedUtc: string;
+  notObservedOffset: string;
+  notObservedUtc: string;
+  dstActive: boolean;
+}
+
+/**
+ * Build a worked example from the user's actual entered values when
+ * available; otherwise fall back to a canonical example
+ * (Brooklyn NY, June 14 1990 @ 03:30 — DST in effect).
+ */
+const buildExample = (
+  birthDate?: string | null,
+  birthTime?: string | null,
+  lat?: number | null,
+  lon?: number | null,
+): WorkedExample => {
+  let date = birthDate ?? null;
+  let time = birthTime ?? null;
+  let latitude = lat ?? null;
+  let longitude = lon ?? null;
+  let zone: string | null =
+    latitude != null && longitude != null
+      ? resolveTimezone(latitude, longitude)
+      : null;
+
+  // Validate inputs; if anything is missing or unparseable, use the
+  // canonical demo so the example is always present.
+  const hasValidInputs =
+    !!date &&
+    !!time &&
+    /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+    /^\d{2}:\d{2}/.test(time) &&
+    !!zone;
+
+  if (!hasValidInputs) {
+    date = "1990-06-14";
+    time = "03:30";
+    latitude = 40.6782;
+    longitude = -73.9442;
+    zone = "America/New_York";
+  }
+
+  const [y, m, d] = date!.split("-").map(Number);
+  const [hh, mm] = time!.split(":").map(Number);
+
+  // Observed: native Luxon resolution honors DST for that historical date.
+  const observed = DateTime.fromObject(
+    { year: y, month: m, day: d, hour: hh, minute: mm },
+    { zone: zone! },
+  );
+  // Not Observed: same wall clock interpreted as if DST never applied —
+  // use the zone's standard offset for that date (offset + 60 when DST is on,
+  // identical when DST is already off).
+  const standardOffset = observed.isInDST ? observed.offset - 60 : observed.offset;
+  const notObservedUtcMs = observed.toMillis() - (standardOffset - observed.offset) * 60_000;
+  const notObserved = DateTime.fromMillis(notObservedUtcMs, { zone: "utc" });
+
+  return {
+    zone: zone!,
+    localLabel: `${date} ${time}`,
+    observedOffset: fmtOffset(observed.offset),
+    observedUtc: observed.toUTC().toISO() ?? "",
+    notObservedOffset: fmtOffset(standardOffset),
+    notObservedUtc: notObserved.toISO() ?? "",
+    dstActive: observed.isInDST,
+  };
+};
 
 /**
  * Help tooltip for the natal-chart Birth Time field.
@@ -25,9 +115,24 @@ interface BirthTimeHelpTooltipProps {
  * we feed to the ephemeris. Uses Popover (not Tooltip) so it works on touch
  * devices and supports rich, multi-paragraph copy.
  */
-const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
+const BirthTimeHelpTooltip = ({
+  className,
+  birthDate,
+  birthTime,
+  latitude,
+  longitude,
+}: BirthTimeHelpTooltipProps) => {
   const [open, setOpen] = useState(false);
   const [observedOpen, setObservedOpen] = useState(false);
+
+  const example = buildExample(birthDate, birthTime, latitude, longitude);
+  const usingUserInputs =
+    !!birthDate &&
+    !!birthTime &&
+    latitude != null &&
+    longitude != null &&
+    /^\d{4}-\d{2}-\d{2}$/.test(birthDate) &&
+    /^\d{2}:\d{2}/.test(birthTime);
 
   return (
     <>
@@ -132,6 +237,65 @@ const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
             sign change) and your Moon by ~0.5° — so we automate this to keep
             your chart accurate.
           </p>
+
+          <div className="rounded-lg border border-border/40 bg-background/40 p-2.5 space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-foreground/90 font-medium">
+                Worked example
+              </p>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {usingUserInputs ? "Your inputs" : "Sample"}
+              </span>
+            </div>
+            <div className="text-[11px] text-muted-foreground space-y-0.5">
+              <div>
+                Local:{" "}
+                <span className="font-mono text-foreground/90">
+                  {example.localLabel}
+                </span>
+              </div>
+              <div>
+                Zone:{" "}
+                <span className="font-mono text-foreground/90">
+                  {example.zone}
+                </span>
+                {example.dstActive && (
+                  <span className="ml-1.5 text-accent">(DST in effect)</span>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-1 pt-1">
+              <div className="rounded-md border border-border/40 bg-background/60 px-2 py-1.5">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-foreground/90 text-[11px] font-medium">
+                    Observed
+                  </span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {example.observedOffset}
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] text-muted-foreground">
+                  → {example.observedUtc}
+                </div>
+              </div>
+              <div className="rounded-md border border-border/40 bg-background/60 px-2 py-1.5">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-foreground/90 text-[11px] font-medium">
+                    Not Observed
+                  </span>
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {example.notObservedOffset}
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] text-muted-foreground">
+                  → {example.notObservedUtc}
+                </div>
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground pt-0.5">
+              The "Observed" instant is what we send to the ephemeris.
+            </p>
+          </div>
         </div>
       </PopoverContent>
     </Popover>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, X, Sparkles } from "lucide-react";
 
@@ -12,6 +12,8 @@ const UpdateAvailableSnackbar = () => {
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [open, setOpen] = useState(false);
   const [reloading, setReloading] = useState(false);
+  const unmountedRef = useRef(false);
+  useEffect(() => () => { unmountedRef.current = true; }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
@@ -74,13 +76,9 @@ const UpdateAvailableSnackbar = () => {
 
     // Safety fallback in case controllerchange never fires
     window.setTimeout(() => {
-      if (!cancelled.current) window.location.reload();
+      if (!unmountedRef.current) window.location.reload();
     }, 2500);
   };
-
-  // Tiny mutable holder for the safety timeout, scoped to component lifetime.
-  const cancelled = { current: false };
-  useEffect(() => () => { cancelled.current = true; }, []);
 
   return (
     <AnimatePresence>

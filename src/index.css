@@ -216,6 +216,23 @@
   .text-gradient-golden {
     @apply bg-gradient-golden bg-clip-text text-transparent;
   }
+  /* Keyboard-aware bottom padding.
+     `--keyboard-inset` is set by useKeyboardInsets() from window.visualViewport.
+     Falls back to 0px on desktop / when no virtual keyboard is open. */
+  .kb-pad-bottom {
+    padding-bottom: calc(
+      var(--keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px) + 5.5rem
+    );
+  }
+  .kb-pad-bottom-tight {
+    padding-bottom: calc(
+      var(--keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px) + 1rem
+    );
+  }
+}
+
+:root {
+  --keyboard-inset: 0px;
 }
 
 @keyframes pageEnter {

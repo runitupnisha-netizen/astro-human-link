@@ -4,6 +4,8 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+const APP_VERSION = "2026.04.25";
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -12,6 +14,7 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __APP_VERSION__: JSON.stringify(APP_VERSION),
   },
   plugins: [
     react(),

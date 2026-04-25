@@ -9,6 +9,7 @@ import {
   MapPin,
   Check,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { DateTime } from "luxon";
 import { format } from "date-fns";
@@ -108,6 +109,15 @@ const ChartWizard = () => {
     });
     let dstActive = false;
     let offsetLabel = "—";
+    // Detect ambiguous fall-back hour: the same local wall-clock instant
+    // exists twice (once in DST, once in Standard time). Luxon resolves
+    // this by picking one; we check both explicitly so we can warn the user.
+    let ambiguity: {
+      dstUtc: string;
+      stdUtc: string;
+      dstOffset: string;
+      stdOffset: string;
+    } | null = null;
     if (zone) {
       const local = DateTime.fromObject(
         {
@@ -124,6 +134,43 @@ const ChartWizard = () => {
         const sign = local.offset >= 0 ? "+" : "-";
         const abs = Math.abs(local.offset);
         offsetLabel = `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+
+        // Probe both branches by sampling the UTC instants 30 min before and
+        // after the wall-clock time. If their offsets disagree AND the local
+        // time falls inside an autumn fall-back window, the input is ambiguous.
+        const earlier = local.minus({ minutes: 60 });
+        const later = local.plus({ minutes: 60 });
+        if (
+          earlier.isValid &&
+          later.isValid &&
+          earlier.offset !== later.offset &&
+          earlier.offset > later.offset // fall-back: DST → Standard (offset shrinks)
+        ) {
+          // Build both candidate UTC instants for the same wall-clock time.
+          const dstCandidate = DateTime.fromMillis(
+            local.toMillis() - earlier.offset * 60_000,
+            { zone: "utc" },
+          );
+          const stdCandidate = DateTime.fromMillis(
+            local.toMillis() - later.offset * 60_000,
+            { zone: "utc" },
+          );
+          // Only show the panel if the two candidates actually differ
+          // (i.e. we're inside the repeated hour).
+          if (dstCandidate.toMillis() !== stdCandidate.toMillis()) {
+            const fmtOffset = (mins: number) => {
+              const s = mins >= 0 ? "+" : "-";
+              const a = Math.abs(mins);
+              return `UTC${s}${String(Math.floor(a / 60)).padStart(2, "0")}:${String(a % 60).padStart(2, "0")}`;
+            };
+            ambiguity = {
+              dstUtc: dstCandidate.toISO() ?? "",
+              stdUtc: stdCandidate.toISO() ?? "",
+              dstOffset: fmtOffset(earlier.offset),
+              stdOffset: fmtOffset(later.offset),
+            };
+          }
+        }
       }
     }
     return {
@@ -132,6 +179,7 @@ const ChartWizard = () => {
       dstActive,
       utcInstant: utc.toISOString(),
       placements,
+      ambiguity,
     };
   }, [data]);
 
@@ -329,6 +377,62 @@ const ChartWizard = () => {
                         </span>
                       </div>
                     </div>
+
+                    {/* Ambiguous fall-back hour warning */}
+                    {preview.ambiguity && (
+                      <div className="rounded-lg border border-accent/40 bg-accent/5 p-3 space-y-2 text-xs">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                          <div className="space-y-1">
+                            <p className="font-medium text-foreground">
+                              Ambiguous birth time
+                            </p>
+                            <p className="text-muted-foreground leading-relaxed">
+                              On this date, the clock fell back — so{" "}
+                              <span className="font-mono">{data.birthTime}</span>{" "}
+                              happened twice. Pick the one that matches your
+                              birth certificate or family memory.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-1.5 pl-6">
+                          <div className="rounded-md border border-border/40 bg-background/40 p-2">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="text-foreground/90 font-medium">
+                                1st occurrence (DST)
+                              </span>
+                              <span className="font-mono text-[10px] text-muted-foreground">
+                                {preview.ambiguity.dstOffset}
+                              </span>
+                            </div>
+                            <span className="font-mono text-[10px] text-muted-foreground">
+                              {preview.ambiguity.dstUtc}
+                            </span>
+                          </div>
+                          <div className="rounded-md border border-border/40 bg-background/40 p-2">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="text-foreground/90 font-medium">
+                                2nd occurrence (Standard)
+                              </span>
+                              <span className="font-mono text-[10px] text-muted-foreground">
+                                {preview.ambiguity.stdOffset}
+                              </span>
+                            </div>
+                            <span className="font-mono text-[10px] text-muted-foreground">
+                              {preview.ambiguity.stdUtc}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground pl-6">
+                          We're currently using the{" "}
+                          <span className="text-foreground/90 font-medium">
+                            {preview.dstActive ? "1st (DST)" : "2nd (Standard)"}
+                          </span>{" "}
+                          instant — these two charts can differ by a full sign
+                          on the Ascendant.
+                        </p>
+                      </div>
+                    )}
 
                     {/* Sample placements */}
                     <div>

@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import PhotoGallery from "@/components/PhotoGallery";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
+import DstShiftWarning from "@/components/DstShiftWarning";
 import BioPrompts from "@/components/BioPrompts";
 import ProfileChecklist from "@/components/ProfileChecklist";
 import SelfieVerification from "@/components/SelfieVerification";

@@ -74,22 +74,44 @@ const SelfieVerification = () => {
 
   const startCamera = useCallback(async () => {
     try {
+      // Set active FIRST so the <video> element mounts, then attach the stream.
+      setCapturedImage(null);
+      setCameraActive(true);
+      setStep(2);
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // Wait for video metadata before playing — critical on mobile
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(() => {});
+
+      // Wait for the <video> element to mount, then attach the stream.
+      // Poll a few frames because React may not have committed yet.
+      const attach = (attempt = 0) => {
+        const v = videoRef.current;
+        if (!v) {
+          if (attempt < 20) requestAnimationFrame(() => attach(attempt + 1));
+          return;
+        }
+        v.srcObject = stream;
+        v.onloadedmetadata = () => {
+          v.play().catch(() => {});
         };
-      }
-      setCameraActive(true);
-      setCapturedImage(null);
-      setStep(2);
-    } catch {
-      toast({ title: "Camera access denied", description: "Please allow camera access to verify your profile.", variant: "destructive" });
+        // Some mobile browsers need an explicit play attempt too
+        v.play().catch(() => {});
+      };
+      attach();
+    } catch (err: any) {
+      // Roll back UI state if permission failed
+      setCameraActive(false);
+      const msg =
+        err?.name === "NotAllowedError"
+          ? "Camera access was denied. Please enable camera permissions in your browser settings and try again."
+          : err?.name === "NotFoundError"
+            ? "No camera found on this device."
+            : err?.name === "NotReadableError"
+              ? "Your camera is being used by another app. Close it and try again."
+              : "Couldn't start your camera. Please check permissions and try again.";
+      toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
     }
   }, [toast]);
 

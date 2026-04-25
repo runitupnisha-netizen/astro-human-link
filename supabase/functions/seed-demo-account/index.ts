@@ -120,6 +120,11 @@ serve(async (req) => {
       social_energy: 7,
       // Demo gets 1 year of Pro access via the bonus_pro_until window
       bonus_pro_until: new Date(Date.now() + 365 * 86400000).toISOString(),
+      // Set Daily Ritual to "completed yesterday" so the ritual is
+      // available (not already done today) for App Store reviewers.
+      daily_ritual_last_completed: new Date(Date.now() - 86400000)
+        .toISOString()
+        .slice(0, 10),
     };
     const { error: pErr } = await admin
       .from("profiles")

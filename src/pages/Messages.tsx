@@ -1247,7 +1247,14 @@ const Messages = () => {
                       </AnimatePresence>
 
                       {/* Message Input */}
-                      <div className="p-4 border-t border-border">
+                      <div
+                        className="p-4 border-t border-border"
+                        style={{
+                          paddingBottom:
+                            "calc(var(--keyboard-inset, 0px) + 1rem)",
+                          transition: "padding-bottom 180ms ease-out",
+                        }}
+                      >
                         <input
                           type="file"
                           ref={fileInputRef}

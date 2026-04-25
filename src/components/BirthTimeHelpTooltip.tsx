@@ -88,6 +88,24 @@ const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
             </p>
           </div>
 
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
+            <p className="text-foreground/90 font-medium mb-1">
+              Ambiguous "fall-back" hour
+            </p>
+            <p className="text-muted-foreground mb-1.5">
+              When clocks roll back in autumn, the same wall-clock hour
+              happens <span className="text-foreground/90 font-medium">twice</span>.
+              For example, in New York on Nov 7 2021, both 1:30 AM EDT and
+              1:30 AM EST exist — and they're a full hour apart in UTC.
+            </p>
+            <p className="text-muted-foreground">
+              If your birth time falls in this window, we'll show you{" "}
+              <span className="text-foreground/90 font-medium">both</span>{" "}
+              possible UTC instants on the review step so you can pick the
+              correct one (DST = first occurrence, Standard = second).
+            </p>
+          </div>
+
           <p className="text-[11px] text-muted-foreground">
             ✦ A 1-hour DST mistake can shift your Rising sign by ~30° (a full
             sign change) and your Moon by ~0.5° — so we automate this to keep

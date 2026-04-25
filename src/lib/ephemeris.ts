@@ -12,6 +12,8 @@ import {
   Observer,
   Ecliptic,
   SiderealTime,
+  MakeTime,
+  e_tilt,
 } from "astronomy-engine";
 import tzLookup from "tz-lookup";
 import { DateTime } from "luxon";
@@ -116,10 +118,28 @@ export function calcMercurySign(date: Date): ZodiacSign {
 }
 
 /**
+ * True obliquity of the ecliptic in degrees, including nutation in obliquity.
+ * Wraps astronomy-engine's `e_tilt` (which returns {mobl, tobl, ee, ...}).
+ * Falls back to mean obliquity at J2000 if the helper ever throws.
+ */
+export function trueObliquityDeg(date: Date): number {
+  try {
+    const t = MakeTime(date);
+    const tilt = e_tilt(t);
+    if (Number.isFinite(tilt?.tobl)) return tilt.tobl;
+  } catch {
+    /* fall through */
+  }
+  return 23.4367;
+}
+
+/**
  * Compute the Ascendant (Rising sign) using local sidereal time + latitude.
  * Standard formula:
  *   tan(ASC) = -cos(LST) / (sin(ε) * tan(φ) + cos(ε) * sin(LST))
- *   ε = obliquity of ecliptic (~23.4367°)
+ *   ε = true obliquity of ecliptic (mean + nutation in obliquity, via
+ *       astronomy-engine's `e_tilt` — matches Astro.com's apparent
+ *       coordinates instead of using a static mean value).
  *   φ = geographic latitude
  *   LST = local sidereal time (in degrees)
  */
@@ -133,7 +153,8 @@ export function calcRisingSign(
   const lstHours = (gst + longitudeDeg / 15 + 24) % 24;
   const lstDeg = lstHours * 15;
 
-  const epsilonDeg = 23.4367; // mean obliquity of ecliptic — close enough
+  // True obliquity (mean + nutation in obliquity) for this instant.
+  const epsilonDeg = trueObliquityDeg(date);
   const toRad = (d: number) => (d * Math.PI) / 180;
   const toDeg = (r: number) => (r * 180) / Math.PI;
 
@@ -285,7 +306,7 @@ export function calcChartDebug(opts: {
   if (opts.birthTime != null && opts.latitude != null && opts.longitude != null) {
     // Reproduce the exact ASC math from calcRisingSign so the longitude shown
     // matches the sign returned by the chart.
-    const epsilonDeg = 23.4367;
+    const epsilonDeg = trueObliquityDeg(utcDate);
     const toRad = (d: number) => (d * Math.PI) / 180;
     const toDeg = (r: number) => (r * 180) / Math.PI;
     const ε = toRad(epsilonDeg);

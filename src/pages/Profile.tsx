@@ -825,6 +825,12 @@ const Profile = () => {
                 onChange={(e) => setEditBirthTime(e.target.value)}
                 className="bg-muted/50 border-border"
               />
+              <DstShiftWarning
+                birthDate={editBirthDate || null}
+                birthTime={editBirthTime || null}
+                latitude={(profile as any)?.birth_latitude ?? null}
+                longitude={(profile as any)?.birth_longitude ?? null}
+              />
             </div>
 
             <div className="space-y-2">

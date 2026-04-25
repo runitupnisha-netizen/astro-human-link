@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "regen:fixtures": "tsx scripts/regen-fixtures.ts"
+    "regen:fixtures": "bun scripts/regen-fixtures.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",

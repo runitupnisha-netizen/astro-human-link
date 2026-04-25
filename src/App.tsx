@@ -65,6 +65,7 @@ const MyChart = lazy(() => import("./pages/MyChart"));
 const ChartParity = lazy(() => import("./pages/ChartParity"));
 const ChartWizard = lazy(() => import("./pages/ChartWizard"));
 const ChartDrift = lazy(() => import("./pages/ChartDrift"));
+const AstralAccuracy = lazy(() => import("./pages/AstralAccuracy"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));
@@ -260,6 +261,7 @@ const AppRoutes = () => {
             <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
             <Route path="/admin/chart-parity" element={<Suspense fallback={<LoadingScreen />}><ChartParity /></Suspense>} />
             <Route path="/admin/chart-drift" element={<Suspense fallback={<LoadingScreen />}><ChartDrift /></Suspense>} />
+            <Route path="/admin/astral-accuracy" element={<Suspense fallback={<LoadingScreen />}><AstralAccuracy /></Suspense>} />
             <Route path="/chart-wizard" element={<PageTransition><ChartWizard /></PageTransition>} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />

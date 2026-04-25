@@ -191,6 +191,17 @@ const MyChart = () => {
     : null;
   const utcIso = utcInstant ? utcInstant.toISOString() : null;
 
+  // Full ephemeris debug: exposes JD, GAST, LST, and intermediate longitudes.
+  const debug =
+    profile.birth_date
+      ? calcChartDebug({
+          birthDate: profile.birth_date,
+          birthTime: profile.birth_time,
+          latitude: profile.birth_latitude,
+          longitude: profile.birth_longitude,
+        })
+      : null;
+
   return (
     <div className="relative min-h-screen pt-24 pb-28 md:pb-12">
       <CosmicBackground />

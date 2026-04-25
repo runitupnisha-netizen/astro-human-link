@@ -5,6 +5,8 @@ import {
   Ecliptic,
   GeoVector,
   SiderealTime,
+  MakeTime,
+  e_tilt,
 } from "npm:astronomy-engine@2.1.19";
 import { DateTime } from "npm:luxon@3.4.4";
 import tzLookup from "npm:tz-lookup@6.1.25";
@@ -83,7 +85,15 @@ function calcRising(
   const lstHours = (gst + longitudeDeg / 15 + 24) % 24;
   const lstDeg = lstHours * 15;
 
-  const epsilonDeg = 23.4367;
+  // True obliquity (mean + nutation in obliquity) for this instant —
+  // matches Astro.com / apparent coordinates instead of a static mean.
+  let epsilonDeg = 23.4367;
+  try {
+    const tilt = e_tilt(MakeTime(date));
+    if (Number.isFinite(tilt?.tobl)) epsilonDeg = tilt.tobl;
+  } catch {
+    /* fall back to mean obliquity */
+  }
   const toRad = (d: number) => (d * Math.PI) / 180;
   const toDeg = (r: number) => (r * 180) / Math.PI;
 

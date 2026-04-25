@@ -813,7 +813,10 @@ const Profile = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-birth-time">Birth Time <span className="text-muted-foreground text-xs">(optional, improves accuracy)</span></Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="edit-birth-time">Birth Time <span className="text-muted-foreground text-xs">(optional, improves accuracy)</span></Label>
+                <BirthTimeHelpTooltip />
+              </div>
               <Input
                 id="edit-birth-time"
                 type="time"

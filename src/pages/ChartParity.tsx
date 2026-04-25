@@ -246,6 +246,95 @@ function offsetLabel(min: number | null): string {
   ).padStart(2, "0")}`;
 }
 
+/**
+ * Astro.com input mapping.
+ *
+ * Astro.com's "Extended Chart Selection" form expects:
+ *   - Birth date (YYYY-MM-DD)
+ *   - Birth time in **local clock time** at the birth city
+ *   - A timezone selection (or "u=UT/GMT" + manual UTC offset)
+ *   - "Daylight Saving Time: Yes / No / Auto"
+ *
+ * This helper takes the same `(birthDate, birthTime, lat, lng)` we feed into
+ * `calcChartPlacements` and produces the literal field values you should type
+ * into Astro.com so its result matches ours. It also surfaces the resolved
+ * IANA zone, the exact UTC offset that was applied, and whether DST was in
+ * effect — so a user can paste / dictate the form fields with zero ambiguity.
+ */
+export interface AstroComMapping {
+  date: string; // YYYY-MM-DD (unchanged — Astro.com uses local civil date)
+  time: string; // HH:mm 24h local clock time
+  ianaZone: string | null;
+  zoneCity: string | null; // human-friendly: "America/New_York" → "New York"
+  dstObserved: "Yes" | "No"; // matches Astro.com's DST radio
+  utcOffsetLabel: string; // "UTC-04:00"
+  utcOffsetMinutes: number | null;
+  utcInstant: string; // ISO UTC instant the chart will be cast for
+  notes: string[]; // edge-case warnings (ambiguous local time, no zone, etc.)
+}
+
+function mapToAstroCom(
+  birthDate: string,
+  birthTime: string,
+  latitude: number,
+  longitude: number,
+): AstroComMapping | null {
+  if (!birthDate) return null;
+  const time = birthTime || "12:00";
+  const zone = resolveTimezone(latitude, longitude);
+  const notes: string[] = [];
+  if (!zone) {
+    notes.push(
+      "No IANA zone resolved from coordinates — Astro.com will need a manual UTC offset.",
+    );
+  }
+  let dt: DateTime;
+  if (zone) {
+    dt = DateTime.fromObject(parseLocal(birthDate, time), { zone });
+    if (!dt.isValid) {
+      // Spring-forward gap: the local time literally never existed.
+      notes.push(
+        `Local time ${time} on ${birthDate} falls inside a DST spring-forward gap — Astro.com will reject it. Use the next valid minute.`,
+      );
+      dt = DateTime.fromObject(parseLocal(birthDate, time), {
+        zone,
+      }).plus({ hours: 1 });
+    }
+    // Detect fall-back ambiguity: 1:30am occurs twice. Luxon picks the first
+    // occurrence; warn the user that Astro.com's DST radio decides which one.
+    const altDt = dt.minus({ hours: 1 });
+    if (
+      altDt.isValid &&
+      altDt.toFormat("yyyy-LL-dd HH:mm") === dt.toFormat("yyyy-LL-dd HH:mm") &&
+      altDt.offset !== dt.offset
+    ) {
+      notes.push(
+        "Local time is ambiguous due to DST fall-back — set Astro.com's DST to match the offset shown below.",
+      );
+    }
+  } else {
+    // No IANA zone: fall back to longitude-based UT estimate (matches our pipeline).
+    const utc = buildBirthDateUTC(birthDate, time, longitude, latitude);
+    dt = DateTime.fromJSDate(utc).toUTC();
+  }
+
+  const inDst = zone ? dt.isInDST : false;
+  const offset = dt.offset; // minutes from UTC
+  const zoneCity = zone ? zone.split("/").pop()?.replace(/_/g, " ") ?? zone : null;
+
+  return {
+    date: birthDate,
+    time,
+    ianaZone: zone,
+    zoneCity,
+    dstObserved: inDst ? "Yes" : "No",
+    utcOffsetLabel: offsetLabel(offset),
+    utcOffsetMinutes: offset,
+    utcInstant: dt.toUTC().toISO() ?? "",
+    notes,
+  };
+}
+
 const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
   <span
     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${

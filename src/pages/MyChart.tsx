@@ -95,7 +95,7 @@ const MyChart = () => {
       const { data } = await supabase
         .from("profiles")
         .select(
-          "display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_profile, human_design_strategy, human_design_authority, gene_keys_life_purpose, life_path_number, birthday_number, personal_year_number, compatibility_tags"
+          "display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_profile, human_design_strategy, human_design_authority, gene_keys_life_purpose, life_path_number, birthday_number, personal_year_number, compatibility_tags, birth_date, birth_time, birth_place, birth_latitude, birth_longitude"
         )
         .eq("user_id", user.id)
         .maybeSingle();

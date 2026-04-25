@@ -196,8 +196,8 @@ function computeDiff(fx: DriftFixture): FixtureDiff {
 
 const SeverityBadge = ({ severity }: { severity: Severity }) => {
   const cfg = {
-    ok: { label: "OK", cls: "border-emerald-500/40 text-emerald-400 bg-emerald-500/5" },
-    drift: { label: "Drift", cls: "border-amber-500/40 text-amber-400 bg-amber-500/5" },
+    ok: { label: "OK", cls: "border-border/50 text-muted-foreground bg-background/40" },
+    drift: { label: "Drift", cls: "border-accent/40 text-accent bg-accent/5" },
     sign: { label: "Sign flipped", cls: "border-destructive/50 text-destructive bg-destructive/5" },
   }[severity];
   return (
@@ -259,15 +259,15 @@ const ChartDrift = () => {
           className={cn(
             "border-border/50 bg-card/40 backdrop-blur-sm",
             overall === "sign" && "border-destructive/40",
-            overall === "drift" && "border-amber-500/30",
-            overall === "ok" && "border-emerald-500/30",
+            overall === "drift" && "border-accent/30",
+            overall === "ok" && "border-border/60",
           )}
         >
           <CardContent className="pt-6 flex items-center gap-3 flex-wrap">
             {overall === "ok" ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-muted-foreground shrink-0" />
             ) : overall === "drift" ? (
-              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-accent shrink-0" />
             ) : (
               <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />
             )}
@@ -284,10 +284,10 @@ const ChartDrift = () => {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <Badge variant="outline" className="border-emerald-500/40 text-emerald-400 text-[10px] font-mono">
+              <Badge variant="outline" className="border-border/50 text-muted-foreground text-[10px] font-mono">
                 {totals.ok} ok
               </Badge>
-              <Badge variant="outline" className="border-amber-500/40 text-amber-400 text-[10px] font-mono">
+              <Badge variant="outline" className="border-accent/40 text-accent text-[10px] font-mono">
                 {totals.drift} drift
               </Badge>
               <Badge variant="outline" className="border-destructive/50 text-destructive text-[10px] font-mono">
@@ -350,7 +350,7 @@ const ChartDrift = () => {
                       className={cn(
                         "rounded-lg border p-3 grid grid-cols-12 gap-2 items-center text-xs",
                         p.severity === "ok" && "border-border/40 bg-background/30",
-                        p.severity === "drift" && "border-amber-500/30 bg-amber-500/5",
+                        p.severity === "drift" && "border-accent/30 bg-accent/5",
                         p.severity === "sign" && "border-destructive/40 bg-destructive/5",
                       )}
                     >

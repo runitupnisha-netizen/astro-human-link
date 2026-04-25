@@ -345,7 +345,8 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
   const step = TOUR_STEPS[stepIdx];
   const Icon = step.icon;
   const isLast = stepIdx === TOUR_STEPS.length - 1;
-  const nextDisabled = !!step.lyraDemo && !lyraDemoComplete;
+  // Lyra demo is optional — never block progression. Just nudge with the label.
+  const showLyraNudge = !!step.lyraDemo && !lyraDemoComplete;
 
   return (
     <AnimatePresence>
@@ -457,9 +458,8 @@ const OnboardingTour = ({ forceOpen = false, onClose }: OnboardingTourProps) => 
                 onClick={next}
                 className="gap-1.5 min-w-[6.5rem]"
                 style={isLast ? { background: "var(--gradient-aurora)" } : undefined}
-                disabled={nextDisabled}
               >
-                {isLast ? "Begin journey" : nextDisabled ? "Try Lyra first" : "Next"}
+                {isLast ? "Begin journey" : showLyraNudge ? "Skip demo" : "Next"}
                 {!isLast && <ArrowRight className="h-3.5 w-3.5" />}
               </Button>
             </div>

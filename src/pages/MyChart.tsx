@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock } from "lucide-react";
+import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock, Bug } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
-import { resolveTimezone, buildBirthDateUTC } from "@/lib/ephemeris";
+import { resolveTimezone, buildBirthDateUTC, calcChartDebug, formatLongitude } from "@/lib/ephemeris";
 import { DateTime } from "luxon";
 
 type ProfileRow = {
@@ -80,6 +80,43 @@ const NUMBER_MEANINGS: Record<number, string> = {
 };
 
 const numberMeaning = (n: number | null) => (n != null ? NUMBER_MEANINGS[n] ?? "A deeply personal cosmic signature." : "—");
+
+const DebugRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-lg border border-border/40 bg-background/40 px-2.5 py-1.5">
+    <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
+    <div className="text-foreground break-all">{value}</div>
+  </div>
+);
+
+const LongitudeRow = ({
+  label,
+  deg,
+  highlight,
+  missingHint,
+}: {
+  label: string;
+  deg: number | null;
+  highlight?: boolean;
+  missingHint?: string;
+}) => (
+  <div
+    className={`flex items-center justify-between gap-3 px-3 py-1.5 ${
+      highlight ? "bg-accent/5" : ""
+    }`}
+  >
+    <span className="text-foreground/80">{label}</span>
+    {deg != null ? (
+      <span className="text-right">
+        <span className="text-foreground">{formatLongitude(deg)}</span>
+        <span className="text-muted-foreground ml-2">({deg.toFixed(4)}°)</span>
+      </span>
+    ) : (
+      <span className="text-muted-foreground italic text-[10px]">
+        {missingHint ?? "—"}
+      </span>
+    )}
+  </div>
+);
 
 const MyChart = () => {
   const navigate = useNavigate();
@@ -190,6 +227,17 @@ const MyChart = () => {
     ? DateTime.fromJSDate(utcInstant).toUTC().toFormat("LLL d, yyyy · HH:mm 'UTC'")
     : null;
   const utcIso = utcInstant ? utcInstant.toISOString() : null;
+
+  // Full ephemeris debug: exposes JD, GAST, LST, and intermediate longitudes.
+  const debug =
+    profile.birth_date
+      ? calcChartDebug({
+          birthDate: profile.birth_date,
+          birthTime: profile.birth_time,
+          latitude: profile.birth_latitude,
+          longitude: profile.birth_longitude,
+        })
+      : null;
 
   return (
     <div className="relative min-h-screen pt-24 pb-28 md:pb-12">
@@ -355,6 +403,70 @@ const MyChart = () => {
               </CardContent>
             </Card>
           </motion.div>
+
+          {/* Chart Debug — raw ephemeris intermediates (UTC, JD, GAST, LST, longitudes) */}
+          {debug && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.13 }}
+            >
+              <Card className="bg-card/60 backdrop-blur-sm border-border/40">
+                <CardContent className="p-2 md:p-3">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="chart-debug" className="border-none">
+                      <AccordionTrigger className="px-3 md:px-4 hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <Bug className="w-4 h-4 text-accent" />
+                          <span className="font-display text-sm font-semibold">Chart Debug</span>
+                          <span className="text-[10px] uppercase tracking-wide text-muted-foreground ml-2">
+                            Raw ephemeris values
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-3 md:px-4 pb-4">
+                        <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+                          Every number used to compute Moon, Rising, and Mars. Use this to verify
+                          parity against external ephemerides (e.g. Astro.com).
+                        </p>
+
+                        <div className="grid sm:grid-cols-2 gap-2 text-[11px] font-mono">
+                          <DebugRow label="Local birth ISO" value={debug.localIso} />
+                          <DebugRow label="IANA timezone" value={debug.timezone ?? "— (fallback: lng/15)"} />
+                          <DebugRow label="UTC instant" value={debug.utcIso} />
+                          <DebugRow label="Julian Day (UT)" value={debug.julianDay.toFixed(6)} />
+                          <DebugRow label="GAST (hours)" value={debug.gastHours.toFixed(6)} />
+                          <DebugRow
+                            label="LST (degrees)"
+                            value={debug.lstDeg != null ? debug.lstDeg.toFixed(4) : "— (no longitude)"}
+                          />
+                        </div>
+
+                        <div className="mt-4">
+                          <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5">
+                            Geocentric ecliptic longitudes
+                          </div>
+                          <div className="rounded-lg border border-border/40 bg-background/40 divide-y divide-border/30 text-[11px] font-mono">
+                            <LongitudeRow label="☉ Sun" deg={debug.longitudes.sun} />
+                            <LongitudeRow label="☽ Moon" deg={debug.longitudes.moon} highlight />
+                            <LongitudeRow label="☿ Mercury" deg={debug.longitudes.mercury} />
+                            <LongitudeRow label="♀ Venus" deg={debug.longitudes.venus} />
+                            <LongitudeRow label="♂ Mars" deg={debug.longitudes.mars} highlight />
+                            <LongitudeRow
+                              label="↗ Ascendant"
+                              deg={debug.longitudes.ascendant}
+                              highlight
+                              missingHint="needs birth time + lat/lng"
+                            />
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
           {/* Layer 2 — Deeper details in accordion */}
           <motion.div

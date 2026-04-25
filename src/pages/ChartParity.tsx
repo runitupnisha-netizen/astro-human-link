@@ -501,6 +501,23 @@ const ChartParity = () => {
   }));
   const fxPassed = fxRows.filter((r) => r.pass).length;
 
+  // ----- Astro.com input mapping -----
+  // Defaults to the fixture-editor's selected fixture but can be overridden
+  // ad-hoc with the inputs below. Recomputes on every keystroke.
+  const [astroInputs, setAstroInputs] = useState({
+    birthDate: CASES[0].birthDate,
+    birthTime: CASES[0].birthTime,
+    latitude: String(CASES[0].latitude),
+    longitude: String(CASES[0].longitude),
+    label: CASES[0].label,
+  });
+  const astroMapping = useMemo(() => {
+    const lat = parseFloat(astroInputs.latitude);
+    const lng = parseFloat(astroInputs.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return mapToAstroCom(astroInputs.birthDate, astroInputs.birthTime, lat, lng);
+  }, [astroInputs]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

@@ -14,6 +14,7 @@ import numerologyMandala from "@/assets/numerology-mandala.png";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useAuth } from "@/hooks/useAuth";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
+import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 import AvatarUpload from "@/components/AvatarUpload";
 import PhotoGallery from "@/components/PhotoGallery";
 

@@ -63,6 +63,11 @@ export const useAuth = () => {
     // Mark as an explicit sign-out so the listener doesn't flag it as "session expired"
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem("auth-explicit-signout", "true");
+      // Clear any lingering password-recovery flags so the next login isn't
+      // forced into the /reset-password flow.
+      window.sessionStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-requested-at");
     }
     await supabase.auth.signOut();
     // Hard reload to wipe ALL in-memory React state, query cache, and route stack.

@@ -336,12 +336,12 @@ const MyChart = () => {
                         </div>
                       )}
                       {!profile.birth_time && (
-                        <div className="text-amber-300/80 mt-2 text-[11px]">
+                        <div className="text-accent/80 mt-2 text-[11px]">
                           No birth time on file — defaulting to local 12:00. Moon &amp; Rising may be off.
                         </div>
                       )}
                       {!tzZone && profile.birth_longitude != null && (
-                        <div className="text-amber-300/80 mt-2 text-[11px]">
+                        <div className="text-accent/80 mt-2 text-[11px]">
                           No IANA zone resolved — falling back to longitude/15 offset (no DST).
                         </div>
                       )}

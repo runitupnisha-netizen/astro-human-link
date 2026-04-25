@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
+import { resolveTimezone, buildBirthDateUTC } from "@/lib/ephemeris";
+import { DateTime } from "luxon";
 
 type ProfileRow = {
   display_name: string | null;
@@ -32,6 +34,11 @@ type ProfileRow = {
   birthday_number: number | null;
   personal_year_number: number | null;
   compatibility_tags: string[] | null;
+  birth_date: string | null;
+  birth_time: string | null;
+  birth_place: string | null;
+  birth_latitude: number | null;
+  birth_longitude: number | null;
 };
 
 const SIGN_INTERPRETATIONS: Record<string, { sun: string; moon: string; rising: string }> = {

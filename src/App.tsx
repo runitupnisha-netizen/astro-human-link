@@ -23,6 +23,7 @@ import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
+import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -125,6 +126,11 @@ const AnalyticsTracker = () => {
   return null;
 };
 
+const KeyboardInsetTracker = () => {
+  useKeyboardInsets();
+  return null;
+};
+
 /**
  * Captures ?ref=CODE from any URL the user lands on, stores it for 30 days,
  * and lets the onboarding reveal step redeem it for both users.
@@ -201,6 +207,7 @@ const AppRoutes = () => {
     <>
       <AnalyticsTracker />
       <ReferralCapture />
+      <KeyboardInsetTracker />
       <RecoveryLinkRedirect />
       {!isRecoveryRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && user && onboardingComplete && <EmailVerificationReminder />}

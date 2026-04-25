@@ -246,6 +246,95 @@ function offsetLabel(min: number | null): string {
   ).padStart(2, "0")}`;
 }
 
+/**
+ * Astro.com input mapping.
+ *
+ * Astro.com's "Extended Chart Selection" form expects:
+ *   - Birth date (YYYY-MM-DD)
+ *   - Birth time in **local clock time** at the birth city
+ *   - A timezone selection (or "u=UT/GMT" + manual UTC offset)
+ *   - "Daylight Saving Time: Yes / No / Auto"
+ *
+ * This helper takes the same `(birthDate, birthTime, lat, lng)` we feed into
+ * `calcChartPlacements` and produces the literal field values you should type
+ * into Astro.com so its result matches ours. It also surfaces the resolved
+ * IANA zone, the exact UTC offset that was applied, and whether DST was in
+ * effect — so a user can paste / dictate the form fields with zero ambiguity.
+ */
+export interface AstroComMapping {
+  date: string; // YYYY-MM-DD (unchanged — Astro.com uses local civil date)
+  time: string; // HH:mm 24h local clock time
+  ianaZone: string | null;
+  zoneCity: string | null; // human-friendly: "America/New_York" → "New York"
+  dstObserved: "Yes" | "No"; // matches Astro.com's DST radio
+  utcOffsetLabel: string; // "UTC-04:00"
+  utcOffsetMinutes: number | null;
+  utcInstant: string; // ISO UTC instant the chart will be cast for
+  notes: string[]; // edge-case warnings (ambiguous local time, no zone, etc.)
+}
+
+function mapToAstroCom(
+  birthDate: string,
+  birthTime: string,
+  latitude: number,
+  longitude: number,
+): AstroComMapping | null {
+  if (!birthDate) return null;
+  const time = birthTime || "12:00";
+  const zone = resolveTimezone(latitude, longitude);
+  const notes: string[] = [];
+  if (!zone) {
+    notes.push(
+      "No IANA zone resolved from coordinates — Astro.com will need a manual UTC offset.",
+    );
+  }
+  let dt: DateTime;
+  if (zone) {
+    dt = DateTime.fromObject(parseLocal(birthDate, time), { zone });
+    if (!dt.isValid) {
+      // Spring-forward gap: the local time literally never existed.
+      notes.push(
+        `Local time ${time} on ${birthDate} falls inside a DST spring-forward gap — Astro.com will reject it. Use the next valid minute.`,
+      );
+      dt = DateTime.fromObject(parseLocal(birthDate, time), {
+        zone,
+      }).plus({ hours: 1 });
+    }
+    // Detect fall-back ambiguity: 1:30am occurs twice. Luxon picks the first
+    // occurrence; warn the user that Astro.com's DST radio decides which one.
+    const altDt = dt.minus({ hours: 1 });
+    if (
+      altDt.isValid &&
+      altDt.toFormat("yyyy-LL-dd HH:mm") === dt.toFormat("yyyy-LL-dd HH:mm") &&
+      altDt.offset !== dt.offset
+    ) {
+      notes.push(
+        "Local time is ambiguous due to DST fall-back — set Astro.com's DST to match the offset shown below.",
+      );
+    }
+  } else {
+    // No IANA zone: fall back to longitude-based UT estimate (matches our pipeline).
+    const utc = buildBirthDateUTC(birthDate, time, longitude, latitude);
+    dt = DateTime.fromJSDate(utc).toUTC();
+  }
+
+  const inDst = zone ? dt.isInDST : false;
+  const offset = dt.offset; // minutes from UTC
+  const zoneCity = zone ? zone.split("/").pop()?.replace(/_/g, " ") ?? zone : null;
+
+  return {
+    date: birthDate,
+    time,
+    ianaZone: zone,
+    zoneCity,
+    dstObserved: inDst ? "Yes" : "No",
+    utcOffsetLabel: offsetLabel(offset),
+    utcOffsetMinutes: offset,
+    utcInstant: dt.toUTC().toISO() ?? "",
+    notes,
+  };
+}
+
 const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
   <span
     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
@@ -257,6 +346,29 @@ const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
     {ok ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
     {label}
   </span>
+);
+
+const MappingRow = ({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+      {label}
+    </span>
+    <span
+      className={`font-mono text-xs ${
+        accent ? "text-amber-300" : "text-foreground"
+      }`}
+    >
+      {value}
+    </span>
+  </div>
 );
 
 const CaseTable = ({ result }: { result: CaseResult }) => {
@@ -411,6 +523,23 @@ const ChartParity = () => {
     pass: fxPlacements[f] === fxExpected[f],
   }));
   const fxPassed = fxRows.filter((r) => r.pass).length;
+
+  // ----- Astro.com input mapping -----
+  // Defaults to the fixture-editor's selected fixture but can be overridden
+  // ad-hoc with the inputs below. Recomputes on every keystroke.
+  const [astroInputs, setAstroInputs] = useState({
+    birthDate: CASES[0].birthDate,
+    birthTime: CASES[0].birthTime,
+    latitude: String(CASES[0].latitude),
+    longitude: String(CASES[0].longitude),
+    label: CASES[0].label,
+  });
+  const astroMapping = useMemo(() => {
+    const lat = parseFloat(astroInputs.latitude);
+    const lng = parseFloat(astroInputs.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return mapToAstroCom(astroInputs.birthDate, astroInputs.birthTime, lat, lng);
+  }, [astroInputs]);
 
   if (loading) {
     return (
@@ -732,6 +861,170 @@ const ChartParity = () => {
                 Reset expected
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Astro.com input mapping — converts our local inputs into the exact
+            fields you'd type into Astro.com so its chart matches ours. */}
+        <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ArrowLeft className="w-4 h-4 text-accent rotate-180" />
+                  Astro.com input mapping
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Type these values into Astro.com's birth-data form to
+                  reproduce the same chart we compute. The IANA zone, DST
+                  setting, and UTC offset are derived from the coordinates.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {CASES.map((c) => (
+                  <Button
+                    key={c.id}
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-[11px]"
+                    onClick={() =>
+                      setAstroInputs({
+                        birthDate: c.birthDate,
+                        birthTime: c.birthTime,
+                        latitude: String(c.latitude),
+                        longitude: String(c.longitude),
+                        label: c.label,
+                      })
+                    }
+                  >
+                    Load {c.id}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Birth date</Label>
+                <Input
+                  type="date"
+                  value={astroInputs.birthDate}
+                  onChange={(e) =>
+                    setAstroInputs((p) => ({ ...p, birthDate: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Birth time (local)</Label>
+                <Input
+                  type="time"
+                  value={astroInputs.birthTime}
+                  onChange={(e) =>
+                    setAstroInputs((p) => ({ ...p, birthTime: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Latitude</Label>
+                <Input
+                  type="number"
+                  step="0.0001"
+                  value={astroInputs.latitude}
+                  onChange={(e) =>
+                    setAstroInputs((p) => ({ ...p, latitude: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Longitude</Label>
+                <Input
+                  type="number"
+                  step="0.0001"
+                  value={astroInputs.longitude}
+                  onChange={(e) =>
+                    setAstroInputs((p) => ({ ...p, longitude: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+
+            {/* Mapping output */}
+            {astroMapping ? (
+              <div className="rounded-lg border border-border/40 bg-background/40 p-4 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <MappingRow label="Date" value={astroMapping.date} />
+                  <MappingRow
+                    label="Time (local clock)"
+                    value={astroMapping.time}
+                  />
+                  <MappingRow
+                    label="City / Zone"
+                    value={
+                      astroMapping.zoneCity
+                        ? `${astroMapping.zoneCity} (${astroMapping.ianaZone})`
+                        : "Manual UTC offset required"
+                    }
+                  />
+                  <MappingRow
+                    label="Daylight Saving"
+                    value={astroMapping.dstObserved}
+                    accent={astroMapping.dstObserved === "Yes"}
+                  />
+                  <MappingRow
+                    label="UTC offset"
+                    value={astroMapping.utcOffsetLabel}
+                  />
+                  <MappingRow
+                    label="UTC instant (chart cast for)"
+                    value={astroMapping.utcInstant}
+                  />
+                </div>
+                {astroMapping.notes.length > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-border/30">
+                    {astroMapping.notes.map((n, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 text-[11px] text-amber-300"
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                        <span>{n}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/30">
+                  <p className="text-[11px] text-muted-foreground">
+                    Paste these into Astro.com's "Extended Chart Selection"
+                    form. If the result drifts, the local time, city, or DST
+                    setting on Astro.com is wrong — our pipeline is the source
+                    of truth.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const text = [
+                        `Date: ${astroMapping.date}`,
+                        `Time: ${astroMapping.time}`,
+                        `Zone: ${astroMapping.ianaZone ?? "manual"}`,
+                        `DST: ${astroMapping.dstObserved}`,
+                        `UTC offset: ${astroMapping.utcOffsetLabel}`,
+                        `UTC instant: ${astroMapping.utcInstant}`,
+                      ].join("\n");
+                      navigator.clipboard?.writeText(text);
+                    }}
+                  >
+                    Copy
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Enter a valid date and coordinates to see the mapping.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

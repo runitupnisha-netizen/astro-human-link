@@ -207,6 +207,7 @@ const AppRoutes = () => {
     <>
       <AnalyticsTracker />
       <ReferralCapture />
+      <KeyboardInsetTracker />
       <RecoveryLinkRedirect />
       {!isRecoveryRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && user && onboardingComplete && <EmailVerificationReminder />}

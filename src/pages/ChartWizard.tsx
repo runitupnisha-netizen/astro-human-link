@@ -315,7 +315,7 @@ const ChartWizard = () => {
                           className={cn(
                             "text-[10px]",
                             preview.dstActive
-                              ? "border-amber-400/40 text-amber-300"
+                              ? "border-accent/40 text-accent"
                               : "border-border/50 text-muted-foreground",
                           )}
                         >

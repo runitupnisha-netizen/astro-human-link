@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown, Telescope } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2 } from "lucide-react";
 
 type Report = {
   id: string;
@@ -302,6 +302,29 @@ const UserLookupSection = () => {
 
 const Admin = () => {
   const { isAdmin, loading } = useIsAdmin();
+  const [recomputing, setRecomputing] = useState(false);
+
+  const recomputeDemoChart = async () => {
+    setRecomputing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("recompute-chart", {
+        body: {},
+      });
+      if (error) throw error;
+      const after = (data as { after?: Record<string, string | null> } | null)?.after;
+      if (after) {
+        toast.success(
+          `Demo chart updated · ☉ ${after.sun_sign} · ☽ ${after.moon_sign} · ↗ ${after.rising_sign ?? "—"}`,
+        );
+      } else {
+        toast.success("Demo chart recomputed");
+      }
+    } catch (e) {
+      toast.error(`Recompute failed: ${(e as Error).message}`);
+    } finally {
+      setRecomputing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -320,13 +343,29 @@ const Admin = () => {
             <Shield className="w-5 h-5 text-slate-700" />
             <h1 className="text-xl font-semibold">Stellara Admin</h1>
           </div>
-          <Link
-            to="/admin/chart-parity"
-            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            <Telescope className="w-3.5 h-3.5" />
-            Chart Parity
-          </Link>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs gap-1.5"
+              onClick={recomputeDemoChart}
+              disabled={recomputing}
+            >
+              {recomputing ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5" />
+              )}
+              {recomputing ? "Recomputing…" : "Recompute demo chart"}
+            </Button>
+            <Link
+              to="/admin/chart-parity"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              <Telescope className="w-3.5 h-3.5" />
+              Chart Parity
+            </Link>
+          </div>
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-6 py-6">

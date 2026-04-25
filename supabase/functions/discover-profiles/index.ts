@@ -226,6 +226,21 @@ serve(async (req) => {
     const swipedIds = (swipedRows || []).map((r: any) => r.target_user_id);
     swipedIds.push(user.id); // exclude self
 
+    // Exclude users you have blocked AND users who have blocked you
+    const { data: myBlocks } = await supabase
+      .from("blocks")
+      .select("blocked_id")
+      .eq("blocker_id", user.id);
+    const { data: blocksAgainstMe } = await supabase
+      .from("blocks")
+      .select("blocker_id")
+      .eq("blocked_id", user.id);
+    const blockedIds = [
+      ...((myBlocks || []).map((b: any) => b.blocked_id)),
+      ...((blocksAgainstMe || []).map((b: any) => b.blocker_id)),
+    ];
+    const excludeIds = Array.from(new Set([...swipedIds, ...blockedIds]));
+
     // Fetch candidate profiles (onboarding complete, not paused, not already swiped)
     const { data: candidates, error: candErr } = await supabase
       .from("profiles")
@@ -233,7 +248,7 @@ serve(async (req) => {
       .eq("onboarding_complete", true)
       .eq("is_paused", false)
       .eq("is_incognito", false)
-      .not("user_id", "in", `(${swipedIds.join(",")})`)
+      .not("user_id", "in", `(${excludeIds.join(",")})`)
       .limit(50);
 
     if (candErr) {

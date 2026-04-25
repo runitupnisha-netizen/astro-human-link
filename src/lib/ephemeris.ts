@@ -107,6 +107,14 @@ export function calcVenusSign(date: Date): ZodiacSign {
   return signFromLongitude(eclipticLongitude(Body.Venus, date));
 }
 
+export function calcMarsSign(date: Date): ZodiacSign {
+  return signFromLongitude(eclipticLongitude(Body.Mars, date));
+}
+
+export function calcMercurySign(date: Date): ZodiacSign {
+  return signFromLongitude(eclipticLongitude(Body.Mercury, date));
+}
+
 /**
  * Compute the Ascendant (Rising sign) using local sidereal time + latitude.
  * Standard formula:
@@ -152,6 +160,8 @@ export interface ChartPlacements {
   sun_sign: ZodiacSign;
   moon_sign: ZodiacSign;
   venus_sign: ZodiacSign;
+  mars_sign: ZodiacSign;
+  mercury_sign: ZodiacSign;
   rising_sign: ZodiacSign | null;
 }
 
@@ -174,11 +184,20 @@ export function calcChartPlacements(opts: {
   const sun = calcSunSign(utc);
   const moon = calcMoonSign(utc);
   const venus = calcVenusSign(utc);
+  const mars = calcMarsSign(utc);
+  const mercury = calcMercurySign(utc);
 
   const canRising = opts.birthTime != null && opts.latitude != null && opts.longitude != null;
   const rising = canRising
     ? calcRisingSign(utc, opts.latitude as number, opts.longitude as number)
     : null;
 
-  return { sun_sign: sun, moon_sign: moon, venus_sign: venus, rising_sign: rising };
+  return {
+    sun_sign: sun,
+    moon_sign: moon,
+    venus_sign: venus,
+    mars_sign: mars,
+    mercury_sign: mercury,
+    rising_sign: rising,
+  };
 }

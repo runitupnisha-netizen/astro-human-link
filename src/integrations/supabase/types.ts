@@ -878,7 +878,9 @@ export type Database = {
           kids_preference: string | null
           last_seen_at: string | null
           life_path_number: number | null
+          mars_sign: string | null
           max_distance_km: number | null
+          mercury_sign: string | null
           moon_sign: string | null
           numerology_summary: string | null
           onboarding_complete: boolean | null
@@ -955,7 +957,9 @@ export type Database = {
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
+          mars_sign?: string | null
           max_distance_km?: number | null
+          mercury_sign?: string | null
           moon_sign?: string | null
           numerology_summary?: string | null
           onboarding_complete?: boolean | null
@@ -1032,7 +1036,9 @@ export type Database = {
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
+          mars_sign?: string | null
           max_distance_km?: number | null
+          mercury_sign?: string | null
           moon_sign?: string | null
           numerology_summary?: string | null
           onboarding_complete?: boolean | null

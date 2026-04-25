@@ -415,12 +415,14 @@ serve(async (req) => {
     const sunSign = signFromLongitude(eclipticLon(Body.Sun, utcDate));
     const moonSign = signFromLongitude(eclipticLon(Body.Moon, utcDate));
     const venusSign = signFromLongitude(eclipticLon(Body.Venus, utcDate));
+    const marsSign = signFromLongitude(eclipticLon(Body.Mars, utcDate));
+    const mercurySign = signFromLongitude(eclipticLon(Body.Mercury, utcDate));
     const calculatedRising =
       hasBirthTime && coords ? calcAscendant(utcDate, coords.lat, coords.lng) : null;
 
     console.log(`Birth data: ${birthDate} ${birthTime || "no time"} in ${birthPlace} (${latLng})`);
     console.log(
-      `Ephemeris: Sun=${sunSign}, Moon=${moonSign}, Venus=${venusSign}, Rising=${calculatedRising ?? "n/a (need birth time + coords)"}`
+      `Ephemeris: Sun=${sunSign}, Moon=${moonSign}, Venus=${venusSign}, Mars=${marsSign}, Mercury=${mercurySign}, Rising=${calculatedRising ?? "n/a (need birth time + coords)"}`
     );
     console.log(`Numerology: LifePath=${lifePathNumber}, Birthday=${birthdayNumber}, PersonalYear=${personalYearNumber}`);
 
@@ -438,6 +440,8 @@ CRITICAL RULES:
    - Sun: ${sunSign}
    - Moon: ${moonSign}
    - Venus: ${venusSign}
+   - Mars: ${marsSign}
+   - Mercury: ${mercurySign}
    - Rising/Ascendant: ${calculatedRising ?? "Unknown (birth time or location not provided)"}
 2. Speak about these placements as facts — write the astro_summary in a way that explicitly references at least the Sun, Moon, Venus, and Rising sign and what they mean for the person's love life, emotional world, and outward presentation.
 3. ${calculatedRising ? "" : "If Rising is unknown, say so in the summary and use 'unknown' as rising_sign value — do NOT guess."}
@@ -467,6 +471,8 @@ You MUST respond using the provided tool/function call format. Do not respond wi
 - CONFIRMED Sun Sign: ${sunSign} (use this exactly)
 - CONFIRMED Moon Sign: ${moonSign} (ephemeris-calculated, use this exactly)
 - CONFIRMED Venus Sign: ${venusSign} (ephemeris-calculated, use this exactly)
+- CONFIRMED Mars Sign: ${marsSign} (ephemeris-calculated, use this exactly)
+- CONFIRMED Mercury Sign: ${mercurySign} (ephemeris-calculated, use this exactly)
 - CONFIRMED Rising Sign: ${calculatedRising ?? "unknown"} (${calculatedRising ? "ephemeris-calculated, use this exactly" : "not enough data — use 'unknown' as the value"})
 - Life Path Number: ${lifePathNumber} (${lifePathContext})
 - Birthday Number: ${birthdayNumber} (${birthdayContext})
@@ -590,6 +596,8 @@ Provide:
         moon_sign: moonSign,
         rising_sign: calculatedRising ?? cosmicData.rising_sign,
         venus_sign: venusSign,
+        mars_sign: marsSign,
+        mercury_sign: mercurySign,
         astro_summary: cosmicData.astro_summary,
         human_design_type: cosmicData.human_design_type,
         human_design_strategy: cosmicData.human_design_strategy,

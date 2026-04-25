@@ -81,6 +81,9 @@ serve(async (req) => {
       sun_sign: "Capricorn",
       moon_sign: "Aries",
       rising_sign: "Libra",
+      venus_sign: "Sagittarius",
+      mars_sign: "Sagittarius",
+      mercury_sign: "Capricorn",
       human_design_type: "Generator",
       human_design_strategy: "To respond",
       human_design_authority: "Sacral",
@@ -111,6 +114,8 @@ serve(async (req) => {
       is_incognito: false,
       preferred_language: "English",
       social_energy: 7,
+      // Demo gets 1 year of Pro access via the bonus_pro_until window
+      bonus_pro_until: new Date(Date.now() + 365 * 86400000).toISOString(),
     };
     const { error: pErr } = await admin
       .from("profiles")

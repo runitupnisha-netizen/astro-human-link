@@ -817,7 +817,12 @@ const Profile = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-1.5">
                 <Label htmlFor="edit-birth-time">Birth Time <span className="text-muted-foreground text-xs">(optional, improves accuracy)</span></Label>
-                <BirthTimeHelpTooltip />
+                <BirthTimeHelpTooltip
+                  birthDate={editBirthDate || null}
+                  birthTime={editBirthTime || null}
+                  latitude={(profile as any)?.birth_latitude ?? null}
+                  longitude={(profile as any)?.birth_longitude ?? null}
+                />
               </div>
               <Input
                 id="edit-birth-time"

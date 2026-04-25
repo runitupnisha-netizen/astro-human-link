@@ -300,7 +300,16 @@ const ChartWizard = () => {
                         <Clock className="w-3.5 h-3.5" />
                         Local birth time (24h)
                       </Label>
-                      <BirthTimeHelpTooltip />
+                      <BirthTimeHelpTooltip
+                        birthDate={
+                          data.birthDate
+                            ? DateTime.fromJSDate(data.birthDate).toFormat("yyyy-LL-dd")
+                            : null
+                        }
+                        birthTime={data.birthTime}
+                        latitude={data.latitude}
+                        longitude={data.longitude}
+                      />
                     </div>
                     <Input
                       type="time"

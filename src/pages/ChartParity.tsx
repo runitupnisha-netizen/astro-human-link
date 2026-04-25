@@ -352,6 +352,61 @@ const ChartParity = () => {
   );
   const allGreen = totals.passed === totals.total;
 
+  // ----- Fixture editor: live computation (must run on every render, before
+  // any early returns, to satisfy Rules of Hooks) -----
+  const fxCase = CASES.find((c) => c.id === fxId) ?? CASES[0];
+  const fxBuild = useMemo(
+    () =>
+      buildUtcWithDst(
+        fxCase.birthDate,
+        fxCase.birthTime,
+        fxCase.latitude,
+        fxCase.longitude,
+        fxDst,
+      ),
+    [fxCase, fxDst],
+  );
+  const fxAutoOffset = useMemo(() => {
+    const zone = resolveTimezone(fxCase.latitude, fxCase.longitude);
+    if (!zone) return null;
+    const dt = DateTime.fromObject(
+      parseLocal(fxCase.birthDate, fxCase.birthTime),
+      { zone },
+    );
+    return dt.isValid ? dt.offset : null;
+  }, [fxCase]);
+  const fxZoneInfo = useMemo(
+    () => inspectZone(fxBuild.zone, fxCase.birthDate),
+    [fxBuild.zone, fxCase.birthDate],
+  );
+  const fxPlacements: Placements = useMemo(() => {
+    const targetUtc = fxBuild.utc;
+    if (!fxBuild.zone) {
+      return calcChartPlacements({
+        birthDate: fxCase.birthDate,
+        birthTime: fxCase.birthTime || null,
+        latitude: fxCase.latitude,
+        longitude: fxCase.longitude,
+      });
+    }
+    // Convert targetUtc back to the IANA zone's clock time, so the existing
+    // tz-lookup → luxon pipeline reproduces the same UTC instant when called.
+    const local = DateTime.fromJSDate(targetUtc).setZone(fxBuild.zone);
+    return calcChartPlacements({
+      birthDate: local.toFormat("yyyy-LL-dd"),
+      birthTime: local.toFormat("HH:mm"),
+      latitude: fxCase.latitude,
+      longitude: fxCase.longitude,
+    });
+  }, [fxBuild, fxCase]);
+  const fxRows = FIELD_ORDER.map((f) => ({
+    field: f,
+    expected: fxExpected[f],
+    computed: fxPlacements[f] ?? ("—" as ZodiacSign),
+    pass: fxPlacements[f] === fxExpected[f],
+  }));
+  const fxPassed = fxRows.filter((r) => r.pass).length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

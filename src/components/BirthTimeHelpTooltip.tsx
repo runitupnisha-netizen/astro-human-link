@@ -88,7 +88,7 @@ const BirthTimeHelpTooltip = ({ className }: BirthTimeHelpTooltipProps) => {
             </p>
           </div>
 
-          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2.5">
+          <div className="rounded-lg border border-accent/40 bg-accent/5 p-2.5">
             <p className="text-foreground/90 font-medium mb-1">
               Ambiguous "fall-back" hour
             </p>

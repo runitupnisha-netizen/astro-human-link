@@ -365,6 +365,13 @@ const Admin = () => {
               <Telescope className="w-3.5 h-3.5" />
               Chart Parity
             </Link>
+            <Link
+              to="/admin/astral-accuracy"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              <Telescope className="w-3.5 h-3.5" />
+              Astral Accuracy
+            </Link>
           </div>
         </div>
       </header>

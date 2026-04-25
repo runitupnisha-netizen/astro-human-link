@@ -81,6 +81,43 @@ const NUMBER_MEANINGS: Record<number, string> = {
 
 const numberMeaning = (n: number | null) => (n != null ? NUMBER_MEANINGS[n] ?? "A deeply personal cosmic signature." : "—");
 
+const DebugRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-lg border border-border/40 bg-background/40 px-2.5 py-1.5">
+    <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
+    <div className="text-foreground break-all">{value}</div>
+  </div>
+);
+
+const LongitudeRow = ({
+  label,
+  deg,
+  highlight,
+  missingHint,
+}: {
+  label: string;
+  deg: number | null;
+  highlight?: boolean;
+  missingHint?: string;
+}) => (
+  <div
+    className={`flex items-center justify-between gap-3 px-3 py-1.5 ${
+      highlight ? "bg-accent/5" : ""
+    }`}
+  >
+    <span className="text-foreground/80">{label}</span>
+    {deg != null ? (
+      <span className="text-right">
+        <span className="text-foreground">{formatLongitude(deg)}</span>
+        <span className="text-muted-foreground ml-2">({deg.toFixed(4)}°)</span>
+      </span>
+    ) : (
+      <span className="text-muted-foreground italic text-[10px]">
+        {missingHint ?? "—"}
+      </span>
+    )}
+  </div>
+);
+
 const MyChart = () => {
   const navigate = useNavigate();
   const { user } = useAuth();

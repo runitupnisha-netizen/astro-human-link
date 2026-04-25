@@ -170,6 +170,77 @@ function runCase(c: ParityCase): CaseResult {
   };
 }
 
+/**
+ * Inspect an IANA zone at a date and report whether DST is in effect plus
+ * the matching standard / DST UTC offsets in minutes. Used by the fixture
+ * editor to forcibly toggle DST on or off without changing the IANA zone.
+ */
+function inspectZone(zone: string | null, isoDate: string) {
+  if (!zone) return { inDst: false, stdOffsetMin: 0, dstOffsetMin: 0 };
+  // Sample two datetimes 6 months apart to discover the zone's two offsets.
+  const winter = DateTime.fromISO(`${isoDate.slice(0, 4)}-01-15T12:00`, { zone });
+  const summer = DateTime.fromISO(`${isoDate.slice(0, 4)}-07-15T12:00`, { zone });
+  const stdOffsetMin = Math.min(winter.offset, summer.offset);
+  const dstOffsetMin = Math.max(winter.offset, summer.offset);
+  const onDate = DateTime.fromISO(`${isoDate}T12:00`, { zone });
+  const inDst = onDate.isInDST ?? onDate.offset === dstOffsetMin;
+  return { inDst, stdOffsetMin, dstOffsetMin };
+}
+
+/**
+ * Build the UTC instant for a fixture using a forced DST mode:
+ *   - "auto":     honor the IANA zone (real historical DST rules)
+ *   - "standard": treat the local time as standard (winter) offset
+ *   - "dst":      treat the local time as DST (summer) offset
+ * Falls back to `buildBirthDateUTC` when no IANA zone is resolvable.
+ */
+function buildUtcWithDst(
+  birthDate: string,
+  birthTime: string,
+  latitude: number,
+  longitude: number,
+  mode: "auto" | "standard" | "dst",
+): { utc: Date; zone: string | null; effectiveOffsetMin: number | null } {
+  const zone = resolveTimezone(latitude, longitude);
+  if (mode === "auto" || !zone) {
+    const utc = buildBirthDateUTC(birthDate, birthTime, longitude, latitude);
+    const effective = zone
+      ? DateTime.fromObject(
+          parseLocal(birthDate, birthTime),
+          { zone },
+        ).offset
+      : null;
+    return { utc, zone, effectiveOffsetMin: effective };
+  }
+  const { stdOffsetMin, dstOffsetMin } = inspectZone(zone, birthDate);
+  const offsetMin = mode === "standard" ? stdOffsetMin : dstOffsetMin;
+  // Build a fixed-offset zone string like "UTC-05:00".
+  const sign = offsetMin >= 0 ? "+" : "-";
+  const abs = Math.abs(offsetMin);
+  const fixedZone = `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(
+    abs % 60,
+  ).padStart(2, "0")}`;
+  const dt = DateTime.fromObject(parseLocal(birthDate, birthTime), {
+    zone: fixedZone,
+  });
+  return { utc: dt.toUTC().toJSDate(), zone, effectiveOffsetMin: offsetMin };
+}
+
+function parseLocal(birthDate: string, birthTime: string) {
+  const [y, m, d] = birthDate.split("-").map(Number);
+  const [hh, mm] = (birthTime || "12:00").split(":").map(Number);
+  return { year: y, month: m, day: d, hour: hh, minute: mm, second: 0 };
+}
+
+function offsetLabel(min: number | null): string {
+  if (min == null) return "—";
+  const sign = min >= 0 ? "+" : "-";
+  const abs = Math.abs(min);
+  return `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(
+    abs % 60,
+  ).padStart(2, "0")}`;
+}
+
 const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
   <span
     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${

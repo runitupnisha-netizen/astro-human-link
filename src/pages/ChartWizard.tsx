@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/popover";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
+import DstShiftWarning from "@/components/DstShiftWarning";
 import {
   calcChartPlacements,
   buildBirthDateUTC,
@@ -313,6 +314,16 @@ const ChartWizard = () => {
                       birth city. We handle DST automatically using historical
                       IANA rules.
                     </p>
+                    <DstShiftWarning
+                      birthDate={
+                        data.birthDate
+                          ? DateTime.fromJSDate(data.birthDate).toFormat("yyyy-LL-dd")
+                          : null
+                      }
+                      birthTime={data.birthTime}
+                      latitude={data.latitude}
+                      longitude={data.longitude}
+                    />
                   </div>
                 )}
 

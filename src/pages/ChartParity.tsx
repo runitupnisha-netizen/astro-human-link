@@ -44,6 +44,11 @@ const FIELD_ORDER: ParityField[] = [
   "mars_sign",
 ];
 
+const ZODIAC_SIGNS: ZodiacSign[] = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+];
+
 interface ParityCase {
   id: string;
   label: string;

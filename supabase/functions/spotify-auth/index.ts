@@ -43,11 +43,16 @@ Deno.serve(async (req) => {
   }
 
   const url = new URL(req.url);
-  const action = url.searchParams.get("action") || (await req.json().catch(() => ({}))).action;
+  // Parse body ONCE — calling req.json() multiple times throws "Body already consumed".
+  let body: Record<string, any> = {};
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    body = await req.json().catch(() => ({}));
+  }
+  const action = url.searchParams.get("action") || body.action;
 
   // ACTION: get auth URL
   if (action === "auth_url") {
-    const redirectUri = url.searchParams.get("redirect_uri") || (await req.json().catch(() => ({}))).redirect_uri;
+    const redirectUri = url.searchParams.get("redirect_uri") || body.redirect_uri;
     const scopes = "user-read-currently-playing user-top-read user-read-recently-played";
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&show_dialog=true`;
     return new Response(JSON.stringify({ url: authUrl }), {
@@ -64,7 +69,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
     const code = body.code || url.searchParams.get("code");
     const redirectUri = body.redirect_uri || url.searchParams.get("redirect_uri");
 
@@ -130,7 +134,7 @@ Deno.serve(async (req) => {
 
   // ACTION: get currently playing / top tracks for a user
   if (action === "now_playing" || action === "top_tracks") {
-    const targetUserId = url.searchParams.get("user_id") || (await req.json().catch(() => ({}))).user_id || userId;
+    const targetUserId = url.searchParams.get("user_id") || body.user_id || userId;
     if (!targetUserId) {
       return new Response(JSON.stringify({ error: "Missing user_id" }), {
         status: 400,

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Check, X, AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react";
+import { Check, X, AlertTriangle, RefreshCw, ArrowLeft, Sliders } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import {
   calcChartPlacements,
@@ -14,6 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DateTime } from "luxon";
 
 type Placements = ChartPlacements;
 type ParityField = keyof Placements;
@@ -34,6 +42,11 @@ const FIELD_ORDER: ParityField[] = [
   "mercury_sign",
   "venus_sign",
   "mars_sign",
+];
+
+const ZODIAC_SIGNS: ZodiacSign[] = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
 ];
 
 interface ParityCase {
@@ -162,6 +175,77 @@ function runCase(c: ParityCase): CaseResult {
   };
 }
 
+/**
+ * Inspect an IANA zone at a date and report whether DST is in effect plus
+ * the matching standard / DST UTC offsets in minutes. Used by the fixture
+ * editor to forcibly toggle DST on or off without changing the IANA zone.
+ */
+function inspectZone(zone: string | null, isoDate: string) {
+  if (!zone) return { inDst: false, stdOffsetMin: 0, dstOffsetMin: 0 };
+  // Sample two datetimes 6 months apart to discover the zone's two offsets.
+  const winter = DateTime.fromISO(`${isoDate.slice(0, 4)}-01-15T12:00`, { zone });
+  const summer = DateTime.fromISO(`${isoDate.slice(0, 4)}-07-15T12:00`, { zone });
+  const stdOffsetMin = Math.min(winter.offset, summer.offset);
+  const dstOffsetMin = Math.max(winter.offset, summer.offset);
+  const onDate = DateTime.fromISO(`${isoDate}T12:00`, { zone });
+  const inDst = onDate.isInDST ?? onDate.offset === dstOffsetMin;
+  return { inDst, stdOffsetMin, dstOffsetMin };
+}
+
+/**
+ * Build the UTC instant for a fixture using a forced DST mode:
+ *   - "auto":     honor the IANA zone (real historical DST rules)
+ *   - "standard": treat the local time as standard (winter) offset
+ *   - "dst":      treat the local time as DST (summer) offset
+ * Falls back to `buildBirthDateUTC` when no IANA zone is resolvable.
+ */
+function buildUtcWithDst(
+  birthDate: string,
+  birthTime: string,
+  latitude: number,
+  longitude: number,
+  mode: "auto" | "standard" | "dst",
+): { utc: Date; zone: string | null; effectiveOffsetMin: number | null } {
+  const zone = resolveTimezone(latitude, longitude);
+  if (mode === "auto" || !zone) {
+    const utc = buildBirthDateUTC(birthDate, birthTime, longitude, latitude);
+    const effective = zone
+      ? DateTime.fromObject(
+          parseLocal(birthDate, birthTime),
+          { zone },
+        ).offset
+      : null;
+    return { utc, zone, effectiveOffsetMin: effective };
+  }
+  const { stdOffsetMin, dstOffsetMin } = inspectZone(zone, birthDate);
+  const offsetMin = mode === "standard" ? stdOffsetMin : dstOffsetMin;
+  // Build a fixed-offset zone string like "UTC-05:00".
+  const sign = offsetMin >= 0 ? "+" : "-";
+  const abs = Math.abs(offsetMin);
+  const fixedZone = `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(
+    abs % 60,
+  ).padStart(2, "0")}`;
+  const dt = DateTime.fromObject(parseLocal(birthDate, birthTime), {
+    zone: fixedZone,
+  });
+  return { utc: dt.toUTC().toJSDate(), zone, effectiveOffsetMin: offsetMin };
+}
+
+function parseLocal(birthDate: string, birthTime: string) {
+  const [y, m, d] = birthDate.split("-").map(Number);
+  const [hh, mm] = (birthTime || "12:00").split(":").map(Number);
+  return { year: y, month: m, day: d, hour: hh, minute: mm, second: 0 };
+}
+
+function offsetLabel(min: number | null): string {
+  if (min == null) return "—";
+  const sign = min >= 0 ? "+" : "-";
+  const abs = Math.abs(min);
+  return `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(
+    abs % 60,
+  ).padStart(2, "0")}`;
+}
+
 const Pill = ({ ok, label }: { ok: boolean; label: string }) => (
   <span
     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
@@ -253,12 +337,80 @@ const ChartParity = () => {
     null,
   );
 
+  // ----- Fixture editor state -----
+  // Pick one of the canonical fixtures, override the DST mode, edit the
+  // expected placements inline, and see the live diff against the computed
+  // chart. "Auto" honors the IANA zone (real history). "Standard" forces the
+  // zone's winter offset. "DST" forces the zone's summer offset. Useful for
+  // sanity-checking what would happen if the user (or Astro.com) chose the
+  // wrong DST setting on the same input.
+  const [fxId, setFxId] = useState<string>(CASES[0].id);
+  const [fxDst, setFxDst] = useState<"auto" | "standard" | "dst">("auto");
+  const [fxExpected, setFxExpected] = useState<Record<ParityField, ZodiacSign>>(
+    () => ({ ...CASES[0].expected }),
+  );
+
   const results = useMemo(() => CASES.map(runCase), [tick]);
   const totals = results.reduce(
     (acc, r) => ({ passed: acc.passed + r.passed, total: acc.total + r.total }),
     { passed: 0, total: 0 },
   );
   const allGreen = totals.passed === totals.total;
+
+  // ----- Fixture editor: live computation (must run on every render, before
+  // any early returns, to satisfy Rules of Hooks) -----
+  const fxCase = CASES.find((c) => c.id === fxId) ?? CASES[0];
+  const fxBuild = useMemo(
+    () =>
+      buildUtcWithDst(
+        fxCase.birthDate,
+        fxCase.birthTime,
+        fxCase.latitude,
+        fxCase.longitude,
+        fxDst,
+      ),
+    [fxCase, fxDst],
+  );
+  const fxAutoOffset = useMemo(() => {
+    const zone = resolveTimezone(fxCase.latitude, fxCase.longitude);
+    if (!zone) return null;
+    const dt = DateTime.fromObject(
+      parseLocal(fxCase.birthDate, fxCase.birthTime),
+      { zone },
+    );
+    return dt.isValid ? dt.offset : null;
+  }, [fxCase]);
+  const fxZoneInfo = useMemo(
+    () => inspectZone(fxBuild.zone, fxCase.birthDate),
+    [fxBuild.zone, fxCase.birthDate],
+  );
+  const fxPlacements: Placements = useMemo(() => {
+    const targetUtc = fxBuild.utc;
+    if (!fxBuild.zone) {
+      return calcChartPlacements({
+        birthDate: fxCase.birthDate,
+        birthTime: fxCase.birthTime || null,
+        latitude: fxCase.latitude,
+        longitude: fxCase.longitude,
+      });
+    }
+    // Convert targetUtc back to the IANA zone's clock time, so the existing
+    // tz-lookup → luxon pipeline reproduces the same UTC instant when called.
+    const local = DateTime.fromJSDate(targetUtc).setZone(fxBuild.zone);
+    return calcChartPlacements({
+      birthDate: local.toFormat("yyyy-LL-dd"),
+      birthTime: local.toFormat("HH:mm"),
+      latitude: fxCase.latitude,
+      longitude: fxCase.longitude,
+    });
+  }, [fxBuild, fxCase]);
+  const fxRows = FIELD_ORDER.map((f) => ({
+    field: f,
+    expected: fxExpected[f],
+    computed: fxPlacements[f] ?? ("—" as ZodiacSign),
+    pass: fxPlacements[f] === fxExpected[f],
+  }));
+  const fxPassed = fxRows.filter((r) => r.pass).length;
 
   if (loading) {
     return (
@@ -442,6 +594,144 @@ const ChartParity = () => {
                 </p>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Fixture Editor — pick a canonical case, override DST, edit expected */}
+        <Card className="border-border/50 bg-card/40 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-accent" />
+                  Fixture editor
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Toggle DST and edit expected placements live. Useful for
+                  diagnosing "Astro.com vs us" disagreements caused by a wrong
+                  Daylight-Saving choice on the source side.
+                </p>
+              </div>
+              <Pill ok={fxPassed === FIELD_ORDER.length} label={`${fxPassed}/${FIELD_ORDER.length}`} />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Selectors row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Fixture</Label>
+                <Select
+                  value={fxId}
+                  onValueChange={(id) => {
+                    setFxId(id);
+                    const c = CASES.find((x) => x.id === id);
+                    if (c) setFxExpected({ ...c.expected });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CASES.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">DST mode</Label>
+                <Select value={fxDst} onValueChange={(v) => setFxDst(v as typeof fxDst)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">
+                      Auto (IANA history) — {fxZoneInfo.inDst ? "DST in effect" : "Standard time"}
+                    </SelectItem>
+                    <SelectItem value="standard">Force Standard ({offsetLabel(fxZoneInfo.stdOffsetMin)})</SelectItem>
+                    <SelectItem value="dst">Force DST ({offsetLabel(fxZoneInfo.dstOffsetMin)})</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Resolved meta */}
+            <div className="rounded-lg border border-border/40 bg-background/40 p-3 text-[11px] font-mono space-y-0.5">
+              <div className="text-muted-foreground">
+                Local: {fxCase.birthDate} {fxCase.birthTime} · {fxCase.latitude.toFixed(3)}, {fxCase.longitude.toFixed(3)}
+              </div>
+              <div className="text-muted-foreground">
+                Zone: {fxBuild.zone ?? "no-tz"} · auto-offset {offsetLabel(fxAutoOffset)} → applied {offsetLabel(fxBuild.effectiveOffsetMin)}
+              </div>
+              <div className="text-foreground">UTC instant: {fxBuild.utc.toISOString()}</div>
+            </div>
+
+            {/* Diff table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/50">
+                    <th className="py-2 pr-2 font-medium">Field</th>
+                    <th className="py-2 px-2 font-medium">Expected (editable)</th>
+                    <th className="py-2 px-2 font-medium">Computed</th>
+                    <th className="py-2 pl-2 font-medium text-right">Match</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fxRows.map((r) => (
+                    <tr key={r.field} className="border-b border-border/20 last:border-0">
+                      <td className="py-2 pr-2 text-muted-foreground">{FIELD_LABELS[r.field]}</td>
+                      <td className="py-2 px-2">
+                        <Select
+                          value={r.expected ?? ""}
+                          onValueChange={(v) =>
+                            setFxExpected((p) => ({ ...p, [r.field]: v as ZodiacSign }))
+                          }
+                        >
+                          <SelectTrigger className="h-8 text-xs font-mono w-[140px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ZODIAC_SIGNS.map((s) => (
+                              <SelectItem key={s} value={s} className="font-mono text-xs">
+                                {s}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className={`py-2 px-2 font-mono ${r.pass ? "text-emerald-300" : "text-rose-300"}`}>
+                        {r.computed ?? "—"}
+                      </td>
+                      <td className="py-2 pl-2 text-right">
+                        {r.pass ? (
+                          <Check className="inline w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <X className="inline w-4 h-4 text-rose-400" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-[11px] text-muted-foreground">
+                Edits stay local to this session. Update{" "}
+                <span className="font-mono">CASES</span> in this file (and the
+                test fixtures) to persist a new expected value.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFxExpected({ ...fxCase.expected })}
+              >
+                Reset expected
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

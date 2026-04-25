@@ -261,6 +261,19 @@ const ChartParity = () => {
     null,
   );
 
+  // ----- Fixture editor state -----
+  // Pick one of the canonical fixtures, override the DST mode, edit the
+  // expected placements inline, and see the live diff against the computed
+  // chart. "Auto" honors the IANA zone (real history). "Standard" forces the
+  // zone's winter offset. "DST" forces the zone's summer offset. Useful for
+  // sanity-checking what would happen if the user (or Astro.com) chose the
+  // wrong DST setting on the same input.
+  const [fxId, setFxId] = useState<string>(CASES[0].id);
+  const [fxDst, setFxDst] = useState<"auto" | "standard" | "dst">("auto");
+  const [fxExpected, setFxExpected] = useState<Record<ParityField, ZodiacSign>>(
+    () => ({ ...CASES[0].expected }),
+  );
+
   const results = useMemo(() => CASES.map(runCase), [tick]);
   const totals = results.reduce(
     (acc, r) => ({ passed: acc.passed + r.passed, total: acc.total + r.total }),

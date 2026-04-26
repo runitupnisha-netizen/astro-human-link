@@ -498,6 +498,189 @@ const LyraProbeSection = () => {
   );
 };
 
+type RoleUser = {
+  user_id: string;
+  email: string | null;
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  created_at: string | null;
+  roles: string[];
+};
+
+const ROLE_OPTIONS: Array<"admin" | "moderator"> = ["admin", "moderator"];
+
+const RolesSection = () => {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<RoleUser[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  const search = async () => {
+    if (!query.trim()) return;
+    setSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-manage-roles", {
+        body: { type: "search", query: query.trim() },
+      });
+      if (error) throw error;
+      const payload = data as { results?: RoleUser[]; error?: string };
+      if (payload.error) throw new Error(payload.error);
+      setResults(payload.results ?? []);
+    } catch (e) {
+      toast.error(`Search failed: ${(e as Error).message}`);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const toggleRole = async (
+    user: RoleUser,
+    role: "admin" | "moderator",
+    grant: boolean,
+  ) => {
+    const key = `${user.user_id}:${role}`;
+    setBusyKey(key);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-manage-roles", {
+        body: { type: grant ? "grant" : "revoke", user_id: user.user_id, role },
+      });
+      if (error) throw error;
+      const payload = data as { ok?: boolean; error?: string };
+      if (payload.error) throw new Error(payload.error);
+      toast.success(`${grant ? "Granted" : "Revoked"} ${role}`);
+      setResults((prev) =>
+        prev.map((u) =>
+          u.user_id === user.user_id
+            ? {
+                ...u,
+                roles: grant
+                  ? Array.from(new Set([...u.roles, role]))
+                  : u.roles.filter((r) => r !== role),
+              }
+            : u,
+        ),
+      );
+    } catch (e) {
+      toast.error(`${grant ? "Grant" : "Revoke"} failed: ${(e as Error).message}`);
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  return (
+    <Card className="bg-white border-slate-200 p-5 space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 rounded-md bg-indigo-100 text-indigo-700">
+          <UserCog className="w-4 h-4" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-slate-900">Roles &amp; permissions</h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Search by email, display name, or @username. Grant or revoke admin and moderator
+            access. Changes are written to <code>user_roles</code> server-side.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          placeholder="Search by email, name, or @username…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && search()}
+          disabled={searching}
+        />
+        <Button onClick={search} disabled={searching || !query.trim()}>
+          {searching ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-1" />
+          ) : (
+            <Search className="w-4 h-4 mr-1" />
+          )}
+          Search
+        </Button>
+      </div>
+
+      {results.length === 0 ? (
+        <p className="text-sm text-slate-500 py-8 text-center">
+          {searching ? "Searching…" : "Enter an email, name, or @username to begin."}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {results.map((u) => (
+            <Card
+              key={u.user_id}
+              className="p-3 bg-white border-slate-200 flex flex-col sm:flex-row sm:items-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden flex-shrink-0">
+                {u.avatar_url && (
+                  <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-slate-900 truncate">
+                  {u.display_name || u.username || u.email || u.user_id.slice(0, 8)}
+                </p>
+                <p className="text-xs text-slate-500 truncate">
+                  {u.email ?? "—"}
+                  {u.username ? ` · @${u.username}` : ""}
+                </p>
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {u.roles.length === 0 ? (
+                    <Badge variant="outline" className="text-xs">No special roles</Badge>
+                  ) : (
+                    u.roles.map((r) => (
+                      <Badge
+                        key={r}
+                        className={
+                          r === "admin"
+                            ? "bg-amber-100 text-amber-800 border-amber-300"
+                            : r === "moderator"
+                              ? "bg-indigo-100 text-indigo-800 border-indigo-300"
+                              : "bg-slate-100 text-slate-700 border-slate-300"
+                        }
+                        variant="outline"
+                      >
+                        {r}
+                      </Badge>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-1.5 sm:justify-end">
+                {ROLE_OPTIONS.map((role) => {
+                  const has = u.roles.includes(role);
+                  const key = `${u.user_id}:${role}`;
+                  const busy = busyKey === key;
+                  return (
+                    <Button
+                      key={role}
+                      size="sm"
+                      variant={has ? "outline" : "default"}
+                      className="h-8 text-xs gap-1"
+                      disabled={busy}
+                      onClick={() => toggleRole(u, role, !has)}
+                    >
+                      {busy ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : has ? (
+                        <ShieldOff className="w-3 h-3" />
+                      ) : (
+                        <ShieldCheck className="w-3 h-3" />
+                      )}
+                      {has ? `Revoke ${role}` : `Grant ${role}`}
+                    </Button>
+                  );
+                })}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+};
+
 const Admin = () => {
   const { isAdmin, loading } = useIsAdmin();
   const [recomputing, setRecomputing] = useState(false);

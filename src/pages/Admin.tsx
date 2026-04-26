@@ -762,6 +762,7 @@ const Admin = () => {
           <TabsList className="bg-white border border-slate-200">
             <TabsTrigger value="reports">Reports Queue</TabsTrigger>
             <TabsTrigger value="users">User Lookup</TabsTrigger>
+            <TabsTrigger value="roles">Roles</TabsTrigger>
             <TabsTrigger value="lyra">Lyra Probe</TabsTrigger>
           </TabsList>
           <TabsContent value="reports" className="mt-4">
@@ -771,6 +772,9 @@ const Admin = () => {
           </TabsContent>
           <TabsContent value="users" className="mt-4">
             <UserLookupSection />
+          </TabsContent>
+          <TabsContent value="roles" className="mt-4">
+            <RolesSection />
           </TabsContent>
           <TabsContent value="lyra" className="mt-4">
             <LyraProbeSection />

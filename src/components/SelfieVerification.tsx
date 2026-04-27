@@ -319,7 +319,7 @@ const SelfieVerification = () => {
                   autoPlay
                   playsInline
                   muted
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity ${cameraActive ? "opacity-100" : "opacity-0"}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
                   style={{ transform: "scaleX(-1)" }}
                 />
                 {capturedImage && (
@@ -332,7 +332,7 @@ const SelfieVerification = () => {
                   </div>
                 )}
                 {cameraStarting && !cameraActive && !capturedImage && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted text-muted-foreground">
                     <Loader2 className="w-8 h-8 animate-spin" />
                     <span className="text-sm">Opening camera…</span>
                   </div>

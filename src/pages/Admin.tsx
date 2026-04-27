@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X, UserCog, ShieldCheck, ShieldOff } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X, UserCog, ShieldCheck, ShieldOff, Copy, ExternalLink } from "lucide-react";
 
 type Report = {
   id: string;

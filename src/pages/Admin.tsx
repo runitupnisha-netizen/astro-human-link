@@ -781,6 +781,9 @@ const Admin = () => {
       </header>
       <main className="max-w-6xl mx-auto px-6 py-6">
         <MetricsSection />
+        <div className="mb-6 ring-2 ring-violet-400 rounded-lg">
+          <LyraProbeSection />
+        </div>
         <Tabs defaultValue="reports">
           <TabsList className="bg-white border border-slate-200 h-auto flex flex-wrap justify-start gap-1 p-1">
             <TabsTrigger value="reports">Reports Queue</TabsTrigger>

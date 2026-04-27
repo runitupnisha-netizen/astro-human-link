@@ -44,6 +44,7 @@ const SelfieVerification = () => {
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
   const [cameraActive, setCameraActive] = useState(false);
+  const [cameraStarting, setCameraStarting] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<Step>(1);
@@ -72,37 +73,47 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
+  const stopCamera = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.srcObject = null;
+      video.removeAttribute("src");
+      video.load();
+    }
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+    setCameraStarting(false);
+  }, []);
+
   const startCamera = useCallback(async () => {
     try {
-      // Set active FIRST so the <video> element mounts, then attach the stream.
+      stopCamera();
       setCapturedImage(null);
-      setCameraActive(true);
+      setCameraStarting(true);
       setStep(2);
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } },
+        video: { facingMode: { ideal: "user" }, width: { ideal: 720 }, height: { ideal: 720 } },
+        audio: false,
       });
       streamRef.current = stream;
 
-      // Wait for the <video> element to mount, then attach the stream.
-      // Poll a few frames because React may not have committed yet.
-      const attach = (attempt = 0) => {
-        const v = videoRef.current;
-        if (!v) {
-          if (attempt < 20) requestAnimationFrame(() => attach(attempt + 1));
-          return;
-        }
-        v.srcObject = stream;
-        v.onloadedmetadata = () => {
-          v.play().catch(() => {});
-        };
-        // Some mobile browsers need an explicit play attempt too
-        v.play().catch(() => {});
-      };
-      attach();
+      const video = videoRef.current;
+      if (!video) throw new Error("Camera preview did not initialize.");
+
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      video.srcObject = stream;
+
+      await video.play();
+      setCameraActive(true);
     } catch (err: any) {
-      // Roll back UI state if permission failed
-      setCameraActive(false);
+      stopCamera();
+      setStep(1);
       const msg =
         err?.name === "NotAllowedError"
           ? "Camera access was denied. Please enable camera permissions in your browser settings and try again."
@@ -113,18 +124,15 @@ const SelfieVerification = () => {
               : "Couldn't start your camera. Please check permissions and try again.";
       toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
     }
-  }, [toast]);
-
-  const stopCamera = useCallback(() => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    setCameraActive(false);
-  }, []);
+  }, [stopCamera, toast]);
 
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas || !streamRef.current || !video.videoWidth || !video.videoHeight) {
+      toast({ title: "Camera still loading", description: "Please wait until your selfie preview appears.", variant: "destructive" });
+      return;
+    }
 
     const size = Math.min(video.videoWidth, video.videoHeight);
     canvas.width = size;
@@ -143,7 +151,7 @@ const SelfieVerification = () => {
     setCapturedImage(dataUrl);
     stopCamera();
     setStep(3);
-  }, [stopCamera]);
+  }, [stopCamera, toast]);
 
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;

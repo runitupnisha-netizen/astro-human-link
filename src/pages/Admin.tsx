@@ -322,7 +322,7 @@ type LyraProbeResult = {
 };
 
 const DEFAULT_LYRA_QUESTION =
-  "What's my Sun sign and what does it say about how I love?";
+  "What does my Venus sign say about how I love?";
 
 const LyraProbeLinkBanner = () => {
   const [copied, setCopied] = useState(false);

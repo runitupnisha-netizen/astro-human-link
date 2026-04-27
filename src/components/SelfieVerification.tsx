@@ -40,6 +40,8 @@ const SelfieVerification = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const mountedRef = useRef(true);
+  const cameraRequestRef = useRef(0);
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
@@ -73,7 +75,7 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
-  const stopCamera = useCallback(() => {
+  const releaseCamera = useCallback(() => {
     const video = videoRef.current;
     if (video) {
       video.pause();
@@ -83,21 +85,38 @@ const SelfieVerification = () => {
     }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    setCameraActive(false);
-    setCameraStarting(false);
   }, []);
 
+  const stopCamera = useCallback(() => {
+    cameraRequestRef.current += 1;
+    releaseCamera();
+    setCameraActive(false);
+    setCameraStarting(false);
+  }, [releaseCamera]);
+
   const startCamera = useCallback(async () => {
+    const requestId = cameraRequestRef.current + 1;
+    cameraRequestRef.current = requestId;
     try {
-      stopCamera();
+      releaseCamera();
       setCapturedImage(null);
       setCameraStarting(true);
       setStep(2);
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("UNSUPPORTED_CAMERA");
+      }
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "user" }, width: { ideal: 720 }, height: { ideal: 720 } },
         audio: false,
       });
+
+      if (!mountedRef.current || requestId !== cameraRequestRef.current) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+
       streamRef.current = stream;
 
       const video = videoRef.current;
@@ -109,13 +128,19 @@ const SelfieVerification = () => {
       video.setAttribute("webkit-playsinline", "true");
       video.srcObject = stream;
 
-      await video.play();
+      const playAttempt = video.play();
+      playAttempt?.catch(() => {
+        requestAnimationFrame(() => video.play().catch(() => {}));
+      });
+      setCameraStarting(false);
       setCameraActive(true);
     } catch (err: any) {
       stopCamera();
       setStep(1);
       const msg =
-        err?.name === "NotAllowedError"
+        err?.message === "UNSUPPORTED_CAMERA"
+          ? "Camera capture isn't available in this browser. Please open Stellara in Safari or Chrome and try again."
+          : err?.name === "NotAllowedError"
           ? "Camera access was denied. Please enable camera permissions in your browser settings and try again."
           : err?.name === "NotFoundError"
             ? "No camera found on this device."
@@ -124,7 +149,7 @@ const SelfieVerification = () => {
               : "Couldn't start your camera. Please check permissions and try again.";
       toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
     }
-  }, [stopCamera, toast]);
+  }, [releaseCamera, stopCamera, toast]);
 
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;
@@ -197,9 +222,11 @@ const SelfieVerification = () => {
   // Cleanup camera on unmount
   useEffect(() => {
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      mountedRef.current = false;
+      cameraRequestRef.current += 1;
+      releaseCamera();
     };
-  }, []);
+  }, [releaseCamera]);
 
   if (loading) {
     return (

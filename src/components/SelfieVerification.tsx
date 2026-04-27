@@ -287,23 +287,27 @@ const SelfieVerification = () => {
 
               {/* Camera viewfinder */}
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4">
-                {cameraActive && (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ transform: "scaleX(-1)" }}
-                  />
-                )}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity ${cameraActive ? "opacity-100" : "opacity-0"}`}
+                  style={{ transform: "scaleX(-1)" }}
+                />
                 {capturedImage && (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
                 )}
-                {!cameraActive && !capturedImage && (
+                {!cameraActive && !cameraStarting && !capturedImage && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
                     <span className="text-sm">Camera preview</span>
+                  </div>
+                )}
+                {cameraStarting && !cameraActive && !capturedImage && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-sm">Opening camera…</span>
                   </div>
                 )}
                 {/* Face guide overlay */}
@@ -340,8 +344,9 @@ const SelfieVerification = () => {
               {/* Controls */}
               <div className="flex justify-center gap-3">
                 {!cameraActive && !capturedImage && (
-                  <Button onClick={startCamera} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
-                    <Camera className="w-4 h-4" /> {status === "rejected" ? "Try Again" : "Open Camera"}
+                  <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
+                    {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && (

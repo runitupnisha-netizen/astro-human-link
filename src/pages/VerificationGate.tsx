@@ -15,9 +15,9 @@ const VerificationGate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative flex items-center justify-center">
+    <div className="min-h-screen bg-background relative flex items-center justify-center pb-24 md:pb-12">
       <CosmicBackground />
-      <div className="relative z-10 w-full max-w-md mx-auto px-6 py-12">
+      <div className="relative z-10 w-full max-w-md mx-auto px-6 pt-20 pb-12 md:pt-12">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}

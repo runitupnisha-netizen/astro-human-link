@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +33,14 @@ const TIPS: { icon: typeof Sun; label: string; ok: boolean }[] = [
   { icon: EyeOff, label: "No hats, masks, or filters", ok: false },
   { icon: Glasses, label: "Remove sunglasses", ok: false },
 ];
+
+const prefersNativeSelfieCapture = () => {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isMobile = /Android|Mobile/.test(ua) || isIOS;
+  return isMobile;
+};
 
 const SelfieVerification = () => {
   const { user } = useAuth();
@@ -158,7 +167,7 @@ const SelfieVerification = () => {
     }
   }, [releaseCamera, stopCamera, toast]);
 
-  const handleNativeSelfie = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) {

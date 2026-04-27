@@ -389,6 +389,14 @@ const SelfieVerification = () => {
                 )}
               </div>
               <canvas ref={canvasRef} className="hidden" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="user"
+                className="hidden"
+                onChange={handleNativeSelfie}
+              />
 
               {/* Inline help — only when not yet captured */}
               {!capturedImage && (

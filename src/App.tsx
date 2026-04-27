@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,7 +12,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useVerificationGate } from "@/hooks/useVerificationGate";
 import { Button } from "@/components/ui/button";
-import { MessageCircleQuestion } from "lucide-react";
+import { Check, Copy, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -144,8 +144,46 @@ const KeyboardInsetTracker = () => {
 const AdminLyraProbeShortcut = () => {
   const location = useLocation();
   const { isAdmin, loading } = useIsAdmin();
+  const [copied, setCopied] = useState(false);
 
-  if (loading || !isAdmin || location.pathname.startsWith("/admin")) return null;
+  if (loading || !isAdmin) return null;
+
+  const isAdminPage = location.pathname === "/admin";
+  const lyraUrl = typeof window !== "undefined" ? `${window.location.origin}/admin/lyra` : "/admin/lyra";
+
+  const copyLyraLink = async () => {
+    try {
+      await navigator.clipboard.writeText(lyraUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  if (isAdminPage) {
+    return (
+      <div className="fixed right-5 top-20 z-[99999] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-lg border-2 border-violet-300 bg-white p-2 shadow-2xl shadow-violet-500/30">
+        <Button asChild className="h-10 px-4 text-xs font-bold uppercase bg-violet-600 hover:bg-violet-700 text-white">
+          <Link to="/admin/lyra" aria-label="Open Lyra Probe">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            OPEN LYRA PROBE
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 px-4 text-xs font-bold uppercase border-violet-300 text-violet-800 hover:bg-violet-50"
+          onClick={copyLyraLink}
+        >
+          {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+          {copied ? "COPIED" : "COPY LINK"}
+        </Button>
+      </div>
+    );
+  }
+
+  if (location.pathname.startsWith("/admin")) return null;
 
   return (
     <Button

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X, UserCog, ShieldCheck, ShieldOff } from "lucide-react";
+import { Search, Shield, Users, AlertTriangle, Crown, Telescope, Sparkles, Loader2, MessageCircleQuestion, Check, X, UserCog, ShieldCheck, ShieldOff, Copy, ExternalLink } from "lucide-react";
 
 type Report = {
   id: string;
@@ -323,6 +323,54 @@ type LyraProbeResult = {
 
 const DEFAULT_LYRA_QUESTION =
   "What's my Sun sign and what does it say about how I love?";
+
+const LyraProbeLinkBanner = () => {
+  const [copied, setCopied] = useState(false);
+  const url =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/admin/lyra`
+      : "/admin/lyra";
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Lyra Probe link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+
+  return (
+    <div className="mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 rounded-lg border-2 border-violet-300 bg-violet-50">
+      <div className="flex items-center gap-2 text-sm font-semibold text-violet-900 shrink-0">
+        <MessageCircleQuestion className="w-4 h-4" />
+        Lyra Probe link:
+      </div>
+      <code className="flex-1 px-2 py-1.5 rounded bg-white border border-violet-200 text-xs text-slate-700 truncate">
+        {url}
+      </code>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 text-xs gap-1.5 border-violet-300 bg-white text-violet-800 hover:bg-violet-100"
+          onClick={copy}
+        >
+          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? "Copied" : "Copy"}
+        </Button>
+        <Button asChild size="sm" className="h-8 text-xs gap-1.5 bg-violet-600 hover:bg-violet-700 text-white">
+          <a href="/admin/lyra" target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="w-3.5 h-3.5" />
+            Open
+          </a>
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const LyraProbeSection = () => {
   const [question, setQuestion] = useState(DEFAULT_LYRA_QUESTION);
@@ -797,6 +845,7 @@ const Admin = () => {
             ← Back to Admin
           </Link>
         )}
+        <LyraProbeLinkBanner />
         <div className="mb-6 ring-4 ring-violet-400 rounded-lg shadow-lg shadow-violet-200/60">
           <LyraProbeSection />
         </div>

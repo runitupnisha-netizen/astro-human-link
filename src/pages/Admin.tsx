@@ -797,6 +797,7 @@ const Admin = () => {
             ← Back to Admin
           </Link>
         )}
+        <LyraProbeLinkBanner />
         <div className="mb-6 ring-4 ring-violet-400 rounded-lg shadow-lg shadow-violet-200/60">
           <LyraProbeSection />
         </div>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -683,6 +684,7 @@ const RolesSection = () => {
 
 const Admin = () => {
   const { isAdmin, loading } = useIsAdmin();
+  const { user, loading: authLoading } = useAuth();
   const [recomputing, setRecomputing] = useState(false);
 
   const recomputeDemoChart = async () => {
@@ -707,14 +709,35 @@ const Admin = () => {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <p className="text-slate-500">Checking permissions…</p>
       </div>
     );
   }
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/auth?redirect=/admin" replace />;
+  }
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
+        <Card className="max-w-md w-full p-6 bg-white border-slate-200 text-center space-y-3">
+          <Shield className="w-8 h-8 text-slate-400 mx-auto" />
+          <h1 className="text-lg font-semibold text-slate-900">Admin access required</h1>
+          <p className="text-sm text-slate-600">
+            You're signed in as <code className="text-slate-800">{user.email}</code>, but this account does not have the admin role.
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-100"
+          >
+            Back to app
+          </Link>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">

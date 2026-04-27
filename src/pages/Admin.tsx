@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/hooks/useAuth";
@@ -685,7 +685,9 @@ const RolesSection = () => {
 const Admin = () => {
   const { isAdmin, loading } = useIsAdmin();
   const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
   const [recomputing, setRecomputing] = useState(false);
+  const isLyraProbeRoute = location.pathname === "/admin/lyra";
 
   const recomputeDemoChart = async () => {
     setRecomputing(true);
@@ -748,6 +750,13 @@ const Admin = () => {
             <h1 className="text-xl font-semibold">Stellara Admin</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin/lyra"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-violet-300 bg-violet-50 text-violet-800 hover:bg-violet-100 transition-colors font-semibold"
+            >
+              <MessageCircleQuestion className="w-3.5 h-3.5" />
+              Run Lyra Probe
+            </Link>
             <Button
               size="sm"
               variant="outline"
@@ -780,16 +789,24 @@ const Admin = () => {
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-6 py-6">
-        <MetricsSection />
-        <div className="mb-6 ring-2 ring-violet-400 rounded-lg">
+        {isLyraProbeRoute && (
+          <Link
+            to="/admin"
+            className="inline-flex mb-4 text-sm text-slate-600 hover:text-slate-900"
+          >
+            ← Back to Admin
+          </Link>
+        )}
+        <div className="mb-6 ring-4 ring-violet-400 rounded-lg shadow-lg shadow-violet-200/60">
           <LyraProbeSection />
         </div>
+        {!isLyraProbeRoute && <MetricsSection />}
+        {!isLyraProbeRoute && (
         <Tabs defaultValue="reports">
           <TabsList className="bg-white border border-slate-200 h-auto flex flex-wrap justify-start gap-1 p-1">
             <TabsTrigger value="reports">Reports Queue</TabsTrigger>
             <TabsTrigger value="users">User Lookup</TabsTrigger>
             <TabsTrigger value="roles">Roles</TabsTrigger>
-            <TabsTrigger value="lyra">Lyra Probe</TabsTrigger>
           </TabsList>
           <TabsContent value="reports" className="mt-4">
             <Card className="bg-white border-slate-200">
@@ -802,10 +819,8 @@ const Admin = () => {
           <TabsContent value="roles" className="mt-4">
             <RolesSection />
           </TabsContent>
-          <TabsContent value="lyra" className="mt-4">
-            <LyraProbeSection />
-          </TabsContent>
         </Tabs>
+        )}
       </main>
     </div>
   );

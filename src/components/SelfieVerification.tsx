@@ -39,6 +39,7 @@ const SelfieVerification = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const mountedRef = useRef(true);
   const cameraRequestRef = useRef(0);
@@ -100,15 +101,21 @@ const SelfieVerification = () => {
     try {
       releaseCamera();
       setCapturedImage(null);
-      setCameraStarting(true);
       setStep(2);
+
+      if (prefersNativeSelfieCapture()) {
+        fileInputRef.current?.click();
+        return;
+      }
+
+      setCameraStarting(true);
 
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error("UNSUPPORTED_CAMERA");
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "user" }, width: { ideal: 720 }, height: { ideal: 720 } },
+        video: { facingMode: "user" },
         audio: false,
       });
 
@@ -150,6 +157,29 @@ const SelfieVerification = () => {
       toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
     }
   }, [releaseCamera, stopCamera, toast]);
+
+  const handleNativeSelfie = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) {
+      setStep(1);
+      return;
+    }
+
+    releaseCamera();
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCapturedImage(typeof reader.result === "string" ? reader.result : null);
+      setCameraActive(false);
+      setCameraStarting(false);
+      setStep(3);
+    };
+    reader.onerror = () => {
+      setStep(1);
+      toast({ title: "Selfie unavailable", description: "Please try taking your selfie again.", variant: "destructive" });
+    };
+    reader.readAsDataURL(file);
+  }, [releaseCamera, toast]);
 
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;

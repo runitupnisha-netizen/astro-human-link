@@ -207,6 +207,7 @@ const AppRoutes = () => {
   const location = useLocation();
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const isRecoveryRoute = location.pathname === "/reset-password" || hasRecoverySignal(location);
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   if (loading && !isRecoveryRoute) return <LoadingScreen />;
 
@@ -216,11 +217,11 @@ const AppRoutes = () => {
       <ReferralCapture />
       <KeyboardInsetTracker />
       <RecoveryLinkRedirect />
-      {!isRecoveryRoute && user && onboardingComplete && <Navigation />}
-      {!isRecoveryRoute && user && onboardingComplete && <EmailVerificationReminder />}
-      {!isRecoveryRoute && user && onboardingComplete && <InAppFeedback />}
-      {!isRecoveryRoute && user && onboardingComplete && <CosmicNudge />}
-      {!isRecoveryRoute && user && onboardingComplete && <ReleaseNotesPanel />}
+      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
+      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
+      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
+      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
+      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />

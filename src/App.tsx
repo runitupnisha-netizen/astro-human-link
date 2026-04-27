@@ -268,6 +268,7 @@ const AppRoutes = () => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const isRecoveryRoute = location.pathname === "/reset-password" || hasRecoverySignal(location);
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isVerificationRoute = location.pathname === "/verify";
 
   if (loading && !isRecoveryRoute) return <LoadingScreen />;
 
@@ -277,12 +278,12 @@ const AppRoutes = () => {
       <ReferralCapture />
       <KeyboardInsetTracker />
       <RecoveryLinkRedirect />
-      {!isRecoveryRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
-      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
-      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
-      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
-      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
-      {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
+      {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />

@@ -15,7 +15,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navigation
     "nav.discover": "Discover",
-    "nav.connections": "Connections",
+    "nav.connections": "Matches",
     "nav.profile": "Profile",
     "nav.settings": "Settings",
     "nav.messages": "Messages",
@@ -101,7 +101,7 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.search": "Search conversations...",
 
     // Connections
-    "connections.title": "Connections",
+    "connections.title": "Matches",
     "connections.matches": "Matches",
     "connections.no_connections": "Your soul connections will manifest here.",
     "connections.start_discovering": "Start discovering",

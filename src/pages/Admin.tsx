@@ -360,7 +360,7 @@ const LyraProbeSection = () => {
         </div>
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-slate-900">
-            Run as demo · Lyra question probe
+            Lyra Probe
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
             Calls the cosmic-guide AI prompt server-side using the demo
@@ -404,7 +404,7 @@ const LyraProbeSection = () => {
           ) : (
             <>
               <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-              Run as demo
+              Run Lyra Probe
             </>
           )}
         </Button>

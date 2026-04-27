@@ -65,7 +65,7 @@ const Navigation = () => {
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
     { path: "/inner-world", label: "My Cosmos", icon: Moon },
-    { path: "/guide", label: "Lyra", icon: Wand2 },
+    { path: "/lyra", label: "Lyra", icon: Wand2 },
     { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/premium", label: t("premium.title"), icon: Crown, premium: true },
@@ -76,7 +76,7 @@ const Navigation = () => {
   const bottomTabs = [
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
-    { path: "/guide", label: "Lyra", icon: Wand2 },
+    { path: "/lyra", label: "Lyra", icon: Wand2 },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
   ];
 
@@ -186,7 +186,7 @@ const Navigation = () => {
                       <span>{t("nav.settings")}</span>
                     </Link>
                     <Link
-                      to="/guide"
+                      to="/lyra"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
                     >

@@ -243,7 +243,7 @@ const TOUR_STEPS: TourStep[] = [
     iconWrapClass: "bg-violet-500/15 text-violet-300 border-violet-400/30",
     title: "Meet Lyra · your AI cosmic guide",
     body: "Lyra is your personal cosmic confidante. Ask her about your chart, a connection, your week, or anything weighing on your heart — she knows you.",
-    cta: { label: "Message Lyra", path: "/guide", highlight: "lyra-input" },
+    cta: { label: "Message Lyra", path: "/lyra", highlight: "lyra-input" },
   },
   {
     icon: Wand2,

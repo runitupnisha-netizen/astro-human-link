@@ -4,12 +4,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useVerificationGate } from "@/hooks/useVerificationGate";
+import { Button } from "@/components/ui/button";
+import { MessageCircleQuestion } from "lucide-react";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -138,6 +141,25 @@ const KeyboardInsetTracker = () => {
   return null;
 };
 
+const AdminLyraProbeShortcut = () => {
+  const location = useLocation();
+  const { isAdmin, loading } = useIsAdmin();
+
+  if (loading || !isAdmin || location.pathname.startsWith("/admin")) return null;
+
+  return (
+    <Button
+      asChild
+      className="fixed right-4 top-24 z-[9999] h-11 px-4 text-xs font-bold uppercase shadow-lg"
+    >
+      <Link to="/admin/lyra" aria-label="Run Lyra Probe">
+        <MessageCircleQuestion className="w-4 h-4 mr-2" />
+        RUN LYRA PROBE
+      </Link>
+    </Button>
+  );
+};
+
 /**
  * Captures ?ref=CODE from any URL the user lands on, stores it for 30 days,
  * and lets the onboarding reveal step redeem it for both users.
@@ -217,6 +239,7 @@ const AppRoutes = () => {
       <ReferralCapture />
       <KeyboardInsetTracker />
       <RecoveryLinkRedirect />
+      {!isRecoveryRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
       {!isRecoveryRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}

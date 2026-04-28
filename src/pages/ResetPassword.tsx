@@ -115,35 +115,34 @@ const ResetPassword = () => {
   };
 
   useEffect(() => {
-    let recovered = false;
-    let failureTimer: number | undefined;
-    let sessionPoller: number | undefined;
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.replace("#", ""));
 
-    const params = new URLSearchParams(window.location.search);
-    const { accessToken, refreshToken, tokenHash, type } = getRecoveryTokensFromHash();
-    const encodedConfirmationUrl = params.get("confirmation_url");
-    const safeConfirmationUrl = encodedConfirmationUrl
-      ? decodeURIComponent(encodedConfirmationUrl)
-      : null;
+    const type = params.get("type");
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
 
-    const hasFreshRecoveryToken = hasGenuineRecoveryLink();
+    const isGenuineRecovery =
+      type === "recovery" &&
+      !!accessToken &&
+      accessToken.length > 20;
 
-    if (!hasFreshRecoveryToken && !safeConfirmationUrl) {
-      window.sessionStorage.removeItem("auth-recovery-pending");
+    if (!isGenuineRecovery) {
       window.localStorage.removeItem("auth-recovery-pending");
-      window.localStorage.removeItem("auth-recovery-requested-at");
-      navigate("/auth", { replace: true });
+      window.sessionStorage.clear();
+      window.history.replaceState(
+        null,
+        document.title,
+        window.location.pathname
+      );
+      navigate("/", { replace: true });
       return;
     }
 
-    if (safeConfirmationUrl) {
-      setConfirmationUrl(safeConfirmationUrl);
-      setVerifyingLink(false);
-    }
+    window.localStorage.setItem("auth-recovery-pending", "true");
 
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" && session) {
-        recovered = true;
         setConfirmationUrl(null);
         setReady(true);
         setVerifyingLink(false);
@@ -151,68 +150,27 @@ const ResetPassword = () => {
     });
 
     const initializeRecovery = async () => {
-      if (accessToken && refreshToken && type === "recovery") {
+      if (accessToken && refreshToken) {
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
 
         if (!error) {
-          recovered = true;
           setReady(true);
           setVerifyingLink(false);
-          window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
           return;
         }
       }
 
-      if (tokenHash && params.get("type") === "recovery") {
-        const { error } = await supabase.auth.verifyOtp({
-          type: "recovery",
-          token_hash: tokenHash,
-        });
-
-        if (!error) {
-          recovered = true;
-          setReady(true);
-          setVerifyingLink(false);
-          window.history.replaceState(null, "", window.location.pathname);
-          return;
-        }
-      }
-
-      if (safeConfirmationUrl) {
-        setVerifyingLink(false);
-        return;
-      }
-
-      if (!hasFreshRecoveryToken) {
-        setVerifyingLink(false);
-        setShowManualFallback(true);
-        return;
-      }
-
-      failureTimer = window.setTimeout(() => {
-        if (!recovered) {
-          if (sessionPoller) {
-            window.clearInterval(sessionPoller);
-          }
-          setVerifyingLink(false);
-          setShowManualFallback(true);
-        }
-      }, 12000);
+      setVerifyingLink(false);
+      setShowManualFallback(true);
     };
 
     void initializeRecovery();
 
     return () => {
       subscription.subscription.unsubscribe();
-      if (failureTimer) {
-        window.clearTimeout(failureTimer);
-      }
-      if (sessionPoller) {
-        window.clearInterval(sessionPoller);
-      }
     };
   }, [navigate]);
 

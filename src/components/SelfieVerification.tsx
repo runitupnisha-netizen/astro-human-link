@@ -335,6 +335,14 @@ const SelfieVerification = () => {
               )}
 
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={handleMobileCapture}
+                />
                 <video
                   ref={videoRef}
                   playsInline={true}
@@ -392,7 +400,7 @@ const SelfieVerification = () => {
                 {!cameraActive && !capturedImage && (
                   <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                     {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : isMobile ? "Take Selfie" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && !capturedImage && (

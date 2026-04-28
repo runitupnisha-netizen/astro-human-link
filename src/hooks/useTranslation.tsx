@@ -65,12 +65,12 @@ const translations: Record<Language, Record<string, string>> = {
     "settings.sign_out": "Sign Out",
     "settings.pause_profile": "Pause Profile",
     "settings.incognito": "Incognito Mode",
-    "settings.connection_prefs": "Connection Preferences",
+    "settings.connection_prefs": "Match Preferences",
     "settings.discovery_distance": "Discovery Distance",
     "settings.looking_for": "What are you looking for?",
     "settings.new_matches": "New Matches",
     "settings.new_matches_desc": "When someone likes you back",
-    "settings.messages_desc": "New messages from your connections",
+    "settings.messages_desc": "New messages from your matches",
     "settings.cosmic_insights": "Cosmic Insights",
     "settings.cosmic_insights_desc": "Daily intentions & weekly readings",
     "settings.tips_updates": "Tips & Updates",
@@ -100,10 +100,10 @@ const translations: Record<Language, Record<string, string>> = {
     "messages.request_call": "Request Call",
     "messages.search": "Search conversations...",
 
-    // Connections
+    // Matches
     "connections.title": "Matches",
     "connections.matches": "Matches",
-    "connections.no_connections": "Your soul connections will manifest here.",
+    "connections.no_connections": "Your soul matches will manifest here.",
     "connections.start_discovering": "Start discovering",
     "connections.discover_more": "Discover more",
     "connections.message": "Message",

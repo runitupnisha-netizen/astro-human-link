@@ -27,6 +27,12 @@ const getRecoveryTokensFromHash = () => {
   };
 };
 
+const hasGenuineRecoveryLink = () => {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
+  return hashParams.get("type") === "recovery" || queryParams.get("type") === "recovery";
+};
+
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -109,14 +115,14 @@ const ResetPassword = () => {
     const safeConfirmationUrl = encodedConfirmationUrl
       ? decodeURIComponent(encodedConfirmationUrl)
       : null;
-    const hasRecoveryIntent =
-      params.get("reset") === "1" ||
-      window.location.hash.includes("type=recovery") ||
-      window.location.hash.includes("access_token") ||
-      window.location.hash.includes("refresh_token") ||
-      window.sessionStorage.getItem("auth-recovery-pending") === "true" ||
-      window.localStorage.getItem("auth-recovery-pending") === "true" ||
-      document.referrer.includes("/verify");
+
+    if (!hasGenuineRecoveryLink() && !safeConfirmationUrl) {
+      window.sessionStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.localStorage.removeItem("auth-recovery-requested-at");
+      navigate("/auth", { replace: true });
+      return;
+    }
 
     if (safeConfirmationUrl) {
       setConfirmationUrl(safeConfirmationUrl);
@@ -124,7 +130,7 @@ const ResetPassword = () => {
     }
 
     const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+      if (event === "PASSWORD_RECOVERY" && session) {
         recovered = true;
         setConfirmationUrl(null);
         setReady(true);
@@ -133,7 +139,7 @@ const ResetPassword = () => {
     });
 
     const initializeRecovery = async () => {
-      if (accessToken && refreshToken && (type === "recovery" || hasRecoveryIntent)) {
+      if (accessToken && refreshToken && type === "recovery") {
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -148,30 +154,21 @@ const ResetPassword = () => {
         }
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setReady(true);
-        setVerifyingLink(false);
-        return;
-      }
-
       if (safeConfirmationUrl) {
         setVerifyingLink(false);
         return;
       }
 
-      if (hasRecoveryIntent) {
-        setVerifyingLink(true);
-        sessionPoller = window.setInterval(async () => {
-          const { data } = await supabase.auth.getSession();
-          if (!data.session) return;
+      setVerifyingLink(true);
+      sessionPoller = window.setInterval(async () => {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) return;
 
-          recovered = true;
-          window.clearInterval(sessionPoller);
-          setReady(true);
-          setVerifyingLink(false);
-        }, 500);
-      }
+        recovered = true;
+        window.clearInterval(sessionPoller);
+        setReady(true);
+        setVerifyingLink(false);
+      }, 500);
 
       failureTimer = window.setTimeout(() => {
         if (!recovered) {
@@ -181,7 +178,7 @@ const ResetPassword = () => {
           setVerifyingLink(false);
           setShowManualFallback(true);
         }
-      }, hasRecoveryIntent ? 12000 : 2000);
+      }, 12000);
     };
 
     void initializeRecovery();

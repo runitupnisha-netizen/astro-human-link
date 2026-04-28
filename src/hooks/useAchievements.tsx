@@ -35,7 +35,7 @@ export const useAchievements = () => {
         supabase.from("messages").select("id", { count: "exact", head: true }).eq("sender_id", user.id),
         supabase.from("swipes").select("id", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("profiles").select("avatar_url, display_name, birth_date, sun_sign, bio_prompt_1_answer").eq("user_id", user.id).maybeSingle(),
-        supabase.from("photo_verifications").select("status").eq("user_id", user.id).eq("status", "approved").maybeSingle(),
+        supabase.from("photo_verifications").select("status").eq("user_id", user.id).in("status", ["approved", "verified"]).maybeSingle(),
         supabase.from("alignment_posts").select("id", { count: "exact", head: true }).eq("user_id", user.id),
       ]);
 

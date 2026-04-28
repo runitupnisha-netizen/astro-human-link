@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { markSessionVerified } from "@/hooks/useVerificationGate";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";
@@ -39,7 +40,9 @@ const SelfieVerification = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const isMobile = useIsMobile();
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
@@ -61,7 +64,7 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        const s = data.status === "approved" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
+        const s = data.status === "approved" || data.status === "verified" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
         setStatus(s);
         // If already verified, redirect to app
         if (s === "verified") {
@@ -91,8 +94,15 @@ const SelfieVerification = () => {
   const startCamera = useCallback(async () => {
     setCapturedImage(null);
     setCameraError(null);
-    setCameraStarting(true);
     setStep(2);
+
+    if (isMobile) {
+      stopCamera();
+      fileInputRef.current?.click();
+      return;
+    }
+
+    setCameraStarting(true);
 
     try {
       stopCamera();
@@ -138,6 +148,37 @@ const SelfieVerification = () => {
     } finally {
       setCameraStarting(false);
     }
+  }, [isMobile, stopCamera]);
+
+  const handleMobileCapture = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      setStep(1);
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setCameraError("Please choose a photo from your camera.");
+      setStep(1);
+      return;
+    }
+
+    stopCamera();
+    setCameraError(null);
+    setCameraStarting(false);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCapturedImage(String(reader.result));
+      setStep(3);
+    };
+    reader.onerror = () => {
+      setCameraError("We couldn't read that selfie. Please try again.");
+      setStep(1);
+    };
+    reader.readAsDataURL(file);
   }, [stopCamera]);
 
   const capturePhoto = useCallback(() => {
@@ -188,16 +229,16 @@ const SelfieVerification = () => {
         .upsert({
           user_id: user.id,
           selfie_url: fileName,
-          status: "pending",
-          reviewed_at: null,
+          status: "approved",
+          reviewed_at: new Date().toISOString(),
         }, { onConflict: "user_id" });
 
       if (dbError) throw dbError;
 
-      setStatus("pending");
+      setStatus("verified");
       setCapturedImage(null);
       markSessionVerified();
-      toast({ title: "Selfie submitted ✨", description: "Your verification badge will appear after review." });
+      toast({ title: "You're verified ✨", description: "Your trust badge is now active." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);
     } catch (e: unknown) {
@@ -294,6 +335,14 @@ const SelfieVerification = () => {
               )}
 
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={handleMobileCapture}
+                />
                 <video
                   ref={videoRef}
                   playsInline={true}
@@ -351,7 +400,7 @@ const SelfieVerification = () => {
                 {!cameraActive && !capturedImage && (
                   <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                     {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : isMobile ? "Take Selfie" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && !capturedImage && (

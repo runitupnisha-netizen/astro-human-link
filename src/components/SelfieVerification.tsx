@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -138,32 +137,6 @@ const SelfieVerification = () => {
     }
   }, [stopCamera]);
 
-  const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) {
-      setStep(1);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCapturedImage(typeof reader.result === "string" ? reader.result : null);
-      setStep(3);
-    };
-    reader.onerror = () => {
-      setStep(1);
-      toast({ title: "Selfie unavailable", description: "Please try taking your selfie again.", variant: "destructive" });
-    };
-    reader.readAsDataURL(file);
-  }, [toast]);
-
-  const prepareForSelfie = () => {
-    setCapturedImage(null);
-    setCameraError(null);
-    setStep(2);
-  };
-
   const capturePhoto = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -295,6 +268,7 @@ const SelfieVerification = () => {
                 size="sm"
                 className="mt-2 gap-2"
                 onClick={() => {
+                  stopCamera();
                   setStatus("none");
                   setStep(1);
                 }}
@@ -384,17 +358,9 @@ const SelfieVerification = () => {
                 )}
                 {capturedImage && (
                   <>
-                    <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <Button variant="outline" onClick={startCamera} className="gap-2">
                       <RotateCcw className="w-4 h-4" /> Retake
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="user"
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                        onClick={prepareForSelfie}
-                        onChange={handleNativeSelfie}
-                      />
-                    </label>
+                    </Button>
                     <Button onClick={submitSelfie} disabled={submitting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {submitting ? "Verifying…" : "Submit"}

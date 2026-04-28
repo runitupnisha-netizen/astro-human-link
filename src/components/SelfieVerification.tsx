@@ -34,29 +34,14 @@ const TIPS: { icon: typeof Sun; label: string; ok: boolean }[] = [
   { icon: Glasses, label: "Remove sunglasses", ok: false },
 ];
 
-const prefersNativeSelfieCapture = () => {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent || "";
-  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const isMobile = /Android|Mobile/.test(ua) || isIOS;
-  return isMobile;
-};
-
 const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const mountedRef = useRef(true);
-  const cameraRequestRef = useRef(0);
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
-  const [cameraActive, setCameraActive] = useState(false);
-  const [cameraStarting, setCameraStarting] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<Step>(1);
@@ -72,7 +57,7 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        const s = data.status as VerificationStatus;
+        const s = data.status === "approved" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
         setStatus(s);
         // If already verified, redirect to app
         if (s === "verified") {
@@ -85,88 +70,6 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
-  const releaseCamera = useCallback(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.pause();
-      video.srcObject = null;
-      video.removeAttribute("src");
-      video.load();
-    }
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    cameraRequestRef.current += 1;
-    releaseCamera();
-    setCameraActive(false);
-    setCameraStarting(false);
-  }, [releaseCamera]);
-
-  const startCamera = useCallback(async () => {
-    const requestId = cameraRequestRef.current + 1;
-    cameraRequestRef.current = requestId;
-    try {
-      releaseCamera();
-      setCapturedImage(null);
-      setStep(2);
-
-      if (prefersNativeSelfieCapture()) {
-        fileInputRef.current?.click();
-        return;
-      }
-
-      setCameraStarting(true);
-
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("UNSUPPORTED_CAMERA");
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false,
-      });
-
-      if (!mountedRef.current || requestId !== cameraRequestRef.current) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-
-      streamRef.current = stream;
-
-      const video = videoRef.current;
-      if (!video) throw new Error("Camera preview did not initialize.");
-
-      video.muted = true;
-      video.playsInline = true;
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("webkit-playsinline", "true");
-      video.srcObject = stream;
-
-      const playAttempt = video.play();
-      playAttempt?.catch(() => {
-        requestAnimationFrame(() => video.play().catch(() => {}));
-      });
-      setCameraStarting(false);
-      setCameraActive(true);
-    } catch (err: any) {
-      stopCamera();
-      setStep(1);
-      const msg =
-        err?.message === "UNSUPPORTED_CAMERA"
-          ? "Camera capture isn't available in this browser. Please open Stellara in Safari or Chrome and try again."
-          : err?.name === "NotAllowedError"
-          ? "Camera access was denied. Please enable camera permissions in your browser settings and try again."
-          : err?.name === "NotFoundError"
-            ? "No camera found on this device."
-            : err?.name === "NotReadableError"
-              ? "Your camera is being used by another app. Close it and try again."
-              : "Couldn't start your camera. Please check permissions and try again.";
-      toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
-    }
-  }, [releaseCamera, stopCamera, toast]);
-
   const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -175,12 +78,9 @@ const SelfieVerification = () => {
       return;
     }
 
-    releaseCamera();
     const reader = new FileReader();
     reader.onload = () => {
       setCapturedImage(typeof reader.result === "string" ? reader.result : null);
-      setCameraActive(false);
-      setCameraStarting(false);
       setStep(3);
     };
     reader.onerror = () => {
@@ -188,34 +88,7 @@ const SelfieVerification = () => {
       toast({ title: "Selfie unavailable", description: "Please try taking your selfie again.", variant: "destructive" });
     };
     reader.readAsDataURL(file);
-  }, [releaseCamera, toast]);
-
-  const capturePhoto = useCallback(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || !streamRef.current || !video.videoWidth || !video.videoHeight) {
-      toast({ title: "Camera still loading", description: "Please wait until your selfie preview appears.", variant: "destructive" });
-      return;
-    }
-
-    const size = Math.min(video.videoWidth, video.videoHeight);
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Center-crop and mirror for selfie
-    const offsetX = (video.videoWidth - size) / 2;
-    const offsetY = (video.videoHeight - size) / 2;
-    ctx.translate(size, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
-
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-    setCapturedImage(dataUrl);
-    stopCamera();
-    setStep(3);
-  }, [stopCamera, toast]);
+  }, [toast]);
 
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;

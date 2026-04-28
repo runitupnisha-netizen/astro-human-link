@@ -210,15 +210,17 @@ const StartupAuthRedirect = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash.includes("type=recovery")) {
+    const isRecoveryLink = location.pathname === "/reset-password" && isPasswordResetUrl(hash);
+
+    if (!isRecoveryLink) {
       window.localStorage.removeItem("auth-recovery-pending");
       window.sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token")) {
+      if (hash.includes("access_token") || hash.includes("type=recovery")) {
         window.history.replaceState(null, document.title, window.location.pathname);
       }
     }
 
-    if (location.pathname === "/reset-password" && !isPasswordResetUrl(hash)) {
+    if (location.pathname === "/reset-password" && !isRecoveryLink) {
       navigate("/sign-in", { replace: true });
     }
   }, [location.pathname, navigate]);

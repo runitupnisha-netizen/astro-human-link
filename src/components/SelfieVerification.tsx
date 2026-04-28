@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,6 @@ const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
@@ -90,6 +89,11 @@ const SelfieVerification = () => {
     reader.readAsDataURL(file);
   }, [toast]);
 
+  const prepareForSelfie = () => {
+    setCapturedImage(null);
+    setStep(2);
+  };
+
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;
     setSubmitting(true);
@@ -106,22 +110,22 @@ const SelfieVerification = () => {
 
       if (uploadError) throw uploadError;
 
-      // Upsert verification record — auto-verify for now (can add AI review later)
+      // Submit for review. Badges only render after an approved status.
       const { error: dbError } = await supabase
         .from("photo_verifications")
         .upsert({
           user_id: user.id,
           selfie_url: fileName,
-          status: "verified",
-          reviewed_at: new Date().toISOString(),
+          status: "pending",
+          reviewed_at: null,
         }, { onConflict: "user_id" });
 
       if (dbError) throw dbError;
 
-      setStatus("verified");
+      setStatus("pending");
       setCapturedImage(null);
       markSessionVerified();
-      toast({ title: "You're verified! ✨", description: "Your profile now shows a trust badge." });
+      toast({ title: "Selfie submitted ✨", description: "Your verification badge will appear after review." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);
     } catch (e: any) {
@@ -130,15 +134,6 @@ const SelfieVerification = () => {
       setSubmitting(false);
     }
   }, [capturedImage, user, toast]);
-
-  // Cleanup camera on unmount
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-      cameraRequestRef.current += 1;
-      releaseCamera();
-    };
-  }, [releaseCamera]);
 
   if (loading) {
     return (

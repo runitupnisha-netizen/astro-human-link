@@ -1,20 +1,3 @@
-const hash = window.location.hash;
-const isRecoveryUrl = hash.includes('type=recovery');
-if (!isRecoveryUrl) {
-  localStorage.removeItem('auth-recovery-pending');
-  sessionStorage.removeItem('auth-recovery-pending');
-  sessionStorage.removeItem('supabase-recovery');
-
-  if (hash.includes('access_token') &&
-      !hash.includes('type=recovery')) {
-    window.history.replaceState(
-      null,
-      document.title,
-      window.location.pathname
-    );
-  }
-}
-
 import { Suspense, lazy, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -104,19 +87,9 @@ const LoadingScreen = () => (
   </div>
 );
 
-const hasRecoverySignal = (location: { search: string; hash: string }) => {
-  const searchParams = new URLSearchParams(location.search);
-  const hashParams = new URLSearchParams(location.hash.replace(/^#/, ""));
-
-  const hashHasRecoverySession =
-    hashParams.get("type") === "recovery" &&
-    !!hashParams.get("access_token") &&
-    !!hashParams.get("refresh_token");
-  const queryHasRecoveryToken =
-    searchParams.get("type") === "recovery" &&
-    (!!searchParams.get("token_hash") || !!searchParams.get("token"));
-
-  return hashHasRecoverySession || queryHasRecoveryToken;
+const isPasswordResetUrl = (hash: string) => {
+  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+  return hashParams.get("type") === "recovery" && !!hashParams.get("access_token");
 };
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {

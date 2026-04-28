@@ -300,7 +300,7 @@ const AppRoutes = () => {
             <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
             <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
-            <Route path="/growth" element={<PageTransition><ProtectedRoute><Growth /></ProtectedRoute></PageTransition>} />
+            <Route path="/growth" element={<PageTransition><ProtectedRoute skipVerificationCheck><Growth /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/ritual" element={<PageTransition><ProtectedRoute><DailyRitual /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/shadow" element={<PageTransition><ProtectedRoute><ShadowJournal /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/moon" element={<PageTransition><ProtectedRoute><MoonCycle /></ProtectedRoute></PageTransition>} />

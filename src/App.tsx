@@ -89,15 +89,9 @@ const LoadingScreen = () => (
 
 const hasRecoverySignal = (location: { search: string; hash: string }) => {
   const searchParams = new URLSearchParams(location.search);
+  const hashParams = new URLSearchParams(location.hash.replace(/^#/, ""));
 
-  return (
-    location.hash.includes("type=recovery") ||
-    location.hash.includes("access_token=") ||
-    location.hash.includes("refresh_token=") ||
-    searchParams.get("type") === "recovery" ||
-    searchParams.get("mode") === "confirm-recovery" ||
-    searchParams.get("reset") === "1"
-  );
+  return hashParams.get("type") === "recovery" || searchParams.get("type") === "recovery";
 };
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
@@ -215,29 +209,14 @@ const RecoveryLinkRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasPendingRecovery = typeof window !== "undefined" && (() => {
-      const sessionFlag = window.sessionStorage.getItem("auth-recovery-pending") === "true";
-      const localFlag = window.localStorage.getItem("auth-recovery-pending") === "true";
-      const requestedAt = Number(window.localStorage.getItem("auth-recovery-requested-at") || "0");
-      const recoveryWindowActive = requestedAt > 0 && Date.now() - requestedAt < 30 * 60 * 1000;
-      return sessionFlag || (localFlag && recoveryWindowActive);
-    })();
-
-    const cameFromAuthVerify =
-      typeof document !== "undefined" && document.referrer.includes("/verify");
-    const isRecoveryFlow =
-      hasPendingRecovery ||
-      hasRecoverySignal(location) ||
-      cameFromAuthVerify;
+    const isRecoveryFlow = hasRecoverySignal(location);
 
     if (!isRecoveryFlow || location.pathname === "/reset-password") return;
-
-    const nextSearch = location.search || "?reset=1";
 
     navigate(
       {
         pathname: "/reset-password",
-        search: nextSearch,
+        search: location.search,
         hash: location.hash,
       },
       { replace: true }
@@ -248,12 +227,10 @@ const RecoveryLinkRedirect = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "PASSWORD_RECOVERY") return;
 
-      window.sessionStorage.setItem("auth-recovery-pending", "true");
-      window.localStorage.setItem("auth-recovery-pending", "true");
-      window.localStorage.setItem("auth-recovery-requested-at", Date.now().toString());
+      if (!hasRecoverySignal({ search: window.location.search, hash: window.location.hash })) return;
 
       if (window.location.pathname !== "/reset-password") {
-        navigate("/reset-password", { replace: true });
+        navigate({ pathname: "/reset-password", search: window.location.search, hash: window.location.hash }, { replace: true });
       }
     });
 

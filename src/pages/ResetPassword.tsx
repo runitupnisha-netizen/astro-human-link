@@ -204,7 +204,8 @@ const ResetPassword = () => {
       toast.success("Password updated! Welcome back ✨", {
         description: "Redirecting you to the app...",
       });
-      setTimeout(() => navigate("/"), 2000);
+      window.history.replaceState(null, document.title, "/growth");
+      setTimeout(() => navigate("/growth", { replace: true }), 2000);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to reset password";
       const m = message.toLowerCase();

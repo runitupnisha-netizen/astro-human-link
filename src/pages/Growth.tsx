@@ -99,7 +99,7 @@ const Growth = () => {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto px-5 pt-20 pb-28 md:pb-12">
+      <div className="relative z-10 max-w-md mx-auto px-5 pt-24 md:pt-28 pb-28 md:pb-12">
         {/* Lyra greeting strip */}
         <div className="mb-5">
           <LyraStrip

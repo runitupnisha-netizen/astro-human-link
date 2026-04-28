@@ -61,7 +61,7 @@ const LyraStrip = ({ context, contextKey, payload, fallback, size = "sm", classN
       initial={{ opacity: 0 }}
       animate={{ opacity: loaded ? 1 : 0.6 }}
       transition={{ duration: 0.6 }}
-      className={`flex items-start gap-1.5 leading-snug ${size === "md" ? "text-sm" : "text-xs"} ${className}`}
+      className={`flex items-start gap-1.5 leading-snug ${size === "md" ? "text-sm" : "text-[12px]"} ${className}`}
       style={{ color: "#d0b4f7", fontFamily: "Poppins, sans-serif", fontWeight: 300 }}
     >
       <Sparkles className="w-3 h-3 shrink-0 mt-[2px] opacity-80" />

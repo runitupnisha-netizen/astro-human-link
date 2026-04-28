@@ -286,7 +286,7 @@ const Connections = () => {
     return (
       <div className="min-h-screen bg-background relative">
         <CosmicBackground />
-        <div className="relative z-10 pt-20 pb-24 md:pb-12">
+        <div className="relative z-10 pt-24 md:pt-28 pb-24 md:pb-12">
           <div className="max-w-4xl mx-auto px-6 space-y-4 mt-16">
             {[0, 1, 2, 3].map((i) => (
               <ConnectionCardSkeleton key={i} />
@@ -313,7 +313,7 @@ const Connections = () => {
       >
         <Plus className="w-5 h-5" strokeWidth={2.5} />
       </button>
-      <div ref={containerRef} {...pullHandlers} className="relative z-10 pt-20 pb-24 md:pb-12 overflow-y-auto">
+      <div ref={containerRef} {...pullHandlers} className="relative z-10 pt-24 md:pt-28 pb-24 md:pb-12 overflow-y-auto">
         {pullIndicator}
         <div className="max-w-4xl mx-auto px-6">
           {/* Offline cache notice — visible only when serving stale data */}

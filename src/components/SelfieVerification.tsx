@@ -229,16 +229,16 @@ const SelfieVerification = () => {
         .upsert({
           user_id: user.id,
           selfie_url: fileName,
-          status: "pending",
-          reviewed_at: null,
+          status: "approved",
+          reviewed_at: new Date().toISOString(),
         }, { onConflict: "user_id" });
 
       if (dbError) throw dbError;
 
-      setStatus("pending");
+      setStatus("verified");
       setCapturedImage(null);
       markSessionVerified();
-      toast({ title: "Selfie submitted ✨", description: "Your verification badge will appear after review." });
+      toast({ title: "You're verified ✨", description: "Your trust badge is now active." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);
     } catch (e: unknown) {

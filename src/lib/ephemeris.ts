@@ -49,14 +49,13 @@ export function resolveTimezone(
 
 /**
  * Build a UTC Date from a local birth date/time at a specific lat/lng.
- * Uses tz-lookup + luxon to honor real IANA zones, including DST and historical
+ * Uses IANA timezone lookup + luxon to honor real zones, including DST and historical
  * offset rules — so a 3:30 PM birth in New York on Jan 20 1990 maps to the
  * correct EST UTC instant, and a July 4 1985 noon birth in LA maps to PDT.
  *
  * Fallbacks (in order):
- *  1) IANA zone from (lat, lng) via tz-lookup
- *  2) Longitude-based offset (lng / 15) when lat is missing
- *  3) UTC when no coordinates are provided at all
+ *  1) IANA zone from (lat, lng)
+ *  2) UTC when coordinates are missing or cannot resolve
  * If birthTime is missing, defaults to local 12:00 (noon).
  */
 export function buildBirthDateUTC(
@@ -84,10 +83,8 @@ export function buildBirthDateUTC(
     if (dt.isValid) return dt.toUTC().toJSDate();
   }
 
-  // Fallback: longitude-based offset (no DST, but reasonable when lat is unknown).
-  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
   const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
-  return new Date(asUTC - offsetHours * 3600 * 1000);
+  return new Date(asUTC);
 }
 
 function eclipticLongitude(body: Body, date: Date): number {

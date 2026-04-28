@@ -65,9 +65,8 @@ function buildBirthDateUTC(
     if (dt.isValid) return dt.toUTC().toJSDate();
   }
 
-  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
   const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
-  return new Date(asUTC - offsetHours * 3600 * 1000);
+  return new Date(asUTC);
 }
 
 function eclipticLongitude(body: Body, date: Date): number {

@@ -15,14 +15,34 @@ export const useAuth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (typeof window !== "undefined") {
         if (event === "PASSWORD_RECOVERY") {
-          window.sessionStorage.setItem("auth-recovery-pending", "true");
-          window.localStorage.setItem("auth-recovery-pending", "true");
-          window.localStorage.setItem("auth-recovery-requested-at", Date.now().toString());
+          // Only treat as a real recovery flow if the URL actually contains
+          // recovery tokens. Supabase can fire PASSWORD_RECOVERY on session
+          // restore in some edge cases — we must not hijack normal logins.
+          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+          const search = new URLSearchParams(window.location.search);
+          const isRealRecovery =
+            hash.get("type") === "recovery" || search.get("type") === "recovery";
+          if (isRealRecovery) {
+            window.sessionStorage.setItem("auth-recovery-pending", "true");
+          }
         }
         if (event === "SIGNED_OUT") {
           window.sessionStorage.removeItem("auth-recovery-pending");
           window.localStorage.removeItem("auth-recovery-pending");
           window.localStorage.removeItem("auth-recovery-requested-at");
+        }
+        if (event === "SIGNED_IN") {
+          // A successful normal sign-in should clear any stale recovery flags
+          // so the next session restore doesn't bounce to /reset-password.
+          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+          const search = new URLSearchParams(window.location.search);
+          const isRealRecovery =
+            hash.get("type") === "recovery" || search.get("type") === "recovery";
+          if (!isRealRecovery) {
+            window.sessionStorage.removeItem("auth-recovery-pending");
+            window.localStorage.removeItem("auth-recovery-pending");
+            window.localStorage.removeItem("auth-recovery-requested-at");
+          }
         }
       }
 

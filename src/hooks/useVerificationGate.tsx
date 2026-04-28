@@ -48,7 +48,7 @@ export const useVerificationGate = (userId: string | null | undefined) => {
         .limit(1)
         .maybeSingle();
 
-      const isVerified = data?.status === "approved" || data?.status === "pending";
+      const isVerified = data?.status === "approved" || data?.status === "verified" || data?.status === "pending";
       if (isVerified) sessionVerified = true;
       setVerified(isVerified);
       setLoading(false);

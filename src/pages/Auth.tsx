@@ -132,7 +132,7 @@ const Auth = () => {
         });
         if (error) throw error;
         toast.success("Welcome back ✨");
-        navigate("/");
+        navigate("/growth", { replace: true });
       } else {
         const { error, data } = await supabase.auth.signUp({
           email: email.trim(),
@@ -158,7 +158,7 @@ const Auth = () => {
         } else {
           // Auto-confirm enabled — user is signed in directly
           toast.success("Welcome to Stellara ✨");
-          navigate("/");
+          navigate("/growth", { replace: true });
         }
       }
     } catch (err) {

@@ -304,7 +304,7 @@ const Settings = () => {
 
   const handleSignOut = async () => {
     toast.success("Signed out. See you next time! 🌙");
-    // signOut() now performs a hard reload to /auth, clearing ALL in-memory state
+    // signOut() now performs a hard reload to /sign-in, clearing ALL in-memory state
     // (matches, messages, chart data, journal entries, react-query cache) so the
     // previous user's data can never leak into the next session.
     await signOut();
@@ -1003,7 +1003,7 @@ const Settings = () => {
                   if (error) throw error;
                   await signOut();
                   toast.success("Your account has been deleted. Take care out there. 🌙");
-                  navigate("/auth");
+                  navigate("/sign-in");
                 } catch (err: any) {
                   toast.error(err.message || "Failed to delete account");
                 } finally {

@@ -18,13 +18,4 @@ export const RELEASE_NOTES: ReleaseNoteEntry[] = [
       { type: "added", text: "Automated smoke tests guarding the bio/expander behavior on every deploy." },
     ],
   },
-  {
-    version: "1.3.0",
-    date: "2026-04-18",
-    title: "Password reset reliability",
-    changes: [
-      { type: "added", text: "Manual password reset fallback — paste your reset link if the redirect ever fails." },
-      { type: "improved", text: "Recovery flow now persists across reloads with a 30-minute window." },
-    ],
-  },
 ];

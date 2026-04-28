@@ -7,7 +7,7 @@ import SparkleLoader from "@/components/SparkleLoader";
 /**
  * Deep-link handler for stellara.app/join/[CODE].
  * - Stores the code in localStorage (30-day TTL).
- * - If the visitor isn't signed in, sends them to /auth (signup) with the
+ * - If the visitor isn't signed in, sends them to /sign-in with the
  *   code preserved.
  * - If they're already signed in, sends them to the Referral page so they
  *   can either redeem (if eligible) or share their own.
@@ -26,7 +26,7 @@ const JoinWithCode = () => {
     if (user) {
       navigate("/referral", { replace: true });
     } else {
-      navigate(`/auth?ref=${(code || "").toUpperCase()}`, { replace: true });
+      navigate(`/sign-in?ref=${(code || "").toUpperCase()}`, { replace: true });
     }
   }, [loading, user, code, navigate]);
 

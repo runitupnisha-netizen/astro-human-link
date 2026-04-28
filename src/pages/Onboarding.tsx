@@ -312,7 +312,7 @@ const Onboarding = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Please sign in first");
-        navigate("/auth");
+        navigate("/sign-in");
         return;
       }
 
@@ -664,7 +664,7 @@ const Onboarding = () => {
                   transition={{ delay: 0.5 }}
                   className="flex gap-3"
                 >
-                  <Button variant="outline" onClick={() => navigate("/auth")} className="h-12 px-6 group">
+                  <Button variant="outline" onClick={() => navigate("/sign-in")} className="h-12 px-6 group">
                     <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
                     Go Back
                   </Button>

@@ -1,20 +1,3 @@
-const hash = window.location.hash;
-const isRecoveryUrl = hash.includes('type=recovery');
-if (!isRecoveryUrl) {
-  localStorage.removeItem('auth-recovery-pending');
-  sessionStorage.removeItem('auth-recovery-pending');
-  sessionStorage.removeItem('supabase-recovery');
-
-  if (hash.includes('access_token') &&
-      !hash.includes('type=recovery')) {
-    window.history.replaceState(
-      null,
-      document.title,
-      window.location.pathname
-    );
-  }
-}
-
 import { Suspense, lazy, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -104,19 +87,9 @@ const LoadingScreen = () => (
   </div>
 );
 
-const hasRecoverySignal = (location: { search: string; hash: string }) => {
-  const searchParams = new URLSearchParams(location.search);
-  const hashParams = new URLSearchParams(location.hash.replace(/^#/, ""));
-
-  const hashHasRecoverySession =
-    hashParams.get("type") === "recovery" &&
-    !!hashParams.get("access_token") &&
-    !!hashParams.get("refresh_token");
-  const queryHasRecoveryToken =
-    searchParams.get("type") === "recovery" &&
-    (!!searchParams.get("token_hash") || !!searchParams.get("token"));
-
-  return hashHasRecoverySession || queryHasRecoveryToken;
+const isPasswordResetUrl = (hash: string) => {
+  const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+  return hashParams.get("type") === "recovery" && !!hashParams.get("access_token");
 };
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
@@ -124,10 +97,10 @@ const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificat
   const { sessionExpired } = useAuth();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  // If a session expired mid-app, show the friendly screen instead of bouncing to /auth.
+  // If a session expired mid-app, show the friendly screen instead of bouncing to sign-in.
   if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/sign-in" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
   // After onboarding, require verification before accessing the app
   if (!skipVerificationCheck && onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
@@ -139,7 +112,7 @@ const AuthRoute = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/growth" replace />;
 
   return <>{children}</>;
 };
@@ -229,24 +202,17 @@ const ReferralCapture = () => {
   return null;
 };
 
-const RecoveryLinkRedirect = () => {
+const StartupAuthRedirect = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isRecoveryFlow = hasRecoverySignal(location);
+    if (location.pathname === "/reset-password" && isPasswordResetUrl(location.hash)) return;
 
-    if (!isRecoveryFlow || location.pathname === "/reset-password" || location.pathname === "/auth") return;
-
-    navigate(
-      {
-        pathname: "/reset-password",
-        search: location.search,
-        hash: location.hash,
-      },
-      { replace: true }
-    );
-  }, [location.hash, location.pathname, location.search, navigate]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      navigate(session ? "/growth" : "/sign-in", { replace: true });
+    });
+  }, []);
 
   return null;
 };
@@ -254,7 +220,7 @@ const RecoveryLinkRedirect = () => {
 const AppRoutes = () => {
   const location = useLocation();
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const isRecoveryRoute = location.pathname === "/reset-password" || hasRecoverySignal(location);
+  const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
 
@@ -265,7 +231,7 @@ const AppRoutes = () => {
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      <RecoveryLinkRedirect />
+      <StartupAuthRedirect />
       {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
@@ -274,7 +240,10 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
+            <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
+            <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
             <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding skipVerificationCheck><VerificationGate /></ProtectedRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
@@ -328,9 +297,9 @@ const AppRoutes = () => {
             <Route 
               path="/reset-password" 
               element={
-                window.location.hash.includes('type=recovery') 
+                isPasswordResetUrl(window.location.hash) 
                   ? <ResetPassword /> 
-                  : <Navigate to="/" replace />
+                  : <Navigate to="/sign-in" replace />
               } 
             />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />

@@ -19,10 +19,12 @@ const passwordSchema = z
 
 const getRecoveryTokensFromHash = () => {
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const queryParams = new URLSearchParams(window.location.search);
 
   return {
     accessToken: hashParams.get("access_token"),
     refreshToken: hashParams.get("refresh_token"),
+    tokenHash: queryParams.get("token_hash") || queryParams.get("token"),
     type: hashParams.get("type"),
   };
 };
@@ -110,7 +112,7 @@ const ResetPassword = () => {
     let sessionPoller: number | undefined;
 
     const params = new URLSearchParams(window.location.search);
-    const { accessToken, refreshToken, type } = getRecoveryTokensFromHash();
+    const { accessToken, refreshToken, tokenHash, type } = getRecoveryTokensFromHash();
     const encodedConfirmationUrl = params.get("confirmation_url");
     const safeConfirmationUrl = encodedConfirmationUrl
       ? decodeURIComponent(encodedConfirmationUrl)
@@ -150,6 +152,21 @@ const ResetPassword = () => {
           setReady(true);
           setVerifyingLink(false);
           window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+          return;
+        }
+      }
+
+      if (tokenHash && params.get("type") === "recovery") {
+        const { error } = await supabase.auth.verifyOtp({
+          type: "recovery",
+          token_hash: tokenHash,
+        });
+
+        if (!error) {
+          recovered = true;
+          setReady(true);
+          setVerifyingLink(false);
+          window.history.replaceState(null, "", window.location.pathname);
           return;
         }
       }

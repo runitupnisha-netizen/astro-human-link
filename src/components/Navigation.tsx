@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2 } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2, Diamond } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sheet,
@@ -15,6 +15,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,38 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Fetch the current user's avatar for the top-right profile button (mobile)
+  useEffect(() => {
+    if (!user) {
+      setAvatarUrl(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const url = data?.avatar_url ?? null;
+      if (!url) {
+        setAvatarUrl(null);
+        return;
+      }
+      if (/^https?:\/\//i.test(url)) {
+        setAvatarUrl(url);
+      } else {
+        const { data: signed } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(url, 3600);
+        if (!cancelled) setAvatarUrl(signed?.signedUrl ?? null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   // Fetch unread message count
   useEffect(() => {
@@ -72,19 +105,19 @@ const Navigation = () => {
     { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
-  // Bottom tab bar items — 5 key tabs for mobile (Settings accessible from Profile)
-  const bottomTabs = [
+  // Bottom tab bar items — 4 key tabs for mobile (Profile via top-right avatar)
+  const bottomTabs: Array<{ path: string; label: string; icon: typeof Sparkles; badge?: number }> = [
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
-    { path: "/lyra", label: "Lyra", icon: Wand2 },
-    { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
+    { path: "/growth", label: "Growth", icon: Diamond },
+    { path: "/lyra", label: "Lyra", icon: Moon },
   ];
 
   return (
     <>
       {/* Top Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30" role="navigation" aria-label="Main navigation">
-        <div className="max-w-7xl mx-auto px-4 md:px-5 lg:px-6">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30 pt-[env(safe-area-inset-top,0px)]" role="navigation" aria-label="Main navigation">
+        <div className="max-w-7xl mx-auto px-3 md:px-5 lg:px-6">
           <div className="flex items-center justify-between h-14 gap-2">
             <Link to="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="relative">
@@ -138,6 +171,19 @@ const Navigation = () => {
 
             {/* Notification Bell + Sign Out (desktop) + Mobile Menu */}
             <div className="flex items-center gap-1 shrink-0">
+              {/* Mobile-only profile avatar — opens My Cosmos (Profile) */}
+              <Link
+                to="/profile"
+                aria-label="Open My Cosmos"
+                className="md:hidden flex items-center justify-center w-11 h-11 rounded-full hover:bg-muted/30 transition-colors"
+              >
+                <Avatar className="w-9 h-9 border border-border/40">
+                  {avatarUrl ? <AvatarImage src={avatarUrl} alt="My Cosmos" /> : null}
+                  <AvatarFallback className="bg-muted text-foreground text-xs">
+                    <User className="w-4 h-4" />
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               <NotificationBell />
               <button
                 onClick={async () => {
@@ -261,7 +307,7 @@ const Navigation = () => {
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30 safe-area-bottom" role="navigation" aria-label="Bottom navigation">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30" role="navigation" aria-label="Bottom navigation" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <div className="grid grid-cols-4 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;

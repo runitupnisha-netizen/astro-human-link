@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
@@ -8,45 +8,43 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sessionExpired, setSessionExpired] = useState(false);
-  const initialized = useRef(false);
-  const hadSession = useRef(false);
 
   useEffect(() => {
-    // Set up the auth state listener FIRST so we don't miss events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && window.location.pathname !== "/reset-password") {
-        navigate("/growth", { replace: true });
+    const hash = window.location.hash;
+    if (!hash.includes("type=recovery")) {
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.sessionStorage.removeItem("auth-recovery-pending");
+      if (hash.includes("access_token")) {
+        window.history.replaceState(null, document.title, window.location.pathname);
       }
+    }
 
-      // Detect session expiry: had a session, now lost it without an explicit sign-out action.
-      // SIGNED_OUT can fire on token refresh failure too — flag it so UI can show "Session expired".
-      if (initialized.current && hadSession.current && !session) {
-        const explicit = typeof window !== "undefined" && window.sessionStorage.getItem("auth-explicit-signout") === "true";
-        if (!explicit) {
-          setSessionExpired(true);
-        }
-        if (typeof window !== "undefined") {
-          window.sessionStorage.removeItem("auth-explicit-signout");
-        }
-      }
-
-      setSession(session);
-      setUser(session?.user ?? null);
-      hadSession.current = !!session;
-      // Only set loading false here if we've already initialized
-      if (initialized.current) {
-        setLoading(false);
-      }
-    });
-
-    // THEN restore the session from storage
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      hadSession.current = !!session;
-      initialized.current = true;
       setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      if (event === "SIGNED_IN") {
+        window.localStorage.removeItem("auth-recovery-pending");
+        window.sessionStorage.removeItem("auth-recovery-pending");
+        if (window.location.pathname !== "/reset-password") {
+          navigate("/growth", { replace: true });
+        }
+      }
+
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+      }
+
+      if (event === "PASSWORD_RECOVERY" && window.location.hash.includes("type=recovery")) {
+        navigate("/reset-password", { replace: true });
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -68,5 +66,5 @@ export const useAuth = () => {
     }
   };
 
-  return { user, session, loading, sessionExpired, signOut };
+  return { user, session, loading, signOut };
 };

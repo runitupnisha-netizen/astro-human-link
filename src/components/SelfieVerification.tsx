@@ -124,18 +124,27 @@ const SelfieVerification = () => {
 
       if (video) {
         streamRef.current = stream;
-        video.onloadedmetadata = () => {
-          video.play()
-            .then(() => setCameraActive(true))
-            .catch((e) => console.error("Play failed:", e));
-        };
-        video.srcObject = stream;
+        // iOS Safari requires these attributes BEFORE srcObject is assigned.
         video.setAttribute("playsinline", "true");
         video.setAttribute("webkit-playsinline", "true");
         video.setAttribute("autoplay", "true");
         video.setAttribute("muted", "true");
         video.muted = true;
         video.playsInline = true;
+        video.autoplay = true;
+        // Attach metadata handler BEFORE assigning srcObject so we never
+        // call play() before metadata is loaded (iOS Safari black-screen fix).
+        video.onloadedmetadata = () => {
+          const v = videoRef.current;
+          if (!v) return;
+          v.play()
+            .then(() => setCameraActive(true))
+            .catch((e) => {
+              console.error("Play failed:", e);
+              setCameraError("Tap the preview to start the camera.");
+            });
+        };
+        video.srcObject = stream;
       } else {
         stream.getTracks().forEach((track) => track.stop());
         throw new Error("Camera preview did not initialize.");

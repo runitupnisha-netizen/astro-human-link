@@ -11,10 +11,15 @@ export const useAuth = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash.includes("type=recovery")) {
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const isRecoveryLink = window.location.pathname === "/reset-password" &&
+      params.get("type") === "recovery" &&
+      !!params.get("access_token");
+
+    if (!isRecoveryLink) {
       window.localStorage.removeItem("auth-recovery-pending");
       window.sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token")) {
+      if (hash.includes("access_token") || hash.includes("type=recovery")) {
         window.history.replaceState(null, document.title, window.location.pathname);
       }
     }
@@ -42,7 +47,7 @@ export const useAuth = () => {
         setUser(null);
       }
 
-      if (event === "PASSWORD_RECOVERY" && window.location.hash.includes("type=recovery")) {
+      if (event === "PASSWORD_RECOVERY" && window.location.pathname === "/reset-password" && window.location.hash.includes("type=recovery")) {
         navigate("/reset-password", { replace: true });
       }
     });

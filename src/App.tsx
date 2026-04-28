@@ -1,3 +1,20 @@
+const hash = window.location.hash;
+const isRecoveryUrl = hash.includes('type=recovery');
+if (!isRecoveryUrl) {
+  localStorage.removeItem('auth-recovery-pending');
+  sessionStorage.removeItem('auth-recovery-pending');
+  sessionStorage.removeItem('supabase-recovery');
+
+  if (hash.includes('access_token') &&
+      !hash.includes('type=recovery')) {
+    window.history.replaceState(
+      null,
+      document.title,
+      window.location.pathname
+    );
+  }
+}
+
 import { Suspense, lazy, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -308,7 +325,14 @@ const AppRoutes = () => {
             <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
-            <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+            <Route 
+              path="/reset-password" 
+              element={
+                window.location.hash.includes('type=recovery') 
+                  ? <ResetPassword /> 
+                  : <Navigate to="/" replace />
+              } 
+            />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>

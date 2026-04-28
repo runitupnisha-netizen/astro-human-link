@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { markSessionVerified } from "@/hooks/useVerificationGate";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";
@@ -39,7 +40,9 @@ const SelfieVerification = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const isMobile = useIsMobile();
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
@@ -61,7 +64,7 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        const s = data.status === "approved" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
+        const s = data.status === "approved" || data.status === "verified" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
         setStatus(s);
         // If already verified, redirect to app
         if (s === "verified") {
@@ -91,8 +94,15 @@ const SelfieVerification = () => {
   const startCamera = useCallback(async () => {
     setCapturedImage(null);
     setCameraError(null);
-    setCameraStarting(true);
     setStep(2);
+
+    if (isMobile) {
+      stopCamera();
+      fileInputRef.current?.click();
+      return;
+    }
+
+    setCameraStarting(true);
 
     try {
       stopCamera();
@@ -138,6 +148,37 @@ const SelfieVerification = () => {
     } finally {
       setCameraStarting(false);
     }
+  }, [isMobile, stopCamera]);
+
+  const handleMobileCapture = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      setStep(1);
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setCameraError("Please choose a photo from your camera.");
+      setStep(1);
+      return;
+    }
+
+    stopCamera();
+    setCameraError(null);
+    setCameraStarting(false);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCapturedImage(String(reader.result));
+      setStep(3);
+    };
+    reader.onerror = () => {
+      setCameraError("We couldn't read that selfie. Please try again.");
+      setStep(1);
+    };
+    reader.readAsDataURL(file);
   }, [stopCamera]);
 
   const capturePhoto = useCallback(() => {

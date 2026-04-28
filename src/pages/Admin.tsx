@@ -767,7 +767,7 @@ const Admin = () => {
     );
   }
   if (!user) {
-    return <Navigate to="/auth?redirect=/admin" replace />;
+    return <Navigate to="/sign-in?redirect=/admin" replace />;
   }
   if (!isAdmin) {
     return (

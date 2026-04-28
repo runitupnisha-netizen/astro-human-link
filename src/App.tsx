@@ -97,7 +97,7 @@ const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificat
   const { sessionExpired } = useAuth();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  // If a session expired mid-app, show the friendly screen instead of bouncing to /auth.
+  // If a session expired mid-app, show the friendly screen instead of bouncing to sign-in.
   if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
   if (!user) return <Navigate to="/sign-in" replace />;

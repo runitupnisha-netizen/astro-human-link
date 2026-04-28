@@ -160,8 +160,35 @@ const SelfieVerification = () => {
 
   const prepareForSelfie = () => {
     setCapturedImage(null);
+    setCameraError(null);
     setStep(2);
   };
+
+  const capturePhoto = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !streamRef.current || !video.videoWidth || !video.videoHeight) {
+      setCameraError("Camera feed is still loading. Please wait a moment and try again.");
+      return;
+    }
+
+    const size = Math.min(video.videoWidth, video.videoHeight);
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const offsetX = (video.videoWidth - size) / 2;
+    const offsetY = (video.videoHeight - size) / 2;
+    ctx.translate(size, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
+    setCapturedImage(canvas.toDataURL("image/jpeg", 0.85));
+    stopCamera();
+    setStep(3);
+  }, [stopCamera]);
+
+  useEffect(() => stopCamera, [stopCamera]);
 
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;

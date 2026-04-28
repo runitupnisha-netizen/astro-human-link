@@ -75,6 +75,69 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
+  const stopCamera = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.srcObject = null;
+      video.removeAttribute("src");
+      video.load();
+    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+    setCameraStarting(false);
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    setCapturedImage(null);
+    setCameraError(null);
+    setCameraStarting(true);
+    setStep(2);
+
+    try {
+      stopCamera();
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Camera access is not available in this browser.");
+      }
+
+      const constraints = {
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      } satisfies MediaStreamConstraints;
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const video = videoRef.current;
+
+      if (video) {
+        streamRef.current = stream;
+        video.srcObject = stream;
+        video.setAttribute("playsinline", "true");
+        video.setAttribute("webkit-playsinline", "true");
+        video.setAttribute("autoplay", "true");
+        video.setAttribute("muted", "true");
+        video.muted = true;
+        video.playsInline = true;
+        await video.play();
+        setCameraActive(true);
+      } else {
+        stream.getTracks().forEach((track) => track.stop());
+        throw new Error("Camera preview did not initialize.");
+      }
+    } catch (err) {
+      console.error("Camera error:", err);
+      stopCamera();
+      setStep(1);
+      setCameraError("Camera access denied. Please allow camera access in your browser settings.");
+    } finally {
+      setCameraStarting(false);
+    }
+  }, [stopCamera]);
+
   const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";

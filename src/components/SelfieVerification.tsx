@@ -103,21 +103,18 @@ const SelfieVerification = () => {
         throw new Error("Camera access is not available in this browser.");
       }
 
-      const constraints = {
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
         audio: false,
-      } satisfies MediaStreamConstraints;
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      });
       const video = videoRef.current;
 
       if (video) {
         streamRef.current = stream;
-        // iOS Safari requires these attributes BEFORE srcObject is assigned.
         video.setAttribute("playsinline", "true");
         video.setAttribute("webkit-playsinline", "true");
         video.setAttribute("autoplay", "true");
@@ -125,12 +122,9 @@ const SelfieVerification = () => {
         video.muted = true;
         video.playsInline = true;
         video.autoplay = true;
-        // Attach metadata handler BEFORE assigning srcObject so we never
-        // call play() before metadata is loaded (iOS Safari black-screen fix).
+        video.srcObject = stream;
         video.onloadedmetadata = () => {
-          const v = videoRef.current;
-          if (!v) return;
-          v.play()
+          videoRef.current?.play()
             .then(() => {
               setCameraActive(true);
               setCameraStarting(false);
@@ -141,7 +135,6 @@ const SelfieVerification = () => {
               setCameraStarting(false);
             });
         };
-        video.srcObject = stream;
       } else {
         stream.getTracks().forEach((track) => track.stop());
         throw new Error("Camera preview did not initialize.");
@@ -150,7 +143,7 @@ const SelfieVerification = () => {
       console.error("Camera error:", err);
       stopCamera();
       setStep(1);
-      setCameraError("Camera access denied. Please allow camera access in your browser settings.");
+      setCameraError("Please allow camera access to continue.");
     }
   }, [isMobile, stopCamera]);
 

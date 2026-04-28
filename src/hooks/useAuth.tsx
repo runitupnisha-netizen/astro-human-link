@@ -15,35 +15,8 @@ export const useAuth = () => {
   useEffect(() => {
     // Set up the auth state listener FIRST so we don't miss events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (typeof window !== "undefined") {
-        switch (event) {
-          case "PASSWORD_RECOVERY": {
-            const currentHash = window.location.hash;
-            if (currentHash.includes("type=recovery") && currentHash.includes("access_token")) {
-              window.localStorage.setItem("auth-recovery-pending", "true");
-              navigate("/reset-password");
-            } else {
-              window.localStorage.removeItem("auth-recovery-pending");
-              window.sessionStorage.removeItem("auth-recovery-pending");
-            }
-            break;
-          }
-          case "SIGNED_IN": {
-            window.localStorage.removeItem("auth-recovery-pending");
-            window.sessionStorage.removeItem("auth-recovery-pending");
-            window.localStorage.removeItem("auth-recovery-requested-at");
-            if (window.location.pathname === "/reset-password" && !window.location.hash.includes("type=recovery")) {
-              navigate("/growth");
-            }
-            break;
-          }
-          case "SIGNED_OUT": {
-            window.sessionStorage.removeItem("auth-recovery-pending");
-            window.localStorage.removeItem("auth-recovery-pending");
-            window.localStorage.removeItem("auth-recovery-requested-at");
-            break;
-          }
-        }
+      if (event === "SIGNED_IN" && window.location.pathname !== "/reset-password") {
+        navigate("/growth", { replace: true });
       }
 
       // Detect session expiry: had a session, now lost it without an explicit sign-out action.
@@ -83,8 +56,6 @@ export const useAuth = () => {
     // Mark as an explicit sign-out so the listener doesn't flag it as "session expired"
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem("auth-explicit-signout", "true");
-      // Clear any lingering password-recovery flags so the next login isn't
-      // forced into the /reset-password flow.
       window.sessionStorage.removeItem("auth-recovery-pending");
       window.localStorage.removeItem("auth-recovery-pending");
       window.localStorage.removeItem("auth-recovery-requested-at");
@@ -93,7 +64,7 @@ export const useAuth = () => {
     // Hard reload to wipe ALL in-memory React state, query cache, and route stack.
     // This prevents the previous user's matches/messages/chart from leaking into a new session.
     if (typeof window !== "undefined") {
-      window.location.href = "/auth";
+      window.location.href = "/sign-in";
     }
   };
 

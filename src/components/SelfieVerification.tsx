@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
-import type { ChangeEvent } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,9 +37,15 @@ const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraStarting, setCameraStarting] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<Step>(1);
@@ -69,30 +74,94 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
-  const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) {
+  const stopCamera = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.srcObject = null;
+      video.removeAttribute("src");
+      video.load();
+    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+    setCameraStarting(false);
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    setCapturedImage(null);
+    setCameraError(null);
+    setCameraStarting(true);
+    setStep(2);
+
+    try {
+      stopCamera();
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Camera access is not available in this browser.");
+      }
+
+      const constraints = {
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      } satisfies MediaStreamConstraints;
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const video = videoRef.current;
+
+      if (video) {
+        streamRef.current = stream;
+        video.srcObject = stream;
+        video.setAttribute("playsinline", "true");
+        video.setAttribute("webkit-playsinline", "true");
+        video.setAttribute("autoplay", "true");
+        video.setAttribute("muted", "true");
+        video.muted = true;
+        video.playsInline = true;
+        await video.play();
+        setCameraActive(true);
+      } else {
+        stream.getTracks().forEach((track) => track.stop());
+        throw new Error("Camera preview did not initialize.");
+      }
+    } catch (err) {
+      console.error("Camera error:", err);
+      stopCamera();
       setStep(1);
+      setCameraError("Camera access denied. Please allow camera access in your browser settings.");
+    } finally {
+      setCameraStarting(false);
+    }
+  }, [stopCamera]);
+
+  const capturePhoto = useCallback(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !streamRef.current || !video.videoWidth || !video.videoHeight) {
+      setCameraError("Camera feed is still loading. Please wait a moment and try again.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCapturedImage(typeof reader.result === "string" ? reader.result : null);
-      setStep(3);
-    };
-    reader.onerror = () => {
-      setStep(1);
-      toast({ title: "Selfie unavailable", description: "Please try taking your selfie again.", variant: "destructive" });
-    };
-    reader.readAsDataURL(file);
-  }, [toast]);
+    const size = Math.min(video.videoWidth, video.videoHeight);
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  const prepareForSelfie = () => {
-    setCapturedImage(null);
-    setStep(2);
-  };
+    const offsetX = (video.videoWidth - size) / 2;
+    const offsetY = (video.videoHeight - size) / 2;
+    ctx.translate(size, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
+    setCapturedImage(canvas.toDataURL("image/jpeg", 0.85));
+    stopCamera();
+    setStep(3);
+  }, [stopCamera]);
+
+  useEffect(() => stopCamera, [stopCamera]);
 
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;
@@ -199,6 +268,7 @@ const SelfieVerification = () => {
                 size="sm"
                 className="mt-2 gap-2"
                 onClick={() => {
+                  stopCamera();
                   setStatus("none");
                   setStep(1);
                 }}
@@ -221,15 +291,40 @@ const SelfieVerification = () => {
               )}
 
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                <video
+                  ref={videoRef}
+                  playsInline
+                  autoPlay
+                  muted
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
+                />
                 {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
+                ) : !cameraActive && !cameraStarting ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
                     <span className="text-sm">Selfie preview</span>
                   </div>
+                ) : null}
+                {cameraStarting && !cameraActive && !capturedImage && (
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/80 text-muted-foreground">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-sm">Opening camera…</span>
+                  </div>
+                )}
+                {cameraActive && !capturedImage && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
+                  </div>
                 )}
               </div>
+              <canvas ref={canvasRef} className="hidden" />
+              {cameraError && (
+                <p className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-center text-xs text-destructive">
+                  {cameraError}
+                </p>
+              )}
 
               {/* Inline help — only when not yet captured */}
               {!capturedImage && (
@@ -250,33 +345,22 @@ const SelfieVerification = () => {
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
-                {!capturedImage && (
-                  <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                    <Camera className="w-4 h-4" />
-                    {status === "rejected" ? "Try Again" : "Take Selfie"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="user"
-                      className="absolute inset-0 cursor-pointer opacity-0"
-                      onClick={prepareForSelfie}
-                      onChange={handleNativeSelfie}
-                    />
-                  </label>
+                {!cameraActive && !capturedImage && (
+                  <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
+                    {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
+                  </Button>
+                )}
+                {cameraActive && !capturedImage && (
+                  <Button onClick={capturePhoto} size="lg" className="gap-2 rounded-full px-8" style={{ background: "var(--gradient-golden)" }}>
+                    <Camera className="w-5 h-5" /> Take Selfie
+                  </Button>
                 )}
                 {capturedImage && (
                   <>
-                    <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <Button variant="outline" onClick={startCamera} className="gap-2">
                       <RotateCcw className="w-4 h-4" /> Retake
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="user"
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                        onClick={prepareForSelfie}
-                        onChange={handleNativeSelfie}
-                      />
-                    </label>
+                    </Button>
                     <Button onClick={submitSelfie} disabled={submitting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {submitting ? "Verifying…" : "Submit"}

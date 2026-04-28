@@ -108,7 +108,7 @@ const translations: Record<Language, Record<string, string>> = {
     "connections.discover_more": "Discover more",
     "connections.message": "Message",
     "connections.view_compatibility": "View Compatibility",
-    "connections.empty_title": "No Connections Yet",
+    "connections.empty_title": "No Matches Yet",
     "connections.empty_desc": "When you match with someone, they'll appear here",
 
     // Achievements
@@ -160,7 +160,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   es: {
     "nav.discover": "Descubrir",
-    "nav.connections": "Conexiones",
+    "nav.connections": "Matches",
     "nav.profile": "Perfil",
     "nav.settings": "Ajustes",
     "nav.messages": "Mensajes",
@@ -281,7 +281,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   fr: {
     "nav.discover": "Découvrir",
-    "nav.connections": "Connexions",
+    "nav.connections": "Matches",
     "nav.profile": "Profil",
     "nav.settings": "Paramètres",
     "nav.messages": "Messages",
@@ -402,7 +402,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   pt: {
     "nav.discover": "Descobrir",
-    "nav.connections": "Conexões",
+    "nav.connections": "Matches",
     "nav.profile": "Perfil",
     "nav.settings": "Configurações",
     "nav.messages": "Mensagens",
@@ -523,7 +523,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   de: {
     "nav.discover": "Entdecken",
-    "nav.connections": "Verbindungen",
+    "nav.connections": "Matches",
     "nav.profile": "Profil",
     "nav.settings": "Einstellungen",
     "nav.messages": "Nachrichten",
@@ -644,7 +644,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   ja: {
     "nav.discover": "発見",
-    "nav.connections": "つながり",
+    "nav.connections": "Matches",
     "nav.profile": "プロフィール",
     "nav.settings": "設定",
     "nav.messages": "メッセージ",

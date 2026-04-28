@@ -21,7 +21,7 @@ const emptyStates = {
     icon: MessageCircle,
     title: "No messages yet ✦",
     description: "Your messages will appear here once you make your first cosmic connection.",
-    cta: "Find Connections",
+    cta: "Find Matches",
     route: "/connections",
     gradient: "from-primary/20 via-secondary/10 to-accent/20",
   },

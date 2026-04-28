@@ -39,7 +39,7 @@ function resolveTz(latDeg: number | null, lngDeg: number | null): string | null 
 /**
  * Convert local birth date/time → exact UTC Date using the IANA zone for the
  * birth coordinates. Honors DST + historical offsets (e.g. NYC 1990 EST,
- * LA 1985 PDT). Falls back to longitude/15 if lat is missing.
+ * LA 1985 PDT). Falls back to UTC only if coordinates cannot resolve.
  */
 function buildBirthUTC(
   birthDate: string,
@@ -59,9 +59,8 @@ function buildBirthUTC(
     if (dt.isValid) return dt.toUTC().toJSDate();
   }
 
-  const offsetHours = longitudeDeg != null ? longitudeDeg / 15 : 0;
   const asUTC = Date.UTC(y, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0, 0);
-  return new Date(asUTC - offsetHours * 3600 * 1000);
+  return new Date(asUTC);
 }
 
 function eclipticLon(body: typeof Body[keyof typeof Body], date: Date): number {

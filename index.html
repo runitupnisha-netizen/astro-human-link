@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <script>
       var hash = window.location.hash || '';
-      if (!hash.includes('type=recovery')) {
+      var params = new URLSearchParams(hash.replace(/^#/, ''));
+      var isGenuineRecovery = params.get('type') === 'recovery' && !!params.get('access_token');
+      if (!isGenuineRecovery) {
         try {
           var keysToRemove = [];
           for (var i = 0; i < localStorage.length; i++) {
@@ -21,6 +23,8 @@
           keysToRemove.forEach(function(k) {
             localStorage.removeItem(k);
           });
+          sessionStorage.removeItem('auth-recovery-pending');
+          sessionStorage.removeItem('supabase-recovery');
         } catch(e) {}
       }
     </script>

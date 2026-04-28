@@ -96,16 +96,9 @@ const SelfieVerification = () => {
     setCameraError(null);
     setStep(2);
 
-    if (isMobile) {
-      stopCamera();
-      fileInputRef.current?.click();
-      return;
-    }
-
-    setCameraStarting(true);
-
     try {
       stopCamera();
+      setCameraStarting(true);
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error("Camera access is not available in this browser.");
       }
@@ -138,10 +131,14 @@ const SelfieVerification = () => {
           const v = videoRef.current;
           if (!v) return;
           v.play()
-            .then(() => setCameraActive(true))
+            .then(() => {
+              setCameraActive(true);
+              setCameraStarting(false);
+            })
             .catch((e) => {
               console.error("Play failed:", e);
               setCameraError("Tap the preview to start the camera.");
+              setCameraStarting(false);
             });
         };
         video.srcObject = stream;
@@ -154,8 +151,6 @@ const SelfieVerification = () => {
       stopCamera();
       setStep(1);
       setCameraError("Camera access denied. Please allow camera access in your browser settings.");
-    } finally {
-      setCameraStarting(false);
     }
   }, [isMobile, stopCamera]);
 

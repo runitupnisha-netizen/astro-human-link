@@ -21,7 +21,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { markSessionVerified } from "@/hooks/useVerificationGate";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 
 type VerificationStatus = "none" | "pending" | "verified" | "rejected";
@@ -42,7 +41,6 @@ const SelfieVerification = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const isMobile = useIsMobile();
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
@@ -99,53 +97,25 @@ const SelfieVerification = () => {
     try {
       stopCamera();
       setCameraStarting(true);
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("Camera access is not available in this browser.");
-      }
-
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
+        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
-      const video = videoRef.current;
-
-      if (video) {
-        streamRef.current = stream;
-        video.setAttribute("playsinline", "true");
-        video.setAttribute("webkit-playsinline", "true");
-        video.setAttribute("autoplay", "true");
-        video.setAttribute("muted", "true");
-        video.muted = true;
-        video.playsInline = true;
-        video.autoplay = true;
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-          videoRef.current?.play()
-            .then(() => {
-              setCameraActive(true);
-              setCameraStarting(false);
-            })
-            .catch((e) => {
-              console.error("Play failed:", e);
-              setCameraError("Tap the preview to start the camera.");
-              setCameraStarting(false);
-            });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().catch(e => console.error(e));
+          setCameraActive(true);
+          setCameraStarting(false);
         };
-      } else {
-        stream.getTracks().forEach((track) => track.stop());
-        throw new Error("Camera preview did not initialize.");
       }
     } catch (err) {
-      console.error("Camera error:", err);
       stopCamera();
       setStep(1);
       setCameraError("Please allow camera access to continue.");
     }
-  }, [isMobile, stopCamera]);
+  }, [stopCamera]);
 
   const handleMobileCapture = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -346,7 +316,7 @@ const SelfieVerification = () => {
                   autoPlay={true}
                   muted={true}
                   className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
@@ -397,7 +367,7 @@ const SelfieVerification = () => {
                 {!cameraActive && !capturedImage && (
                   <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                     {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : isMobile ? "Take Selfie" : "Open Camera"}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && !capturedImage && (

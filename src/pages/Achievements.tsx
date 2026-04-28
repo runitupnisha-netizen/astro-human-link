@@ -50,7 +50,6 @@ const Achievements = () => {
   const { t } = useTranslation();
   const categories = [
     { key: "all", label: "All" },
-    { key: "streak", label: "Streaks" },
     { key: "profile", label: "Profile" },
     { key: "social", label: "Social" },
     { key: "cosmic", label: "Cosmic" },
@@ -76,7 +75,7 @@ const Achievements = () => {
         </div>
 
         <Tabs defaultValue="all">
-          <TabsList className="w-full grid grid-cols-5 mb-4">
+          <TabsList className="w-full grid grid-cols-4 mb-4">
             {categories.map(c => (
               <TabsTrigger key={c.key} value={c.key} className="text-xs">{c.label}</TabsTrigger>
             ))}

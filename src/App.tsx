@@ -28,6 +28,8 @@ import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -204,45 +206,60 @@ const ReferralCapture = () => {
   return null;
 };
 
-const StartupAuthRedirect = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    const isRecoveryLink = location.pathname === "/reset-password" && isPasswordResetUrl(hash);
-
-    if (!isRecoveryLink) {
-      window.localStorage.removeItem("auth-recovery-pending");
-      window.sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token") || hash.includes("type=recovery")) {
-        window.history.replaceState(null, document.title, window.location.pathname);
-      }
-    }
-
-    if (location.pathname === "/reset-password" && !isRecoveryLink) {
-      navigate("/sign-in", { replace: true });
-    }
-  }, [location.pathname, navigate]);
-
-  return null;
-};
-
 const AppRoutes = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [authReady, setAuthReady] = useState(false);
+  const [authUser, setAuthUser] = useState<User | null>(null);
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
 
-  if (loading && !isRecoveryRoute) return <LoadingScreen />;
+  useEffect(() => {
+    const hash = window.location.hash;
+
+    if (!hash.includes("type=recovery")) {
+      localStorage.removeItem("auth-recovery-pending");
+      sessionStorage.removeItem("auth-recovery-pending");
+      if (hash.includes("access_token")) {
+        window.history.replaceState(null, document.title, window.location.pathname);
+      }
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setAuthUser(data.session?.user || null);
+      setAuthReady(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN") {
+        localStorage.removeItem("auth-recovery-pending");
+        sessionStorage.removeItem("auth-recovery-pending");
+        setAuthUser(session?.user || null);
+      }
+
+      if (event === "SIGNED_OUT") {
+        setAuthUser(null);
+      }
+
+      if (event === "PASSWORD_RECOVERY") {
+        if (window.location.hash.includes("type=recovery")) {
+          navigate("/reset-password", { replace: true });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
 
   return (
     <>
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      <StartupAuthRedirect />
       {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
@@ -251,7 +268,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/growth" replace /> : <Auth />}</PageTransition>} />
             <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
@@ -283,7 +300,7 @@ const AppRoutes = () => {
             <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
             <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />
-            <Route path="/growth" element={<PageTransition><ProtectedRoute><Growth /></ProtectedRoute></PageTransition>} />
+            <Route path="/growth" element={<PageTransition><ProtectedRoute skipVerificationCheck><Growth /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/ritual" element={<PageTransition><ProtectedRoute><DailyRitual /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/shadow" element={<PageTransition><ProtectedRoute><ShadowJournal /></ProtectedRoute></PageTransition>} />
             <Route path="/growth/moon" element={<PageTransition><ProtectedRoute><MoonCycle /></ProtectedRoute></PageTransition>} />

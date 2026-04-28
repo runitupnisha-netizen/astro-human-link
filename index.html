@@ -8,27 +8,17 @@
     <meta http-equiv="Expires" content="0" />
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-          .getRegistrations()
-          .then(function(registrations) {
-            registrations.forEach(function(r) {
-              r.unregister();
-            });
-          });
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          registrations.forEach(function(r) { r.unregister(); });
+        });
       }
       var h = window.location.hash || '';
-      var recoveryParams = new URLSearchParams(h.replace(/^#/, ''));
-      var genuineRecovery = window.location.pathname === '/reset-password' &&
-        recoveryParams.get('type') === 'recovery' &&
-        !!recoveryParams.get('access_token');
-      if (!genuineRecovery) {
-        try {
-          localStorage.removeItem('auth-recovery-pending');
-          sessionStorage.removeItem('auth-recovery-pending');
-          if (h.includes('access_token') || h.includes('type=recovery')) {
-            window.history.replaceState(null, document.title, window.location.pathname);
-          }
-        } catch(e) {}
+      if (!h.includes('type=recovery')) {
+        try { localStorage.removeItem('auth-recovery-pending'); } catch(e) {}
+        try { sessionStorage.removeItem('auth-recovery-pending'); } catch(e) {}
+        if (h.includes('access_token')) {
+          window.history.replaceState(null, document.title, window.location.pathname);
+        }
       }
     </script>
     <title>Stellara — Where Love Aligns With the Stars</title>

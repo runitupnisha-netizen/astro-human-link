@@ -3,28 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <script>
-      var hash = window.location.hash || '';
-      var params = new URLSearchParams(hash.replace(/^#/, ''));
-      var isGenuineRecovery = params.get('type') === 'recovery' && !!params.get('access_token');
-      if (!isGenuineRecovery) {
-        try {
-          var keysToRemove = [];
-          for (var i = 0; i < localStorage.length; i++) {
-            var key = localStorage.key(i);
-            if (key && (
-              key.includes('recovery') ||
-              key.includes('reset') ||
-              key.includes('auth-recovery')
-            )) {
-              keysToRemove.push(key);
-            }
-          }
-          keysToRemove.forEach(function(k) {
-            localStorage.removeItem(k);
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .getRegistrations()
+          .then(function(registrations) {
+            registrations.forEach(function(r) {
+              r.unregister();
+            });
           });
+      }
+      var h = window.location.hash || '';
+      if (!h.includes('type=recovery')) {
+        try {
+          localStorage.removeItem('auth-recovery-pending');
           sessionStorage.removeItem('auth-recovery-pending');
-          sessionStorage.removeItem('supabase-recovery');
+          if (h.includes('access_token')) {
+            window.history.replaceState(null, document.title, window.location.pathname);
+          }
         } catch(e) {}
       }
     </script>

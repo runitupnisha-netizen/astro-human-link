@@ -91,7 +91,15 @@ const hasRecoverySignal = (location: { search: string; hash: string }) => {
   const searchParams = new URLSearchParams(location.search);
   const hashParams = new URLSearchParams(location.hash.replace(/^#/, ""));
 
-  return hashParams.get("type") === "recovery" || searchParams.get("type") === "recovery";
+  const hashHasRecoverySession =
+    hashParams.get("type") === "recovery" &&
+    !!hashParams.get("access_token") &&
+    !!hashParams.get("refresh_token");
+  const queryHasRecoveryToken =
+    searchParams.get("type") === "recovery" &&
+    (!!searchParams.get("token_hash") || !!searchParams.get("token"));
+
+  return hashHasRecoverySession || queryHasRecoveryToken;
 };
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
@@ -211,7 +219,7 @@ const RecoveryLinkRedirect = () => {
   useEffect(() => {
     const isRecoveryFlow = hasRecoverySignal(location);
 
-    if (!isRecoveryFlow || location.pathname === "/reset-password") return;
+    if (!isRecoveryFlow || location.pathname === "/reset-password" || location.pathname === "/auth") return;
 
     navigate(
       {

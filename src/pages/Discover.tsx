@@ -153,7 +153,7 @@ const Discover = () => {
           const matchedId = match.user_a === user.id ? match.user_b : match.user_a;
           const matchedProfile = profiles.find((p) => p.user_id === matchedId);
           if (matchedProfile) setMatchPopup(matchedProfile);
-          else toast({ title: "✨ New Soul Connection!", description: "You both liked each other — go say hi!" });
+          else toast({ title: "✨ New Soul Match!", description: "You both liked each other — go say hi!" });
         }
       })
       .subscribe();

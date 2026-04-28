@@ -52,7 +52,7 @@ const sanitizeConnectionName = (name: string | null): string | null => {
   return trimmed;
 };
 
-// Offline cache helpers — keep recent connection history visible when network drops
+// Offline cache helpers — keep recent match history visible when network drops
 const CACHE_VERSION = 1;
 const cacheKey = (userId: string) => `stellara:connections-cache:v${CACHE_VERSION}:${userId}`;
 
@@ -325,7 +325,7 @@ const Connections = () => {
             >
               <WifiOff className="w-3.5 h-3.5" />
               <span>
-                Offline · Showing your saved connections
+                Offline · Showing your saved matches
                 {cacheTimestamp ? ` from ${formatTime(cacheTimestamp)}` : ""}
               </span>
             </motion.div>
@@ -343,7 +343,7 @@ const Connections = () => {
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0 ? (
                 <>
-                  You have {matches.length} cosmic {matches.length > 1 ? "connections" : "connection"} aligned with your energy.{" "}
+                  You have {matches.length} cosmic {matches.length > 1 ? "matches" : "match"} aligned with your energy.{" "}
                   <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">{t("connections.discover_more")}</button>
                 </>
               ) : (
@@ -381,7 +381,7 @@ const Connections = () => {
                       minWidth: "150px",
                       maxWidth: "190px",
                     }}
-                    aria-label={`Rerun cosmic check for ${c.their_name || "previous connection"}`}
+                    aria-label={`Rerun cosmic check for ${c.their_name || "previous match"}`}
                   >
                     <div className="flex items-center justify-between w-full gap-2">
                       <span
@@ -417,7 +417,7 @@ const Connections = () => {
           ) : (
             <TourHighlight
               targetId="connections-list"
-              label="Your connections"
+              label="Your matches"
               className="space-y-4"
             >
               {matches.map((match, i) => (
@@ -484,7 +484,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {sanitizeConnectionName(match.otherProfile.display_name) || (match.otherProfile.username ? `@${match.otherProfile.username}` : "New Connection")}
+                              {sanitizeConnectionName(match.otherProfile.display_name) || (match.otherProfile.username ? `@${match.otherProfile.username}` : "New Match")}
                             </h3>
                             {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                           </div>

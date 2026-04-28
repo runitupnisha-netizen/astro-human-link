@@ -226,7 +226,7 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               </div>
             </motion.div>
 
-            {/* Connection type badge */}
+            {/* Match type badge */}
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -234,7 +234,7 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               className="mb-4"
             >
               <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wide ${tierClass}`}>
-                {profile.connection_type || "Cosmic Connection"}
+                {profile.connection_type || "Cosmic Match"}
               </span>
             </motion.div>
 

@@ -12,7 +12,7 @@ export const NOTIFICATION_COPY = {
     body: "Good morning. Lyra has today's planetary insight waiting for you.",
   },
   newMatch: (name: string, score: number) => ({
-    title: "A cosmic connection found you ✦",
+    title: "A cosmic match found you ✦",
     body: `${name} and you are ${score}% cosmically compatible. Say hello.`,
   }),
   newMessage: (name: string, preview: string) => ({

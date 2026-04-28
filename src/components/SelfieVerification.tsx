@@ -114,6 +114,11 @@ const SelfieVerification = () => {
 
       if (video) {
         streamRef.current = stream;
+        video.onloadedmetadata = () => {
+          video.play()
+            .then(() => setCameraActive(true))
+            .catch((e) => console.error("Play failed:", e));
+        };
         video.srcObject = stream;
         video.setAttribute("playsinline", "true");
         video.setAttribute("webkit-playsinline", "true");
@@ -121,8 +126,6 @@ const SelfieVerification = () => {
         video.setAttribute("muted", "true");
         video.muted = true;
         video.playsInline = true;
-        await video.play();
-        setCameraActive(true);
       } else {
         stream.getTracks().forEach((track) => track.stop());
         throw new Error("Camera preview did not initialize.");
@@ -293,9 +296,9 @@ const SelfieVerification = () => {
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
                 <video
                   ref={videoRef}
-                  playsInline
-                  autoPlay
-                  muted
+                  playsInline={true}
+                  autoPlay={true}
+                  muted={true}
                   className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
                   style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
                 />

@@ -11,7 +11,7 @@ interface EmptyStateProps {
 const emptyStates = {
   matches: {
     icon: Heart,
-    title: "Your first cosmic connection is coming.",
+    title: "Your first cosmic match is coming.",
     description: "Keep discovering — they are out there.",
     cta: "Keep Discovering",
     route: "/discover",
@@ -20,7 +20,7 @@ const emptyStates = {
   messages: {
     icon: MessageCircle,
     title: "No messages yet ✦",
-    description: "Your messages will appear here once you make your first cosmic connection.",
+    description: "Your messages will appear here once you make your first cosmic match.",
     cta: "Find Matches",
     route: "/connections",
     gradient: "from-primary/20 via-secondary/10 to-accent/20",
@@ -44,7 +44,7 @@ const emptyStates = {
   discover: {
     icon: Compass,
     title: "The cosmos is aligning your matches. ✦",
-    description: "A complete birth chart attracts the most aligned connections.",
+    description: "A complete birth chart attracts the most aligned matches.",
     cta: "Complete My Cosmos",
     route: "/my-cosmos",
     gradient: "from-primary/20 via-accent/10 to-secondary/20",

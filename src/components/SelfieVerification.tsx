@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -150,7 +150,7 @@ const SelfieVerification = () => {
     }
   }, [isMobile, stopCamera]);
 
-  const handleMobileCapture = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMobileCapture = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
 

@@ -202,24 +202,17 @@ const ReferralCapture = () => {
   return null;
 };
 
-const RecoveryLinkRedirect = () => {
+const StartupAuthRedirect = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isRecoveryFlow = hasRecoverySignal(location);
+    if (location.pathname === "/reset-password" && isPasswordResetUrl(location.hash)) return;
 
-    if (!isRecoveryFlow || location.pathname === "/reset-password" || location.pathname === "/auth") return;
-
-    navigate(
-      {
-        pathname: "/reset-password",
-        search: location.search,
-        hash: location.hash,
-      },
-      { replace: true }
-    );
-  }, [location.hash, location.pathname, location.search, navigate]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      navigate(session ? "/growth" : "/sign-in", { replace: true });
+    });
+  }, []);
 
   return null;
 };
@@ -227,7 +220,7 @@ const RecoveryLinkRedirect = () => {
 const AppRoutes = () => {
   const location = useLocation();
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const isRecoveryRoute = location.pathname === "/reset-password" || hasRecoverySignal(location);
+  const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
 
@@ -238,7 +231,7 @@ const AppRoutes = () => {
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      <RecoveryLinkRedirect />
+      <StartupAuthRedirect />
       {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
@@ -247,7 +240,10 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/auth" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
+            <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
+            <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
             <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding skipVerificationCheck><VerificationGate /></ProtectedRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
@@ -301,9 +297,9 @@ const AppRoutes = () => {
             <Route 
               path="/reset-password" 
               element={
-                window.location.hash.includes('type=recovery') 
+                isPasswordResetUrl(window.location.hash) 
                   ? <ResetPassword /> 
-                  : <Navigate to="/" replace />
+                  : <Navigate to="/sign-in" replace />
               } 
             />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />

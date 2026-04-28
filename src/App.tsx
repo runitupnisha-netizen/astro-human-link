@@ -223,20 +223,6 @@ const RecoveryLinkRedirect = () => {
     );
   }, [location.hash, location.pathname, location.search, navigate]);
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "PASSWORD_RECOVERY") return;
-
-      if (!hasRecoverySignal({ search: window.location.search, hash: window.location.hash })) return;
-
-      if (window.location.pathname !== "/reset-password") {
-        navigate({ pathname: "/reset-password", search: window.location.search, hash: window.location.hash }, { replace: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
   return null;
 };
 

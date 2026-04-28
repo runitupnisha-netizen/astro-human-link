@@ -316,7 +316,7 @@ const SelfieVerification = () => {
                   autoPlay={true}
                   muted={true}
                   className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />

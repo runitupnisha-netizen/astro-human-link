@@ -28,6 +28,8 @@ import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -230,12 +232,52 @@ const StartupAuthRedirect = () => {
 
 const AppRoutes = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [authReady, setAuthReady] = useState(false);
+  const [authUser, setAuthUser] = useState<User | null>(null);
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
 
-  if (loading && !isRecoveryRoute) return <LoadingScreen />;
+  useEffect(() => {
+    const hash = window.location.hash;
+
+    if (!hash.includes("type=recovery")) {
+      localStorage.removeItem("auth-recovery-pending");
+      sessionStorage.removeItem("auth-recovery-pending");
+      if (hash.includes("access_token")) {
+        window.history.replaceState(null, document.title, window.location.pathname);
+      }
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setAuthUser(data.session?.user || null);
+      setAuthReady(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN") {
+        localStorage.removeItem("auth-recovery-pending");
+        sessionStorage.removeItem("auth-recovery-pending");
+        setAuthUser(session?.user || null);
+      }
+
+      if (event === "SIGNED_OUT") {
+        setAuthUser(null);
+      }
+
+      if (event === "PASSWORD_RECOVERY") {
+        if (window.location.hash.includes("type=recovery")) {
+          navigate("/reset-password", { replace: true });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
 
   return (
     <>
@@ -251,7 +293,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/growth" replace /> : <Auth />}</PageTransition>} />
             <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />

@@ -187,7 +187,7 @@ const Navigation = () => {
               <NotificationBell />
               <button
                 onClick={async () => {
-                  // Centralized signOut: marks explicit + hard-reloads to /auth
+                  // Centralized signOut: marks explicit + hard-reloads to /sign-in
                   await signOut();
                 }}
                 className="hidden md:flex items-center gap-1 px-2 py-2 lg:px-2.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"

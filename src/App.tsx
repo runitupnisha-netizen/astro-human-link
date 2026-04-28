@@ -112,6 +112,13 @@ const AuthRoute = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 };
 
+const FallbackRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingScreen />;
+  return user ? <NotFound /> : <Navigate to="/sign-in" replace />;
+};
+
 const AnalyticsTracker = () => {
   const { trackPageView } = useAnalytics();
   const location = useLocation();
@@ -243,6 +250,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
@@ -305,7 +313,7 @@ const AppRoutes = () => {
               } 
             />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
-            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+            <Route path="*" element={<PageTransition><FallbackRoute /></PageTransition>} />
           </Routes>
 
       </Suspense>

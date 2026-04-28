@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,29 +34,13 @@ const TIPS: { icon: typeof Sun; label: string; ok: boolean }[] = [
   { icon: Glasses, label: "Remove sunglasses", ok: false },
 ];
 
-const prefersNativeSelfieCapture = () => {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent || "";
-  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const isMobile = /Android|Mobile/.test(ua) || isIOS;
-  return isMobile;
-};
-
 const SelfieVerification = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const mountedRef = useRef(true);
-  const cameraRequestRef = useRef(0);
 
   const [status, setStatus] = useState<VerificationStatus>("none");
   const [loading, setLoading] = useState(true);
-  const [cameraActive, setCameraActive] = useState(false);
-  const [cameraStarting, setCameraStarting] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<Step>(1);
@@ -72,7 +56,7 @@ const SelfieVerification = () => {
         .maybeSingle();
 
       if (data) {
-        const s = data.status as VerificationStatus;
+        const s = data.status === "approved" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
         setStatus(s);
         // If already verified, redirect to app
         if (s === "verified") {
@@ -85,88 +69,6 @@ const SelfieVerification = () => {
     check();
   }, [user, navigate]);
 
-  const releaseCamera = useCallback(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.pause();
-      video.srcObject = null;
-      video.removeAttribute("src");
-      video.load();
-    }
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    cameraRequestRef.current += 1;
-    releaseCamera();
-    setCameraActive(false);
-    setCameraStarting(false);
-  }, [releaseCamera]);
-
-  const startCamera = useCallback(async () => {
-    const requestId = cameraRequestRef.current + 1;
-    cameraRequestRef.current = requestId;
-    try {
-      releaseCamera();
-      setCapturedImage(null);
-      setStep(2);
-
-      if (prefersNativeSelfieCapture()) {
-        fileInputRef.current?.click();
-        return;
-      }
-
-      setCameraStarting(true);
-
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("UNSUPPORTED_CAMERA");
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false,
-      });
-
-      if (!mountedRef.current || requestId !== cameraRequestRef.current) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-
-      streamRef.current = stream;
-
-      const video = videoRef.current;
-      if (!video) throw new Error("Camera preview did not initialize.");
-
-      video.muted = true;
-      video.playsInline = true;
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("webkit-playsinline", "true");
-      video.srcObject = stream;
-
-      const playAttempt = video.play();
-      playAttempt?.catch(() => {
-        requestAnimationFrame(() => video.play().catch(() => {}));
-      });
-      setCameraStarting(false);
-      setCameraActive(true);
-    } catch (err: any) {
-      stopCamera();
-      setStep(1);
-      const msg =
-        err?.message === "UNSUPPORTED_CAMERA"
-          ? "Camera capture isn't available in this browser. Please open Stellara in Safari or Chrome and try again."
-          : err?.name === "NotAllowedError"
-          ? "Camera access was denied. Please enable camera permissions in your browser settings and try again."
-          : err?.name === "NotFoundError"
-            ? "No camera found on this device."
-            : err?.name === "NotReadableError"
-              ? "Your camera is being used by another app. Close it and try again."
-              : "Couldn't start your camera. Please check permissions and try again.";
-      toast({ title: "Camera unavailable", description: msg, variant: "destructive" });
-    }
-  }, [releaseCamera, stopCamera, toast]);
-
   const handleNativeSelfie = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -175,12 +77,9 @@ const SelfieVerification = () => {
       return;
     }
 
-    releaseCamera();
     const reader = new FileReader();
     reader.onload = () => {
       setCapturedImage(typeof reader.result === "string" ? reader.result : null);
-      setCameraActive(false);
-      setCameraStarting(false);
       setStep(3);
     };
     reader.onerror = () => {
@@ -188,34 +87,12 @@ const SelfieVerification = () => {
       toast({ title: "Selfie unavailable", description: "Please try taking your selfie again.", variant: "destructive" });
     };
     reader.readAsDataURL(file);
-  }, [releaseCamera, toast]);
+  }, [toast]);
 
-  const capturePhoto = useCallback(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || !streamRef.current || !video.videoWidth || !video.videoHeight) {
-      toast({ title: "Camera still loading", description: "Please wait until your selfie preview appears.", variant: "destructive" });
-      return;
-    }
-
-    const size = Math.min(video.videoWidth, video.videoHeight);
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Center-crop and mirror for selfie
-    const offsetX = (video.videoWidth - size) / 2;
-    const offsetY = (video.videoHeight - size) / 2;
-    ctx.translate(size, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
-
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-    setCapturedImage(dataUrl);
-    stopCamera();
-    setStep(3);
-  }, [stopCamera, toast]);
+  const prepareForSelfie = () => {
+    setCapturedImage(null);
+    setStep(2);
+  };
 
   const submitSelfie = useCallback(async () => {
     if (!capturedImage || !user) return;
@@ -233,39 +110,31 @@ const SelfieVerification = () => {
 
       if (uploadError) throw uploadError;
 
-      // Upsert verification record — auto-verify for now (can add AI review later)
+      // Submit for review. Badges only render after an approved status.
       const { error: dbError } = await supabase
         .from("photo_verifications")
         .upsert({
           user_id: user.id,
           selfie_url: fileName,
-          status: "verified",
-          reviewed_at: new Date().toISOString(),
+          status: "pending",
+          reviewed_at: null,
         }, { onConflict: "user_id" });
 
       if (dbError) throw dbError;
 
-      setStatus("verified");
+      setStatus("pending");
       setCapturedImage(null);
       markSessionVerified();
-      toast({ title: "You're verified! ✨", description: "Your profile now shows a trust badge." });
+      toast({ title: "Selfie submitted ✨", description: "Your verification badge will appear after review." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);
-    } catch (e: any) {
-      toast({ title: "Verification failed", description: e.message, variant: "destructive" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Please try again.";
+      toast({ title: "Verification failed", description: message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
-  }, [capturedImage, user, toast]);
-
-  // Cleanup camera on unmount
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-      cameraRequestRef.current += 1;
-      releaseCamera();
-    };
-  }, [releaseCamera]);
+  }, [capturedImage, navigate, user, toast]);
 
   if (loading) {
     return (
@@ -351,52 +220,16 @@ const SelfieVerification = () => {
                 </div>
               )}
 
-              {/* Camera viewfinder */}
-              <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
-                  style={{ transform: "scaleX(-1)" }}
-                />
-                {capturedImage && (
+              <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
-                )}
-                {!cameraActive && !cameraStarting && !capturedImage && (
+                ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
-                    <span className="text-sm">Camera preview</span>
-                  </div>
-                )}
-                {cameraStarting && !cameraActive && !capturedImage && (
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted text-muted-foreground">
-                    <Loader2 className="w-8 h-8 animate-spin" />
-                    <span className="text-sm">Opening camera…</span>
-                  </div>
-                )}
-                {/* Face guide overlay */}
-                {cameraActive && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
-                  </div>
-                )}
-                {cameraActive && (
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-background/70 backdrop-blur-sm px-3 py-1 rounded-full text-[11px] text-foreground/90 pointer-events-none">
-                    Center your face inside the oval
+                    <span className="text-sm">Selfie preview</span>
                   </div>
                 )}
               </div>
-              <canvas ref={canvasRef} className="hidden" />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                capture="user"
-                className="hidden"
-                onChange={handleNativeSelfie}
-              />
 
               {/* Inline help — only when not yet captured */}
               {!capturedImage && (
@@ -417,22 +250,33 @@ const SelfieVerification = () => {
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
-                {!cameraActive && !capturedImage && (
-                  <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
-                    {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
-                  </Button>
-                )}
-                {cameraActive && (
-                  <Button onClick={capturePhoto} size="lg" className="gap-2 rounded-full px-8" style={{ background: "var(--gradient-golden)" }}>
-                    <Camera className="w-5 h-5" /> Take Selfie
-                  </Button>
+                {!capturedImage && (
+                  <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <Camera className="w-4 h-4" />
+                    {status === "rejected" ? "Try Again" : "Take Selfie"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="user"
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      onClick={prepareForSelfie}
+                      onChange={handleNativeSelfie}
+                    />
+                  </label>
                 )}
                 {capturedImage && (
                   <>
-                    <Button variant="outline" onClick={startCamera} className="gap-2">
+                    <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                       <RotateCcw className="w-4 h-4" /> Retake
-                    </Button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="user"
+                        className="absolute inset-0 cursor-pointer opacity-0"
+                        onClick={prepareForSelfie}
+                        onChange={handleNativeSelfie}
+                      />
+                    </label>
                     <Button onClick={submitSelfie} disabled={submitting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {submitting ? "Verifying…" : "Submit"}

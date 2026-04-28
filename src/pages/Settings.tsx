@@ -733,7 +733,7 @@ const Settings = () => {
             </Card>
 
             {/* Photo Verification */}
-            {verificationStatus !== "verified" && (
+            {verificationStatus !== "approved" && (
               <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

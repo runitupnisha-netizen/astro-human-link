@@ -128,12 +128,13 @@ const SelfieVerification = () => {
       toast({ title: "Selfie submitted ✨", description: "Your verification badge will appear after review." });
       // Redirect to main app after a brief moment
       setTimeout(() => navigate("/", { replace: true }), 1500);
-    } catch (e: any) {
-      toast({ title: "Verification failed", description: e.message, variant: "destructive" });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Please try again.";
+      toast({ title: "Verification failed", description: message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
-  }, [capturedImage, user, toast]);
+  }, [capturedImage, navigate, user, toast]);
 
   if (loading) {
     return (

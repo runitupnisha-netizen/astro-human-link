@@ -100,7 +100,7 @@ const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificat
   // If a session expired mid-app, show the friendly screen instead of bouncing to /auth.
   if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/sign-in" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
   // After onboarding, require verification before accessing the app
   if (!skipVerificationCheck && onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
@@ -112,7 +112,7 @@ const AuthRoute = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/growth" replace />;
 
   return <>{children}</>;
 };

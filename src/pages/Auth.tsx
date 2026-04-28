@@ -189,7 +189,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password?reset=1`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
       // Always show success even if email doesn't exist (prevents user enumeration)

@@ -32,7 +32,15 @@ const getRecoveryTokensFromHash = () => {
 const hasGenuineRecoveryLink = () => {
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const queryParams = new URLSearchParams(window.location.search);
-  return hashParams.get("type") === "recovery" || queryParams.get("type") === "recovery";
+  const hashHasRecoverySession =
+    hashParams.get("type") === "recovery" &&
+    !!hashParams.get("access_token") &&
+    !!hashParams.get("refresh_token");
+  const queryHasRecoveryToken =
+    queryParams.get("type") === "recovery" &&
+    (!!queryParams.get("token_hash") || !!queryParams.get("token"));
+
+  return hashHasRecoverySession || queryHasRecoveryToken;
 };
 
 const ResetPassword = () => {
@@ -118,7 +126,9 @@ const ResetPassword = () => {
       ? decodeURIComponent(encodedConfirmationUrl)
       : null;
 
-    if (!hasGenuineRecoveryLink() && !safeConfirmationUrl) {
+    const hasFreshRecoveryToken = hasGenuineRecoveryLink();
+
+    if (!hasFreshRecoveryToken && !safeConfirmationUrl) {
       window.sessionStorage.removeItem("auth-recovery-pending");
       window.localStorage.removeItem("auth-recovery-pending");
       window.localStorage.removeItem("auth-recovery-requested-at");
@@ -176,16 +186,11 @@ const ResetPassword = () => {
         return;
       }
 
-      setVerifyingLink(true);
-      sessionPoller = window.setInterval(async () => {
-        const { data } = await supabase.auth.getSession();
-        if (!data.session) return;
-
-        recovered = true;
-        window.clearInterval(sessionPoller);
-        setReady(true);
+      if (!hasFreshRecoveryToken) {
         setVerifyingLink(false);
-      }, 500);
+        setShowManualFallback(true);
+        return;
+      }
 
       failureTimer = window.setTimeout(() => {
         if (!recovered) {

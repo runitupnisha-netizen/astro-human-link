@@ -52,7 +52,7 @@ const SessionExpired = () => {
           <Button
             onClick={() => {
               // Full reload to wipe any stale in-memory state
-              window.location.href = "/auth";
+              window.location.href = "/sign-in";
             }}
             className="w-full h-12 text-base font-semibold"
             style={{ background: "var(--gradient-aurora)" }}

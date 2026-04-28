@@ -54,7 +54,7 @@ const HeroSection = () => {
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
           <Button 
             size="lg" 
-            onClick={() => navigate(user ? "/discover" : "/auth")}
+            onClick={() => navigate(user ? "/discover" : "/sign-in")}
             className="bg-primary hover:bg-primary/90 shadow-glow px-8 py-5 text-base font-medium rounded-2xl"
           >
             <Heart className="w-5 h-5 mr-2" />
@@ -64,7 +64,7 @@ const HeroSection = () => {
           <Button 
             variant="outline" 
             size="lg"
-            onClick={() => navigate(user ? "/profile" : "/auth")}
+            onClick={() => navigate(user ? "/profile" : "/sign-in")}
             className="border-accent/30 hover:bg-accent/10 px-8 py-5 text-base rounded-2xl"
           >
             <Star className="w-5 h-5 mr-2" />

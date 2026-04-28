@@ -317,15 +317,40 @@ const SelfieVerification = () => {
               )}
 
               <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                <video
+                  ref={videoRef}
+                  playsInline
+                  autoPlay
+                  muted
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}
+                />
                 {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
+                ) : !cameraActive && !cameraStarting ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
                     <span className="text-sm">Selfie preview</span>
                   </div>
+                ) : null}
+                {cameraStarting && !cameraActive && !capturedImage && (
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/80 text-muted-foreground">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-sm">Opening camera…</span>
+                  </div>
+                )}
+                {cameraActive && !capturedImage && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
+                  </div>
                 )}
               </div>
+              <canvas ref={canvasRef} className="hidden" />
+              {cameraError && (
+                <p className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-center text-xs text-destructive">
+                  {cameraError}
+                </p>
+              )}
 
               {/* Inline help — only when not yet captured */}
               {!capturedImage && (
@@ -346,19 +371,16 @@ const SelfieVerification = () => {
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
-                {!capturedImage && (
-                  <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                    <Camera className="w-4 h-4" />
-                    {status === "rejected" ? "Try Again" : "Take Selfie"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="user"
-                      className="absolute inset-0 cursor-pointer opacity-0"
-                      onClick={prepareForSelfie}
-                      onChange={handleNativeSelfie}
-                    />
-                  </label>
+                {!cameraActive && !capturedImage && (
+                  <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
+                    {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
+                  </Button>
+                )}
+                {cameraActive && !capturedImage && (
+                  <Button onClick={capturePhoto} size="lg" className="gap-2 rounded-full px-8" style={{ background: "var(--gradient-golden)" }}>
+                    <Camera className="w-5 h-5" /> Take Selfie
+                  </Button>
                 )}
                 {capturedImage && (
                   <>

@@ -21,7 +21,8 @@ export const useAuth = () => {
           const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
           const search = new URLSearchParams(window.location.search);
           const isRealRecovery =
-            hash.get("type") === "recovery" || search.get("type") === "recovery";
+            (hash.get("type") === "recovery" && !!hash.get("access_token") && !!hash.get("refresh_token")) ||
+            (search.get("type") === "recovery" && (!!search.get("token_hash") || !!search.get("token")));
           if (isRealRecovery) {
             window.sessionStorage.setItem("auth-recovery-pending", "true");
           }
@@ -37,7 +38,8 @@ export const useAuth = () => {
           const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
           const search = new URLSearchParams(window.location.search);
           const isRealRecovery =
-            hash.get("type") === "recovery" || search.get("type") === "recovery";
+            (hash.get("type") === "recovery" && !!hash.get("access_token") && !!hash.get("refresh_token")) ||
+            (search.get("type") === "recovery" && (!!search.get("token_hash") || !!search.get("token")));
           if (!isRealRecovery) {
             window.sessionStorage.removeItem("auth-recovery-pending");
             window.localStorage.removeItem("auth-recovery-pending");

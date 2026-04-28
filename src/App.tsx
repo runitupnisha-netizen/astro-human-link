@@ -206,30 +206,6 @@ const ReferralCapture = () => {
   return null;
 };
 
-const StartupAuthRedirect = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    const isRecoveryLink = location.pathname === "/reset-password" && isPasswordResetUrl(hash);
-
-    if (!isRecoveryLink) {
-      window.localStorage.removeItem("auth-recovery-pending");
-      window.sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token") || hash.includes("type=recovery")) {
-        window.history.replaceState(null, document.title, window.location.pathname);
-      }
-    }
-
-    if (location.pathname === "/reset-password" && !isRecoveryLink) {
-      navigate("/sign-in", { replace: true });
-    }
-  }, [location.pathname, navigate]);
-
-  return null;
-};
-
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -284,7 +260,6 @@ const AppRoutes = () => {
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      <StartupAuthRedirect />
       {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}

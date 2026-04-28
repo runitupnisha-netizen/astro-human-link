@@ -1,6 +1,6 @@
 /**
  * Referral code capture & retrieval.
- * When someone visits /join/[CODE] (or /auth?ref=[CODE]), we stash the code
+ * When someone visits /join/[CODE] (or /sign-in?ref=[CODE]), we stash the code
  * in localStorage for 30 days, then auto-redeem it after sign-up when the
  * new user reaches Moment 3 (the birth-chart reveal step in onboarding).
  */

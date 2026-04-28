@@ -367,7 +367,7 @@ const SelfieVerification = () => {
                 {!cameraActive && !capturedImage && (
                   <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                     {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : isMobile ? "Take Selfie" : "Open Camera"}
+                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
                   </Button>
                 )}
                 {cameraActive && !capturedImage && (

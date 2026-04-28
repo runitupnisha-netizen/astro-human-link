@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
     VitePWA({
+      injectRegister: false,
       registerType: "autoUpdate",
       includeAssets: ["stellara-app-icon.png", "stellara-app-icon-192.png", "stellara-app-icon-512.png"],
       workbox: {

@@ -5,7 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -25,7 +24,6 @@ import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import SparkleLoader from "./components/SparkleLoader";
-import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
@@ -94,11 +92,8 @@ const isPasswordResetUrl = (hash: string) => {
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const { sessionExpired } = useAuth();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  // If a session expired mid-app, show the friendly screen instead of bouncing to sign-in.
-  if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
   if (!user) return <Navigate to="/sign-in" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
@@ -115,6 +110,13 @@ const AuthRoute = ({ children }: { children: ReactNode }) => {
   if (user) return <Navigate to="/growth" replace />;
 
   return <>{children}</>;
+};
+
+const FallbackRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingScreen />;
+  return user ? <NotFound /> : <Navigate to="/sign-in" replace />;
 };
 
 const AnalyticsTracker = () => {
@@ -207,12 +209,21 @@ const StartupAuthRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.pathname === "/reset-password" && isPasswordResetUrl(location.hash)) return;
+    const hash = window.location.hash;
+    const isRecoveryLink = location.pathname === "/reset-password" && isPasswordResetUrl(hash);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      navigate(session ? "/growth" : "/sign-in", { replace: true });
-    });
-  }, []);
+    if (!isRecoveryLink) {
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.sessionStorage.removeItem("auth-recovery-pending");
+      if (hash.includes("access_token") || hash.includes("type=recovery")) {
+        window.history.replaceState(null, document.title, window.location.pathname);
+      }
+    }
+
+    if (location.pathname === "/reset-password" && !isRecoveryLink) {
+      navigate("/sign-in", { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   return null;
 };
@@ -241,6 +252,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition><AuthRoute><Auth /></AuthRoute></PageTransition>} />
+            <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
@@ -303,7 +315,7 @@ const AppRoutes = () => {
               } 
             />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
-            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+            <Route path="*" element={<PageTransition><FallbackRoute /></PageTransition>} />
           </Routes>
 
       </Suspense>

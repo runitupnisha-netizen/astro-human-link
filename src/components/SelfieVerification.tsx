@@ -219,52 +219,16 @@ const SelfieVerification = () => {
                 </div>
               )}
 
-              {/* Camera viewfinder */}
-              <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
-                  style={{ transform: "scaleX(-1)" }}
-                />
-                {capturedImage && (
+              <div className="relative aspect-square max-w-xs mx-auto rounded-2xl overflow-hidden bg-muted mb-4 border border-border/50">
+                {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
-                )}
-                {!cameraActive && !cameraStarting && !capturedImage && (
+                ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
-                    <span className="text-sm">Camera preview</span>
-                  </div>
-                )}
-                {cameraStarting && !cameraActive && !capturedImage && (
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted text-muted-foreground">
-                    <Loader2 className="w-8 h-8 animate-spin" />
-                    <span className="text-sm">Opening camera…</span>
-                  </div>
-                )}
-                {/* Face guide overlay */}
-                {cameraActive && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
-                  </div>
-                )}
-                {cameraActive && (
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-background/70 backdrop-blur-sm px-3 py-1 rounded-full text-[11px] text-foreground/90 pointer-events-none">
-                    Center your face inside the oval
+                    <span className="text-sm">Selfie preview</span>
                   </div>
                 )}
               </div>
-              <canvas ref={canvasRef} className="hidden" />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                capture="user"
-                className="hidden"
-                onChange={handleNativeSelfie}
-              />
 
               {/* Inline help — only when not yet captured */}
               {!capturedImage && (
@@ -285,22 +249,33 @@ const SelfieVerification = () => {
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
-                {!cameraActive && !capturedImage && (
-                  <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
-                    {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
-                  </Button>
-                )}
-                {cameraActive && (
-                  <Button onClick={capturePhoto} size="lg" className="gap-2 rounded-full px-8" style={{ background: "var(--gradient-golden)" }}>
-                    <Camera className="w-5 h-5" /> Take Selfie
-                  </Button>
+                {!capturedImage && (
+                  <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <Camera className="w-4 h-4" />
+                    {status === "rejected" ? "Try Again" : "Take Selfie"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="user"
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      onClick={prepareForSelfie}
+                      onChange={handleNativeSelfie}
+                    />
+                  </label>
                 )}
                 {capturedImage && (
                   <>
-                    <Button variant="outline" onClick={startCamera} className="gap-2">
+                    <label className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                       <RotateCcw className="w-4 h-4" /> Retake
-                    </Button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="user"
+                        className="absolute inset-0 cursor-pointer opacity-0"
+                        onClick={prepareForSelfie}
+                        onChange={handleNativeSelfie}
+                      />
+                    </label>
                     <Button onClick={submitSelfie} disabled={submitting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {submitting ? "Verifying…" : "Submit"}

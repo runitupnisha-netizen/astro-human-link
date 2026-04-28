@@ -105,8 +105,8 @@ const Navigation = () => {
     { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
-  // Bottom tab bar items — 5 key tabs for mobile (Settings accessible from Profile)
-  const bottomTabs = [
+  // Bottom tab bar items — 4 key tabs for mobile (Profile via top-right avatar)
+  const bottomTabs: Array<{ path: string; label: string; icon: typeof Sparkles; badge?: number }> = [
     { path: "/discover", label: t("nav.discover"), icon: Sparkles },
     { path: "/connections", label: t("connections.matches"), icon: Heart },
     { path: "/growth", label: "Growth", icon: Diamond },

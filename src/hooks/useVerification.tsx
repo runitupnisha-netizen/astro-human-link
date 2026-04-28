@@ -18,7 +18,7 @@ export const useVerificationStatus = (userId: string | null | undefined) => {
         .from("photo_verifications")
         .select("status")
         .eq("user_id", userId)
-        .eq("status", "approved")
+        .in("status", ["approved", "verified"])
         .maybeSingle();
       setIsVerified(!!data);
       setLoading(false);
@@ -41,7 +41,7 @@ export const useVerificationStatuses = (userIds: string[]) => {
         .from("photo_verifications")
         .select("user_id")
         .in("user_id", validIds)
-        .eq("status", "approved");
+        .in("status", ["approved", "verified"]);
       setVerifiedSet(new Set((data || []).map((d) => d.user_id)));
     };
     check();

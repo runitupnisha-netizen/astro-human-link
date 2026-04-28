@@ -3,6 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script>
+      var hash = window.location.hash || '';
+      if (!hash.includes('type=recovery')) {
+        try {
+          var keysToRemove = [];
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && (
+              key.includes('recovery') ||
+              key.includes('reset') ||
+              key.includes('auth-recovery')
+            )) {
+              keysToRemove.push(key);
+            }
+          }
+          keysToRemove.forEach(function(k) {
+            localStorage.removeItem(k);
+          });
+        } catch(e) {}
+      }
+    </script>
     <title>Stellara — Where Love Aligns With the Stars</title>
     <meta name="description" content="Where love aligns with the stars. Discover your perfect spiritual match through astrology, human design &amp; cosmic compatibility.">
     <meta name="author" content="Stellara" />

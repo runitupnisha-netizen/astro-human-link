@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
 export const useAuth = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,36 +16,32 @@ export const useAuth = () => {
     // Set up the auth state listener FIRST so we don't miss events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (typeof window !== "undefined") {
-        if (event === "PASSWORD_RECOVERY") {
-          // Only treat as a real recovery flow if the URL actually contains
-          // recovery tokens. Supabase can fire PASSWORD_RECOVERY on session
-          // restore in some edge cases — we must not hijack normal logins.
-          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-          const search = new URLSearchParams(window.location.search);
-          const isRealRecovery =
-            (hash.get("type") === "recovery" && !!hash.get("access_token") && !!hash.get("refresh_token")) ||
-            (search.get("type") === "recovery" && (!!search.get("token_hash") || !!search.get("token")));
-          if (isRealRecovery) {
-            window.sessionStorage.setItem("auth-recovery-pending", "true");
+        switch (event) {
+          case "PASSWORD_RECOVERY": {
+            const currentHash = window.location.hash;
+            if (currentHash.includes("type=recovery") && currentHash.includes("access_token")) {
+              window.localStorage.setItem("auth-recovery-pending", "true");
+              navigate("/reset-password");
+            } else {
+              window.localStorage.removeItem("auth-recovery-pending");
+              window.sessionStorage.removeItem("auth-recovery-pending");
+            }
+            break;
           }
-        }
-        if (event === "SIGNED_OUT") {
-          window.sessionStorage.removeItem("auth-recovery-pending");
-          window.localStorage.removeItem("auth-recovery-pending");
-          window.localStorage.removeItem("auth-recovery-requested-at");
-        }
-        if (event === "SIGNED_IN") {
-          // A successful normal sign-in should clear any stale recovery flags
-          // so the next session restore doesn't bounce to /reset-password.
-          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-          const search = new URLSearchParams(window.location.search);
-          const isRealRecovery =
-            (hash.get("type") === "recovery" && !!hash.get("access_token") && !!hash.get("refresh_token")) ||
-            (search.get("type") === "recovery" && (!!search.get("token_hash") || !!search.get("token")));
-          if (!isRealRecovery) {
+          case "SIGNED_IN": {
+            window.localStorage.removeItem("auth-recovery-pending");
+            window.sessionStorage.removeItem("auth-recovery-pending");
+            window.localStorage.removeItem("auth-recovery-requested-at");
+            if (window.location.pathname === "/reset-password" && !window.location.hash.includes("type=recovery")) {
+              navigate("/growth");
+            }
+            break;
+          }
+          case "SIGNED_OUT": {
             window.sessionStorage.removeItem("auth-recovery-pending");
             window.localStorage.removeItem("auth-recovery-pending");
             window.localStorage.removeItem("auth-recovery-requested-at");
+            break;
           }
         }
       }
@@ -79,7 +77,7 @@ export const useAuth = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const signOut = async () => {
     // Mark as an explicit sign-out so the listener doesn't flag it as "session expired"

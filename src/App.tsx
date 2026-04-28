@@ -25,7 +25,6 @@ import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
 import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import SparkleLoader from "./components/SparkleLoader";
-import SessionExpired from "./components/SessionExpired";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
@@ -94,11 +93,8 @@ const isPasswordResetUrl = (hash: string) => {
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const { sessionExpired } = useAuth();
   const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  // If a session expired mid-app, show the friendly screen instead of bouncing to sign-in.
-  if (sessionExpired) return <SessionExpired />;
   if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
   if (!user) return <Navigate to="/sign-in" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
@@ -207,12 +203,19 @@ const StartupAuthRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.pathname === "/reset-password" && isPasswordResetUrl(location.hash)) return;
+    const hash = window.location.hash;
+    if (!hash.includes("type=recovery")) {
+      window.localStorage.removeItem("auth-recovery-pending");
+      window.sessionStorage.removeItem("auth-recovery-pending");
+      if (hash.includes("access_token")) {
+        window.history.replaceState(null, document.title, window.location.pathname);
+      }
+    }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      navigate(session ? "/growth" : "/sign-in", { replace: true });
-    });
-  }, []);
+    if (location.pathname === "/reset-password" && !isPasswordResetUrl(hash)) {
+      navigate("/sign-in", { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   return null;
 };

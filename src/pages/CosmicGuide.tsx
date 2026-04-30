@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import { Send, Plus, Trash2, MessageSquare, Loader2, X, Volume2, VolumeX, Sparkles } from "lucide-react";
+import { Send, Plus, Trash2, MessageSquare, Loader2, X, Volume2, VolumeX, Sparkles, Info, Heart, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import SparkleLoader from "@/components/SparkleLoader";
@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { useTourHighlight } from "@/hooks/useTourHighlight";
 import { useLyraVoice } from "@/hooks/useLyraVoice";
 import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -40,6 +41,7 @@ const CosmicGuide = () => {
   const inputHighlight = useTourHighlight("lyra-input");
   const voice = useLyraVoice();
   const [showVoicePrimer, setShowVoicePrimer] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const lastSpokenRef = useRef<string>("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);

@@ -11,6 +11,13 @@ import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
+
+/**
+ * Phone (SMS) sign-in is disabled for the App Store launch while Twilio A2P
+ * 10DLC verification is pending. Flip this to `true` once the campaign is
+ * approved — no other changes needed; the toggle and form will reappear.
+ */
+const PHONE_AUTH_ENABLED = false;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";

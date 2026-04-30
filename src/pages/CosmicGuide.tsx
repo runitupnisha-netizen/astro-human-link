@@ -107,13 +107,23 @@ const CosmicGuide = () => {
     const newAssistantArrived =
       !streaming && lastRole === "assistant" && (countChanged || roleChanged);
 
+    // Only auto-scroll if the user is already near the bottom of the thread.
+    // This prevents yanking the view away while they're scrolled up reading.
+    const NEAR_BOTTOM_PX = 160;
+    const distanceFromBottom =
+      el.scrollHeight - el.scrollTop - el.clientHeight;
+    const isNearBottom = distanceFromBottom <= NEAR_BOTTOM_PX;
+
     if (newAssistantArrived && lastAssistantRef.current) {
-      // Align top of the latest assistant message to top of scroll viewport,
-      // with a little breathing room.
-      const target = lastAssistantRef.current;
-      const top = target.offsetTop - 12;
-      el.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    } else {
+      if (isNearBottom) {
+        // Align top of the latest assistant message to top of scroll viewport,
+        // with a little breathing room — so long replies are read from the start.
+        const target = lastAssistantRef.current;
+        const top = target.offsetTop - 12;
+        el.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      }
+      // If user has scrolled up to read, leave their position alone.
+    } else if (isNearBottom) {
       el.scrollTop = el.scrollHeight;
     }
 

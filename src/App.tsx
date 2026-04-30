@@ -184,11 +184,11 @@ const AdminLyraProbeShortcut = () => {
   return (
     <Button
       asChild
-      className="fixed right-4 top-24 z-[9999] h-11 px-4 text-xs font-bold uppercase shadow-lg"
+      className="fixed right-3 bottom-24 md:bottom-6 md:top-auto z-[55] h-9 px-3 text-[11px] font-bold uppercase shadow-lg opacity-80 hover:opacity-100"
     >
       <Link to="/admin/lyra" aria-label="Run Lyra Probe">
-        <MessageCircleQuestion className="w-4 h-4 mr-2" />
-        RUN LYRA PROBE
+        <MessageCircleQuestion className="w-3.5 h-3.5 mr-1.5" />
+        LYRA PROBE
       </Link>
     </Button>
   );

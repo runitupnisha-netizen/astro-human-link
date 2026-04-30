@@ -51,6 +51,9 @@ const CosmicGuide = () => {
   const [loadingThread, setLoadingThread] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastAssistantRef = useRef<HTMLDivElement>(null);
+  const prevMsgCountRef = useRef<number>(0);
+  const prevLastRoleRef = useRef<string | null>(null);
 
   // Load conversations
   useEffect(() => {
@@ -90,10 +93,32 @@ const CosmicGuide = () => {
     })();
   }, [activeId]);
 
-  // Auto-scroll on new content
+  // Auto-scroll on new content.
+  // - When the user sends a message or Lyra is mid-stream, follow the bottom.
+  // - When a NEW assistant message has just finished arriving, snap to its TOP
+  //   so long replies are read from the beginning, not the end.
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    const last = messages[messages.length - 1];
+    const lastRole = last?.role ?? null;
+    const countChanged = messages.length !== prevMsgCountRef.current;
+    const roleChanged = lastRole !== prevLastRoleRef.current;
+    const newAssistantArrived =
+      !streaming && lastRole === "assistant" && (countChanged || roleChanged);
+
+    if (newAssistantArrived && lastAssistantRef.current) {
+      // Align top of the latest assistant message to top of scroll viewport,
+      // with a little breathing room.
+      const target = lastAssistantRef.current;
+      const top = target.offsetTop - 12;
+      el.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    } else {
+      el.scrollTop = el.scrollHeight;
+    }
+
+    prevMsgCountRef.current = messages.length;
+    prevLastRoleRef.current = lastRole;
   }, [messages, streaming]);
 
   // When streaming finishes, speak the latest assistant message (if voice on)
@@ -512,7 +537,7 @@ const CosmicGuide = () => {
         ref={scrollRef}
         className="relative z-10 flex-1 overflow-y-auto px-4 md:px-8"
       >
-        <div className="max-w-2xl mx-auto space-y-3 pb-6">
+        <div className="max-w-2xl mx-auto space-y-3 pt-4 pb-6">
           {loadingThread ? (
             <div className="flex items-center justify-center py-10">
               <SparkleLoader size={28} label="Lyra is reading your chart..." />
@@ -557,9 +582,13 @@ const CosmicGuide = () => {
             </motion.div>
           ) : (
             <>
-              {messages.map((m, i) => (
+              {messages.map((m, i) => {
+                const isLastAssistant =
+                  m.role === "assistant" && i === messages.length - 1;
+                return (
                 <motion.div
                   key={i}
+                  ref={isLastAssistant ? lastAssistantRef : undefined}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
@@ -594,7 +623,8 @@ const CosmicGuide = () => {
                     )}
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
               {streaming && messages[messages.length - 1]?.role !== "assistant" && (
                 <div className="flex justify-start">
                   <div

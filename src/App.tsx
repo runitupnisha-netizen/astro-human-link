@@ -89,7 +89,19 @@ const LoadingScreen = () => (
 
 const isPasswordResetUrl = (hash: string) => {
   const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-  return hashParams.get("type") === "recovery" && !!hashParams.get("access_token");
+  if (hashParams.get("type") === "recovery" && !!hashParams.get("access_token")) {
+    return true;
+  }
+  // Modern Supabase recovery emails arrive as ?code=XXX (PKCE).
+  // We treat any visit to /reset-password with ?code or ?token_hash as a
+  // genuine recovery attempt — the page itself exchanges the code.
+  if (typeof window !== "undefined") {
+    const search = new URLSearchParams(window.location.search);
+    if (search.get("code") || search.get("token_hash") || search.get("type") === "recovery") {
+      return true;
+    }
+  }
+  return false;
 };
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
@@ -143,6 +155,11 @@ const AdminLyraProbeShortcut = () => {
   const [copied, setCopied] = useState(false);
 
   if (loading || !isAdmin) return null;
+
+  // Only show the floating shortcut on admin pages. On all other pages,
+  // admins can navigate to /admin/lyra directly. This keeps the published
+  // app clean for end users (and for admins testing the live UX).
+  if (!location.pathname.startsWith("/admin")) return null;
 
   const isAdminPage = location.pathname === "/admin";
   const lyraUrl = typeof window !== "undefined" ? `${window.location.origin}/admin/lyra` : "/admin/lyra";

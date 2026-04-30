@@ -35,3 +35,7 @@ project_id = "wquzijmkiotkupygoxdf"
     verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
+  [functions.send-sms-otp]
+    verify_jwt = false
+  [functions.verify-sms-otp]
+    verify_jwt = false

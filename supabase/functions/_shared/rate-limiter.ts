@@ -20,6 +20,18 @@ const DEFAULT_LIMITS: Record<string, RateLimitConfig> = {
   "push-vapid-key": { maxRequests: 10, windowMs: 60_000 },
   "search-gifs": { maxRequests: 30, windowMs: 60_000 },
   "spotify-auth": { maxRequests: 30, windowMs: 60_000 },
+  // SMS OTP — per IP+phone identifier. Resend limited to 3/15min,
+  // verify allows 10/min for retries on typos.
+  "send-sms-otp": {
+    maxRequests: 3,
+    windowMs: 15 * 60_000,
+    message: "Too many code requests. Wait a few minutes before trying again.",
+  },
+  "verify-sms-otp": {
+    maxRequests: 10,
+    windowMs: 60_000,
+    message: "Too many attempts. Slow down and try again shortly.",
+  },
   // Calls realistically need a few retries (network blip → rejoin, peer
   // hangup + redial). Allow a generous short burst, then a slower long
   // window to discourage abuse without punishing normal usage.

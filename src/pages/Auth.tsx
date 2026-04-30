@@ -10,6 +10,7 @@ import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2 } fr
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
+import PhoneAuthForm from "@/components/PhoneAuthForm";
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
@@ -68,6 +69,7 @@ const mapErrorToField = (friendly: string): "email" | "password" | "form" => {
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -365,6 +367,36 @@ const Auth = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
+              {/* Email/Phone toggle */}
+              <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/40 border border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("email")}
+                  className={`h-9 rounded-lg text-sm font-medium transition-all ${
+                    authMode === "email"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("phone")}
+                  className={`h-9 rounded-lg text-sm font-medium transition-all ${
+                    authMode === "phone"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Phone
+                </button>
+              </div>
+
+              {authMode === "phone" ? (
+                <PhoneAuthForm />
+              ) : (
+              <>
               {/* Email Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
@@ -574,6 +606,8 @@ const Auth = () => {
                   )}
                 </button>
               </div>
+              </>
+              )}
             </motion.div>
           )}
         </motion.div>

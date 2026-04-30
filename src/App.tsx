@@ -45,6 +45,7 @@ const SacredReveal = lazy(() => import("./pages/SacredReveal"));
 const WeeklyInsights = lazy(() => import("./pages/WeeklyInsights"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const PrivacyChecklist = lazy(() => import("./pages/PrivacyChecklist"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const ViewProfile = lazy(() => import("./pages/ViewProfile"));
 const WhoLikedMe = lazy(() => import("./pages/WhoLikedMe"));
@@ -336,6 +337,7 @@ const AppRoutes = () => {
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+            <Route path="/privacy-checklist" element={<PageTransition><PrivacyChecklist /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/support" element={<PageTransition><Contact /></PageTransition>} />

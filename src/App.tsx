@@ -77,6 +77,7 @@ const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 
 const queryClient = new QueryClient();

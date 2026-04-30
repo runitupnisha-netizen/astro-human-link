@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X } from "lucide-react";
+import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X, CheckCircle2, RotateCcw } from "lucide-react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

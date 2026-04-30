@@ -10,6 +10,7 @@ import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2 } fr
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
+import PhoneAuthForm from "@/components/PhoneAuthForm";
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
@@ -68,6 +69,7 @@ const mapErrorToField = (friendly: string): "email" | "password" | "form" => {
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");

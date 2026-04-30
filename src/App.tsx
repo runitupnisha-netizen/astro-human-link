@@ -144,6 +144,11 @@ const AdminLyraProbeShortcut = () => {
 
   if (loading || !isAdmin) return null;
 
+  // Only show the floating shortcut on admin pages. On all other pages,
+  // admins can navigate to /admin/lyra directly. This keeps the published
+  // app clean for end users (and for admins testing the live UX).
+  if (!location.pathname.startsWith("/admin")) return null;
+
   const isAdminPage = location.pathname === "/admin";
   const lyraUrl = typeof window !== "undefined" ? `${window.location.origin}/admin/lyra` : "/admin/lyra";
 

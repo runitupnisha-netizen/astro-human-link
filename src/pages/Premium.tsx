@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X } from "lucide-react";
+import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X, CheckCircle2, RotateCcw } from "lucide-react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,6 +116,28 @@ const Premium = () => {
   // verification, 3DS, or webhook backlog can occasionally push it past
   // our ~24s polling window.
   const [pollingTimedOut, setPollingTimedOut] = useState(false);
+
+  // Restore Purchase visible-state machine. Drives the inline status card
+  // below the Restore button so returning users can SEE the result instead
+  // of relying on a fleeting toast.
+  type RestoreState =
+    | { status: "idle" }
+    | { status: "checking" }
+    | { status: "success"; tier?: string | null; at: number }
+    | { status: "not_found"; at: number }
+    | { status: "error"; message: string; at: number };
+  const [restoreState, setRestoreState] = useState<RestoreState>(() => {
+    try {
+      const raw = localStorage.getItem("stellara:lastRestore");
+      if (raw) {
+        const parsed = JSON.parse(raw) as RestoreState;
+        if (parsed && parsed.status === "success") return parsed;
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return { status: "idle" };
+  });
 
   // Mirrors `subscribed` for use inside the polling interval without putting
   // it in the effect deps (which would tear down and recreate the interval
@@ -583,33 +605,131 @@ const Premium = () => {
         </motion.p>
 
         {/* Restore Purchase */}
-        {!subscribed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="text-center mt-2"
-          >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-4 max-w-md mx-auto"
+        >
+          <div className="flex flex-col items-center gap-3">
             <Button
               variant="ghost"
+              disabled={restoreState.status === "checking"}
               onClick={async () => {
+                setRestoreState({ status: "checking" });
                 try {
                   const result = await restorePurchases();
                   if (result.subscribed) {
-                    toast({ title: "Purchases restored ✦", description: "Your subscription has been restored." });
+                    const next: RestoreState = {
+                      status: "success",
+                      tier: currentTier ?? null,
+                      at: Date.now(),
+                    };
+                    setRestoreState(next);
+                    try {
+                      localStorage.setItem("stellara:lastRestore", JSON.stringify(next));
+                    } catch {
+                      // ignore quota errors
+                    }
+                    toast({
+                      title: "Purchases restored ✦",
+                      description: "Your subscription has been restored.",
+                    });
                   } else {
-                    toast({ title: "No active subscription found", description: "If you believe this is an error, please contact support." });
+                    setRestoreState({ status: "not_found", at: Date.now() });
+                    toast({
+                      title: "No active subscription found",
+                      description: "If you believe this is an error, please contact support.",
+                    });
                   }
-                } catch {
-                  toast({ title: "Could not restore", description: "Please try again or contact support.", variant: "destructive" });
+                } catch (err) {
+                  setRestoreState({
+                    status: "error",
+                    message: err instanceof Error ? err.message : "Unknown error",
+                    at: Date.now(),
+                  });
+                  toast({
+                    title: "Could not restore",
+                    description: "Please try again or contact support.",
+                    variant: "destructive",
+                  });
                 }
               }}
               className="text-muted-foreground hover:text-foreground text-sm min-h-[44px]"
             >
-              Restore Previous Purchase
+              {restoreState.status === "checking" ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Checking with Stripe…
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Restore Previous Purchase
+                </>
+              )}
             </Button>
-          </motion.div>
-        )}
+
+            {/* Inline visible status card */}
+            {restoreState.status === "success" && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 flex items-start gap-3"
+              >
+                <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-semibold text-amber-300">
+                    Subscription restored successfully
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {restoreState.tier
+                      ? `Active plan: ${restoreState.tier}`
+                      : "Your premium access is active."}
+                    {" · "}
+                    Last restored {new Date(restoreState.at).toLocaleString()}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {restoreState.status === "not_found" && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full rounded-xl border border-border bg-muted/40 px-4 py-3 flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-foreground">
+                    No active subscription found
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Make sure you're signed in with the same email used at checkout, then try again.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {restoreState.status === "error" && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 flex items-start gap-3"
+              >
+                <X className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-destructive">
+                    Restore failed
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {restoreState.message}. Please try again or contact support.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
       </TourHighlight>
     </div>
   );

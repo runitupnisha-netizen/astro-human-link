@@ -96,29 +96,90 @@ Deno.serve(async (req) => {
       throw new Error("Could not create code. Try again.");
     }
 
-    // Send via Twilio Messaging Service.
-    const twilioRes = await fetch(`${TWILIO_GATEWAY}/Messages.json`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TWILIO_API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        To: phone,
-        MessagingServiceSid: TWILIO_MESSAGING_SERVICE_SID,
-        Body: `Your Stellara code is: ${code}`,
-      }),
-    });
+    // Send via Twilio Messaging Service. Capture full request/response for logging.
+    const startedAt = Date.now();
+    const requestPayload = {
+      To: phone,
+      MessagingServiceSid: TWILIO_MESSAGING_SERVICE_SID,
+      Body: "Your Stellara code is: ******", // Never persist the actual code
+    };
+
+    let twilioRes: Response;
+    let twilioBodyText = "";
+    let twilioBodyJson: Record<string, unknown> | null = null;
+    try {
+      twilioRes = await fetch(`${TWILIO_GATEWAY}/Messages.json`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": TWILIO_API_KEY,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          To: phone,
+          MessagingServiceSid: TWILIO_MESSAGING_SERVICE_SID,
+          Body: `Your Stellara code is: ${code}`,
+        }),
+      });
+      twilioBodyText = await twilioRes.text();
+      try {
+        twilioBodyJson = twilioBodyText ? JSON.parse(twilioBodyText) : null;
+      } catch {
+        twilioBodyJson = { raw: twilioBodyText };
+      }
+    } catch (networkErr) {
+      const message = networkErr instanceof Error ? networkErr.message : String(networkErr);
+      await supabase.from("sms_logs").insert({
+        phone,
+        ip,
+        status: "internal_error",
+        duration_ms: Date.now() - startedAt,
+        request_payload: requestPayload,
+        internal_error: `Network error reaching Twilio gateway: ${message}`,
+      });
+      return new Response(
+        JSON.stringify({ error: "Could not reach SMS provider. Try again." }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const durationMs = Date.now() - startedAt;
 
     if (!twilioRes.ok) {
-      const errBody = await twilioRes.text();
-      console.error(`Twilio send failed [${twilioRes.status}]: ${errBody}`);
+      console.error(`Twilio send failed [${twilioRes.status}]: ${twilioBodyText}`);
+      await supabase.from("sms_logs").insert({
+        phone,
+        ip,
+        status: "twilio_error",
+        http_status: twilioRes.status,
+        duration_ms: durationMs,
+        twilio_error_code: twilioBodyJson?.code != null ? String(twilioBodyJson.code) : null,
+        twilio_error_message:
+          (twilioBodyJson?.message as string | undefined) ?? twilioBodyText.slice(0, 500),
+        request_payload: requestPayload,
+        response_payload: twilioBodyJson ?? { raw: twilioBodyText },
+      });
       return new Response(
         JSON.stringify({ error: "Could not send SMS. Please check the number and try again." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    // Success — record what Twilio reported.
+    await supabase.from("sms_logs").insert({
+      phone,
+      ip,
+      status: (twilioBodyJson?.status as string | undefined) ?? "queued",
+      http_status: twilioRes.status,
+      duration_ms: durationMs,
+      twilio_sid: (twilioBodyJson?.sid as string | undefined) ?? null,
+      twilio_status: (twilioBodyJson?.status as string | undefined) ?? null,
+      twilio_error_code:
+        twilioBodyJson?.error_code != null ? String(twilioBodyJson.error_code) : null,
+      twilio_error_message: (twilioBodyJson?.error_message as string | undefined) ?? null,
+      request_payload: requestPayload,
+      response_payload: twilioBodyJson ?? { raw: twilioBodyText },
+    });
 
     return new Response(
       JSON.stringify({ success: true, expires_at: expiresAt }),
@@ -127,6 +188,22 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("send-sms-otp error", err);
     const message = err instanceof Error ? err.message : "Unknown error";
+    // Best-effort log of internal failures (env not configured, validation, etc.).
+    try {
+      const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+      const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (SUPABASE_URL && SERVICE_ROLE) {
+        const sb = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
+        await sb.from("sms_logs").insert({
+          phone: "unknown",
+          ip: getIdentifier(req),
+          status: "internal_error",
+          internal_error: message,
+        });
+      }
+    } catch {
+      // swallow — logging failure shouldn't mask the original error
+    }
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

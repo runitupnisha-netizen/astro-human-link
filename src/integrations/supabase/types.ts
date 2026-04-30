@@ -1269,6 +1269,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_logs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          http_status: number | null
+          id: string
+          internal_error: string | null
+          ip: string | null
+          phone: string
+          request_payload: Json | null
+          response_payload: Json | null
+          status: string
+          twilio_error_code: string | null
+          twilio_error_message: string | null
+          twilio_sid: string | null
+          twilio_status: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          http_status?: number | null
+          id?: string
+          internal_error?: string | null
+          ip?: string | null
+          phone: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status: string
+          twilio_error_code?: string | null
+          twilio_error_message?: string | null
+          twilio_sid?: string | null
+          twilio_status?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          http_status?: number | null
+          id?: string
+          internal_error?: string | null
+          ip?: string | null
+          phone?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status?: string
+          twilio_error_code?: string | null
+          twilio_error_message?: string | null
+          twilio_sid?: string | null
+          twilio_status?: string | null
+        }
+        Relationships: []
+      }
       soulmate_sketches: {
         Row: {
           generated_at: string

@@ -77,6 +77,7 @@ const MoonCycle = lazy(() => import("./pages/MoonCycle"));
 const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 
 const queryClient = new QueryClient();
@@ -330,6 +331,7 @@ const AppRoutes = () => {
             <Route path="/admin/chart-parity" element={<Suspense fallback={<LoadingScreen />}><ChartParity /></Suspense>} />
             <Route path="/admin/chart-drift" element={<Suspense fallback={<LoadingScreen />}><ChartDrift /></Suspense>} />
             <Route path="/admin/astral-accuracy" element={<Suspense fallback={<LoadingScreen />}><AstralAccuracy /></Suspense>} />
+            <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
             <Route path="/chart-wizard" element={<PageTransition><ChartWizard /></PageTransition>} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />

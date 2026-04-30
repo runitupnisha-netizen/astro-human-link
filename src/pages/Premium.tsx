@@ -117,6 +117,28 @@ const Premium = () => {
   // our ~24s polling window.
   const [pollingTimedOut, setPollingTimedOut] = useState(false);
 
+  // Restore Purchase visible-state machine. Drives the inline status card
+  // below the Restore button so returning users can SEE the result instead
+  // of relying on a fleeting toast.
+  type RestoreState =
+    | { status: "idle" }
+    | { status: "checking" }
+    | { status: "success"; tier?: string | null; at: number }
+    | { status: "not_found"; at: number }
+    | { status: "error"; message: string; at: number };
+  const [restoreState, setRestoreState] = useState<RestoreState>(() => {
+    try {
+      const raw = localStorage.getItem("stellara:lastRestore");
+      if (raw) {
+        const parsed = JSON.parse(raw) as RestoreState;
+        if (parsed && parsed.status === "success") return parsed;
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return { status: "idle" };
+  });
+
   // Mirrors `subscribed` for use inside the polling interval without putting
   // it in the effect deps (which would tear down and recreate the interval
   // every time the value changes — defeating the "single interval" guarantee).

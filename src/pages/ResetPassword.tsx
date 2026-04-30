@@ -149,6 +149,16 @@ const ResetPassword = () => {
             </div>
             <p className="text-muted-foreground">Redirecting you back...</p>
           </div>
+        ) : exchanging ? (
+          <div className="glass-card glow-border p-8 text-center">
+            <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Verifying your reset link...</p>
+          </div>
+        ) : exchangeError ? (
+          <div className="glass-card glow-border p-8 text-center">
+            <p className="text-muted-foreground">{exchangeError}</p>
+            <p className="text-xs text-muted-foreground mt-2">Redirecting you to sign in...</p>
+          </div>
         ) : (
           <form onSubmit={handleReset} className="glass-card glow-border p-6 space-y-4">
             <div className="relative">

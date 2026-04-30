@@ -622,7 +622,7 @@ const Premium = () => {
                   if (result.subscribed) {
                     const next: RestoreState = {
                       status: "success",
-                      tier: result.tier ?? currentTier ?? null,
+                      tier: currentTier ?? null,
                       at: Date.now(),
                     };
                     setRestoreState(next);

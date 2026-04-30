@@ -19,7 +19,10 @@ const passwordSchema = z
 
 const isGenuineRecoveryLink = () => {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-  return params.get("type") === "recovery" && !!params.get("access_token");
+  if (params.get("type") === "recovery" && !!params.get("access_token")) return true;
+  const search = new URLSearchParams(window.location.search);
+  // PKCE recovery: ?code=...   OR   token-hash flow: ?token_hash=...&type=recovery
+  return !!search.get("code") || !!search.get("token_hash");
 };
 
 const ResetPassword = () => {
@@ -27,12 +30,54 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [exchanging, setExchanging] = useState(true);
+  const [exchangeError, setExchangeError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isGenuineRecoveryLink()) {
-      navigate("/sign-in", { replace: true });
-    }
+    let cancelled = false;
+    const run = async () => {
+      if (!isGenuineRecoveryLink()) {
+        navigate("/sign-in", { replace: true });
+        return;
+      }
+
+      const search = new URLSearchParams(window.location.search);
+      const code = search.get("code");
+      const tokenHash = search.get("token_hash");
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const hashAccessToken = hashParams.get("access_token");
+
+      try {
+        if (code) {
+          // PKCE recovery flow
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash) {
+          // OTP-style recovery flow
+          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+          if (error) throw error;
+        } else if (!hashAccessToken) {
+          throw new Error("Invalid or expired recovery link.");
+        }
+        // Clean the URL so the secrets aren't in the address bar
+        if (!cancelled) {
+          window.history.replaceState(null, document.title, "/reset-password");
+          setExchanging(false);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        const message = err instanceof Error ? err.message : "Recovery link is invalid or expired.";
+        setExchangeError(message);
+        setExchanging(false);
+        toast.error("Reset link expired or invalid. Please request a new one.");
+        setTimeout(() => navigate("/sign-in", { replace: true }), 2500);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
   }, [navigate]);
 
   const handleReset = async (e: React.FormEvent) => {

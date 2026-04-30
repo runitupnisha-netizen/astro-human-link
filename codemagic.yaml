@@ -3,8 +3,6 @@ workflows:
     name: iOS Release
     max_build_duration: 120
     instance_type: mac_mini_m1
-    integrations:
-      app_store_connect: Stellara
     environment:
       ios_signing:
         distribution_type: app_store
@@ -13,6 +11,8 @@ workflows:
         BUNDLE_ID: "com.ruhjupmedia.stellara"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
+        APP_STORE_CONNECT_ISSUER_ID: Encrypted(placeholder)
+        APP_STORE_CONNECT_KEY_IDENTIFIER: DLBHHSZY6L
       node: 18.19.0
     scripts:
       - name: Install dependencies
@@ -21,9 +21,8 @@ workflows:
       - name: Build web assets
         script: |
           npm run build
-      - name: Install Capacitor
+      - name: Capacitor sync
         script: |
-          npm install @capacitor/cli
           npx cap sync ios
       - name: Install CocoaPods
         script: |
@@ -39,7 +38,10 @@ workflows:
             archivePath="/tmp/stellara.xcarchive"
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/stellara.xcarchive
     publishing:
       app_store_connect:
-        auth:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: false
+        submit_to_app_store: false

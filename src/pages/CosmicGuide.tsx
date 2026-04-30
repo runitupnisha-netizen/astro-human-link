@@ -467,6 +467,20 @@ const CosmicGuide = () => {
         >
           your cosmic guide · always here
         </p>
+        <button
+          type="button"
+          onClick={() => setShowDisclaimer(true)}
+          className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 hover:bg-amber-400/15 transition-colors"
+          aria-label="View AI and safety disclaimer"
+        >
+          <Info className="w-3 h-3 text-amber-400" />
+          <span
+            className="text-[10.5px] tracking-wide text-amber-300/90"
+            style={{ fontFamily: "Poppins, sans-serif" }}
+          >
+            AI guidance · for entertainment · tap to learn more
+          </span>
+        </button>
         {voice.speaking && (
           <div className="mt-2 flex flex-col items-center gap-1">
             <div className="flex items-end gap-[3px] h-3">

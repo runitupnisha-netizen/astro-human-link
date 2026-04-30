@@ -24,6 +24,10 @@ const EnvironmentBanner = () => {
     const dismissed = sessionStorage.getItem(DISMISS_KEY) === "true";
     if (dismissed) return;
     const kind = detectEnv(window.location.hostname);
+    // Only surface the banner inside the Lovable preview iframe — never on
+    // the published app or custom domains, where it would just cover the
+    // top navigation on mobile.
+    if (kind !== "preview") return;
     setEnv(kind);
     setShow(true);
   }, []);

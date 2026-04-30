@@ -374,33 +374,35 @@ const Auth = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              {/* Email/Phone toggle */}
-              <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/40 border border-border/40">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("email")}
-                  className={`h-9 rounded-lg text-sm font-medium transition-all ${
-                    authMode === "email"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Email
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("phone")}
-                  className={`h-9 rounded-lg text-sm font-medium transition-all ${
-                    authMode === "phone"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Phone
-                </button>
-              </div>
+              {/* Email/Phone toggle (Phone hidden until Twilio A2P approval) */}
+              {PHONE_AUTH_ENABLED && (
+                <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/40 border border-border/40">
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode("email")}
+                    className={`h-9 rounded-lg text-sm font-medium transition-all ${
+                      authMode === "email"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode("phone")}
+                    className={`h-9 rounded-lg text-sm font-medium transition-all ${
+                      authMode === "phone"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Phone
+                  </button>
+                </div>
+              )}
 
-              {authMode === "phone" ? (
+              {PHONE_AUTH_ENABLED && authMode === "phone" ? (
                 <PhoneAuthForm />
               ) : (
               <>

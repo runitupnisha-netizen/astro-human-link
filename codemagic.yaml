@@ -8,7 +8,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.ruhjupmedia.stellara
+        bundle_identifier: com.runitupmedia.stellara
       node: 18.19.0
     scripts:
       - name: Install dependencies

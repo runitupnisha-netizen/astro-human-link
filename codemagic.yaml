@@ -24,9 +24,17 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ios/App && pod install
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files \
+            com.runitupmedia.stellara \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
       - name: Build iOS app
         script: |
-          xcode-project use-profiles
           xcode-project build-ipa \
             --workspace ios/App/App.xcworkspace \
             --scheme App

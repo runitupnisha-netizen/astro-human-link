@@ -3,15 +3,12 @@ workflows:
     name: iOS Release
     max_build_duration: 120
     instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: Stellara
     environment:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.ruhjupmedia.stellara
-      vars:
-        BUNDLE_ID: "com.ruhjupmedia.stellara"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        APP_STORE_CONNECT_KEY_IDENTIFIER: DLBHHSZY6L
       node: 18.19.0
     scripts:
       - name: Install dependencies
@@ -20,27 +17,24 @@ workflows:
       - name: Build web assets
         script: |
           npm run build
-      - name: Capacitor sync
+      - name: Install Capacitor iOS
         script: |
+          npx cap add ios || true
           npx cap sync ios
       - name: Install CocoaPods
         script: |
           cd ios/App && pod install
-      - name: Build iOS
+      - name: Build iOS app
         script: |
-          xcode-build-action \
-            workspace="ios/App/App.xcworkspace" \
-            scheme="App" \
-            config="Release" \
-            clean=true \
-            archive=true \
-            archivePath="/tmp/stellara.xcarchive"
+          xcode-project use-profiles
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
     artifacts:
       - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: false
+        auth: integration
+        submit_to_testflight: true
         submit_to_app_store: false

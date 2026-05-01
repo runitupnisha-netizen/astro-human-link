@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.ruhjupmedia.stellara',
+  appId: 'com.runitupmedia.stellara',
   appName: 'Stellara',
   webDir: 'dist',
   server: {

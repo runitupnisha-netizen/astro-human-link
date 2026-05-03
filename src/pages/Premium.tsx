@@ -484,6 +484,9 @@ const Premium = () => {
           const tier = STELLARA_TIERS[tierKey];
           const details = tierDetails[tierKey];
           const isCurrentPlan = subscribed && currentTier === tierKey;
+          const livePrice = livePrices[tierKey];
+          const displayPrice = livePrice?.formatted || tier.price;
+          const displayInterval = livePrice?.interval || tier.interval;
 
           return (
             <motion.div
@@ -534,11 +537,11 @@ const Premium = () => {
                       <CardTitle className="text-foreground font-display text-lg">
                         {tier.name}
                       </CardTitle>
-                      <p className="text-muted-foreground text-sm font-body">{details.description}</p>
+                      <p className="text-muted-foreground text-sm font-body">{details.description(displayPrice)}</p>
                     </div>
                     <div className="ml-auto text-right">
-                      <span className="text-foreground font-display text-2xl font-bold">{tier.price}</span>
-                      <span className="text-muted-foreground text-sm font-body">/{tier.interval}</span>
+                      <span className="text-foreground font-display text-2xl font-bold">{displayPrice}</span>
+                      <span className="text-muted-foreground text-sm font-body">/{displayInterval}</span>
                     </div>
                   </div>
                 </CardHeader>

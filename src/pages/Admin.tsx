@@ -232,7 +232,29 @@ const UserLookupSection = () => {
   };
 
   const grantPro = async (userId: string) => {
-    toast.info("Pro entitlement is managed via Stripe / demo allowlist. Add this email to the allowlist in check-subscription edge function.");
+    const daysStr = window.prompt("Grant how many days of Pro? (e.g. 30, 90, 365)", "30");
+    if (!daysStr) return;
+    const days = parseInt(daysStr, 10);
+    if (!Number.isFinite(days) || days <= 0 || days > 3650) {
+      toast.error("Enter a number between 1 and 3650.");
+      return;
+    }
+    // Extend (not overwrite) bonus_pro_until from the greater of now / existing.
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("bonus_pro_until")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const base = existing?.bonus_pro_until && new Date(existing.bonus_pro_until) > new Date()
+      ? new Date(existing.bonus_pro_until)
+      : new Date();
+    const newUntil = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ bonus_pro_until: newUntil.toISOString() })
+      .eq("user_id", userId);
+    if (error) return toast.error(`Grant failed: ${error.message}`);
+    toast.success(`Granted ${days} days of Pro (until ${newUntil.toLocaleDateString()})`);
   };
 
   const deleteUser = async (userId: string) => {

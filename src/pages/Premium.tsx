@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
+import { useStripePrices } from "@/hooks/useStripePrices";
 import TourHighlight from "@/components/TourHighlight";
 
 /**
@@ -37,11 +38,11 @@ const tierDetails: Record<TierKey, {
   highlight?: boolean;
   badge?: string;
   ribbon?: string;
-  description: string;
+  description: (price?: string) => string;
 }> = {
   monthly: {
     icon: <Star className="w-6 h-6" />,
-    description: "7-day free trial · then $9.99/mo",
+    description: (price) => `7-day free trial · then ${price ?? "$9.99"}/mo`,
     badge: "7-Day Free Trial",
     features: [
       "Unlimited cosmic matches",
@@ -54,7 +55,7 @@ const tierDetails: Record<TierKey, {
   },
   yearly: {
     icon: <Zap className="w-6 h-6" />,
-    description: "7-day free trial · then $79.99/yr",
+    description: (price) => `7-day free trial · then ${price ?? "$79.99"}/yr`,
     highlight: true,
     badge: "Save 33%",
     ribbon: "Best Value",
@@ -76,6 +77,7 @@ const premiumPerks = [
 
 const Premium = () => {
   const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription, restorePurchases } = usePremium();
+  const { prices: livePrices } = useStripePrices();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -482,6 +484,9 @@ const Premium = () => {
           const tier = STELLARA_TIERS[tierKey];
           const details = tierDetails[tierKey];
           const isCurrentPlan = subscribed && currentTier === tierKey;
+          const livePrice = livePrices[tierKey];
+          const displayPrice = livePrice?.formatted || tier.price;
+          const displayInterval = livePrice?.interval || tier.interval;
 
           return (
             <motion.div
@@ -532,11 +537,11 @@ const Premium = () => {
                       <CardTitle className="text-foreground font-display text-lg">
                         {tier.name}
                       </CardTitle>
-                      <p className="text-muted-foreground text-sm font-body">{details.description}</p>
+                      <p className="text-muted-foreground text-sm font-body">{details.description(displayPrice)}</p>
                     </div>
                     <div className="ml-auto text-right">
-                      <span className="text-foreground font-display text-2xl font-bold">{tier.price}</span>
-                      <span className="text-muted-foreground text-sm font-body">/{tier.interval}</span>
+                      <span className="text-foreground font-display text-2xl font-bold">{displayPrice}</span>
+                      <span className="text-muted-foreground text-sm font-body">/{displayInterval}</span>
                     </div>
                   </div>
                 </CardHeader>

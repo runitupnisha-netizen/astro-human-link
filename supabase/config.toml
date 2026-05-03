@@ -7,6 +7,8 @@ project_id = "wquzijmkiotkupygoxdf"
     verify_jwt = false
   [functions.create-checkout]
     verify_jwt = false
+  [functions.get-stripe-prices]
+    verify_jwt = false
   [functions.customer-portal]
     verify_jwt = false
   [functions.discover-profiles]

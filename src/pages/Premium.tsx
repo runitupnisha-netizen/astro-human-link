@@ -483,6 +483,8 @@ const Premium = () => {
       >
         <h2 id="plans" className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
 
+        {isAdmin && <PricingDebugPanel />}
+
         {(["yearly", "monthly"] as TierKey[]).map((tierKey, i) => {
           const tier = STELLARA_TIERS[tierKey];
           const details = tierDetails[tierKey];

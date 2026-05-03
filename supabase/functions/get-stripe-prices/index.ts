@@ -35,11 +35,13 @@ serve(async (req) => {
       lookup_keys: [...LOOKUP_KEYS],
       active: true,
       limit: 10,
+      expand: ["data.product"],
     });
 
     const prices: Record<string, {
       price_id: string;
       product_id: string;
+      product_name: string | null;
       unit_amount: number | null;
       currency: string;
       interval: string | null;
@@ -49,9 +51,14 @@ serve(async (req) => {
 
     for (const p of list.data) {
       if (!p.lookup_key) continue;
+      const product = p.product as Stripe.Product | string;
+      const productId = typeof product === "string" ? product : product.id;
+      const productName =
+        typeof product === "string" ? null : (product.name ?? null);
       prices[p.lookup_key] = {
         price_id: p.id,
-        product_id: typeof p.product === "string" ? p.product : p.product.id,
+        product_id: productId,
+        product_name: productName,
         unit_amount: p.unit_amount,
         currency: p.currency,
         interval: p.recurring?.interval ?? null,

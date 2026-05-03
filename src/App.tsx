@@ -285,7 +285,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
+      {/* Release notes panel is internal-only; hidden from customers. */}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />

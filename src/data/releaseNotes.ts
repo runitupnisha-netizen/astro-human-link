@@ -10,12 +10,11 @@ export const RELEASE_NOTES: ReleaseNoteEntry[] = [
   {
     version: "1.4.0",
     date: "2026-04-21",
-    title: "Profile cards & release transparency",
+    title: "A few updates to make your experience better ✦",
     changes: [
-      { type: "fixed", text: "Profile card bios are visible by default again with their own tap-to-expand toggle." },
-      { type: "improved", text: "'More details' now controls only secondary content (about me, shared aspects, compatibility) — fully decoupled from the bio expander." },
-      { type: "added", text: "Release Notes panel so you can always see what shipped and when." },
-      { type: "added", text: "Automated smoke tests guarding the bio/expander behavior on every deploy." },
+      { type: "fixed", text: "Bios are back — profile bios now show by default, with a tap to expand and read more." },
+      { type: "improved", text: "“More Details” now opens just the extras — About Me, shared aspects, and compatibility." },
+      { type: "added", text: "You can now see a history of updates right here, so you always know what's new." },
     ],
   },
 ];

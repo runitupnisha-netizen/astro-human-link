@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Wrench, Plus, Zap, X } from "lucide-react";
+import { Sparkles, Wrench, Plus, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RELEASE_NOTES, type ReleaseNoteEntry } from "@/data/releaseNotes";
 
-const STORAGE_KEY = "stellara:last-seen-release";
+const STORAGE_KEY = "stellara_last_seen_version";
 
 const typeStyles: Record<ReleaseNoteEntry["changes"][number]["type"], { label: string; icon: typeof Wrench; className: string }> = {
   fixed:    { label: "Fixed",    icon: Wrench, className: "bg-primary/10 text-primary border-primary/30" },
@@ -18,16 +18,6 @@ const formatDate = (iso: string) => {
     return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return iso;
-  }
-};
-
-const formatBuildTime = () => {
-  try {
-    const d = new Date(__BUILD_TIME__);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-  } catch {
-    return "—";
   }
 };
 
@@ -83,11 +73,10 @@ const ReleaseNotesPanel = () => {
           <DialogHeader className="px-6 pt-6">
             <DialogTitle className="flex items-center gap-2 font-display text-xl">
               <Sparkles className="h-5 w-5 text-primary" />
-              What's New
+              What's New in Stellara
             </DialogTitle>
             <DialogDescription>
-              Latest build deployed{" "}
-              <span className="font-semibold text-foreground">{formatBuildTime()}</span>
+              A few updates to make your experience better ✦
             </DialogDescription>
           </DialogHeader>
 

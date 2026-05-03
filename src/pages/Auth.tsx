@@ -17,7 +17,7 @@ import PhoneAuthForm from "@/components/PhoneAuthForm";
  * 10DLC verification is pending. Flip this to `true` once the campaign is
  * approved — no other changes needed; the toggle and form will reappear.
  */
-const PHONE_AUTH_ENABLED = true;
+const PHONE_AUTH_ENABLED = false;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";

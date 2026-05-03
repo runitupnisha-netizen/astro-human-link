@@ -77,6 +77,7 @@ const premiumPerks = [
 
 const Premium = () => {
   const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription, restorePurchases } = usePremium();
+  const { prices: livePrices } = useStripePrices();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();

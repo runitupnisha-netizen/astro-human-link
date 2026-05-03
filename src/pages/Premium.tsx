@@ -478,7 +478,7 @@ const Premium = () => {
       >
         <h2 id="plans" className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
 
-        {(Object.keys(STELLARA_TIERS) as TierKey[]).map((tierKey, i) => {
+        {(["yearly", "monthly"] as TierKey[]).map((tierKey, i) => {
           const tier = STELLARA_TIERS[tierKey];
           const details = tierDetails[tierKey];
           const isCurrentPlan = subscribed && currentTier === tierKey;
@@ -503,6 +503,14 @@ const Premium = () => {
                       details.highlight ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
                     }`}>
                       {details.badge}
+                    </Badge>
+                  </div>
+                )}
+
+                {details.ribbon && !isCurrentPlan && (
+                  <div className="absolute -top-px left-1/2 -translate-x-1/2">
+                    <Badge className="rounded-t-none rounded-b-lg bg-gradient-golden text-primary-foreground text-[10px] font-display tracking-wider uppercase px-3 py-0.5 shadow-[var(--shadow-golden)]">
+                      ✦ {details.ribbon}
                     </Badge>
                   </div>
                 )}
@@ -563,7 +571,7 @@ const Premium = () => {
                           Opening checkout...
                         </>
                       ) : (
-                        <>{subscribed ? "Switch to this plan" : "Start now"}</>
+                        <>{subscribed ? "Switch to this plan" : "Start My Free Trial ✦"}</>
                       )}
                     </Button>
                   )}

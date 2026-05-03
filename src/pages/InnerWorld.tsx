@@ -19,7 +19,7 @@ type Tool = {
   route?: string;
   premium: boolean;
   preview: string;
-  requiredTier?: "weekly" | "vip";
+  requiredTier?: "monthly" | "yearly";
 };
 
 const TOOLS: Tool[] = [
@@ -34,7 +34,7 @@ const TOOLS: Tool[] = [
     route: "/briefing",
     premium: false,
     preview: "Today's energy: Magnetic. Focus on conversations that feel destined.",
-    requiredTier: "weekly",
+    requiredTier: "monthly",
   },
   {
     id: "guide",
@@ -46,7 +46,7 @@ const TOOLS: Tool[] = [
     accent: "from-violet-400/30 to-fuchsia-500/10",
     premium: true,
     preview: "“Why do I keep meeting the same kind of partner?” — your guide is ready.",
-    requiredTier: "vip",
+    requiredTier: "monthly",
   },
   {
     id: "dreams",
@@ -58,7 +58,7 @@ const TOOLS: Tool[] = [
     accent: "from-indigo-400/30 to-blue-500/10",
     premium: true,
     preview: "Last night's water symbolism may be tied to Neptune's transit through your 7th house.",
-    requiredTier: "vip",
+    requiredTier: "monthly",
   },
   {
     id: "lookup",
@@ -70,7 +70,7 @@ const TOOLS: Tool[] = [
     accent: "from-rose-400/30 to-pink-500/10",
     premium: true,
     preview: "Save up to 25 people in your private cosmic rolodex.",
-    requiredTier: "vip",
+    requiredTier: "monthly",
   },
 ];
 
@@ -80,7 +80,7 @@ const InnerWorld = () => {
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [upsellFeature, setUpsellFeature] = useState<"synastry" | "unlimited_swipes">("synastry");
 
-  const isVipOrYearly = currentTier === "vip" || currentTier === "yearly";
+  const isVipOrYearly = currentTier === "monthly" || currentTier === "yearly";
 
   const handleOpen = (tool: Tool) => {
     if (tool.id === "briefing") {

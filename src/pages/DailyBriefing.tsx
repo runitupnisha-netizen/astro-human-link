@@ -30,10 +30,8 @@ const dataUrlToBlob = (dataUrl: string): Blob => {
 // Reflections-per-day limit by tier
 const TIER_ACCESS = {
   free:    { label: "Free",     reflectionsPerDay: 0,        accessLabel: "Read-only briefing" },
-  weekly:  { label: "Weekly",   reflectionsPerDay: 1,        accessLabel: "1 reflection / day" },
-  monthly: { label: "Monthly",  reflectionsPerDay: 3,        accessLabel: "3 reflections / day" },
-  vip:     { label: "VIP",      reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
-  yearly:  { label: "Yearly",   reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
+  monthly: { label: "Monthly",  reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
+  yearly:  { label: "Annual",   reflectionsPerDay: Infinity, accessLabel: "Unlimited reflections" },
 } as const;
 
 const DailyBriefing = () => {
@@ -764,7 +762,7 @@ const DailyBriefing = () => {
                     Today: <span className="text-foreground font-semibold">{reflectionsToday}</span>/{limitDisplay}
                   </span>
                 )}
-                {tierKey !== "vip" && tierKey !== "yearly" && (
+                {tierKey !== "monthly" && tierKey !== "yearly" && (
                   <Button asChild size="sm" variant="outline" className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10">
                     <Link to="/premium">{tierKey === "free" ? "Upgrade" : "Upgrade"}</Link>
                   </Button>

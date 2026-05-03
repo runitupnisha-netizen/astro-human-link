@@ -38,52 +38,29 @@ const tierDetails: Record<TierKey, {
   badge?: string;
   description: string;
 }> = {
-  weekly: {
-    icon: <Sparkles className="w-6 h-6" />,
-    description: "Try Premium risk-free",
-    features: [
-      "Unlimited cosmic matches",
-      "Daily Cosmic Briefing + reflections",
-      "Advanced compatibility insights",
-      "Priority Sacred Reveals",
-    ],
-  },
   monthly: {
     icon: <Star className="w-6 h-6" />,
-    description: "Most popular choice",
-    badge: "Popular",
+    description: "7-day free trial · then $9.99/mo",
+    badge: "7-Day Free Trial",
     features: [
-      "Everything in Weekly",
+      "Unlimited cosmic matches",
+      "See who likes you",
       "Full synastry charts",
-      "Who Liked Me access",
       "Advanced filters",
-      "5 Super Likes per week",
-      "Weekly cosmic insights digest",
-    ],
-  },
-  vip: {
-    icon: <Crown className="w-6 h-6" />,
-    description: "The ultimate experience",
-    highlight: true,
-    badge: "Best Value",
-    features: [
-      "Everything in Monthly",
       "Unlimited Super Likes & Boosts",
-      "My Cosmos suite (AI Cosmic Guide, Dream Journal)",
-      "Compatibility lookup for anyone",
-      "Priority profile visibility",
-      "Personal energy readings",
+      "Cancel anytime during trial",
     ],
   },
   yearly: {
     icon: <Zap className="w-6 h-6" />,
-    description: "Save over 55%",
-    badge: "Best Price",
+    description: "7-day free trial · then $79.99/yr",
+    highlight: true,
+    badge: "Save 33%",
     features: [
-      "Everything in VIP, billed yearly",
-      "My Cosmos suite included",
-      "Save $99+ per year",
+      "Everything in Monthly",
+      "Save 33% vs monthly billing",
       "Locked-in price for 12 months",
+      "Priority profile visibility",
     ],
   },
 };

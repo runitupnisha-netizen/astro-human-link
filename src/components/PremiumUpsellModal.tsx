@@ -135,7 +135,7 @@ const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUp
                 </p>
                 <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 border border-accent/30">
                   <Sparkles className="w-3 h-3 text-accent" />
-                  <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">From $4.99/wk</span>
+                  <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">7-Day Free Trial · From $9.99/mo</span>
                 </div>
               </div>
             </div>

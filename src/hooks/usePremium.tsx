@@ -13,30 +13,16 @@ import {
 } from "@/lib/revenuecat";
 
 export const STELLARA_TIERS = {
-  weekly: {
-    name: "Weekly",
-    price: "$4.99",
-    interval: "week",
-    price_id: "price_1TBSzZGjQT3v2NNS3Dl5EggN",
-    product_id: "prod_U9mYKiREwQYdpU",
-  },
   monthly: {
     name: "Monthly",
-    price: "$14.99",
+    price: "$9.99",
     interval: "month",
-    price_id: "price_1TBSzaGjQT3v2NNStNP04TH6",
-    product_id: "prod_U9mYDs9E8nk1sl",
+    price_id: "price_1TSteUGjQT3v2NNSgpJgqSBc",
+    product_id: "prod_URnEjM4cOvDHxP",
     rc_plan_key: "monthly" as RcPlanKey,
   },
-  vip: {
-    name: "VIP",
-    price: "$29.99",
-    interval: "month",
-    price_id: "price_1TBSzcGjQT3v2NNSvxYfK8CF",
-    product_id: "prod_U9mYdclgJK5DOP",
-  },
   yearly: {
-    name: "Yearly",
+    name: "Annual",
     price: "$79.99",
     interval: "year",
     price_id: "price_1TBSzeGjQT3v2NNSSd7TLkPn",
@@ -45,13 +31,22 @@ export const STELLARA_TIERS = {
   },
 } as const;
 
+// Legacy product IDs from prior tiers (weekly/$14.99 monthly/VIP). Existing
+// subscribers on these plans still need their tier resolved when checking
+// subscription status, even though we no longer offer them at checkout.
+const LEGACY_PRODUCT_TO_TIER: Record<string, TierKey> = {
+  prod_U9mYKiREwQYdpU: "monthly", // legacy weekly
+  prod_U9mYDs9E8nk1sl: "monthly", // legacy $14.99 monthly
+  prod_U9mYdclgJK5DOP: "yearly",  // legacy VIP -> show as yearly-tier perks
+};
+
 export type TierKey = keyof typeof STELLARA_TIERS;
 
 const getTierKeyByProductId = (productId: string): TierKey | null => {
   for (const [key, tier] of Object.entries(STELLARA_TIERS)) {
     if (tier.product_id === productId) return key as TierKey;
   }
-  return null;
+  return LEGACY_PRODUCT_TO_TIER[productId] ?? null;
 };
 
 export const usePremium = () => {

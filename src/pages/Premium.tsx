@@ -307,7 +307,7 @@ const Premium = () => {
       <button
         onClick={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate("/growth", { replace: true });
+          else navigate("/", { replace: true });
         }}
         aria-label="Close"
         className="fixed top-3 right-3 z-[110] w-11 h-11 rounded-full bg-background/70 backdrop-blur border border-border/50 hover:bg-background/90 active:scale-95 transition-all flex items-center justify-center touch-manipulation"

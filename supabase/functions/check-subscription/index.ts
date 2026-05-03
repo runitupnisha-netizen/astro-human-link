@@ -61,8 +61,8 @@ serve(async (req) => {
       logStep("Demo reviewer account, granting Pro", { email: user.email });
       return new Response(JSON.stringify({
         subscribed: true,
-        product_id: "prod_U9mYrOjy0ezljw", // yearly tier
-        price_id: "price_1TBSzeGjQT3v2NNSSd7TLkPn",
+        product_id: "prod_URoqBFRb0G2Kg2", // yearly tier (live)
+        price_id: "price_1TSvCqGjQT3v2NNSiycEinsh",
         subscription_end: "2027-12-31T23:59:59.000Z",
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -101,7 +101,7 @@ const ResetPassword = () => {
         description: "Redirecting you to the app...",
       });
       window.history.replaceState(null, document.title, "/growth");
-      setTimeout(() => navigate("/growth", { replace: true }), 1200);
+      setTimeout(() => navigate("/", { replace: true }), 1200);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to reset password";
       const m = message.toLowerCase();

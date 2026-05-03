@@ -124,7 +124,7 @@ const AuthRoute = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/growth" replace />;
+  if (user) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 };
@@ -288,7 +288,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <ReleaseNotesPanel />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/growth" replace /> : <Auth />}</PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
             <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />

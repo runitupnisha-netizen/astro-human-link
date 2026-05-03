@@ -95,7 +95,7 @@ const PhoneAuthForm = () => {
       if (verifyErr) throw verifyErr;
 
       toast.success("Phone verified ✨ Welcome to Stellara");
-      navigate("/growth", { replace: true });
+      navigate("/", { replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? "Could not verify code. Try again.");
     } finally {

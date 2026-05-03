@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
+import { useStripePrices } from "@/hooks/useStripePrices";
 import TourHighlight from "@/components/TourHighlight";
 
 /**

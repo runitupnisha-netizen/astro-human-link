@@ -5,6 +5,7 @@ import type { TierKey } from "@/hooks/usePremium";
 export type StripePriceInfo = {
   price_id: string;
   product_id: string;
+  product_name: string | null;
   unit_amount: number | null;
   currency: string;
   interval: string | null;

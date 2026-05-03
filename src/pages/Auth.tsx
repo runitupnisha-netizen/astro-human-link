@@ -139,7 +139,38 @@ const Auth = () => {
           email: email.trim(),
           password,
         });
-        if (error) throw error;
+        if (error) {
+          // If login failed, check whether this email was created via Google.
+          // If so, route the user to Google OAuth instead of the password flow.
+          const isCredErr = (error.message || "").toLowerCase().includes("invalid login");
+          if (isCredErr) {
+            try {
+              const { data: methodData } = await supabase.functions.invoke(
+                "check-auth-method",
+                { body: { email: email.trim() } },
+              );
+              const providers: string[] = methodData?.providers ?? [];
+              const hasPassword: boolean = !!methodData?.has_password;
+              if (providers.includes("google") && !hasPassword) {
+                toast.info("This email is linked to Google. Redirecting…", {
+                  description: "Continue with Google to sign in.",
+                });
+                await handleSocialLogin("google");
+                return;
+              }
+              if (providers.includes("apple") && !hasPassword) {
+                toast.info("This email is linked to Apple. Redirecting…", {
+                  description: "Continue with Apple to sign in.",
+                });
+                await handleSocialLogin("apple");
+                return;
+              }
+            } catch {
+              // fall through to normal error handling
+            }
+          }
+          throw error;
+        }
         toast.success("Welcome back ✨");
         navigate("/growth", { replace: true });
       } else {

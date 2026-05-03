@@ -39,3 +39,5 @@ project_id = "wquzijmkiotkupygoxdf"
     verify_jwt = false
   [functions.verify-sms-otp]
     verify_jwt = false
+  [functions.check-auth-method]
+    verify_jwt = false

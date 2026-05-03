@@ -84,11 +84,17 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const subscriptions = await stripe.subscriptions.list({
+    // Include both `active` and `trialing` so users on the 7-day free trial
+    // are treated as subscribed. `status: "all"` then filtered keeps the
+    // logic simple and resilient across Stripe API versions.
+    const allSubs = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
-      limit: 1,
+      status: "all",
+      limit: 10,
     });
+    const subscriptions = {
+      data: allSubs.data.filter((s) => s.status === "active" || s.status === "trialing"),
+    };
 
     const hasActiveSub = subscriptions.data.length > 0;
     let productId = null;

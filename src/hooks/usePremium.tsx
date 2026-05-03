@@ -49,6 +49,11 @@ const getTierKeyByProductId = (productId: string): TierKey | null => {
   return LEGACY_PRODUCT_TO_TIER[productId] ?? null;
 };
 
+const LOOKUP_KEY_TO_TIER: Record<string, TierKey> = {
+  stellara_monthly: "monthly",
+  stellara_yearly: "yearly",
+};
+
 export const usePremium = () => {
   const { user, session } = useAuth();
   const [subscribed, setSubscribed] = useState(false);
@@ -113,7 +118,11 @@ export const usePremium = () => {
       if (error) throw error;
 
       setSubscribed(Boolean(data.subscribed) || bonusActive);
-      setCurrentTier(data.product_id ? getTierKeyByProductId(data.product_id) : null);
+      const tierFromLookup =
+        typeof data.lookup_key === "string" ? LOOKUP_KEY_TO_TIER[data.lookup_key] : undefined;
+      setCurrentTier(
+        tierFromLookup ?? (data.product_id ? getTierKeyByProductId(data.product_id) : null),
+      );
       setSubscriptionEnd(data.subscription_end || bonusUntil);
     } catch (err) {
       console.error("Error checking subscription:", err);
@@ -150,8 +159,14 @@ export const usePremium = () => {
     }
 
     try {
+      // Send both priceId and planKey so the edge function can resolve the
+      // current live price by lookup_key — never breaks if IDs rotate.
+      const tierEntry = Object.entries(STELLARA_TIERS).find(
+        ([, t]) => t.price_id === priceId,
+      );
+      const planKey = tierEntry?.[0];
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, redirectTo },
+        body: { priceId, planKey, redirectTo },
       });
       if (error) throw error;
       if (data?.url) {

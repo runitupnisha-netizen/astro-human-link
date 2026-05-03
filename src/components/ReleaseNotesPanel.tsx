@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Sparkles, Wrench, Plus, Zap, X } from "lucide-react";
+import { Sparkles, Wrench, Plus, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,16 +18,6 @@ const formatDate = (iso: string) => {
     return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return iso;
-  }
-};
-
-const formatBuildTime = () => {
-  try {
-    const d = new Date(__BUILD_TIME__);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-  } catch {
-    return "—";
   }
 };
 

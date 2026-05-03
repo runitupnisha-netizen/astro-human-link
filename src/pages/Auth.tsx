@@ -52,7 +52,9 @@ const usernameSchema = z
 
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();
-  if (m.includes("invalid login")) return "That email and password don't match. Try again or reset your password.";
+  if (m.includes("invalid login")) {
+    return "Hmm, that didn't work. Did you sign up with Google or Apple? Try those buttons below instead. Or reset your password.";
+  }
   if (m.includes("email not confirmed")) return "Please verify your email first. Check your inbox for the confirmation link.";
   if (m.includes("user already registered") || m.includes("already been registered")) {
     return "This email already has a Stellara account. Sign in instead. ✦";

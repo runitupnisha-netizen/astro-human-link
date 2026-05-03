@@ -38,11 +38,11 @@ const tierDetails: Record<TierKey, {
   highlight?: boolean;
   badge?: string;
   ribbon?: string;
-  description: string;
+  description: (price?: string) => string;
 }> = {
   monthly: {
     icon: <Star className="w-6 h-6" />,
-    description: "7-day free trial · then $9.99/mo",
+    description: (price) => `7-day free trial · then ${price ?? "$9.99"}/mo`,
     badge: "7-Day Free Trial",
     features: [
       "Unlimited cosmic matches",
@@ -55,7 +55,7 @@ const tierDetails: Record<TierKey, {
   },
   yearly: {
     icon: <Zap className="w-6 h-6" />,
-    description: "7-day free trial · then $79.99/yr",
+    description: (price) => `7-day free trial · then ${price ?? "$79.99"}/yr`,
     highlight: true,
     badge: "Save 33%",
     ribbon: "Best Value",

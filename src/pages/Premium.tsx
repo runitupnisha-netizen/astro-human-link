@@ -492,6 +492,18 @@ const Premium = () => {
           const livePrice = livePrices[tierKey];
           const displayPrice = livePrice?.formatted || tier.price;
           const displayInterval = livePrice?.interval || tier.interval;
+          // Tier label: derive from Stripe product name when available so the
+          // UI label can never drift from the Stripe catalog. We strip the
+          // "Stellara Premium" prefix if present and any parenthesized
+          // qualifier (e.g. "Stellara Premium (Annual)" -> "Annual").
+          const stripeLabel = (() => {
+            const raw = livePrice?.product_name?.trim();
+            if (!raw) return null;
+            const paren = raw.match(/\(([^)]+)\)/)?.[1]?.trim();
+            if (paren) return paren;
+            return raw.replace(/^Stellara\s+Premium\s*/i, "").trim() || raw;
+          })();
+          const displayTierName = stripeLabel || tier.name;
 
           return (
             <motion.div
@@ -540,7 +552,7 @@ const Premium = () => {
                     </div>
                     <div>
                       <CardTitle className="text-foreground font-display text-lg">
-                        {tier.name}
+                        {displayTierName}
                       </CardTitle>
                       <p className="text-muted-foreground text-sm font-body">{details.description(displayPrice)}</p>
                     </div>

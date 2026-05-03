@@ -115,10 +115,18 @@ serve(async (req) => {
       logStep("No active subscription found");
     }
 
+    // Surface the lookup_key (if any) so the frontend can map plans without
+    // depending on hardcoded product/price IDs that change across Stripe modes.
+    let lookupKey: string | null = null;
+    if (hasActiveSub) {
+      lookupKey = (subscriptions.data[0].items.data[0].price as any).lookup_key ?? null;
+    }
+
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       product_id: productId,
       price_id: priceId,
+      lookup_key: lookupKey,
       subscription_end: subscriptionEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

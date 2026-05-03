@@ -36,6 +36,7 @@ const tierDetails: Record<TierKey, {
   features: string[];
   highlight?: boolean;
   badge?: string;
+  ribbon?: string;
   description: string;
 }> = {
   monthly: {
@@ -56,6 +57,7 @@ const tierDetails: Record<TierKey, {
     description: "7-day free trial · then $79.99/yr",
     highlight: true,
     badge: "Save 33%",
+    ribbon: "Best Value",
     features: [
       "Everything in Monthly",
       "Save 33% vs monthly billing",

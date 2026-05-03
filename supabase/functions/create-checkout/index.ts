@@ -39,9 +39,9 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { priceId, redirectTo } = await req.json();
-    if (!priceId) throw new Error("priceId is required");
-    logStep("Price ID received", { priceId, redirectTo });
+    const { priceId, planKey, redirectTo } = await req.json();
+    if (!priceId && !planKey) throw new Error("priceId or planKey is required");
+    logStep("Request received", { priceId, planKey, redirectTo });
 
     // Sanitize redirect target: must be a same-origin path starting with "/"
     // and not a protocol-relative URL ("//host"). Falls back to "/discover".
@@ -53,6 +53,47 @@ serve(async (req) => {
     })();
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+
+    // Resolve the live price by stable lookup_key. This guarantees we always
+    // use a valid price for the *current* Stripe API key (test or live), so
+    // rotating keys can never desync the checkout from the real catalog.
+    const PLAN_LOOKUP_KEYS: Record<string, string> = {
+      monthly: "stellara_monthly",
+      yearly: "stellara_yearly",
+    };
+
+    let resolvedPriceId = priceId as string | undefined;
+    const lookupKey = planKey ? PLAN_LOOKUP_KEYS[planKey] : undefined;
+
+    const tryResolveByLookupKey = async (key: string) => {
+      const list = await stripe.prices.list({ lookup_keys: [key], active: true, limit: 1 });
+      return list.data[0]?.id;
+    };
+
+    if (lookupKey) {
+      const id = await tryResolveByLookupKey(lookupKey);
+      if (!id) throw new Error(`No active price found for lookup_key '${lookupKey}'`);
+      resolvedPriceId = id;
+      logStep("Resolved price by lookup_key", { lookupKey, resolvedPriceId });
+    } else if (resolvedPriceId) {
+      // Validate the provided priceId exists in this mode; if it doesn't,
+      // fall back to the canonical lookup_keys based on interval.
+      try {
+        await stripe.prices.retrieve(resolvedPriceId);
+      } catch (err) {
+        logStep("Provided priceId invalid, attempting lookup_key fallback", {
+          priceId: resolvedPriceId,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        const fallback =
+          (await tryResolveByLookupKey("stellara_monthly")) ||
+          (await tryResolveByLookupKey("stellara_yearly"));
+        if (!fallback) throw err;
+        resolvedPriceId = fallback;
+        logStep("Recovered via lookup_key fallback", { resolvedPriceId });
+      }
+    }
+
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
@@ -65,7 +106,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: resolvedPriceId!, quantity: 1 }],
       mode: "subscription",
       subscription_data: {
         trial_period_days: 7,

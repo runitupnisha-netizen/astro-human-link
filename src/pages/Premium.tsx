@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
 import { useStripePrices } from "@/hooks/useStripePrices";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import PricingDebugPanel from "@/components/PricingDebugPanel";
 import TourHighlight from "@/components/TourHighlight";
 
 /**
@@ -78,6 +80,7 @@ const premiumPerks = [
 const Premium = () => {
   const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription, restorePurchases } = usePremium();
   const { prices: livePrices } = useStripePrices();
+  const { isAdmin } = useIsAdmin();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -479,6 +482,8 @@ const Premium = () => {
         className="px-4 max-w-lg mx-auto space-y-4"
       >
         <h2 id="plans" className="text-foreground font-display text-xl text-center mb-4">Choose Your Plan</h2>
+
+        {isAdmin && <PricingDebugPanel />}
 
         {(["yearly", "monthly"] as TierKey[]).map((tierKey, i) => {
           const tier = STELLARA_TIERS[tierKey];

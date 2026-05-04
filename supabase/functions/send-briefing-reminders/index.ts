@@ -34,6 +34,19 @@ function localHour(tz: string): { hour: number; date: string } {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Cron-only: require shared secret or service-role bearer
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const authHeader = req.headers.get("Authorization") || "";
+  const providedCronSecret = req.headers.get("x-cron-secret");
+  const isAuthorized =
+    (cronSecret && providedCronSecret === cronSecret) ||
+    authHeader === `Bearer ${SERVICE_ROLE}`;
+  if (!isAuthorized) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
   const { data: candidates, error } = await admin

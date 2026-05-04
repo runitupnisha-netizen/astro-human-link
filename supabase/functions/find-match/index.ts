@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getIdentifier } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
@@ -153,17 +154,27 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    try {
-      const id = getIdentifier(req);
-      const rl = await checkRateLimit({ identifier: id, functionName: "find-match", maxRequests: 10, windowMinutes: 5 });
-      if (rl && rl.allowed === false) {
-        return new Response(JSON.stringify({ error: "Slow down — try again in a few minutes." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-    } catch (rlErr) {
-      console.warn("rate-limit check skipped:", rlErr);
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claims, error: claimsErr } = await supabaseAuth.auth.getClaims(
+      authHeader.replace("Bearer ", "")
+    );
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const rl = checkRateLimit(getIdentifier(req, claims.claims.sub), "find-match", corsHeaders);
+    if (rl) return rl;
 
     const { mySigns, theirBirthDate, theirName, myLifePath } = await req.json();
 

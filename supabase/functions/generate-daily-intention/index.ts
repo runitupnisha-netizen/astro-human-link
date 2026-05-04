@@ -11,15 +11,28 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Cron-only: require shared secret
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const authHeader = req.headers.get("Authorization") || "";
+  const providedCronSecret = req.headers.get("x-cron-secret");
+  const isAuthorized =
+    (cronSecret && providedCronSecret === cronSecret) ||
+    (serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`);
+  if (!isAuthorized) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const rateLimitResponse = checkRateLimit(getIdentifier(req), "generate-daily-intention", corsHeaders);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY")!;
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    const supabase = createClient(supabaseUrl, serviceRoleKey!);
 
     // Get all users with completed onboarding
     const { data: profiles, error: profilesError } = await supabase

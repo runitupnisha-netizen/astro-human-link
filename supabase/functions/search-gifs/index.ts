@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const TENOR_API_KEY = "AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ"; // Free Tenor API key
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -16,6 +14,12 @@ Deno.serve(async (req) => {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
+    const TENOR_API_KEY = Deno.env.get("TENOR_API_KEY");
+    if (!TENOR_API_KEY) {
+      return new Response(JSON.stringify({ gifs: [], error: "GIF service not configured" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const { query, limit = 20 } = await req.json();
     
     let url: string;

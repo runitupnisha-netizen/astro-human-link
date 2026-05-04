@@ -16,35 +16,15 @@ Deno.serve(async (req) => {
   try {
     const publicKey = Deno.env.get("VAPID_PUBLIC_KEY");
 
-    if (publicKey) {
+    if (!publicKey) {
       return new Response(
-        JSON.stringify({ publicKey }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "VAPID keys not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Generate new VAPID key pair
-    const keyPair = await crypto.subtle.generateKey(
-      { name: "ECDSA", namedCurve: "P-256" },
-      true,
-      ["sign", "verify"]
-    );
-
-    const publicKeyRaw = await crypto.subtle.exportKey("raw", keyPair.publicKey);
-    const publicKeyBase64Url = arrayBufferToBase64Url(publicKeyRaw);
-
-    const privateKeyJwk = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-
-    console.log("VAPID_PUBLIC_KEY:", publicKeyBase64Url);
-    console.log("VAPID_PRIVATE_KEY_JWK:", JSON.stringify(privateKeyJwk));
-
     return new Response(
-      JSON.stringify({ 
-        publicKey: publicKeyBase64Url,
-        privateKeyJwk,
-        setup_required: true,
-        message: "Store VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY_JWK as secrets for persistence."
-      }),
+      JSON.stringify({ publicKey }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err: any) {

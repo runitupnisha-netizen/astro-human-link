@@ -51,6 +51,7 @@ workflows:
           EOF
           xcode-project build-ipa \
             --project ios/App/App.xcodeproj \
+            --scheme App \
             --export-options-plist /tmp/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa

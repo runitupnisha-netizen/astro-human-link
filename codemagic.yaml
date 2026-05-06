@@ -6,9 +6,8 @@ workflows:
     integrations:
       app_store_connect: Stellara
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.runitupmedia.stellara
+      code_signing:
+        automatic_signing: true
       node: 18.19.0
     scripts:
       - name: Install dependencies
@@ -24,15 +23,6 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ios/App && pod install
-      - name: Set up code signing
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files \
-            com.runitupmedia.stellara \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
-          xcode-project use-profiles
       - name: Build iOS app
         script: |
           xcode-project build-ipa \

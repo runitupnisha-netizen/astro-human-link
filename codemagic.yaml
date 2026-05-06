@@ -6,8 +6,6 @@ workflows:
     integrations:
       app_store_connect: Stellara
     environment:
-      code_signing:
-        automatic_signing: true
       node: 18.19.0
     scripts:
       - name: Install dependencies

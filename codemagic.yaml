@@ -40,8 +40,9 @@ workflows:
       - name: Build iOS app
         script: |
           xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+            --project "ios/App/App.xcodeproj" \
+            --scheme "App" \
+            --config "Release"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log

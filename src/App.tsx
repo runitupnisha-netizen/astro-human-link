@@ -1,17 +1,14 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useVerificationGate } from "@/hooks/useVerificationGate";
-import { Button } from "@/components/ui/button";
-import { Check, Copy, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -147,68 +144,6 @@ const AnalyticsTracker = () => {
 const KeyboardInsetTracker = () => {
   useKeyboardInsets();
   return null;
-};
-
-const AdminLyraProbeShortcut = () => {
-  const location = useLocation();
-  const { isAdmin, loading } = useIsAdmin();
-  const [copied, setCopied] = useState(false);
-
-  if (loading || !isAdmin) return null;
-
-  // Only show the floating shortcut on admin pages. On all other pages,
-  // admins can navigate to /admin/lyra directly. This keeps the published
-  // app clean for end users (and for admins testing the live UX).
-  if (!location.pathname.startsWith("/admin")) return null;
-
-  const isAdminPage = location.pathname === "/admin";
-  const lyraUrl = typeof window !== "undefined" ? `${window.location.origin}/admin/lyra` : "/admin/lyra";
-
-  const copyLyraLink = async () => {
-    try {
-      await navigator.clipboard.writeText(lyraUrl);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  if (isAdminPage) {
-    return (
-      <div className="fixed right-5 top-20 z-[99999] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-lg border-2 border-violet-300 bg-white p-2 shadow-2xl shadow-violet-500/30">
-        <Button asChild className="h-10 px-4 text-xs font-bold uppercase bg-violet-600 hover:bg-violet-700 text-white">
-          <Link to="/admin/lyra" aria-label="Open Lyra Probe">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            OPEN LYRA PROBE
-          </Link>
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 px-4 text-xs font-bold uppercase border-violet-300 text-violet-800 hover:bg-violet-50"
-          onClick={copyLyraLink}
-        >
-          {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-          {copied ? "COPIED" : "COPY LINK"}
-        </Button>
-      </div>
-    );
-  }
-
-  if (location.pathname.startsWith("/admin")) return null;
-
-  return (
-    <Button
-      asChild
-      className="fixed right-3 bottom-24 md:bottom-6 md:top-auto z-[55] h-9 px-3 text-[11px] font-bold uppercase shadow-lg opacity-80 hover:opacity-100"
-    >
-      <Link to="/admin/lyra" aria-label="Run Lyra Probe">
-        <MessageCircleQuestion className="w-3.5 h-3.5 mr-1.5" />
-        LYRA PROBE
-      </Link>
-    </Button>
-  );
 };
 
 /**

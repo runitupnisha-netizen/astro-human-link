@@ -40,7 +40,6 @@ const WeeklyInsights = lazy(() => import("./pages/WeeklyInsights"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const PrivacyChecklist = lazy(() => import("./pages/PrivacyChecklist"));
-const ChartPreview = lazy(() => import("./pages/ChartPreview"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const ViewProfile = lazy(() => import("./pages/ViewProfile"));
 const WhoLikedMe = lazy(() => import("./pages/WhoLikedMe"));
@@ -54,17 +53,12 @@ const AstroEvents = lazy(() => import("./pages/AstroEvents"));
 const Contact = lazy(() => import("./pages/Contact"));
 const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
 const InnerWorld = lazy(() => import("./pages/InnerWorld"));
-const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
 const CosmicGuide = lazy(() => import("./pages/CosmicGuide"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MyChart = lazy(() => import("./pages/MyChart"));
-const ChartParity = lazy(() => import("./pages/ChartParity"));
-const ChartWizard = lazy(() => import("./pages/ChartWizard"));
-const ChartDrift = lazy(() => import("./pages/ChartDrift"));
-const AstralAccuracy = lazy(() => import("./pages/AstralAccuracy"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));
@@ -260,20 +254,20 @@ const AppRoutes = () => {
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
             <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
             <Route path="/admin/lyra" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
-            <Route path="/admin/chart-parity" element={<Suspense fallback={<LoadingScreen />}><ChartParity /></Suspense>} />
-            <Route path="/admin/chart-drift" element={<Suspense fallback={<LoadingScreen />}><ChartDrift /></Suspense>} />
-            <Route path="/admin/astral-accuracy" element={<Suspense fallback={<LoadingScreen />}><AstralAccuracy /></Suspense>} />
+            <Route path="/admin/chart-parity" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
-            <Route path="/chart-wizard" element={<PageTransition><ChartWizard /></PageTransition>} />
+            <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/privacy-checklist" element={<PageTransition><PrivacyChecklist /></PageTransition>} />
-            <Route path="/chart-preview" element={<PageTransition><ChartPreview /></PageTransition>} />
+            <Route path="/chart-preview" element={<Navigate to="/onboarding" replace />} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/support" element={<PageTransition><Contact /></PageTransition>} />
-            <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
+            <Route path="/launch-assets" element={<Navigate to="/" replace />} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
             <Route 

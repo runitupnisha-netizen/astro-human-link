@@ -1,22 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock, Bug } from "lucide-react";
+import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
-import { resolveTimezone, buildBirthDateUTC, calcChartDebug, formatLongitude } from "@/lib/ephemeris";
+import { resolveTimezone, buildBirthDateUTC } from "@/lib/ephemeris";
 import { DateTime } from "luxon";
 
 type ProfileRow = {
@@ -80,43 +74,6 @@ const NUMBER_MEANINGS: Record<number, string> = {
 };
 
 const numberMeaning = (n: number | null) => (n != null ? NUMBER_MEANINGS[n] ?? "A deeply personal cosmic signature." : "—");
-
-const DebugRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-lg border border-border/40 bg-background/40 px-2.5 py-1.5">
-    <div className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</div>
-    <div className="text-foreground break-all">{value}</div>
-  </div>
-);
-
-const LongitudeRow = ({
-  label,
-  deg,
-  highlight,
-  missingHint,
-}: {
-  label: string;
-  deg: number | null;
-  highlight?: boolean;
-  missingHint?: string;
-}) => (
-  <div
-    className={`flex items-center justify-between gap-3 px-3 py-1.5 ${
-      highlight ? "bg-accent/5" : ""
-    }`}
-  >
-    <span className="text-foreground/80">{label}</span>
-    {deg != null ? (
-      <span className="text-right">
-        <span className="text-foreground">{formatLongitude(deg)}</span>
-        <span className="text-muted-foreground ml-2">({deg.toFixed(4)}°)</span>
-      </span>
-    ) : (
-      <span className="text-muted-foreground italic text-[10px]">
-        {missingHint ?? "—"}
-      </span>
-    )}
-  </div>
-);
 
 const MyChart = () => {
   const navigate = useNavigate();
@@ -227,17 +184,6 @@ const MyChart = () => {
     ? DateTime.fromJSDate(utcInstant).toUTC().toFormat("LLL d, yyyy · HH:mm 'UTC'")
     : null;
   const utcIso = utcInstant ? utcInstant.toISOString() : null;
-
-  // Full ephemeris debug: exposes JD, GAST, LST, and intermediate longitudes.
-  const debug =
-    profile.birth_date
-      ? calcChartDebug({
-          birthDate: profile.birth_date,
-          birthTime: profile.birth_time,
-          latitude: profile.birth_latitude,
-          longitude: profile.birth_longitude,
-        })
-      : null;
 
   return (
     <div className="relative min-h-screen pt-24 pb-28 md:pb-12">

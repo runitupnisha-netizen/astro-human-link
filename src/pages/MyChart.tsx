@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight, Globe2, Clock } from "lucide-react";
+import { ArrowLeft, Share2, Star, Zap, Hash, Sparkles, Moon, Sun, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/accordion";
 import CosmicBackground from "@/components/CosmicBackground";
 import SoulBlueprintCard from "@/components/SoulBlueprintCard";
-import { resolveTimezone, buildBirthDateUTC } from "@/lib/ephemeris";
-import { DateTime } from "luxon";
 
 type ProfileRow = {
   display_name: string | null;
@@ -160,36 +158,6 @@ const MyChart = () => {
   const hdInterp = profile.human_design_type ? HD_INTERPRETATIONS[profile.human_design_type] : null;
 
   const tags = profile.compatibility_tags ?? [];
-
-  // Timezone preview: show the IANA zone resolved from birth coords and the
-  // exact UTC instant fed into the ephemeris. Useful for verifying chart inputs.
-  const tzZone = resolveTimezone(profile.birth_latitude, profile.birth_longitude);
-  const utcInstant =
-    profile.birth_date
-      ? buildBirthDateUTC(
-          profile.birth_date,
-          profile.birth_time,
-          profile.birth_longitude,
-          profile.birth_latitude,
-        )
-      : null;
-  const localPretty =
-    profile.birth_date && tzZone
-      ? DateTime.fromObject(
-          {
-            year: Number(profile.birth_date.slice(0, 4)),
-            month: Number(profile.birth_date.slice(5, 7)),
-            day: Number(profile.birth_date.slice(8, 10)),
-            hour: Number((profile.birth_time ?? "12:00").slice(0, 2)),
-            minute: Number((profile.birth_time ?? "12:00").slice(3, 5)),
-          },
-          { zone: tzZone },
-        ).toFormat("LLL d, yyyy · h:mm a 'local' (ZZZZ)")
-      : null;
-  const utcPretty = utcInstant
-    ? DateTime.fromJSDate(utcInstant).toUTC().toFormat("LLL d, yyyy · HH:mm 'UTC'")
-    : null;
-  const utcIso = utcInstant ? utcInstant.toISOString() : null;
 
   return (
     <div className="relative min-h-screen pt-24 pb-28 md:pb-12">

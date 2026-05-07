@@ -16,6 +16,7 @@ workflows:
           npm install
       - name: Build web assets
         script: |
+          echo "Building web assets from commit ${CM_COMMIT:-unknown}"
           npm run build
       - name: Verify iOS folder
         script: |

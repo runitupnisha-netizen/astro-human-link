@@ -17,11 +17,9 @@ import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
 import UpdateAvailableSnackbar from "./components/UpdateAvailableSnackbar";
-import EnvironmentBanner from "./components/EnvironmentBanner";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
-import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import SparkleLoader from "./components/SparkleLoader";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
@@ -279,12 +277,10 @@ const AppRoutes = () => {
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
-      {/* Release notes panel is internal-only; hidden from customers. */}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
@@ -369,7 +365,6 @@ const App = () => (
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <OfflineIndicator />
-            <EnvironmentBanner />
             <Toaster />
             <Sonner />
             <BrowserRouter>

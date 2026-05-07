@@ -4,24 +4,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useVerificationGate } from "@/hooks/useVerificationGate";
-import { Button } from "@/components/ui/button";
-import { Check, Copy, ExternalLink, MessageCircleQuestion } from "lucide-react";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
 import UpdateAvailableSnackbar from "./components/UpdateAvailableSnackbar";
-import EnvironmentBanner from "./components/EnvironmentBanner";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
 import CosmicNudge from "./components/CosmicNudge";
-import ReleaseNotesPanel from "./components/ReleaseNotesPanel";
 import SparkleLoader from "./components/SparkleLoader";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
@@ -45,7 +40,6 @@ const WeeklyInsights = lazy(() => import("./pages/WeeklyInsights"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const PrivacyChecklist = lazy(() => import("./pages/PrivacyChecklist"));
-const ChartPreview = lazy(() => import("./pages/ChartPreview"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const ViewProfile = lazy(() => import("./pages/ViewProfile"));
 const WhoLikedMe = lazy(() => import("./pages/WhoLikedMe"));
@@ -59,17 +53,12 @@ const AstroEvents = lazy(() => import("./pages/AstroEvents"));
 const Contact = lazy(() => import("./pages/Contact"));
 const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
 const InnerWorld = lazy(() => import("./pages/InnerWorld"));
-const LaunchAssets = lazy(() => import("./pages/LaunchAssets"));
 const CosmicGuide = lazy(() => import("./pages/CosmicGuide"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MyChart = lazy(() => import("./pages/MyChart"));
-const ChartParity = lazy(() => import("./pages/ChartParity"));
-const ChartWizard = lazy(() => import("./pages/ChartWizard"));
-const ChartDrift = lazy(() => import("./pages/ChartDrift"));
-const AstralAccuracy = lazy(() => import("./pages/AstralAccuracy"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));
@@ -151,68 +140,6 @@ const KeyboardInsetTracker = () => {
   return null;
 };
 
-const AdminLyraProbeShortcut = () => {
-  const location = useLocation();
-  const { isAdmin, loading } = useIsAdmin();
-  const [copied, setCopied] = useState(false);
-
-  if (loading || !isAdmin) return null;
-
-  // Only show the floating shortcut on admin pages. On all other pages,
-  // admins can navigate to /admin/lyra directly. This keeps the published
-  // app clean for end users (and for admins testing the live UX).
-  if (!location.pathname.startsWith("/admin")) return null;
-
-  const isAdminPage = location.pathname === "/admin";
-  const lyraUrl = typeof window !== "undefined" ? `${window.location.origin}/admin/lyra` : "/admin/lyra";
-
-  const copyLyraLink = async () => {
-    try {
-      await navigator.clipboard.writeText(lyraUrl);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  if (isAdminPage) {
-    return (
-      <div className="fixed right-5 top-20 z-[99999] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-lg border-2 border-violet-300 bg-white p-2 shadow-2xl shadow-violet-500/30">
-        <Button asChild className="h-10 px-4 text-xs font-bold uppercase bg-violet-600 hover:bg-violet-700 text-white">
-          <Link to="/admin/lyra" aria-label="Open Lyra Probe">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            OPEN LYRA PROBE
-          </Link>
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 px-4 text-xs font-bold uppercase border-violet-300 text-violet-800 hover:bg-violet-50"
-          onClick={copyLyraLink}
-        >
-          {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-          {copied ? "COPIED" : "COPY LINK"}
-        </Button>
-      </div>
-    );
-  }
-
-  if (location.pathname.startsWith("/admin")) return null;
-
-  return (
-    <Button
-      asChild
-      className="fixed right-3 bottom-24 md:bottom-6 md:top-auto z-[55] h-9 px-3 text-[11px] font-bold uppercase shadow-lg opacity-80 hover:opacity-100"
-    >
-      <Link to="/admin/lyra" aria-label="Run Lyra Probe">
-        <MessageCircleQuestion className="w-3.5 h-3.5 mr-1.5" />
-        LYRA PROBE
-      </Link>
-    </Button>
-  );
-};
-
 /**
  * Captures ?ref=CODE from any URL the user lands on, stores it for 30 days,
  * and lets the onboarding reveal step redeem it for both users.
@@ -279,12 +206,10 @@ const AppRoutes = () => {
       <AnalyticsTracker />
       <ReferralCapture />
       <KeyboardInsetTracker />
-      {!isRecoveryRoute && !isVerificationRoute && user && onboardingComplete && <AdminLyraProbeShortcut />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
-      {/* Release notes panel is internal-only; hidden from customers. */}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
@@ -329,20 +254,20 @@ const AppRoutes = () => {
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
             <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
             <Route path="/admin/lyra" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
-            <Route path="/admin/chart-parity" element={<Suspense fallback={<LoadingScreen />}><ChartParity /></Suspense>} />
-            <Route path="/admin/chart-drift" element={<Suspense fallback={<LoadingScreen />}><ChartDrift /></Suspense>} />
-            <Route path="/admin/astral-accuracy" element={<Suspense fallback={<LoadingScreen />}><AstralAccuracy /></Suspense>} />
+            <Route path="/admin/chart-parity" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
-            <Route path="/chart-wizard" element={<PageTransition><ChartWizard /></PageTransition>} />
+            <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/privacy-checklist" element={<PageTransition><PrivacyChecklist /></PageTransition>} />
-            <Route path="/chart-preview" element={<PageTransition><ChartPreview /></PageTransition>} />
+            <Route path="/chart-preview" element={<Navigate to="/onboarding" replace />} />
             <Route path="/terms" element={<PageTransition><TermsOfService /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/support" element={<PageTransition><Contact /></PageTransition>} />
-            <Route path="/launch-assets" element={<PageTransition><LaunchAssets /></PageTransition>} />
+            <Route path="/launch-assets" element={<Navigate to="/" replace />} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
             <Route 
@@ -369,7 +294,6 @@ const App = () => (
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <OfflineIndicator />
-            <EnvironmentBanner />
             <Toaster />
             <Sonner />
             <BrowserRouter>

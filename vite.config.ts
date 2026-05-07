@@ -8,6 +8,10 @@ const APP_VERSION = "2026.04.27";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: ".",
+  build: {
+    outDir: "dist",
+  },
   server: {
     host: "::",
     port: 8080,

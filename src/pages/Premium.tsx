@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
-import { useStripePrices } from "@/hooks/useStripePrices";
 import TourHighlight from "@/components/TourHighlight";
 
 /**
@@ -77,7 +76,6 @@ const premiumPerks = [
 
 const Premium = () => {
   const { subscribed, currentTier, subscriptionEnd, loading, checkout, manageSubscription, refreshSubscription, restorePurchases } = usePremium();
-  const { prices: livePrices } = useStripePrices();
   const [checkoutLoading, setCheckoutLoading] = useState<TierKey | null>(null);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -486,21 +484,9 @@ const Premium = () => {
           const tier = STELLARA_TIERS[tierKey];
           const details = tierDetails[tierKey];
           const isCurrentPlan = subscribed && currentTier === tierKey;
-          const livePrice = livePrices[tierKey];
-          const displayPrice = livePrice?.formatted || tier.price;
-          const displayInterval = livePrice?.interval || tier.interval;
-          // Tier label: derive from Stripe product name when available so the
-          // UI label can never drift from the Stripe catalog. We strip the
-          // "Stellara Premium" prefix if present and any parenthesized
-          // qualifier (e.g. "Stellara Premium (Annual)" -> "Annual").
-          const stripeLabel = (() => {
-            const raw = livePrice?.product_name?.trim();
-            if (!raw) return null;
-            const paren = raw.match(/\(([^)]+)\)/)?.[1]?.trim();
-            if (paren) return paren;
-            return raw.replace(/^Stellara\s+Premium\s*/i, "").trim() || raw;
-          })();
-          const displayTierName = stripeLabel || tier.name;
+          const displayPrice = tier.price;
+          const displayInterval = tier.interval;
+          const displayTierName = tier.name;
 
           return (
             <motion.div

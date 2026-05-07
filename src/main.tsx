@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Keep this Vite entry point present in GitHub for Codemagic builds.
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {

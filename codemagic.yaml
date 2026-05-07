@@ -17,6 +17,7 @@ workflows:
       - name: Build web assets
         script: |
           echo "Building web assets from commit ${CM_COMMIT:-unknown}"
+          node scripts/verify-vite-entry.mjs
           npm run build
       - name: Verify iOS folder
         script: |

@@ -46,6 +46,14 @@ workflows:
           </dict>
           </plist>
           EOF
+          /usr/libexec/PlistBuddy \
+            -c "Set :objects:$(
+              grep -A1 'PRODUCT_NAME = App' \
+              ios/App/App.xcodeproj/project.pbxproj \
+              | tail -1 | tr -d '; \t'
+            ):buildSettings:CODE_SIGN_STYLE Automatic" \
+            ios/App/App.xcodeproj/project.pbxproj \
+            2>/dev/null || true
           xcode-project build-ipa \
             --project "ios/App/App.xcodeproj" \
             --scheme "App" \

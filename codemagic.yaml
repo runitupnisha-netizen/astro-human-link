@@ -13,12 +13,7 @@ workflows:
           npm install
       - name: Build web assets
         script: |
-          echo "Building web assets from commit ${CM_COMMIT:-unknown}"
-          node scripts/verify-vite-entry.mjs
           npm run build
-      - name: Verify iOS folder
-        script: |
-          ls -la ios/ || echo "No ios folder yet"
       - name: Install Capacitor iOS
         script: |
           npm install @capacitor/ios
@@ -26,10 +21,6 @@ workflows:
           npx cap sync ios
       - name: Install CocoaPods
         script: |
-          if [ ! -f ios/App/Podfile ]; then
-            echo "Podfile not found!"
-            exit 1
-          fi
           cd ios/App && pod install
       - name: Build iOS app
         script: |

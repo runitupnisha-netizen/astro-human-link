@@ -9,9 +9,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.runitupmedia.stellara
-      vars:
-        XCODE_PROJECT: "ios/App/App.xcodeproj"
-        XCODE_SCHEME: "App"
       node: 22.0.0
     scripts:
       - name: Install dependencies

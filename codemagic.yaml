@@ -6,63 +6,19 @@ workflows:
     integrations:
       app_store_connect: Stellara
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.runitupmedia.stellara
       node: 22.0.0
     scripts:
       - name: Install dependencies
-        script: |
-          npm install
+        script: npm install
       - name: Build web assets
-        script: |
-          npm run build
+        script: npm run build
       - name: Install Capacitor iOS
         script: |
           npm install @capacitor/ios
           npx cap sync ios
       - name: Install CocoaPods
-        script: |
-          cd ios/App && pod install
+        script: cd ios/App && pod install
       - name: Build iOS app
-        script: |
-          defaults write com.apple.dt.Xcode \
-            IDESkipPackagePluginFingerprintValidatation \
-            -bool YES
-          cat > /tmp/export_options.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>teamID</key>
-              <string>Q2Z6W3979Y</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-              <key>compileBitcode</key>
-              <false/>
-          </dict>
-          </plist>
-          EOF
-          /usr/libexec/PlistBuddy \
-            -c "Set :objects:$(
-              grep -A1 'PRODUCT_NAME = App' \
-              ios/App/App.xcodeproj/project.pbxproj \
-              | tail -1 | tr -d '; \t'
-            ):buildSettings:CODE_SIGN_STYLE Automatic" \
-            ios/App/App.xcodeproj/project.pbxproj \
-            2>/dev/null || true
-          xcode-project build-ipa \
-            --project "ios/App/App.xcodeproj" \
-            --scheme "App" \
-            --export-options-plist /tmp/export_options.plist
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        submit_to_app_store: false

@@ -45,7 +45,6 @@ workflows:
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             archive \
-            CODE_SIGN_STYLE=Automatic \
             DEVELOPMENT_TEAM=Q2Z6W3979Y
           xcodebuild \
             -exportArchive \

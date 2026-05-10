@@ -21,36 +21,20 @@ workflows:
           cd ios/App && pod install
       - name: Build iOS app
         script: |
-          cat > /tmp/ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>teamID</key>
-            <string>Q2Z6W3979Y</string>
-            <key>signingStyle</key>
-            <string>automatic</string>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
+            -allowProvisioningUpdates \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist /tmp/ExportOptions.plist \
-            -exportPath /tmp/ipa
+            -exportPath /tmp/ipa \
+            -allowProvisioningUpdates
     artifacts:
       - /tmp/ipa/*.ipa
     publishing:

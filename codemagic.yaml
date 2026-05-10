@@ -6,6 +6,9 @@ workflows:
     integrations:
       app_store_connect: Stellara
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.runitupmedia.stellara
       node: 22.0.0
     scripts:
       - name: Install dependencies
@@ -27,14 +30,37 @@ workflows:
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration \
             archive \
-            DEVELOPMENT_TEAM=Q2Z6W3979Y
+            DEVELOPMENT_TEAM=Q2Z6W3979Y \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Development"
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist /tmp/ExportOptions.plist \
             -exportPath /tmp/ipa \
             -allowProvisioningUpdates
+      - name: Create ExportOptions
+        script: |
+          cat > /tmp/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>Q2Z6W3979Y</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
     artifacts:
       - /tmp/ipa/*.ipa
     publishing:

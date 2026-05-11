@@ -47,12 +47,6 @@ workflows:
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
             base64 --decode > /tmp/AuthKey.p8
           chmod 600 /tmp/AuthKey.p8
-          sed -i '' \
-            's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
-            ios/App/App.xcodeproj/project.pbxproj
-          sed -i '' \
-            's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' \
-            ios/App/App.xcodeproj/project.pbxproj
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
@@ -65,7 +59,7 @@ workflows:
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic \
-            CODE_SIGN_IDENTITY="Apple Distribution"
+            CODE_SIGN_IDENTITY="Apple Development"
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \

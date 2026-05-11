@@ -21,6 +21,8 @@ import SelfieVerification from "@/components/SelfieVerification";
 import { hasSkippedVerification, clearVerificationSkip } from "@/hooks/useVerificationGate";
 import { useAccessibility } from "@/hooks/useAccessibility";
 import { usePremium } from "@/hooks/usePremium";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
+import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 
 const APP_VERSION = "1.0.0";
 
@@ -176,6 +178,15 @@ const Settings = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
+  // Profile editing state
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [editDisplayName, setEditDisplayName] = useState("");
+  const [editBirthDate, setEditBirthDate] = useState("");
+  const [editBirthTime, setEditBirthTime] = useState("");
+  const [editBirthPlace, setEditBirthPlace] = useState("");
+  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+
   // Daily Cosmic Briefing reminder prefs (server-stored)
   const [briefingPrefs, setBriefingPrefs] = useState({
     email: false,
@@ -310,6 +321,78 @@ const Settings = () => {
     await signOut();
   };
 
+  const startEditingProfile = () => {
+    setEditDisplayName(profile?.display_name || "");
+    setEditBirthDate(profile?.birth_date || "");
+    setEditBirthTime(profile?.birth_time?.slice(0, 5) || "");
+    setEditBirthPlace(profile?.birth_place || "");
+    setEditingProfile(true);
+  };
+
+  const cancelEditingProfile = () => {
+    setEditingProfile(false);
+    setShowRegenConfirm(false);
+  };
+
+  const birthChanged = () => {
+    const origTime = profile?.birth_time?.slice(0, 5) || "";
+    return (
+      (editBirthDate || "") !== (profile?.birth_date || "") ||
+      (editBirthTime || "") !== origTime ||
+      (editBirthPlace || "") !== (profile?.birth_place || "")
+    );
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    if (!editDisplayName.trim()) {
+      toast.error("Display name is required");
+      return;
+    }
+    if (birthChanged() && (!editBirthDate || !editBirthPlace)) {
+      toast.error("Birth date and place are required");
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      // Always save display name
+      const { error: nameErr } = await supabase
+        .from("profiles")
+        .update({ display_name: editDisplayName.trim() })
+        .eq("user_id", user.id);
+      if (nameErr) throw nameErr;
+
+      // If birth details changed, regenerate cosmic profile
+      if (birthChanged()) {
+        const { error: genErr } = await supabase.functions.invoke("generate-cosmic-profile", {
+          body: {
+            birthDate: editBirthDate,
+            birthTime: editBirthTime || null,
+            birthPlace: editBirthPlace,
+          },
+        });
+        if (genErr) throw genErr;
+      }
+
+      // Refresh
+      const { data: refreshed } = await supabase
+        .from("profiles")
+        .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused, is_incognito")
+        .eq("user_id", user.id)
+        .single();
+      if (refreshed) setProfile(refreshed);
+
+      toast.success(birthChanged() ? "Blueprint regenerated ✨" : "Profile updated ✨");
+      setEditingProfile(false);
+      setShowRegenConfirm(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Couldn't save profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   if (loadingProfile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -351,33 +434,117 @@ const Settings = () => {
                     <p className="text-[10px] text-muted-foreground mt-1">Email can't be changed here</p>
                   </div>
                   <div>
-                    <Label>Display Name</Label>
-                    <Input value={profile?.display_name || ""} disabled className="bg-background/50 opacity-70" />
-                    <p className="text-[10px] text-muted-foreground mt-1">Edit on your Blueprint page</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>Birth Date</Label>
-                    <Input value={profile?.birth_date || "Not set"} disabled className="bg-background/50 opacity-70" />
-                  </div>
-                  <div>
-                    <Label>Birth Time</Label>
-                    <Input value={profile?.birth_time?.slice(0, 5) || "Not set"} disabled className="bg-background/50 opacity-70" />
-                  </div>
-                  <div>
-                    <Label>Birth Place</Label>
-                    <Input value={profile?.birth_place || "Not set"} disabled className="bg-background/50 opacity-70" />
+                    <Label htmlFor="display-name">Display Name</Label>
+                    <Input
+                      id="display-name"
+                      value={editingProfile ? editDisplayName : (profile?.display_name || "")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditDisplayName(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
                   </div>
                 </div>
 
-                <p className="text-xs text-muted-foreground">
-                  Birth details can be updated on your{" "}
-                  <button onClick={() => navigate("/profile")} className="text-primary hover:underline">
-                    Blueprint page
-                  </button>
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="birth-date">Birth Date</Label>
+                    <Input
+                      id="birth-date"
+                      type={editingProfile ? "date" : "text"}
+                      value={editingProfile ? editBirthDate : (profile?.birth_date || "Not set")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditBirthDate(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="birth-time" className="flex items-center gap-1.5">
+                      Birth Time
+                      {editingProfile && (
+                        <BirthTimeHelpTooltip
+                          birthDate={editBirthDate || null}
+                          birthTime={editBirthTime || null}
+                          latitude={(profile as any)?.birth_latitude ?? null}
+                          longitude={(profile as any)?.birth_longitude ?? null}
+                        />
+                      )}
+                    </Label>
+                    <Input
+                      id="birth-time"
+                      type={editingProfile ? "time" : "text"}
+                      value={editingProfile ? editBirthTime : (profile?.birth_time?.slice(0, 5) || "Not set")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditBirthTime(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="birth-place">Birth Place</Label>
+                    {editingProfile ? (
+                      <LocationAutocomplete
+                        id="birth-place"
+                        value={editBirthPlace}
+                        onChange={(value) => setEditBirthPlace(value)}
+                        placeholder="e.g. Louisville, Kentucky"
+                        showGpsButton={false}
+                      />
+                    ) : (
+                      <Input
+                        value={profile?.birth_place || "Not set"}
+                        disabled
+                        className="bg-background/50 opacity-70"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {editingProfile && birthChanged() && (
+                  <p className="text-xs text-amber-400/90">
+                    ⚠️ Changing birth details will regenerate your entire blueprint (astrology, human design, gene keys, numerology).
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {!editingProfile ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={startEditingProfile}
+                      className="border-primary/40 text-primary hover:bg-primary/10"
+                    >
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (birthChanged()) {
+                            setShowRegenConfirm(true);
+                          } else {
+                            handleSaveProfile();
+                          }
+                        }}
+                        disabled={savingProfile}
+                        style={{ background: "var(--gradient-aurora)" }}
+                      >
+                        {savingProfile ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditingProfile}
+                        disabled={savingProfile}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  )}
+                </div>
 
                 <Separator />
 
@@ -1038,6 +1205,38 @@ const Settings = () => {
               className="bg-[#D85A30] hover:bg-[#D85A30]/90 text-white"
             >
               Sign Out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Regenerate Blueprint Confirmation */}
+      <Dialog open={showRegenConfirm} onOpenChange={setShowRegenConfirm}>
+        <DialogContent className="bg-card border-border/50 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              ⚠️ Overwrite Current Blueprint?
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed pt-2">
+              This will <span className="text-foreground font-medium">permanently replace</span> your current profile — astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
+              <br /><br />
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowRegenConfirm(false)} disabled={savingProfile}>
+              Go Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleSaveProfile}
+              disabled={savingProfile}
+            >
+              {savingProfile ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Regenerating…</>
+              ) : (
+                "Yes, Regenerate"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

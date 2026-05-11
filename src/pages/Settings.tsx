@@ -21,6 +21,8 @@ import SelfieVerification from "@/components/SelfieVerification";
 import { hasSkippedVerification, clearVerificationSkip } from "@/hooks/useVerificationGate";
 import { useAccessibility } from "@/hooks/useAccessibility";
 import { usePremium } from "@/hooks/usePremium";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
+import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 
 const APP_VERSION = "1.0.0";
 

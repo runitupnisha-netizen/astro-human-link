@@ -6,6 +6,13 @@
     <string>app-store</string>
     <key>teamID</key>
     <string>Q2Z6W3979Y</string>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.runitupmedia.stellara</key>
+        <string>Stellara Distribution</string>
+    </dict>
     <key>uploadBitcode</key>
     <false/>
     <key>uploadSymbols</key>

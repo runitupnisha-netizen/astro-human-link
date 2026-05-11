@@ -34,7 +34,12 @@ workflows:
             <key>teamID</key>
             <string>Q2Z6W3979Y</string>
             <key>signingStyle</key>
-            <string>automatic</string>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.runitupmedia.stellara</key>
+              <string>Stellara Distribution</string>
+            </dict>
             <key>uploadSymbols</key>
             <true/>
             <key>compileBitcode</key>
@@ -58,8 +63,9 @@ workflows:
             -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
-            CODE_SIGN_STYLE=Automatic \
-            CODE_SIGN_IDENTITY="Apple Development"
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="Stellara Distribution"
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \

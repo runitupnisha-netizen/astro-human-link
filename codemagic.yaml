@@ -44,25 +44,33 @@ workflows:
           EOF
       - name: Build iOS app
         script: |
-          # Print current signing settings
-          grep "CODE_SIGN_STYLE" \
-            ios/App/App.xcodeproj/project.pbxproj
-          # Replace all signing style occurrences
+          # Patch signing settings
           sed -i '' \
             's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
             ios/App/App.xcodeproj/project.pbxproj
           sed -i '' \
             's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/g' \
             ios/App/App.xcodeproj/project.pbxproj
-          # Verify the change worked
-          grep "CODE_SIGN_STYLE" \
-            ios/App/App.xcodeproj/project.pbxproj
-          # Build
-          xcode-project build-ipa \
-            --project "ios/App/App.xcodeproj" \
-            --scheme "App"
+          # Archive using xcodebuild directly
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath /tmp/App.xcarchive \
+            -allowProvisioningUpdates \
+            archive \
+            DEVELOPMENT_TEAM=Q2Z6W3979Y \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Development"
+          # Export IPA
+          xcodebuild \
+            -exportArchive \
+            -archivePath /tmp/App.xcarchive \
+            -exportOptionsPlist /Users/builder/export_options.plist \
+            -exportPath /tmp/ipa \
+            -allowProvisioningUpdates
     artifacts:
-      - build/ios/ipa/*.ipa
+      - /tmp/ipa/*.ipa
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY

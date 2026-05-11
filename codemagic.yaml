@@ -44,41 +44,33 @@ workflows:
           EOF
       - name: Build iOS app
         script: |
-          # Decode App Store Connect API key to file
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
-            base64 --decode > \
-            /tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8
-          # Patch signing settings
+            base64 --decode > /tmp/AuthKey.p8
+          chmod 600 /tmp/AuthKey.p8
           sed -i '' \
             's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
             ios/App/App.xcodeproj/project.pbxproj
-          sed -i '' \
-            's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/g' \
-            ios/App/App.xcodeproj/project.pbxproj
-          # Archive using xcodebuild directly
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
-            -authenticationKeyPath /tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8 \
-            -authenticationKeyID $APP_STORE_CONNECT_KEY_IDENTIFIER \
-            -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID \
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID 4KKY8X67JN \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
-            CODE_SIGN_STYLE=Automatic \
-            CODE_SIGN_IDENTITY="Apple Development"
-          # Export IPA
+            CODE_SIGN_STYLE=Automatic
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist /Users/builder/export_options.plist \
             -exportPath /tmp/ipa \
             -allowProvisioningUpdates \
-            -authenticationKeyPath /tmp/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8 \
-            -authenticationKeyID $APP_STORE_CONNECT_KEY_IDENTIFIER \
-            -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID 4KKY8X67JN \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d
     artifacts:
       - /tmp/ipa/*.ipa
     publishing:

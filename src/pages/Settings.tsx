@@ -321,6 +321,78 @@ const Settings = () => {
     await signOut();
   };
 
+  const startEditingProfile = () => {
+    setEditDisplayName(profile?.display_name || "");
+    setEditBirthDate(profile?.birth_date || "");
+    setEditBirthTime(profile?.birth_time?.slice(0, 5) || "");
+    setEditBirthPlace(profile?.birth_place || "");
+    setEditingProfile(true);
+  };
+
+  const cancelEditingProfile = () => {
+    setEditingProfile(false);
+    setShowRegenConfirm(false);
+  };
+
+  const birthChanged = () => {
+    const origTime = profile?.birth_time?.slice(0, 5) || "";
+    return (
+      (editBirthDate || "") !== (profile?.birth_date || "") ||
+      (editBirthTime || "") !== origTime ||
+      (editBirthPlace || "") !== (profile?.birth_place || "")
+    );
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    if (!editDisplayName.trim()) {
+      toast.error("Display name is required");
+      return;
+    }
+    if (birthChanged() && (!editBirthDate || !editBirthPlace)) {
+      toast.error("Birth date and place are required");
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      // Always save display name
+      const { error: nameErr } = await supabase
+        .from("profiles")
+        .update({ display_name: editDisplayName.trim() })
+        .eq("user_id", user.id);
+      if (nameErr) throw nameErr;
+
+      // If birth details changed, regenerate cosmic profile
+      if (birthChanged()) {
+        const { error: genErr } = await supabase.functions.invoke("generate-cosmic-profile", {
+          body: {
+            birthDate: editBirthDate,
+            birthTime: editBirthTime || null,
+            birthPlace: editBirthPlace,
+          },
+        });
+        if (genErr) throw genErr;
+      }
+
+      // Refresh
+      const { data: refreshed } = await supabase
+        .from("profiles")
+        .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused, is_incognito")
+        .eq("user_id", user.id)
+        .single();
+      if (refreshed) setProfile(refreshed);
+
+      toast.success(birthChanged() ? "Blueprint regenerated ✨" : "Profile updated ✨");
+      setEditingProfile(false);
+      setShowRegenConfirm(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Couldn't save profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   if (loadingProfile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

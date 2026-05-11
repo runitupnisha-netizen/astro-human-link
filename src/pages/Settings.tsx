@@ -178,6 +178,15 @@ const Settings = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
+  // Profile editing state
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [editDisplayName, setEditDisplayName] = useState("");
+  const [editBirthDate, setEditBirthDate] = useState("");
+  const [editBirthTime, setEditBirthTime] = useState("");
+  const [editBirthPlace, setEditBirthPlace] = useState("");
+  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+
   // Daily Cosmic Briefing reminder prefs (server-stored)
   const [briefingPrefs, setBriefingPrefs] = useState({
     email: false,

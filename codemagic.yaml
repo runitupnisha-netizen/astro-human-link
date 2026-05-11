@@ -44,6 +44,12 @@ workflows:
           EOF
       - name: Build iOS app
         script: |
+          # Force automatic signing in project file
+          sed -i '' 's/CODE_SIGN_STYLE = Manual/CODE_SIGN_STYLE = Automatic/g' \
+            ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Distribution"/CODE_SIGN_IDENTITY = "Apple Development"/g' \
+            ios/App/App.xcodeproj/project.pbxproj
+          # Now build
           xcode-project build-ipa \
             --project "ios/App/App.xcodeproj" \
             --scheme "App"

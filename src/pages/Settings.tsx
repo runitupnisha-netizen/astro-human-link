@@ -434,33 +434,117 @@ const Settings = () => {
                     <p className="text-[10px] text-muted-foreground mt-1">Email can't be changed here</p>
                   </div>
                   <div>
-                    <Label>Display Name</Label>
-                    <Input value={profile?.display_name || ""} disabled className="bg-background/50 opacity-70" />
-                    <p className="text-[10px] text-muted-foreground mt-1">Edit on your Blueprint page</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>Birth Date</Label>
-                    <Input value={profile?.birth_date || "Not set"} disabled className="bg-background/50 opacity-70" />
-                  </div>
-                  <div>
-                    <Label>Birth Time</Label>
-                    <Input value={profile?.birth_time?.slice(0, 5) || "Not set"} disabled className="bg-background/50 opacity-70" />
-                  </div>
-                  <div>
-                    <Label>Birth Place</Label>
-                    <Input value={profile?.birth_place || "Not set"} disabled className="bg-background/50 opacity-70" />
+                    <Label htmlFor="display-name">Display Name</Label>
+                    <Input
+                      id="display-name"
+                      value={editingProfile ? editDisplayName : (profile?.display_name || "")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditDisplayName(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
                   </div>
                 </div>
 
-                <p className="text-xs text-muted-foreground">
-                  Birth details can be updated on your{" "}
-                  <button onClick={() => navigate("/profile")} className="text-primary hover:underline">
-                    Blueprint page
-                  </button>
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="birth-date">Birth Date</Label>
+                    <Input
+                      id="birth-date"
+                      type={editingProfile ? "date" : "text"}
+                      value={editingProfile ? editBirthDate : (profile?.birth_date || "Not set")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditBirthDate(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="birth-time" className="flex items-center gap-1.5">
+                      Birth Time
+                      {editingProfile && (
+                        <BirthTimeHelpTooltip
+                          birthDate={editBirthDate || null}
+                          birthTime={editBirthTime || null}
+                          latitude={(profile as any)?.birth_latitude ?? null}
+                          longitude={(profile as any)?.birth_longitude ?? null}
+                        />
+                      )}
+                    </Label>
+                    <Input
+                      id="birth-time"
+                      type={editingProfile ? "time" : "text"}
+                      value={editingProfile ? editBirthTime : (profile?.birth_time?.slice(0, 5) || "Not set")}
+                      disabled={!editingProfile}
+                      onChange={(e) => setEditBirthTime(e.target.value)}
+                      className={!editingProfile ? "bg-background/50 opacity-70" : "bg-background"}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="birth-place">Birth Place</Label>
+                    {editingProfile ? (
+                      <LocationAutocomplete
+                        id="birth-place"
+                        value={editBirthPlace}
+                        onChange={(value) => setEditBirthPlace(value)}
+                        placeholder="e.g. Louisville, Kentucky"
+                        showGpsButton={false}
+                      />
+                    ) : (
+                      <Input
+                        value={profile?.birth_place || "Not set"}
+                        disabled
+                        className="bg-background/50 opacity-70"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {editingProfile && birthChanged() && (
+                  <p className="text-xs text-amber-400/90">
+                    ⚠️ Changing birth details will regenerate your entire blueprint (astrology, human design, gene keys, numerology).
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {!editingProfile ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={startEditingProfile}
+                      className="border-primary/40 text-primary hover:bg-primary/10"
+                    >
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (birthChanged()) {
+                            setShowRegenConfirm(true);
+                          } else {
+                            handleSaveProfile();
+                          }
+                        }}
+                        disabled={savingProfile}
+                        style={{ background: "var(--gradient-aurora)" }}
+                      >
+                        {savingProfile ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditingProfile}
+                        disabled={savingProfile}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  )}
+                </div>
 
                 <Separator />
 

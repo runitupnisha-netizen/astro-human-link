@@ -44,12 +44,20 @@ workflows:
           EOF
       - name: Build iOS app
         script: |
-          # Force automatic signing in project file
-          sed -i '' 's/CODE_SIGN_STYLE = Manual/CODE_SIGN_STYLE = Automatic/g' \
+          # Print current signing settings
+          grep "CODE_SIGN_STYLE" \
             ios/App/App.xcodeproj/project.pbxproj
-          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Distribution"/CODE_SIGN_IDENTITY = "Apple Development"/g' \
+          # Replace all signing style occurrences
+          sed -i '' \
+            's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
             ios/App/App.xcodeproj/project.pbxproj
-          # Now build
+          sed -i '' \
+            's/ProvisioningStyle = Manual;/ProvisioningStyle = Automatic;/g' \
+            ios/App/App.xcodeproj/project.pbxproj
+          # Verify the change worked
+          grep "CODE_SIGN_STYLE" \
+            ios/App/App.xcodeproj/project.pbxproj
+          # Build
           xcode-project build-ipa \
             --project "ios/App/App.xcodeproj" \
             --scheme "App"

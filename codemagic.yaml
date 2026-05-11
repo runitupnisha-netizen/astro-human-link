@@ -9,8 +9,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.runitupmedia.stellara
-        provisioning_profile: Stellara_Profile
-        certificate: Stellara Distribution
       node: 22.0.0
     scripts:
       - name: Install dependencies

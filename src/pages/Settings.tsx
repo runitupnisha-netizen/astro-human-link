@@ -1209,6 +1209,38 @@ const Settings = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Regenerate Blueprint Confirmation */}
+      <Dialog open={showRegenConfirm} onOpenChange={setShowRegenConfirm}>
+        <DialogContent className="bg-card border-border/50 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              ⚠️ Overwrite Current Blueprint?
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed pt-2">
+              This will <span className="text-foreground font-medium">permanently replace</span> your current profile — astrology, human design, gene keys, numerology, and compatibility tags — with a freshly generated one based on the new birth details.
+              <br /><br />
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowRegenConfirm(false)} disabled={savingProfile}>
+              Go Back
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleSaveProfile}
+              disabled={savingProfile}
+            >
+              {savingProfile ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Regenerating…</>
+              ) : (
+                "Yes, Regenerate"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

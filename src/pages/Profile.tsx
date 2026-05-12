@@ -190,14 +190,7 @@ const Profile = () => {
       });
       if (error) throw error;
 
-      // Refresh profile from DB
-      const { data: refreshed } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user!.id)
-        .single();
-      if (refreshed) setProfile(refreshed);
-
+      await refreshProfile();
       setEditOpen(false);
       toast({ title: "Blueprint updated ✨", description: "Your profile has been refreshed with the new birth details." });
     } catch (err: any) {
@@ -417,8 +410,10 @@ const Profile = () => {
               <textarea
                 value={profile.about_me || ""}
                 onChange={(e) => setProfile({ ...profile, about_me: e.target.value.slice(0, 500) })}
-                onBlur={async () => {
+              onBlur={async () => {
                   await supabase.from("profiles").update({ about_me: profile.about_me?.trim() || null }).eq("user_id", user!.id);
+                  await refreshProfile();
+                  toast({ title: "About Me saved ✨" });
                 }}
                 placeholder="Tell potential matches a little about yourself…"
                 rows={4}
@@ -469,7 +464,7 @@ const Profile = () => {
                       current_longitude: lon,
                     }).eq("user_id", user!.id);
                     if (!error) {
-                      setProfile({ ...profile, current_city: val, current_latitude: lat, current_longitude: lon });
+                      await refreshProfile();
                       toast({ title: "Location updated ✨" });
                     }
                   }
@@ -993,7 +988,7 @@ const Profile = () => {
                   }
                   return;
                 }
-                setProfile({ ...profile, ...updates });
+                await refreshProfile();
                 setEditNameOpen(false);
                 toast({ title: "Profile updated ✨" });
               }}

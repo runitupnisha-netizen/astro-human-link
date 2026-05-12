@@ -448,7 +448,7 @@ const Profile = () => {
                 <Heart className="w-5 h-5 text-accent" />
                 About You
               </h2>
-              <BioPrompts userId={user!.id} editable={true} />
+              <BioPrompts userId={user!.id} editable={true} onSaved={refreshProfile} />
             </CardContent>
           </Card>
 

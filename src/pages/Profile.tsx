@@ -120,6 +120,36 @@ const Profile = () => {
   const [editDisplayName, setEditDisplayName] = useState("");
   const [editUsername, setEditUsername] = useState("");
   const [forceTour, setForceTour] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+
+  const refreshProfile = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+    if (error) {
+      console.error("refreshProfile error:", error);
+      return;
+    }
+    if (data) {
+      setProfile(data);
+      setLastSavedAt(new Date());
+    }
+  };
+
+  const formatLastSaved = (date: Date | null) => {
+    if (!date) return "";
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffSec < 10) return "Saved just now";
+    if (diffSec < 60) return `Saved ${diffSec}s ago`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `Saved ${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    return `Saved ${diffHr}h ago`;
+  };
 
   const handlePreviewAsNewUser = () => {
     try {
@@ -160,14 +190,7 @@ const Profile = () => {
       });
       if (error) throw error;
 
-      // Refresh profile from DB
-      const { data: refreshed } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user!.id)
-        .single();
-      if (refreshed) setProfile(refreshed);
-
+      await refreshProfile();
       setEditOpen(false);
       toast({ title: "Blueprint updated ✨", description: "Your profile has been refreshed with the new birth details." });
     } catch (err: any) {
@@ -204,6 +227,7 @@ const Profile = () => {
       .single()
       .then(({ data }) => {
         setProfile(data);
+        if (data) setLastSavedAt(new Date());
         setLoading(false);
       });
     supabase
@@ -277,7 +301,7 @@ const Profile = () => {
           </div>
 
           {/* Stats bar — like Instagram */}
-          <div className="flex items-center justify-between gap-2 mb-6 py-3 px-2 border-y border-border/30 overflow-visible">
+          <div className="flex items-center justify-between gap-2 mb-1 py-3 px-2 border-y border-border/30 overflow-visible">
             <div className="shrink-0">
               <ProfileCompletionScore profile={profile} photoCount={photoCount} />
             </div>
@@ -293,6 +317,11 @@ const Profile = () => {
               </Button>
             </div>
           </div>
+          {lastSavedAt && (
+            <div className="flex justify-end px-2 mb-4">
+              <span className="text-[10px] text-muted-foreground/70">{formatLastSaved(lastSavedAt)}</span>
+            </div>
+          )}
 
           {/* Preview as new user — replays first-time tour & verification gate */}
           <button
@@ -387,8 +416,10 @@ const Profile = () => {
               <textarea
                 value={profile.about_me || ""}
                 onChange={(e) => setProfile({ ...profile, about_me: e.target.value.slice(0, 500) })}
-                onBlur={async () => {
+              onBlur={async () => {
                   await supabase.from("profiles").update({ about_me: profile.about_me?.trim() || null }).eq("user_id", user!.id);
+                  await refreshProfile();
+                  toast({ title: "About Me saved ✨" });
                 }}
                 placeholder="Tell potential matches a little about yourself…"
                 rows={4}
@@ -417,7 +448,7 @@ const Profile = () => {
                 <Heart className="w-5 h-5 text-accent" />
                 About You
               </h2>
-              <BioPrompts userId={user!.id} editable={true} />
+              <BioPrompts userId={user!.id} editable={true} onSaved={refreshProfile} />
             </CardContent>
           </Card>
 
@@ -439,7 +470,7 @@ const Profile = () => {
                       current_longitude: lon,
                     }).eq("user_id", user!.id);
                     if (!error) {
-                      setProfile({ ...profile, current_city: val, current_latitude: lat, current_longitude: lon });
+                      await refreshProfile();
                       toast({ title: "Location updated ✨" });
                     }
                   }
@@ -963,7 +994,7 @@ const Profile = () => {
                   }
                   return;
                 }
-                setProfile({ ...profile, ...updates });
+                await refreshProfile();
                 setEditNameOpen(false);
                 toast({ title: "Profile updated ✨" });
               }}

@@ -54,9 +54,10 @@ interface Prompt {
 interface BioPromptsProps {
   userId: string;
   editable?: boolean;
+  onSaved?: () => void | Promise<void>;
 }
 
-const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
+const BioPrompts = ({ userId, editable = false, onSaved }: BioPromptsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [prompts, setPrompts] = useState<Prompt[]>([
@@ -127,6 +128,7 @@ const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {
     setPrompts(newPrompts);
     setEditingIndex(null);
     toast({ title: "Prompt saved ✨" });
+    await onSaved?.();
   };
 
   if (loading) return null;

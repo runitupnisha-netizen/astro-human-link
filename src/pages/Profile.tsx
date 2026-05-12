@@ -301,7 +301,7 @@ const Profile = () => {
           </div>
 
           {/* Stats bar — like Instagram */}
-          <div className="flex items-center justify-between gap-2 mb-6 py-3 px-2 border-y border-border/30 overflow-visible">
+          <div className="flex items-center justify-between gap-2 mb-1 py-3 px-2 border-y border-border/30 overflow-visible">
             <div className="shrink-0">
               <ProfileCompletionScore profile={profile} photoCount={photoCount} />
             </div>
@@ -317,6 +317,11 @@ const Profile = () => {
               </Button>
             </div>
           </div>
+          {lastSavedAt && (
+            <div className="flex justify-end px-2 mb-4">
+              <span className="text-[10px] text-muted-foreground/70">{formatLastSaved(lastSavedAt)}</span>
+            </div>
+          )}
 
           {/* Preview as new user — replays first-time tour & verification gate */}
           <button

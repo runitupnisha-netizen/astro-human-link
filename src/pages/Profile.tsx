@@ -256,10 +256,16 @@ const Profile = () => {
                 <span className="text-sm text-muted-foreground">@{profile.username}</span>
               )}
             </div>
-            {(profile.current_city || profile.birth_place) && (
+            {profile.current_city && (
               <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
                 <MapPin className="w-3.5 h-3.5 text-accent" />
-                <span>{profile.current_city || profile.birth_place}</span>
+                <span>Lives in {profile.current_city}</span>
+              </div>
+            )}
+            {profile.birth_place && profile.birth_place !== profile.current_city && (
+              <div className="flex items-center gap-1 text-muted-foreground/80 text-xs mt-0.5">
+                <Sparkles className="w-3 h-3 text-accent/70" />
+                <span>Born in {profile.birth_place}</span>
               </div>
             )}
             <div className="flex flex-wrap justify-center gap-1.5 mt-3">

@@ -54,6 +54,7 @@ interface Prompt {
 interface BioPromptsProps {
   userId: string;
   editable?: boolean;
+  onSaved?: () => void | Promise<void>;
 }
 
 const BioPrompts = ({ userId, editable = false }: BioPromptsProps) => {

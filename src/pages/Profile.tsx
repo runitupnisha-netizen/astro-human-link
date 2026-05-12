@@ -120,6 +120,36 @@ const Profile = () => {
   const [editDisplayName, setEditDisplayName] = useState("");
   const [editUsername, setEditUsername] = useState("");
   const [forceTour, setForceTour] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+
+  const refreshProfile = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+    if (error) {
+      console.error("refreshProfile error:", error);
+      return;
+    }
+    if (data) {
+      setProfile(data);
+      setLastSavedAt(new Date());
+    }
+  };
+
+  const formatLastSaved = (date: Date | null) => {
+    if (!date) return "";
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffSec < 10) return "Saved just now";
+    if (diffSec < 60) return `Saved ${diffSec}s ago`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `Saved ${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    return `Saved ${diffHr}h ago`;
+  };
 
   const handlePreviewAsNewUser = () => {
     try {

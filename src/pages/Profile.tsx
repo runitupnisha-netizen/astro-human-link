@@ -227,6 +227,7 @@ const Profile = () => {
       .single()
       .then(({ data }) => {
         setProfile(data);
+        if (data) setLastSavedAt(new Date());
         setLoading(false);
       });
     supabase

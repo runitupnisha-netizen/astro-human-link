@@ -47,7 +47,7 @@ workflows:
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
-            -exportOptionsPlist /Users/builder/export_options.plist \
+            -exportOptionsPlist export_options.plist \
             -exportPath /tmp/ipa \
             -allowProvisioningUpdates \
             -authenticationKeyPath /tmp/AuthKey.p8 \

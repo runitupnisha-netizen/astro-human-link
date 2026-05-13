@@ -7,17 +7,6 @@
   <key>teamID</key>
   <string>Q2Z6W3979Y</string>
   <key>signingStyle</key>
-  <string>manual</string>
-  <key>provisioningProfiles</key>
-  <dict>
-    <key>com.runitupmedia.stellara</key>
-    <string>Stellara Distribution</string>
-  </dict>
-  <key>signingCertificate</key>
-  <string>Apple Distribution</string>
-  <key>uploadSymbols</key>
-  <true/>
-  <key>uploadBitcode</key>
-  <false/>
+  <string>automatic</string>
 </dict>
 </plist>

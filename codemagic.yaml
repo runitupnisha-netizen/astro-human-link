@@ -58,7 +58,7 @@ workflows:
           pod install --repo-update
           cd ../..
           xcodebuild \
-            -project ios/App/App.xcodeproj \
+            -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
@@ -72,6 +72,7 @@ workflows:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="Stellara Distribution"
           xcodebuild \
+            -workspace ios/App/App.xcworkspace \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist /Users/builder/export_options.plist \

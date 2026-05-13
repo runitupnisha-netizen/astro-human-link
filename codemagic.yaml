@@ -70,7 +70,6 @@ workflows:
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist /Users/builder/export_options.plist \

@@ -28,7 +28,7 @@ workflows:
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID Z7F742VM7F \
+            -authenticationKeyID MZ827S8VPG \
             -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
@@ -40,7 +40,7 @@ workflows:
             -exportPath /tmp/ipa \
             -allowProvisioningUpdates \
             -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID Z7F742VM7F \
+            -authenticationKeyID MZ827S8VPG \
             -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d
     artifacts:
       - /tmp/ipa/*.ipa

@@ -58,7 +58,7 @@ workflows:
           pod install --repo-update
           cd ../..
           xcodebuild \
-            -project ios/App/App.xcodeproj \
+            -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \

@@ -68,9 +68,7 @@ workflows:
             -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="Stellara Distribution"
+            CODE_SIGN_STYLE=Automatic
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -exportArchive \

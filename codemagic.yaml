@@ -14,24 +14,30 @@ workflows:
         script: npx cap sync ios
       - name: Pod install
         script: cd ios/App && pod install --repo-update
-      - name: Build iOS
+      - name: Build iOS app
         script: |
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
+            base64 --decode > /tmp/AuthKey.p8
+          chmod 600 /tmp/AuthKey.p8
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID Z7F742VM7F \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
-      - name: Export IPA
-        script: |
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
-            -exportPath /tmp/ipa \
             -exportOptionsPlist export_options.plist \
-            -allowProvisioningUpdates
+            -exportPath /tmp/ipa \
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID Z7F742VM7F \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d
     artifacts:
       - /tmp/ipa/*.ipa

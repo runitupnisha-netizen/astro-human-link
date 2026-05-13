@@ -21,7 +21,9 @@ workflows:
           npx cap sync ios
       - name: Install CocoaPods
         script: |
-          cd ios/App && pod install
+          cd ios/App
+          pod install --repo-update
+          cd ../..
       - name: Generate export options
         script: |
           cat > /Users/builder/export_options.plist << EOF
@@ -52,6 +54,9 @@ workflows:
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
             base64 --decode > /tmp/AuthKey.p8
           chmod 600 /tmp/AuthKey.p8
+          # Verify pods are installed
+          ls ios/App/Pods/Capacitor || \
+            (cd ios/App && pod install --repo-update)
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \

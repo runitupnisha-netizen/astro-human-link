@@ -3,9 +3,9 @@ workflows:
     name: iOS Release
     max_build_duration: 120
     instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: Codemagic
     environment:
-      groups:
-        - ios_credentials
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.runitupmedia.stellara
@@ -16,49 +16,22 @@ workflows:
       - name: Build web assets
         script: npm run build
       - name: Install Capacitor iOS
+        script: npx cap sync ios
+      - name: Pod install
+        script: cd ios/App && pod install --repo-update
+      - name: Build iOS
         script: |
-          npm install @capacitor/ios
-          npx cap sync ios
-      - name: Install CocoaPods
-        script: |
-          cd ios/App
-          pod install --repo-update
-          cd ../..
-      - name: Build iOS app
-        script: |
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
-            base64 --decode > /tmp/AuthKey.p8
-          chmod 600 /tmp/AuthKey.p8
-          cd ios/App
-          pod install --repo-update
-          cd ../..
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
-            -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID Z7F742VM7F \
-            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
-          xcodebuild \
-            -exportArchive \
-            -archivePath /tmp/App.xcarchive \
-            -exportOptionsPlist export_options.plist \
-            -exportPath /tmp/ipa \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID Z7F742VM7F \
-            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d
     artifacts:
-      - /tmp/ipa/*.ipa
+      - /tmp/App.xcarchive
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        submit_to_app_store: false
+        auth: integration

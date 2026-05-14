@@ -28,5 +28,13 @@ workflows:
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
+      - name: Export IPA
+        script: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath /tmp/App.xcarchive \
+            -exportOptionsPlist export_options.plist \
+            -exportPath /tmp/ipa \
+            -allowProvisioningUpdates
     artifacts:
-      - /tmp/App.xcarchive
+      - /tmp/ipa/*.ipa

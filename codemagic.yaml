@@ -16,6 +16,7 @@ workflows:
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
             base64 --decode > /tmp/AuthKey.p8
           chmod 600 /tmp/AuthKey.p8
+          cd ios/App && pod install --repo-update && cd ../..
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \

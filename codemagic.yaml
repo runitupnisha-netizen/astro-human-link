@@ -11,30 +11,31 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install
-      - name: Build web assets
-        script: npm run build
-      - name: Sync Capacitor
-        script: npx cap sync ios
-      - name: Pod install
-        script: cd ios/App && pod install --repo-update
-      - name: Archive app
+      - name: Build and export IPA
         script: |
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \
+            base64 --decode > /tmp/AuthKey.p8
+          chmod 600 /tmp/AuthKey.p8
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID MZ827S8VPG \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
-      - name: Export IPA
-        script: |
           xcodebuild \
             -exportArchive \
             -archivePath /tmp/App.xcarchive \
             -exportOptionsPlist export_options.plist \
             -exportPath /tmp/ipa \
+            -authenticationKeyPath /tmp/AuthKey.p8 \
+            -authenticationKeyID MZ827S8VPG \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             -allowProvisioningUpdates
     artifacts:
       - /tmp/ipa/*.ipa

@@ -45,5 +45,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Stellara uses your microphone for voice messages to your matches.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Stellara uses your camera for profile photos and selfie verification.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Stellara needs access to your photo library so you can add photos to your profile and send them in messages.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Stellara saves shareable Soul Blueprint cards and match memories to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Stellara uses your location to find compatible matches near you.</string>
 </dict>
 </plist>

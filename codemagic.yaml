@@ -31,8 +31,8 @@ workflows:
             -archivePath /tmp/App.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID $APP_STORE_CONNECT_KEY_IDENTIFIER \
-            -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID \
+            -authenticationKeyID D9QU8TNU74 \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             archive \
             DEVELOPMENT_TEAM=Q2Z6W3979Y \
             CODE_SIGN_STYLE=Automatic
@@ -42,8 +42,8 @@ workflows:
             -exportOptionsPlist export_options.plist \
             -exportPath /tmp/ipa \
             -authenticationKeyPath /tmp/AuthKey.p8 \
-            -authenticationKeyID $APP_STORE_CONNECT_KEY_IDENTIFIER \
-            -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID \
+            -authenticationKeyID D9QU8TNU74 \
+            -authenticationKeyIssuerID fa782600-e1c3-477c-82de-16bb87c42a3d \
             -allowProvisioningUpdates
     artifacts:
       - /tmp/ipa/*.ipa

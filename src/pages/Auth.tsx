@@ -615,6 +615,18 @@ const Auth = () => {
                 </Button>
               </div>
 
+              {PHONE_AUTH_ENABLED && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAuthMode("phone")}
+                  className="w-full h-11 bg-muted/30 border-border/50 hover:bg-muted/60 transition-all"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Continue with Phone
+                </Button>
+              )}
+
               <div className="text-center pt-1">
                 <button
                   type="button"

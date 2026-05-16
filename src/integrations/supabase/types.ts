@@ -918,6 +918,7 @@ export type Database = {
           numerology_summary: string | null
           onboarding_complete: boolean | null
           personal_year_number: number | null
+          phone: string | null
           preferred_elements: string[] | null
           preferred_genders: string[] | null
           preferred_hd_types: string[] | null
@@ -997,6 +998,7 @@ export type Database = {
           numerology_summary?: string | null
           onboarding_complete?: boolean | null
           personal_year_number?: number | null
+          phone?: string | null
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null
@@ -1076,6 +1078,7 @@ export type Database = {
           numerology_summary?: string | null
           onboarding_complete?: boolean | null
           personal_year_number?: number | null
+          phone?: string | null
           preferred_elements?: string[] | null
           preferred_genders?: string[] | null
           preferred_hd_types?: string[] | null

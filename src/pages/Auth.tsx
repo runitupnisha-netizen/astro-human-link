@@ -6,18 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2, Phone } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
 
-/**
- * Phone (SMS) sign-in is disabled for the App Store launch while Twilio A2P
- * 10DLC verification is pending. Flip this to `true` once the campaign is
- * approved — no other changes needed; the toggle and form will reappear.
- */
-const PHONE_AUTH_ENABLED = false;
+/** Phone (SMS) sign-in via Twilio. */
+const PHONE_AUTH_ENABLED = true;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
@@ -407,36 +403,20 @@ const Auth = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              {/* Email/Phone toggle (Phone hidden until Twilio A2P approval) */}
-              {PHONE_AUTH_ENABLED && (
-                <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/40 border border-border/40">
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode("email")}
-                    className={`h-9 rounded-lg text-sm font-medium transition-all ${
-                      authMode === "email"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode("phone")}
-                    className={`h-9 rounded-lg text-sm font-medium transition-all ${
-                      authMode === "phone"
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Phone
-                  </button>
-                </div>
-              )}
-
               {PHONE_AUTH_ENABLED && authMode === "phone" ? (
-                <PhoneAuthForm />
+                <div className="space-y-4">
+                  <PhoneAuthForm />
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("email")}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
+                    >
+                      <ArrowLeft className="w-3 h-3" />
+                      Back to email
+                    </button>
+                  </div>
+                </div>
               ) : (
               <>
               {/* Email Auth Form */}
@@ -634,6 +614,18 @@ const Auth = () => {
                   Apple
                 </Button>
               </div>
+
+              {PHONE_AUTH_ENABLED && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAuthMode("phone")}
+                  className="w-full h-11 bg-muted/30 border-border/50 hover:bg-muted/60 transition-all"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Continue with Phone
+                </Button>
+              )}
 
               <div className="text-center pt-1">
                 <button

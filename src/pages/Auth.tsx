@@ -6,18 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2, Phone } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
 
-/**
- * Phone (SMS) sign-in is disabled for the App Store launch while Twilio A2P
- * 10DLC verification is pending. Flip this to `true` once the campaign is
- * approved — no other changes needed; the toggle and form will reappear.
- */
-const PHONE_AUTH_ENABLED = false;
+/** Phone (SMS) sign-in via Twilio. */
+const PHONE_AUTH_ENABLED = true;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";

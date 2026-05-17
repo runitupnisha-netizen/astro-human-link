@@ -205,6 +205,11 @@ const Auth = () => {
           // If so, route the user to Google OAuth instead of the password flow.
           const isCredErr = (error.message || "").toLowerCase().includes("invalid login");
           if (isCredErr) {
+            // Auto-redirect to OAuth provider is gated on SOCIAL_AUTH_ENABLED
+            // so users aren't sent to a Lovable-branded consent screen.
+            if (!SOCIAL_AUTH_ENABLED) {
+              // fall through to normal credential error handling
+            } else
             try {
               const { data: methodData } = await supabase.functions.invoke(
                 "check-auth-method",

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall, Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall, Activity, ChevronDown, ChevronUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
 import { usePremium } from "@/hooks/usePremium";
 import { useAuth } from "@/hooks/useAuth";
+import { playRingtone, stopRingtone } from "@/lib/ringtone";
 
 interface CallScreenProps {
   open: boolean;
@@ -57,9 +58,12 @@ const isTransientCallServiceError = (
   return false;
 };
 
-const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
+const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initialCallType, isIncoming = false, matchId }: CallScreenProps) => {
   const { subscribed, loading: premiumLoading, subscriptionEnd } = usePremium();
   const { user, session, loading: authLoading } = useAuth();
+  // Local mutable call type so the user can downgrade video → voice
+  // from the pre-connect screen if their bandwidth/preference shifts.
+  const [callType, setCallType] = useState<"voice" | "video">(initialCallType);
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejoinAttempt, setRejoinAttempt] = useState(0);
@@ -85,6 +89,9 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const peerHasJoinedOnceRef = useRef(false);
   const sessionIdRef = useRef<string | null>(null);
+  // Tracks whether the peer ever joined; used to mark a hangup as "missed"
+  // for the recipient when the caller bails before connect.
+  const ringtoneActiveRef = useRef(false);
 
   const teardownCallObject = useCallback(async () => {
     const co = callObjectRef.current;

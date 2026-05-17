@@ -328,7 +328,96 @@ const Auth = () => {
           </motion.div>
 
           {/* Forgot Password Form */}
-          {showForgotPassword ? (
+          {magicLinkMode ? (
+            magicLinkSent ? (
+              <motion.div
+                className="glass-card glow-border p-6 space-y-4 text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+                  <Sparkles className="w-7 h-7 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-base font-semibold text-foreground">Magic link sent</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    We sent a sign-in link to <span className="font-medium text-foreground">{email}</span>.
+                    Click it from this device to enter Stellara instantly.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMagicLinkSent(false);
+                    setMagicLinkMode(false);
+                  }}
+                  className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mx-auto"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  Back to sign in
+                </button>
+              </motion.div>
+            ) : (
+              <motion.form
+                onSubmit={handleMagicLink}
+                className="glass-card glow-border p-6 space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <p className="text-sm text-muted-foreground text-center">
+                  Enter your email and we'll send a one-click sign-in link.
+                </p>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: "" }));
+                    }}
+                    className={`pl-10 bg-muted/50 border-border ${fieldErrors.email ? "border-destructive" : ""}`}
+                    required
+                    autoComplete="email"
+                  />
+                  {fieldErrors.email && (
+                    <p className="text-xs text-destructive mt-1.5 ml-1">{fieldErrors.email}</p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 text-base font-semibold"
+                  style={{ background: "var(--gradient-aurora)" }}
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Send Magic Link
+                    </>
+                  )}
+                </Button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMagicLinkMode(false);
+                      setFieldErrors({});
+                    }}
+                    className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mx-auto"
+                  >
+                    <ArrowLeft className="w-3 h-3" />
+                    Back to sign in
+                  </button>
+                </div>
+              </motion.form>
+            )
+          ) : showForgotPassword ? (
             resetSent ? (
               <motion.div
                 className="glass-card glow-border p-6 space-y-4 text-center"

@@ -167,7 +167,9 @@ const AuthCallback = () => {
       } else if (accessToken && refreshToken) {
         await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
       }
-      navigate("/", { replace: true });
+
+      const { data } = await supabase.auth.getSession();
+      navigate(data.session ? "/" : "/sign-in", { replace: true });
     };
 
     finishSignIn();
@@ -190,10 +192,20 @@ const AppRoutes = () => {
   useEffect(() => {
     const hash = window.location.hash;
     const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
     const accessToken = hashParams.get("access_token");
     const refreshToken = hashParams.get("refresh_token");
 
     const hydrateOAuthSession = async () => {
+      if (!isAuthCallbackRoute && !isRecoveryRoute && code) {
+        const { data } = await supabase.auth.exchangeCodeForSession(code);
+        if (data.session) {
+          window.history.replaceState(null, document.title, window.location.pathname);
+          return data.session.user;
+        }
+      }
+
       if (!isAuthCallbackRoute && !hash.includes("type=recovery") && accessToken && refreshToken) {
         const { data } = await supabase.auth.setSession({
           access_token: accessToken,

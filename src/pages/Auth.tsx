@@ -47,6 +47,7 @@ const usernameSchema = z
   .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
 
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
+const AUTH_CALLBACK_URL = `${PRODUCTION_ORIGIN}/auth/callback`;
 
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();
@@ -109,7 +110,7 @@ const Auth = () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
-        options: { emailRedirectTo: `${PRODUCTION_ORIGIN}/` },
+        options: { emailRedirectTo: AUTH_CALLBACK_URL },
       });
       if (error) throw error;
       setMagicLinkSent(true);

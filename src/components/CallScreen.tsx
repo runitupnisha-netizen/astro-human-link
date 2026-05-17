@@ -376,6 +376,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
       setDuration(0);
       setMuted(false);
       setVideoOff(callType === "voice");
+      setCallType(initialCallType);
       setShowPremium(false);
       setRemoteJoined(false);
       setNetworkQuality(null);
@@ -384,6 +385,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
       setStatsExpanded(false);
       peerHasJoinedOnceRef.current = false;
       sessionIdRef.current = null;
+      stopRingtone();
+      ringtoneActiveRef.current = false;
       teardownCallObject();
       return;
     }
@@ -403,11 +406,27 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
 
     return () => {
       cancelledRef.current = true;
+      stopRingtone();
+      ringtoneActiveRef.current = false;
       teardownCallObject();
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handleBeforeUnload);
     };
   }, [open, callType, provisionRoom, teardownCallObject, premiumLoading, authLoading]);
+
+  // Ringtone: play while ringing / waiting for the peer, stop on connect/end.
+  useEffect(() => {
+    if (!open) return;
+    const shouldRing =
+      callStatus === "ringing" || callStatus === "waiting" || callStatus === "connecting";
+    if (shouldRing && !ringtoneActiveRef.current) {
+      ringtoneActiveRef.current = true;
+      playRingtone(isIncoming ? "incoming" : "outgoing");
+    } else if (!shouldRing && ringtoneActiveRef.current) {
+      ringtoneActiveRef.current = false;
+      stopRingtone();
+    }
+  }, [callStatus, isIncoming, open]);
 
   // Promote waiting → connected as soon as a remote participant arrives
   useEffect(() => {

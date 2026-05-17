@@ -187,10 +187,7 @@ const AppRoutes = () => {
   useEffect(() => {
     const hash = window.location.hash;
     const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
-    const searchParams = new URLSearchParams(window.location.search);
-    const code = searchParams.get("code");
     const accessToken = hashParams.get("access_token");
-    const refreshToken = hashParams.get("refresh_token");
 
     const hydrateOAuthSession = async () => {
       const session = await completeAuthRedirectFromUrl();

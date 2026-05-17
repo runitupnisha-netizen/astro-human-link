@@ -43,3 +43,5 @@ project_id = "wquzijmkiotkupygoxdf"
     verify_jwt = false
   [functions.check-auth-method]
     verify_jwt = false
+  [functions.notify-missed-call]
+    verify_jwt = false

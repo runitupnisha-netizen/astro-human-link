@@ -69,6 +69,7 @@ const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
+const CallHistory = lazy(() => import("./pages/CallHistory"));
 
 const queryClient = new QueryClient();
 
@@ -224,6 +225,7 @@ const AppRoutes = () => {
             <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
             <Route path="/connections" element={<PageTransition><ProtectedRoute><Connections /></ProtectedRoute></PageTransition>} />
             <Route path="/messages" element={<PageTransition><ProtectedRoute><Messages /></ProtectedRoute></PageTransition>} />
+            <Route path="/calls" element={<PageTransition><ProtectedRoute><CallHistory /></ProtectedRoute></PageTransition>} />
             <Route path="/compatibility/:matchId" element={<PageTransition><ProtectedRoute><Compatibility /></ProtectedRoute></PageTransition>} />
             <Route path="/profile/:userId" element={<PageTransition><ProtectedRoute><ViewProfile /></ProtectedRoute></PageTransition>} />
             <Route path="/feed" element={<PageTransition><ProtectedRoute><AlignmentFeed /></ProtectedRoute></PageTransition>} />

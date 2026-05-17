@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2, Diamond } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2, Diamond, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sheet,
@@ -278,6 +278,14 @@ const Navigation = () => {
                     >
                       <Sun className="w-5 h-5" />
                       <span>Daily Briefing</span>
+                    </Link>
+                    <Link
+                      to="/calls"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
+                    >
+                      <Phone className="w-5 h-5" />
+                      <span>Calls</span>
                     </Link>
                     <Link
                       to="/contact"

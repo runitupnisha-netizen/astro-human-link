@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Check, Sparkles, Star } from "lucide-react";
+import { Bell, Check, Sparkles, Star, PhoneMissed } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -11,6 +11,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   message: <Bell className="w-4 h-4 text-primary" />,
   daily_intention: <Sparkles className="w-4 h-4 text-primary" />,
   weekly_insight: <Star className="w-4 h-4 text-accent" />,
+  missed_call: <PhoneMissed className="w-4 h-4 text-destructive" />,
 };
 
 const NotificationBell = () => {
@@ -48,6 +49,11 @@ const NotificationBell = () => {
     if (notification.type === "message") {
       // Try to extract sender info and navigate to the conversation
       navigate("/messages");
+      return;
+    }
+
+    if (notification.type === "missed_call") {
+      navigate("/calls");
       return;
     }
 

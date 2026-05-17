@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall, Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, X, Loader2, RefreshCw, AlertTriangle, PhoneCall, Activity, ChevronDown, ChevronUp, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import PremiumRequiredScreen from "@/components/PremiumRequiredScreen";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import DailyIframe, { DailyCall, DailyEventObjectParticipant, DailyEventObjectFatalError, DailyEventObjectNonFatalError } from "@daily-co/daily-js";
 import { usePremium } from "@/hooks/usePremium";
 import { useAuth } from "@/hooks/useAuth";
+import { playRingtone, stopRingtone } from "@/lib/ringtone";
 
 interface CallScreenProps {
   open: boolean;
@@ -57,9 +58,12 @@ const isTransientCallServiceError = (
   return false;
 };
 
-const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncoming = false, matchId }: CallScreenProps) => {
+const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initialCallType, isIncoming = false, matchId }: CallScreenProps) => {
   const { subscribed, loading: premiumLoading, subscriptionEnd } = usePremium();
   const { user, session, loading: authLoading } = useAuth();
+  // Local mutable call type so the user can downgrade video → voice
+  // from the pre-connect screen if their bandwidth/preference shifts.
+  const [callType, setCallType] = useState<"voice" | "video">(initialCallType);
   const [callStatus, setCallStatus] = useState<CallStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rejoinAttempt, setRejoinAttempt] = useState(0);
@@ -85,6 +89,9 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const peerHasJoinedOnceRef = useRef(false);
   const sessionIdRef = useRef<string | null>(null);
+  // Tracks whether the peer ever joined; used to mark a hangup as "missed"
+  // for the recipient when the caller bails before connect.
+  const ringtoneActiveRef = useRef(false);
 
   const teardownCallObject = useCallback(async () => {
     const co = callObjectRef.current;
@@ -369,6 +376,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setDuration(0);
       setMuted(false);
       setVideoOff(callType === "voice");
+      setCallType(initialCallType);
       setShowPremium(false);
       setRemoteJoined(false);
       setNetworkQuality(null);
@@ -377,6 +385,8 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
       setStatsExpanded(false);
       peerHasJoinedOnceRef.current = false;
       sessionIdRef.current = null;
+      stopRingtone();
+      ringtoneActiveRef.current = false;
       teardownCallObject();
       return;
     }
@@ -396,11 +406,27 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
 
     return () => {
       cancelledRef.current = true;
+      stopRingtone();
+      ringtoneActiveRef.current = false;
       teardownCallObject();
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("pagehide", handleBeforeUnload);
     };
   }, [open, callType, provisionRoom, teardownCallObject, premiumLoading, authLoading]);
+
+  // Ringtone: play while ringing / waiting for the peer, stop on connect/end.
+  useEffect(() => {
+    if (!open) return;
+    const shouldRing =
+      callStatus === "ringing" || callStatus === "waiting" || callStatus === "connecting";
+    if (shouldRing && !ringtoneActiveRef.current) {
+      ringtoneActiveRef.current = true;
+      playRingtone(isIncoming ? "incoming" : "outgoing");
+    } else if (!shouldRing && ringtoneActiveRef.current) {
+      ringtoneActiveRef.current = false;
+      stopRingtone();
+    }
+  }, [callStatus, isIncoming, open]);
 
   // Promote waiting → connected as soon as a remote participant arrives
   useEffect(() => {
@@ -527,9 +553,24 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
   const handleEndCall = useCallback(() => {
     setCallStatus("ended");
     if (timerRef.current) clearInterval(timerRef.current);
+    stopRingtone();
+    ringtoneActiveRef.current = false;
     const wasConnected = peerHasJoinedOnceRef.current && duration > 0;
     if (wasConnected) {
       toast.success(`Call ended · ${formatDuration(duration)}`);
+    }
+    // If the caller hangs up *before* the peer ever joined, notify them
+    // as a missed call so they see a badge and can call back.
+    if (!peerHasJoinedOnceRef.current && !isIncoming && matchId && !simulated) {
+      supabase.functions
+        .invoke("notify-missed-call", {
+          body: {
+            matchId,
+            callType,
+            sessionId: sessionIdRef.current,
+          },
+        })
+        .catch((e) => console.warn("notify-missed-call failed:", e?.message ?? e));
     }
     // Mark session as ended (best-effort — RLS only allows updating our own row).
     const sid = sessionIdRef.current;
@@ -546,7 +587,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
     // Release camera/mic and Daily room immediately, don't wait for unmount
     teardownCallObject();
     setTimeout(onClose, 600);
-  }, [duration, onClose, teardownCallObject]);
+  }, [duration, onClose, teardownCallObject, isIncoming, matchId, simulated, callType]);
 
   if (!open) return null;
 
@@ -843,7 +884,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                 auto-provision didn't run (e.g. premium loading) or after an
                 error/dismissal. Re-runs the same provisionRoom flow. */}
             {(callStatus === "connecting" || callStatus === "ringing") && !isIncoming && !simulated && (
-              <div className="mt-5 flex items-center justify-center">
+              <div className="mt-5 flex flex-col items-center justify-center gap-2.5">
                 <Button
                   size="lg"
                   onClick={() => provisionRoom("connecting")}
@@ -852,6 +893,21 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType, isIncom
                   <PhoneCall className="w-4 h-4 mr-2" />
                   Start 1-on-1 Call
                 </Button>
+                {callType === "video" && !peerHasJoinedOnceRef.current && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setCallType("voice");
+                      setVideoOff(true);
+                      toast("Switched to audio-only");
+                    }}
+                    className="rounded-full text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <Headphones className="w-3.5 h-3.5 mr-1.5" />
+                    Switch to audio-only
+                  </Button>
+                )}
               </div>
             )}
 

@@ -884,7 +884,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
                 auto-provision didn't run (e.g. premium loading) or after an
                 error/dismissal. Re-runs the same provisionRoom flow. */}
             {(callStatus === "connecting" || callStatus === "ringing") && !isIncoming && !simulated && (
-              <div className="mt-5 flex items-center justify-center">
+              <div className="mt-5 flex flex-col items-center justify-center gap-2.5">
                 <Button
                   size="lg"
                   onClick={() => provisionRoom("connecting")}
@@ -893,6 +893,21 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
                   <PhoneCall className="w-4 h-4 mr-2" />
                   Start 1-on-1 Call
                 </Button>
+                {callType === "video" && !peerHasJoinedOnceRef.current && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setCallType("voice");
+                      setVideoOff(true);
+                      toast("Switched to audio-only");
+                    }}
+                    className="rounded-full text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <Headphones className="w-3.5 h-3.5 mr-1.5" />
+                    Switch to audio-only
+                  </Button>
+                )}
               </div>
             )}
 

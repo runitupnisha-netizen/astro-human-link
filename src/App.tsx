@@ -24,6 +24,7 @@ import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { completeAuthRedirectFromUrl } from "@/lib/authRedirect";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -158,18 +159,12 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const finishSignIn = async () => {
-      const code = new URLSearchParams(window.location.search).get("code");
-      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-      const accessToken = hashParams.get("access_token");
-      const refreshToken = hashParams.get("refresh_token");
-      if (code) {
-        await supabase.auth.exchangeCodeForSession(code);
-      } else if (accessToken && refreshToken) {
-        await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      try {
+        const session = await completeAuthRedirectFromUrl();
+        navigate(session ? "/" : "/sign-in", { replace: true });
+      } catch {
+        navigate("/sign-in", { replace: true });
       }
-
-      const { data } = await supabase.auth.getSession();
-      navigate(data.session ? "/" : "/sign-in", { replace: true });
     };
 
     finishSignIn();
@@ -198,27 +193,8 @@ const AppRoutes = () => {
     const refreshToken = hashParams.get("refresh_token");
 
     const hydrateOAuthSession = async () => {
-      if (!isAuthCallbackRoute && !isRecoveryRoute && code) {
-        const { data } = await supabase.auth.exchangeCodeForSession(code);
-        if (data.session) {
-          window.history.replaceState(null, document.title, window.location.pathname);
-          return data.session.user;
-        }
-      }
-
-      if (!isAuthCallbackRoute && !hash.includes("type=recovery") && accessToken && refreshToken) {
-        const { data } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-        if (data.session) {
-          window.history.replaceState(null, document.title, `${window.location.pathname}${window.location.search}`);
-          return data.session.user;
-        }
-      }
-
-      const { data } = await supabase.auth.getSession();
-      return data.session?.user || null;
+      const session = await completeAuthRedirectFromUrl();
+      return session?.user || null;
     };
 
     if (!isAuthCallbackRoute && !hash.includes("type=recovery")) {

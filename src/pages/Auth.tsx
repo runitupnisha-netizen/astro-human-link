@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2, Phone } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Eye, EyeOff, CheckCircle2, Phone, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -86,20 +86,42 @@ const Auth = () => {
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [magicLinkMode, setMagicLinkMode] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
   const handleSocialLogin = async (provider: "google" | "apple") => {
-    setSocialLoading(provider);
+    toast.info("Social login coming soon — please use email to sign in.");
+  };
+
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFieldErrors({});
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      const msg = result.error.issues[0].message;
+      setFieldErrors({ email: msg });
+      toast.error(msg);
+      return;
+    }
+    setLoading(true);
     try {
-      const { error } = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: PRODUCTION_ORIGIN,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { emailRedirectTo: `${PRODUCTION_ORIGIN}/` },
       });
       if (error) throw error;
-    } catch (err: any) {
-      toast.error(err.message || `Failed to sign in with ${provider}`);
+      setMagicLinkSent(true);
+      toast.success("Magic link sent ✨", {
+        description: "Check your inbox and click the link to sign in instantly.",
+        duration: 7000,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to send magic link";
+      toast.error(friendlyAuthError(message));
     } finally {
-      setSocialLoading(null);
+      setLoading(false);
     }
   };
 

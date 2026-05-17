@@ -93,7 +93,31 @@ const Auth = () => {
   const navigate = useNavigate();
 
   const handleSocialLogin = async (provider: "google" | "apple") => {
-    toast.info("Social login coming soon — please use email to sign in.");
+    setSocialLoading(provider);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: AUTH_CALLBACK_URL,
+      });
+      if (result.redirected) return; // browser is navigating to provider
+      if (result.error) {
+        const message = result.error instanceof Error ? result.error.message : String(result.error);
+        const lower = message.toLowerCase();
+        if (lower.includes("cancel") || lower.includes("closed") || lower.includes("popup")) {
+          toast.info("Sign-in cancelled.");
+        } else {
+          toast.error(friendlyAuthError(message));
+        }
+        return;
+      }
+      // Tokens received and session set
+      toast.success(`Welcome ✨`);
+      navigate("/", { replace: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Sign-in failed";
+      toast.error(friendlyAuthError(message));
+    } finally {
+      setSocialLoading(null);
+    }
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
@@ -713,9 +737,52 @@ const Auth = () => {
                 </>
               )}
 
-              <p className="text-center text-xs text-muted-foreground pt-1">
-                Social login (Google &amp; Apple) coming soon ✦
-              </p>
+              {/* Social login (Google + Apple) */}
+              <div className="flex items-center gap-3 my-2">
+                <Separator className="flex-1 bg-border/50" />
+                <span className="text-[11px] text-muted-foreground uppercase tracking-[0.18em]">or continue with</span>
+                <Separator className="flex-1 bg-border/50" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialLogin("google")}
+                  disabled={!!socialLoading}
+                  className="h-11 bg-background hover:bg-muted text-foreground border-border"
+                  aria-label="Sign in with Google"
+                >
+                  {socialLoading === "google" ? (
+                    <div className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.46-1.7 4.28-5.5 4.28-3.3 0-6-2.74-6-6.12s2.7-6.12 6-6.12c1.88 0 3.14.8 3.86 1.48l2.63-2.54C16.83 3.6 14.66 2.6 12 2.6 6.86 2.6 2.7 6.76 2.7 11.9S6.86 21.2 12 21.2c6.93 0 9.16-4.86 9.16-8.42 0-.57-.06-1-.13-1.4H12z"/>
+                      </svg>
+                      Google
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialLogin("apple")}
+                  disabled={!!socialLoading}
+                  className="h-11 bg-black hover:bg-black/90 text-white border-black"
+                  aria-label="Sign in with Apple"
+                >
+                  {socialLoading === "apple" ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M17.05 12.04c-.03-2.65 2.17-3.92 2.27-3.98-1.24-1.81-3.17-2.06-3.85-2.09-1.64-.17-3.2.96-4.04.96-.83 0-2.12-.94-3.49-.91-1.79.03-3.45 1.04-4.37 2.64-1.87 3.24-.48 8.04 1.34 10.68.89 1.29 1.95 2.74 3.34 2.69 1.34-.05 1.85-.87 3.47-.87 1.62 0 2.07.87 3.49.84 1.44-.03 2.36-1.31 3.24-2.61 1.02-1.5 1.44-2.95 1.46-3.03-.03-.01-2.8-1.07-2.86-4.32zM14.4 4.34c.73-.88 1.22-2.1 1.09-3.32-1.05.04-2.32.7-3.07 1.58-.67.78-1.26 2.02-1.1 3.22 1.17.09 2.36-.59 3.08-1.48z"/>
+                      </svg>
+                      Apple
+                    </>
+                  )}
+                </Button>
+              </div>
 
               <div className="text-center pt-1">
                 <button

@@ -229,7 +229,7 @@ const AppRoutes = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [isAuthCallbackRoute, navigate]);
+  }, [isAuthCallbackRoute, isRecoveryRoute, navigate]);
 
   if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
 

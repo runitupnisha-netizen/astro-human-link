@@ -615,7 +615,7 @@ const Auth = () => {
                 </Button>
               </div>
 
-              {PHONE_AUTH_ENABLED && (
+              {PHONE_AUTH_ENABLED ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -625,6 +625,10 @@ const Auth = () => {
                   <Phone className="w-4 h-4 mr-2" />
                   Continue with Phone
                 </Button>
+              ) : (
+                <p className="text-center text-xs text-muted-foreground px-4">
+                  SMS verification coming soon! Please use email or social login for now.
+                </p>
               )}
 
               <div className="text-center pt-1">

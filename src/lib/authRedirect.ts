@@ -6,8 +6,10 @@ export const AUTH_CALLBACK_PATH = "/auth/callback";
 const CALLBACK_OTP_TYPES = new Set<EmailOtpType>(["magiclink", "email", "signup", "invite"]);
 
 const cleanAuthUrl = () => {
-  const cleanPath = window.location.pathname === AUTH_CALLBACK_PATH ? "/" : window.location.pathname;
-  window.history.replaceState(null, document.title, cleanPath);
+  // After a successful auth redirect (magic link / OAuth / signup verify),
+  // always send the user to the app root. Staying on /sign-in or
+  // /auth/callback after the session is established is never desired.
+  window.history.replaceState(null, document.title, "/");
 };
 
 export const isPasswordRecoveryRedirect = () => {

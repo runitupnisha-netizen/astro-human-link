@@ -10,21 +10,43 @@ export const useAuth = () => {
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace(/^#/, ""));
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
     const isRecoveryLink = window.location.pathname === "/reset-password" &&
       params.get("type") === "recovery" &&
       !!params.get("access_token");
 
+    const hydrateOAuthSession = async () => {
+      if (!isRecoveryLink && accessToken && refreshToken) {
+        const { data } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (data.session) {
+          window.history.replaceState(null, document.title, `${window.location.pathname}${window.location.search}`);
+          return data.session;
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    };
+
     if (!isRecoveryLink) {
       window.localStorage.removeItem("auth-recovery-pending");
       window.sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token") || hash.includes("type=recovery")) {
+      if (!accessToken && (hash.includes("access_token") || hash.includes("type=recovery"))) {
         window.history.replaceState(null, document.title, window.location.pathname);
       }
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    hydrateOAuthSession().then((session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
+    }).catch(() => {
+      setSession(null);
+      setUser(null);
       setLoading(false);
     });
 

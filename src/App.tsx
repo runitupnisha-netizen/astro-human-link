@@ -189,17 +189,39 @@ const AppRoutes = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
+    const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
+    const accessToken = hashParams.get("access_token");
+    const refreshToken = hashParams.get("refresh_token");
+
+    const hydrateOAuthSession = async () => {
+      if (!isAuthCallbackRoute && !hash.includes("type=recovery") && accessToken && refreshToken) {
+        const { data } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (data.session) {
+          window.history.replaceState(null, document.title, `${window.location.pathname}${window.location.search}`);
+          return data.session.user;
+        }
+      }
+
+      const { data } = await supabase.auth.getSession();
+      return data.session?.user || null;
+    };
 
     if (!isAuthCallbackRoute && !hash.includes("type=recovery")) {
       localStorage.removeItem("auth-recovery-pending");
       sessionStorage.removeItem("auth-recovery-pending");
-      if (hash.includes("access_token")) {
+      if (!accessToken && hash.includes("access_token")) {
         window.history.replaceState(null, document.title, window.location.pathname);
       }
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      setAuthUser(data.session?.user || null);
+    hydrateOAuthSession().then((user) => {
+      setAuthUser(user);
+      setAuthReady(true);
+    }).catch(() => {
+      setAuthUser(null);
       setAuthReady(true);
     });
 

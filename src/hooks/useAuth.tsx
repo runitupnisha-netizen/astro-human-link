@@ -8,6 +8,8 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace(/^#/, ""));
     const accessToken = params.get("access_token");
@@ -17,6 +19,15 @@ export const useAuth = () => {
       !!params.get("access_token");
 
     const hydrateOAuthSession = async () => {
+      if (!isRecoveryLink && code) {
+        const { data } = await supabase.auth.exchangeCodeForSession(code);
+        if (data.session) {
+          const cleanPath = window.location.pathname === "/auth/callback" ? "/" : window.location.pathname;
+          window.history.replaceState(null, document.title, cleanPath);
+          return data.session;
+        }
+      }
+
       if (!isRecoveryLink && accessToken && refreshToken) {
         const { data } = await supabase.auth.setSession({
           access_token: accessToken,

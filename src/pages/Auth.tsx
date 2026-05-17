@@ -46,6 +46,8 @@ const usernameSchema = z
   .max(30, { message: "Username must be 30 characters or fewer" })
   .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
 
+const PRODUCTION_ORIGIN = "https://stellaraapp.net";
+
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();
   if (m.includes("invalid login")) {
@@ -91,7 +93,7 @@ const Auth = () => {
     setSocialLoading(provider);
     try {
       const { error } = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: PRODUCTION_ORIGIN,
       });
       if (error) throw error;
     } catch (err: any) {

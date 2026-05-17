@@ -14,6 +14,20 @@ import PhoneAuthForm from "@/components/PhoneAuthForm";
 
 /** Phone (SMS) sign-in via Twilio. Disabled until A2P campaign is approved. */
 const PHONE_AUTH_ENABLED = false;
+
+/**
+ * Social sign-in (Google + Apple) is HIDDEN pending Stellara's own
+ * developer credentials. The managed Lovable Cloud OAuth flow currently
+ * presents "Sign in with Lovable Apps" branding on the Apple consent
+ * sheet and uses Lovable's Google OAuth client — neither is acceptable
+ * for production. Flip this flag back to `true` once BYOC is configured
+ * in Lovable Cloud → Auth Settings with:
+ *   • Stellara Google Cloud OAuth Client ID + Secret
+ *   • Stellara Apple Services ID + Team ID + Key ID + .p8 private key
+ * The button JSX and handler below are intentionally left in place for
+ * a one-line re-enable.
+ */
+const SOCIAL_AUTH_ENABLED = false;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
@@ -190,7 +204,9 @@ const Auth = () => {
           // If login failed, check whether this email was created via Google.
           // If so, route the user to Google OAuth instead of the password flow.
           const isCredErr = (error.message || "").toLowerCase().includes("invalid login");
-          if (isCredErr) {
+          // Auto-redirect to OAuth provider is gated on SOCIAL_AUTH_ENABLED
+          // so users aren't sent to a Lovable-branded consent screen.
+          if (isCredErr && SOCIAL_AUTH_ENABLED) {
             try {
               const { data: methodData } = await supabase.functions.invoke(
                 "check-auth-method",
@@ -737,7 +753,18 @@ const Auth = () => {
                 </>
               )}
 
-              {/* Social login (Google + Apple) */}
+              {/*
+                Social login (Google + Apple) — HIDDEN for launch.
+                These buttons stay in the codebase so re-enabling is a single
+                flag flip (SOCIAL_AUTH_ENABLED = true at the top of this file)
+                once Stellara's own Google Cloud OAuth client and Apple
+                Services ID are configured in Lovable Cloud → Auth Settings.
+                Until then, the managed Lovable Cloud flow would render
+                "Sign in with Lovable Apps" on the Apple consent sheet,
+                which is unacceptable for production / App Review.
+              */}
+              {SOCIAL_AUTH_ENABLED && (
+              <>
               <div className="flex items-center gap-3 my-2">
                 <Separator className="flex-1 bg-border/50" />
                 <span className="text-[11px] text-muted-foreground uppercase tracking-[0.18em]">or continue with</span>
@@ -783,6 +810,8 @@ const Auth = () => {
                   )}
                 </Button>
               </div>
+              </>
+              )}
 
               <div className="text-center pt-1">
                 <button

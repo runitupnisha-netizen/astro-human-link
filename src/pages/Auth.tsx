@@ -14,6 +14,20 @@ import PhoneAuthForm from "@/components/PhoneAuthForm";
 
 /** Phone (SMS) sign-in via Twilio. Disabled until A2P campaign is approved. */
 const PHONE_AUTH_ENABLED = false;
+
+/**
+ * Social sign-in (Google + Apple) is HIDDEN pending Stellara's own
+ * developer credentials. The managed Lovable Cloud OAuth flow currently
+ * presents "Sign in with Lovable Apps" branding on the Apple consent
+ * sheet and uses Lovable's Google OAuth client — neither is acceptable
+ * for production. Flip this flag back to `true` once BYOC is configured
+ * in Lovable Cloud → Auth Settings with:
+ *   • Stellara Google Cloud OAuth Client ID + Secret
+ *   • Stellara Apple Services ID + Team ID + Key ID + .p8 private key
+ * The button JSX and handler below are intentionally left in place for
+ * a one-line re-enable.
+ */
+const SOCIAL_AUTH_ENABLED = false;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import soulConnection from "@/assets/soul-connection.jpg";
 import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";

@@ -46,6 +46,9 @@ const usernameSchema = z
   .max(30, { message: "Username must be 30 characters or fewer" })
   .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
 
+const PRODUCTION_ORIGIN = "https://stellaraapp.net";
+const PRODUCTION_AUTH_CALLBACK = `${PRODUCTION_ORIGIN}/auth/callback`;
+
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();
   if (m.includes("invalid login")) {
@@ -91,7 +94,7 @@ const Auth = () => {
     setSocialLoading(provider);
     try {
       const { error } = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: PRODUCTION_AUTH_CALLBACK,
       });
       if (error) throw error;
     } catch (err: any) {
@@ -176,7 +179,7 @@ const Auth = () => {
           email: email.trim(),
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${PRODUCTION_ORIGIN}/`,
             data: { full_name: fullName.trim(), username: username.trim() || undefined },
           },
         });
@@ -227,7 +230,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${PRODUCTION_ORIGIN}/reset-password`,
       });
       if (error) throw error;
       // Always show success even if email doesn't exist (prevents user enumeration)

@@ -753,7 +753,18 @@ const Auth = () => {
                 </>
               )}
 
-              {/* Social login (Google + Apple) */}
+              {/*
+                Social login (Google + Apple) — HIDDEN for launch.
+                These buttons stay in the codebase so re-enabling is a single
+                flag flip (SOCIAL_AUTH_ENABLED = true at the top of this file)
+                once Stellara's own Google Cloud OAuth client and Apple
+                Services ID are configured in Lovable Cloud → Auth Settings.
+                Until then, the managed Lovable Cloud flow would render
+                "Sign in with Lovable Apps" on the Apple consent sheet,
+                which is unacceptable for production / App Review.
+              */}
+              {SOCIAL_AUTH_ENABLED && (
+              <>
               <div className="flex items-center gap-3 my-2">
                 <Separator className="flex-1 bg-border/50" />
                 <span className="text-[11px] text-muted-foreground uppercase tracking-[0.18em]">or continue with</span>
@@ -799,6 +810,8 @@ const Auth = () => {
                   )}
                 </Button>
               </div>
+              </>
+              )}
 
               <div className="text-center pt-1">
                 <button

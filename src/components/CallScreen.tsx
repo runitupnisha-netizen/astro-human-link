@@ -553,9 +553,24 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
   const handleEndCall = useCallback(() => {
     setCallStatus("ended");
     if (timerRef.current) clearInterval(timerRef.current);
+    stopRingtone();
+    ringtoneActiveRef.current = false;
     const wasConnected = peerHasJoinedOnceRef.current && duration > 0;
     if (wasConnected) {
       toast.success(`Call ended · ${formatDuration(duration)}`);
+    }
+    // If the caller hangs up *before* the peer ever joined, notify them
+    // as a missed call so they see a badge and can call back.
+    if (!peerHasJoinedOnceRef.current && !isIncoming && matchId && !simulated) {
+      supabase.functions
+        .invoke("notify-missed-call", {
+          body: {
+            matchId,
+            callType,
+            sessionId: sessionIdRef.current,
+          },
+        })
+        .catch((e) => console.warn("notify-missed-call failed:", e?.message ?? e));
     }
     // Mark session as ended (best-effort — RLS only allows updating our own row).
     const sid = sessionIdRef.current;
@@ -572,7 +587,7 @@ const CallScreen = ({ open, onClose, callerName, callerAvatar, callType: initial
     // Release camera/mic and Daily room immediately, don't wait for unmount
     teardownCallObject();
     setTimeout(onClose, 600);
-  }, [duration, onClose, teardownCallObject]);
+  }, [duration, onClose, teardownCallObject, isIncoming, matchId, simulated, callType]);
 
   if (!open) return null;
 

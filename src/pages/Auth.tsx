@@ -593,7 +593,11 @@ const Auth = () => {
                     }}
                     className={`pl-10 h-12 bg-muted/50 border-border ${fieldErrors.email ? "border-destructive" : ""}`}
                     required
-                    autoComplete="email"
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
+                    name="stellara-email-no-autofill"
                     aria-invalid={!!fieldErrors.email}
                   />
                   {fieldErrors.email && (

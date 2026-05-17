@@ -153,6 +153,24 @@ const ReferralCapture = () => {
   return null;
 };
 
+const AuthCallback = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const finishSignIn = async () => {
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (code) {
+        await supabase.auth.exchangeCodeForSession(code);
+      }
+      navigate("/", { replace: true });
+    };
+
+    finishSignIn();
+  }, [navigate]);
+
+  return <LoadingScreen />;
+};
+
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -160,13 +178,14 @@ const AppRoutes = () => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const { user, onboardingComplete, loading } = useOnboardingStatus();
   const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
+  const isAuthCallbackRoute = location.pathname === "/auth/callback";
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
 
   useEffect(() => {
     const hash = window.location.hash;
 
-    if (!hash.includes("type=recovery")) {
+    if (!isAuthCallbackRoute && !hash.includes("type=recovery")) {
       localStorage.removeItem("auth-recovery-pending");
       sessionStorage.removeItem("auth-recovery-pending");
       if (hash.includes("access_token")) {
@@ -198,7 +217,7 @@ const AppRoutes = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [isAuthCallbackRoute, navigate]);
 
   if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
 
@@ -214,6 +233,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />

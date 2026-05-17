@@ -614,7 +614,11 @@ const Auth = () => {
                     className={`pl-10 pr-11 h-12 bg-muted/50 border-border ${fieldErrors.password ? "border-destructive" : ""}`}
                     required
                     minLength={isLogin ? 1 : 8}
-                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
+                    name="stellara-password-no-autofill"
                     aria-invalid={!!fieldErrors.password}
                   />
                   <button

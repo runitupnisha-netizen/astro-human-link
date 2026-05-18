@@ -340,6 +340,11 @@ const Connections = () => {
             <h1 className="text-4xl font-bold mb-3 bg-gradient-aurora bg-clip-text text-transparent">
               {t("connections.title")}
             </h1>
+            {matches.length === 0 && (
+              <p className="italic text-sm text-primary/80 mb-2 font-serif">
+                Self-discovery first. Connection follows.
+              </p>
+            )}
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0 ? (
                 <>

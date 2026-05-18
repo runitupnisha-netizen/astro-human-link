@@ -566,7 +566,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Let's Build Your Profile
+                  Self-discovery first. Connection follows.
                 </motion.h1>
                 <motion.p 
                   className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base"
@@ -574,7 +574,7 @@ const Onboarding = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Enter your birth details so we can work out your astrology, Human Design & Gene Keys
+                  Enter your birth details so we can map your astrology, Human Design & Gene Keys.
                 </motion.p>
               </motion.div>
 

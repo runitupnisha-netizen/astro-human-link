@@ -333,7 +333,7 @@ const Discover = () => {
                 </Button>
                 {swipeCount > 0 && (
                   <Button onClick={() => navigate("/connections")} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
-                    <MessageCircle className="w-4 h-4" /> View Matches
+                    <MessageCircle className="w-4 h-4" /> View Connections
                   </Button>
                 )}
               </div>

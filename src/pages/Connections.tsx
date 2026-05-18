@@ -90,6 +90,7 @@ const Connections = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const online = useNetworkStatus();
+  const foundation = useFoundationStatus();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [recentChecks, setRecentChecks] = useState<
     Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>

@@ -18,7 +18,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     icon: <Star className="w-6 h-6" />,
   },
   who_liked_me: {
-    title: "See Who Likes You",
+    title: "See Who Resonates",
     description: "Skip the guessing game — see who's already into you",
     icon: <Eye className="w-6 h-6" />,
   },
@@ -33,7 +33,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     icon: <Shield className="w-6 h-6" />,
   },
   unlimited_swipes: {
-    title: "Unlimited Matches",
+    title: "Unlimited Connections",
     description: "No daily limits — explore as many connections as the cosmos offer",
     icon: <Heart className="w-6 h-6" />,
   },
@@ -70,7 +70,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
 };
 
 const allPerks = [
-  { icon: <Heart className="w-4 h-4" />, label: "Unlimited cosmic matches" },
+  { icon: <Heart className="w-4 h-4" />, label: "Unlimited cosmic connections" },
   { icon: <Eye className="w-4 h-4" />, label: "See who likes you" },
   { icon: <Sparkles className="w-4 h-4" />, label: "Full synastry charts" },
   { icon: <Star className="w-4 h-4" />, label: "Unlimited Super Likes" },

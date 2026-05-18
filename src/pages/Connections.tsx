@@ -16,6 +16,8 @@ import { ConnectionCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import TourHighlight from "@/components/TourHighlight";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useFoundationStatus } from "@/hooks/useFoundationStatus";
+import ConnectionsLocked from "@/components/ConnectionsLocked";
 
 interface MatchWithProfile {
   id: string;

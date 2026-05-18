@@ -270,7 +270,7 @@ const CheckConnection = () => {
             fontFamily: "Poppins, sans-serif",
           }}
         >
-          My Matches
+          My Connections
         </button>
       </div>
 
@@ -811,7 +811,7 @@ const CheckConnection = () => {
               <div className="p-4 pt-[max(env(safe-area-inset-top),1rem)]">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base" style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}>
-                    My Matches
+                    My Connections
                   </h3>
                   <button
                     onClick={() => setShowSaved(false)}

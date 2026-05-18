@@ -716,7 +716,7 @@ const Settings = () => {
 
                 <p className="text-xs text-muted-foreground">Choose which in-app notifications you'd like to receive</p>
 
-                {/* Matches */}
+                {/* Connections */}
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
@@ -805,11 +805,11 @@ const Settings = () => {
               <CardContent className="space-y-4">
                 <p className="text-xs text-muted-foreground">Control which email notifications you'd like to receive</p>
 
-                {/* Email - Matches */}
+                {/* Email - Connections */}
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-medium flex items-center gap-2">
-                      <Heart className="w-4 h-4 text-accent" /> New Matches
+                      <Heart className="w-4 h-4 text-accent" /> New Connections
                     </span>
                     <p className="text-sm text-muted-foreground">Email when someone likes you back</p>
                   </div>

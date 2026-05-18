@@ -255,9 +255,9 @@ const TOUR_STEPS: TourStep[] = [
   {
     icon: Heart,
     iconWrapClass: "bg-pink-500/15 text-pink-300 border-pink-400/30",
-    title: "Matches & Sacred Reveal",
-    body: "Mutual likes appear in Matches. Each day, one curated soul is unveiled to you in the Sacred Reveal — slow dating, the cosmic way.",
-    cta: { label: "Find Matches", path: "/connections", highlight: "connections-list" },
+    title: "Connections & Sacred Reveal",
+    body: "Mutual likes appear in Connections (unlocked once your Self-Knowledge Foundation is complete). Each day, one curated soul is unveiled to you in the Sacred Reveal — slow alignment, the cosmic way.",
+    cta: { label: "View Connections", path: "/connections", highlight: "connections-list" },
   },
   {
     icon: MessageCircle,

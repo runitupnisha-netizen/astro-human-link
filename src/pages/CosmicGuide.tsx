@@ -10,6 +10,7 @@ import { useTourHighlight } from "@/hooks/useTourHighlight";
 import { useLyraVoice } from "@/hooks/useLyraVoice";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { markLyraIntroAck } from "@/hooks/useFoundationStatus";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -58,6 +59,7 @@ const CosmicGuide = () => {
   // Load conversations
   useEffect(() => {
     if (!user) return;
+    markLyraIntroAck();
     (async () => {
       const { data } = await supabase
         .from("guide_conversations")

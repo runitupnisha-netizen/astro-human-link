@@ -20,8 +20,8 @@ const emptyStates = {
   messages: {
     icon: MessageCircle,
     title: "No messages yet ✦",
-    description: "Your messages will appear here once you make your first cosmic match.",
-    cta: "Find Matches",
+    description: "Your messages will appear here once you make your first cosmic connection.",
+    cta: "View Connections",
     route: "/connections",
     gradient: "from-primary/20 via-secondary/10 to-accent/20",
   },
@@ -43,8 +43,8 @@ const emptyStates = {
   },
   discover: {
     icon: Compass,
-    title: "The cosmos is aligning your matches. ✦",
-    description: "A complete birth chart attracts the most aligned matches.",
+    title: "The cosmos is aligning your connections. ✦",
+    description: "A complete birth chart attracts the most aligned souls.",
     cta: "Complete My Cosmos",
     route: "/my-cosmos",
     gradient: "from-primary/20 via-accent/10 to-secondary/20",

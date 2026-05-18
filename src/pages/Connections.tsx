@@ -16,6 +16,8 @@ import { ConnectionCardSkeleton } from "@/components/Skeletons";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import TourHighlight from "@/components/TourHighlight";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useFoundationStatus } from "@/hooks/useFoundationStatus";
+import ConnectionsLocked from "@/components/ConnectionsLocked";
 
 interface MatchWithProfile {
   id: string;
@@ -88,6 +90,7 @@ const Connections = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const online = useNetworkStatus();
+  const foundation = useFoundationStatus();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [recentChecks, setRecentChecks] = useState<
     Array<{ id: string; their_name: string | null; compatibility_score: number | null; created_at: string }>
@@ -282,6 +285,14 @@ const Connections = () => {
     return "New Match";
   };
 
+  if (foundation.loading) {
+    return null;
+  }
+
+  if (!foundation.complete) {
+    return <ConnectionsLocked status={foundation} />;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background relative">
@@ -422,7 +433,7 @@ const Connections = () => {
           ) : (
             <TourHighlight
               targetId="connections-list"
-              label="Your matches"
+              label="Your connections"
               className="space-y-4"
             >
               {matches.map((match, i) => (

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Moon, Sun, Zap, Flame, Droplets, Wind, Mountain, Heart, TrendingUp, Calendar, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { markInsightRead } from "@/hooks/useFoundationStatus";
 
 const ZODIAC_SYMBOLS: Record<string, string> = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋", Leo: "♌", Virgo: "♍",
@@ -50,6 +51,7 @@ const WeeklyInsights = () => {
 
   useEffect(() => {
     if (!user) return;
+    markInsightRead();
     supabase
       .from("profiles")
       .select("*")

@@ -44,7 +44,7 @@ const tierDetails: Record<TierKey, {
     description: (price) => `7-day free trial · then ${price ?? "$9.99"}/mo`,
     badge: "7-Day Free Trial",
     features: [
-      "Unlimited cosmic matches",
+      "Unlimited cosmic connections",
       "See who likes you",
       "Full synastry charts",
       "Advanced filters",
@@ -68,8 +68,8 @@ const tierDetails: Record<TierKey, {
 };
 
 const premiumPerks = [
-  { icon: <Heart className="w-5 h-5" />, title: "Unlimited Matches", desc: "No daily limits on cosmic connections" },
-  { icon: <Eye className="w-5 h-5" />, title: "See Who Likes You", desc: "Know your admirers before you swipe" },
+  { icon: <Heart className="w-5 h-5" />, title: "Unlimited Connections", desc: "No daily limits on cosmic connections" },
+  { icon: <Eye className="w-5 h-5" />, title: "See Who Resonates", desc: "Know who's aligned with you before you swipe" },
   { icon: <Sparkles className="w-5 h-5" />, title: "Deep Compatibility", desc: "Full synastry charts & soul blueprints" },
   { icon: <Shield className="w-5 h-5" />, title: "Priority Visibility", desc: "Your profile gets seen first" },
 ];

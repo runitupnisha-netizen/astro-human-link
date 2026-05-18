@@ -1067,7 +1067,7 @@ const Onboarding = () => {
                   <h3 className="text-lg font-semibold text-foreground">I'm interested in...</h3>
                   <Badge variant="outline" className="border-primary/30 text-primary text-xs ml-auto">Multi-select</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">Select all that apply — your matches will be filtered accordingly.</p>
+                <p className="text-sm text-muted-foreground mb-4">Select all that apply — this shapes who you'll meet once Connections unlocks.</p>
                 <div className="grid grid-cols-2 gap-2">
                   {DATING_PREFERENCE_OPTIONS.map((opt) => (
                     <motion.button
@@ -1246,7 +1246,7 @@ const Onboarding = () => {
                 </motion.div>
                 <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">What Lights You Up?</h1>
                 <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
-                  Select the things you love — the more you pick, the better your matches ✨
+                  Select the things you love — the more you pick, the deeper your self-discovery journey ✨
                 </p>
                 <AnimatePresence>
                   {selectedInterests.length > 0 && (

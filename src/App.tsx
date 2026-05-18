@@ -75,8 +75,11 @@ const CallHistory = lazy(() => import("./pages/CallHistory"));
 const queryClient = new QueryClient();
 
 const LoadingScreen = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6">
     <SparkleLoader size={36} />
+    <p className="font-display text-sm md:text-base bg-gradient-golden bg-clip-text text-transparent text-center">
+      Self-discovery first. Connection follows.
+    </p>
   </div>
 );
 

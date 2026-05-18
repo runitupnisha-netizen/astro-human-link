@@ -285,6 +285,14 @@ const Connections = () => {
     return "New Match";
   };
 
+  if (foundation.loading) {
+    return null;
+  }
+
+  if (!foundation.complete) {
+    return <ConnectionsLocked status={foundation} />;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background relative">

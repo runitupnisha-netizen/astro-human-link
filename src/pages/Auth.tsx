@@ -363,7 +363,7 @@ const Auth = () => {
               {showForgotPassword
                 ? "We'll send a reset link to your inbox"
                 : isLogin
-                ? "Your matches are waiting"
+                ? "Self-discovery first. Connection follows."
                 : "Real connections, written in the stars"}
             </p>
           </motion.div>

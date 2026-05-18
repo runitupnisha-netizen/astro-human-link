@@ -278,6 +278,7 @@ const AppRoutes = () => {
             {/* Legacy routes — redirected to /profile (My Cosmos merged screen) */}
             <Route path="/inner-world" element={<Navigate to="/profile" replace />} />
             <Route path="/my-chart" element={<Navigate to="/profile" replace />} />
+            <Route path="/blueprint" element={<Navigate to="/profile" replace />} />
             <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
             <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />

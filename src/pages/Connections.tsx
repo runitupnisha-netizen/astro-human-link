@@ -433,7 +433,7 @@ const Connections = () => {
           ) : (
             <TourHighlight
               targetId="connections-list"
-              label="Your matches"
+              label="Your connections"
               className="space-y-4"
             >
               {matches.map((match, i) => (

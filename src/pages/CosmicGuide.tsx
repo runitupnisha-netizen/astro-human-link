@@ -81,9 +81,8 @@ const CosmicGuide = () => {
         .select("id,title,last_message_at")
         .order("last_message_at", { ascending: false });
       setConversations(data ?? []);
-      if (data && data.length > 0 && !activeId) {
-        setActiveId(data[0].id);
-      }
+      // Land on welcome/recent-chats state instead of auto-opening last chat,
+      // so users can see their Recent Chats list.
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

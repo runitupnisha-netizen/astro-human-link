@@ -20,6 +20,24 @@ export interface FoundationStatus {
 
 const INSIGHTS_READ_KEY = "stellara:insights-read";
 const LYRA_ACK_KEY = "stellara:lyra-intro-ack";
+const REVIEWER_MODE_KEY = "stellara:reviewer-mode";
+const REVIEWER_TOKEN = "STELLARA-REVIEW-2026";
+
+// One-time URL bypass: visiting any page with ?reviewer=STELLARA-REVIEW-2026
+// flips a sessionStorage flag so App Store reviewers can skip the Foundation
+// gate and reach Connections immediately. Cleared when the tab closes.
+if (typeof window !== "undefined") {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("reviewer") === REVIEWER_TOKEN) {
+      sessionStorage.setItem(REVIEWER_MODE_KEY, "1");
+    }
+  } catch {}
+}
+
+export const isReviewerMode = (): boolean => {
+  try { return sessionStorage.getItem(REVIEWER_MODE_KEY) === "1"; } catch { return false; }
+};
 
 export const markInsightRead = () => {
   try {
@@ -54,6 +72,16 @@ export const useFoundationStatus = (): FoundationStatus => {
     if (!user) {
       setLoading(false);
       setSteps([]);
+      return;
+    }
+    if (isReviewerMode()) {
+      setSteps([
+        { id: "chart",    label: "Complete your birth chart", description: "Reviewer bypass active.", done: true, path: "/onboarding" },
+        { id: "profile",  label: "Reach 80% profile score",   description: "Reviewer bypass active.", done: true, path: "/profile" },
+        { id: "insights", label: "Read your first 3 Insights",description: "Reviewer bypass active.", done: true, path: "/insights" },
+        { id: "lyra",     label: "Meet Lyra, your cosmic guide", description: "Reviewer bypass active.", done: true, path: "/lyra" },
+      ]);
+      setLoading(false);
       return;
     }
     let cancelled = false;

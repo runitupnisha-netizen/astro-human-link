@@ -668,6 +668,9 @@ const Profile = () => {
               <div ref={blueprintRef}>
                 <SoulBlueprintCard profile={profile} />
               </div>
+              <p className="mt-4 text-center font-display text-xs text-muted-foreground/80 tracking-wide">
+                Strategy is what you do. Alignment is when you do it.
+              </p>
             </CardContent>
           </Card>
 

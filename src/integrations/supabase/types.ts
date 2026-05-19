@@ -1959,19 +1959,10 @@ export type Database = {
       get_my_private_profile: {
         Args: never
         Returns: {
-          bonus_pro_until: string
-          boost_until: string
-          briefing_email_reminder: boolean
-          briefing_last_reminder_date: string
-          briefing_push_reminder: boolean
-          briefing_reminder_hour: number
-          briefing_reminder_timezone: string
           current_latitude: number
           current_longitude: number
           is_suspended: boolean
           phone: string
-          referral_redeemed_at: string
-          referred_by_code: string
         }[]
       }
       has_role: {

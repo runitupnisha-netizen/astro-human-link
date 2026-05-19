@@ -157,6 +157,9 @@ const WeeklyInsights = () => {
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
               Weekly Alignment
             </h1>
+            <p className="font-display text-sm text-accent/90 tracking-wide mb-2">
+              Strategy is what you do. Alignment is when you do it.
+            </p>
             <p className="text-muted-foreground text-sm font-serif">
               Your cosmic cheat sheet for {weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — {weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.{" "}
               <button onClick={generateInsights} disabled={generating} className="text-accent hover:underline underline-offset-2 transition-colors disabled:opacity-50">

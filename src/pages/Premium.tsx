@@ -432,6 +432,9 @@ const Premium = () => {
             Unlock the full power of{" "}
             <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }} className="text-accent hover:underline underline-offset-2 transition-colors cursor-pointer">cosmic connection ↓</a>
           </p>
+          <p className="mt-4 font-display text-sm text-accent/90 tracking-wide">
+            Strategy is what you do. Alignment is when you do it.
+          </p>
 
           {subscribed && currentTier && (
             <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-6">

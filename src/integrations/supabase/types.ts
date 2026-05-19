@@ -1748,6 +1748,189 @@ export type Database = {
         }
         Relationships: []
       }
+      public_profiles: {
+        Row: {
+          about_me: string | null
+          astro_summary: string | null
+          avatar_url: string | null
+          bio_prompt_1: string | null
+          bio_prompt_1_answer: string | null
+          bio_prompt_2: string | null
+          bio_prompt_2_answer: string | null
+          bio_prompt_3: string | null
+          bio_prompt_3_answer: string | null
+          birth_date: string | null
+          birth_place: string | null
+          birth_time: string | null
+          birthday_number: number | null
+          boost_until: string | null
+          compatibility_tags: string[] | null
+          created_at: string | null
+          current_city: string | null
+          current_latitude: number | null
+          current_longitude: number | null
+          display_name: string | null
+          drinking: string | null
+          gender: string | null
+          gene_keys_evolution: string | null
+          gene_keys_life_purpose: string | null
+          gene_keys_radiance: string | null
+          gene_keys_summary: string | null
+          growth_commitment: string | null
+          human_design_authority: string | null
+          human_design_profile: string | null
+          human_design_strategy: string | null
+          human_design_summary: string | null
+          human_design_type: string | null
+          interests: string[] | null
+          is_incognito: boolean | null
+          is_paused: boolean | null
+          kids_preference: string | null
+          last_seen_at: string | null
+          life_path_number: number | null
+          mars_sign: string | null
+          mercury_sign: string | null
+          moon_sign: string | null
+          numerology_summary: string | null
+          onboarding_complete: boolean | null
+          personal_year_number: number | null
+          preferred_language: string | null
+          recurring_themes: string | null
+          relationship_goal: string | null
+          rising_sign: string | null
+          smoking: string | null
+          social_energy: number | null
+          spiritual_practice: string | null
+          substances: string | null
+          sun_sign: string | null
+          updated_at: string | null
+          user_id: string | null
+          username: string | null
+          venus_sign: string | null
+          voice_intro_url: string | null
+        }
+        Insert: {
+          about_me?: string | null
+          astro_summary?: string | null
+          avatar_url?: string | null
+          bio_prompt_1?: string | null
+          bio_prompt_1_answer?: string | null
+          bio_prompt_2?: string | null
+          bio_prompt_2_answer?: string | null
+          bio_prompt_3?: string | null
+          bio_prompt_3_answer?: string | null
+          birth_date?: string | null
+          birth_place?: string | null
+          birth_time?: string | null
+          birthday_number?: number | null
+          boost_until?: string | null
+          compatibility_tags?: string[] | null
+          created_at?: string | null
+          current_city?: string | null
+          current_latitude?: never
+          current_longitude?: never
+          display_name?: string | null
+          drinking?: string | null
+          gender?: string | null
+          gene_keys_evolution?: string | null
+          gene_keys_life_purpose?: string | null
+          gene_keys_radiance?: string | null
+          gene_keys_summary?: string | null
+          growth_commitment?: string | null
+          human_design_authority?: string | null
+          human_design_profile?: string | null
+          human_design_strategy?: string | null
+          human_design_summary?: string | null
+          human_design_type?: string | null
+          interests?: string[] | null
+          is_incognito?: boolean | null
+          is_paused?: boolean | null
+          kids_preference?: string | null
+          last_seen_at?: string | null
+          life_path_number?: number | null
+          mars_sign?: string | null
+          mercury_sign?: string | null
+          moon_sign?: string | null
+          numerology_summary?: string | null
+          onboarding_complete?: boolean | null
+          personal_year_number?: number | null
+          preferred_language?: string | null
+          recurring_themes?: string | null
+          relationship_goal?: string | null
+          rising_sign?: string | null
+          smoking?: string | null
+          social_energy?: number | null
+          spiritual_practice?: string | null
+          substances?: string | null
+          sun_sign?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          username?: string | null
+          venus_sign?: string | null
+          voice_intro_url?: string | null
+        }
+        Update: {
+          about_me?: string | null
+          astro_summary?: string | null
+          avatar_url?: string | null
+          bio_prompt_1?: string | null
+          bio_prompt_1_answer?: string | null
+          bio_prompt_2?: string | null
+          bio_prompt_2_answer?: string | null
+          bio_prompt_3?: string | null
+          bio_prompt_3_answer?: string | null
+          birth_date?: string | null
+          birth_place?: string | null
+          birth_time?: string | null
+          birthday_number?: number | null
+          boost_until?: string | null
+          compatibility_tags?: string[] | null
+          created_at?: string | null
+          current_city?: string | null
+          current_latitude?: never
+          current_longitude?: never
+          display_name?: string | null
+          drinking?: string | null
+          gender?: string | null
+          gene_keys_evolution?: string | null
+          gene_keys_life_purpose?: string | null
+          gene_keys_radiance?: string | null
+          gene_keys_summary?: string | null
+          growth_commitment?: string | null
+          human_design_authority?: string | null
+          human_design_profile?: string | null
+          human_design_strategy?: string | null
+          human_design_summary?: string | null
+          human_design_type?: string | null
+          interests?: string[] | null
+          is_incognito?: boolean | null
+          is_paused?: boolean | null
+          kids_preference?: string | null
+          last_seen_at?: string | null
+          life_path_number?: number | null
+          mars_sign?: string | null
+          mercury_sign?: string | null
+          moon_sign?: string | null
+          numerology_summary?: string | null
+          onboarding_complete?: boolean | null
+          personal_year_number?: number | null
+          preferred_language?: string | null
+          recurring_themes?: string | null
+          relationship_goal?: string | null
+          rising_sign?: string | null
+          smoking?: string | null
+          social_energy?: number | null
+          spiritual_practice?: string | null
+          substances?: string | null
+          sun_sign?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          username?: string | null
+          venus_sign?: string | null
+          voice_intro_url?: string | null
+        }
+        Relationships: []
+      }
       verification_status: {
         Row: {
           status: string | null

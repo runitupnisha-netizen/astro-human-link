@@ -123,10 +123,10 @@ const Growth = () => {
             className="text-2xl md:text-3xl mb-2 tracking-wide"
             style={{ fontFamily: "Lora, Georgia, serif", color: TITLE }}
           >
-            Date from the Soul Out.
+            Your Growth Journey
           </h1>
           <p className="text-sm" style={{ color: BODY, fontFamily: "Poppins, sans-serif", fontWeight: 300 }}>
-            Know yourself. Love yourself. Find your person.
+            Know yourself. Track your evolution. Become your highest self.
           </p>
         </motion.div>
 

@@ -9,6 +9,7 @@ import BodyGraph from "@/components/blueprint/BodyGraph";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
+import CachedAiSection from "@/components/blueprint/CachedAiSection";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -127,14 +128,18 @@ const HumanDesign = () => {
                   title={`What ${hdProfile} actually means`}
                   teaser={`Your ${hdProfile} profile describes two distinct lines that show up together: a conscious personality you operate from and an unconscious design others feel. Unlock the full read.`}
                   lyraSeed={`My HD profile is ${hdProfile}. Break down what each line means, how they interact, and what my life theme is.`}
-                />
+                >
+                  <CachedAiSection section="profile_detail" title={`Profile ${hdProfile} — full read`} />
+                </PremiumLock>
               </div>
             ) : (
               <PremiumLock
                 title="Your Profile"
                 teaser="Your profile is your personality archetype — the role you play in relationships and the life theme you're here to live. Unlock to get yours."
                 lyraSeed="What's my HD profile and what does it mean for how I live?"
-              />
+              >
+                <CachedAiSection section="profile_detail" title="Your HD Profile" />
+              </PremiumLock>
             )}
           </section>
 
@@ -146,7 +151,9 @@ const HumanDesign = () => {
               title="Your 9 Centers"
               teaser="Defined centers are your fixed traits — the way you reliably operate. Undefined centers are where you take in and amplify other people's energy. Unlock to see all nine centers personalized to you."
               lyraSeed="Walk me through my nine centers — which are defined, which are undefined, and what each one means for how I show up."
-            />
+            >
+              <CachedAiSection section="centers" title="Your 9 Centers" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 6 — Channels & Gates */}
@@ -159,7 +166,9 @@ const HumanDesign = () => {
               title="Your active channels & gates"
               teaser="Each active gate carries a specific theme. Active channels turn pairs of gates into life-long signatures. Unlock to see what's wired in your design and what it means."
               lyraSeed="What channels and gates are active in my design, and what are the headline themes I should know?"
-            />
+            >
+              <CachedAiSection section="channels" title="Your Channels & Gates" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 7 — Incarnation Cross */}
@@ -170,7 +179,9 @@ const HumanDesign = () => {
               title="What you're here to embody"
               teaser="Your Incarnation Cross is built from your Sun and Earth — conscious and unconscious. It names the larger theme you're here to live out across this lifetime."
               lyraSeed="What's my Incarnation Cross, and what is it asking me to embody in this lifetime?"
-            />
+            >
+              <CachedAiSection section="incarnation_cross" title="Your Incarnation Cross" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 8 — Learn */}

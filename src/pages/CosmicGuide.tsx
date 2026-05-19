@@ -592,6 +592,66 @@ const CosmicGuide = () => {
                 I read your stars, your design, your numbers — and I listen.
                 Ask me anything about love, alignment, or what your soul is whispering today.
               </p>
+              {conversations.length > 0 && (
+                <div className="w-full max-w-lg mb-6">
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span
+                      className="text-[11px] uppercase tracking-[0.15em]"
+                      style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+                    >
+                      Recent chats
+                    </span>
+                    {conversations.length > 3 && (
+                      <button
+                        onClick={() => setShowHistory(true)}
+                        className="text-[11px] text-[#d0b4f7] hover:text-[#e0d4ff] transition-colors"
+                        style={{ fontFamily: "Poppins, sans-serif" }}
+                      >
+                        View all
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    {conversations.slice(0, 3).map((c) => {
+                      const d = new Date(c.last_message_at);
+                      const diffMs = Date.now() - d.getTime();
+                      const diffH = Math.floor(diffMs / 3600000);
+                      const diffD = Math.floor(diffH / 24);
+                      const when =
+                        diffH < 1 ? "just now" :
+                        diffH < 24 ? `${diffH}h ago` :
+                        diffD === 1 ? "yesterday" :
+                        diffD < 7 ? `${diffD}d ago` :
+                        d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => setActiveId(c.id)}
+                          className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-2xl transition-colors"
+                          style={{
+                            backgroundColor: "rgba(77, 58, 92, 0.35)",
+                            border: "1px solid rgba(208, 180, 247, 0.18)",
+                          }}
+                        >
+                          <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" style={{ color: "#d0b4f7" }} />
+                          <span
+                            className="flex-1 truncate text-sm"
+                            style={{ color: "#c9b8f0", fontFamily: "Poppins, sans-serif" }}
+                          >
+                            {c.title}
+                          </span>
+                          <span
+                            className="text-[10px] shrink-0"
+                            style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+                          >
+                            {when}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="w-full grid grid-cols-1 gap-2 max-w-lg">
                 {STARTER_PROMPTS.map((p) => (
                   <button

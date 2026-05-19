@@ -67,9 +67,11 @@ Deno.serve(async (req) => {
         .eq("user_id", senderId)
         .single();
 
-      const senderName = senderProfile?.display_name || "Someone";
+      // NOTE: Web Push payloads are not yet RFC 8291 encrypted, so push services
+      // can read the body. Avoid leaking sender identity or message content.
+      void senderProfile;
       title = "💬 New Message";
-      body = `${senderName} sent you a message`;
+      body = "You have a new message";
       url = `/messages?match=${matchId}`;
     } else if (type === "daily_briefing" && user_id) {
       targetUserIds = [user_id];

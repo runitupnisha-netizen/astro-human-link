@@ -30,12 +30,12 @@ const Footer = () => (
 
       <div className="text-center space-y-4 text-xs text-muted-foreground/70 leading-relaxed max-w-3xl mx-auto">
         <p className="font-semibold text-muted-foreground text-sm">
-          © 2026 Stellara. All Rights Reserved.
+          © 2026 RunItUp Media Group LLC. All rights reserved.
         </p>
         <p>
-          Stellara and all related content, features, functionality, software, algorithms, designs,
+          Stellara is a product of RunItUp Media Group LLC. All related content, features, functionality, software, algorithms, designs,
           user interfaces, graphics, text, branding, trademarks, service marks, and intellectual
-          property are the exclusive property of Stellara and are protected by United States and
+          property are the exclusive property of RunItUp Media Group LLC and are protected by United States and
           international copyright, trademark, trade secret, and other intellectual property laws.
         </p>
         <p>

@@ -8,7 +8,7 @@ import SparkleLoader from "@/components/SparkleLoader";
 import { toast } from "@/hooks/use-toast";
 import { useTourHighlight } from "@/hooks/useTourHighlight";
 import { useLyraVoice } from "@/hooks/useLyraVoice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { markLyraIntroAck } from "@/hooks/useFoundationStatus";
 
@@ -39,6 +39,7 @@ const STAR_FIELD = Array.from({ length: 18 }, (_, i) => {
 const CosmicGuide = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const inputHighlight = useTourHighlight("lyra-input");
   const voice = useLyraVoice();
   const [showVoicePrimer, setShowVoicePrimer] = useState(false);
@@ -48,6 +49,20 @@ const CosmicGuide = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+
+  // Honor ?seed= deep-links (Today nudge, Blueprint "Ask Lyra about this" buttons).
+  // Pre-fills the composer so the user can edit before sending.
+  useEffect(() => {
+    const seed = searchParams.get("seed");
+    if (seed && !input) {
+      setInput(seed);
+      // Strip the param so refreshes don't re-seed
+      const next = new URLSearchParams(searchParams);
+      next.delete("seed");
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [streaming, setStreaming] = useState(false);
   const [loadingThread, setLoadingThread] = useState(false);
   const [showHistory, setShowHistory] = useState(false);

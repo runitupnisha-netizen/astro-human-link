@@ -69,7 +69,7 @@ const TermsOfService = () => (
 
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">11. Contact Us</h2>
-              <p>For questions about these Terms of Service, contact us at <a href="mailto:stellaradating@gmail.com" className="text-primary hover:underline">stellaradating@gmail.com</a>.</p>
+              <p>For questions about these Terms of Service, contact us at <a href="mailto:info@stellaraapp.net" className="text-primary hover:underline">info@stellaraapp.net</a>.</p>
             </section>
 
             <section className="border-t border-border pt-4 mt-6">

@@ -162,8 +162,8 @@ const PrivacyChecklist = () => {
                   <p className="font-medium text-foreground/90 mb-1">2. Email (within 30 days)</p>
                   <p className="text-muted-foreground flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5" />
-                    <a href="mailto:stellaradating@gmail.com" className="text-amber-400 hover:underline">
-                      stellaradating@gmail.com
+                    <a href="mailto:info@stellaraapp.net" className="text-amber-400 hover:underline">
+                      info@stellaraapp.net
                     </a>
                   </p>
                 </div>

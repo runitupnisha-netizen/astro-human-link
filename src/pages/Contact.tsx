@@ -59,7 +59,7 @@ const Contact = () => {
       if (adminRes.error) {
         toast({
           title: "Couldn't send right now",
-          description: "Please try again in a moment, or email us directly at stellaradating@gmail.com.",
+          description: "Please try again in a moment, or email us directly at info@stellaraapp.net.",
           variant: "destructive",
         });
         return;
@@ -74,7 +74,7 @@ const Contact = () => {
       console.error("Contact submit failed:", err);
       toast({
         title: "Something went wrong",
-        description: "Please try again or email us at stellaradating@gmail.com.",
+        description: "Please try again or email us at info@stellaraapp.net.",
         variant: "destructive",
       });
     } finally {
@@ -166,10 +166,10 @@ const Contact = () => {
         <div className="text-center text-muted-foreground text-sm space-y-2">
           <p>You can also reach us directly at:</p>
           <a
-            href="mailto:stellaradating@gmail.com"
+            href="mailto:info@stellaraapp.net"
             className="text-primary hover:underline font-medium text-base"
           >
-            stellaradating@gmail.com
+            info@stellaraapp.net
           </a>
           <p className="mt-4 text-xs">We typically respond within 24–48 hours.</p>
         </div>

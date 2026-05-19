@@ -26,8 +26,13 @@ serve(async (req) => {
 
   // Simple shared-secret guard so this can't be triggered by random clients
   const provided = req.headers.get("x-seed-secret");
-  const expected = Deno.env.get("DEMO_SEED_SECRET") || "stellara-seed-2026";
-  if (provided !== expected) {
+  const expected = Deno.env.get("DEMO_SEED_SECRET");
+  if (!expected) {
+    return new Response(JSON.stringify({ error: "Demo seeding not configured" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (!provided || provided !== expected) {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

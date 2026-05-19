@@ -8,6 +8,7 @@ import CosmicBackground from "@/components/CosmicBackground";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
+import CachedAiSection from "@/components/blueprint/CachedAiSection";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -107,7 +108,9 @@ const Numerology = () => {
               title="Your Expression / Destiny"
               teaser="Your Life Path tells you what you're here to learn. Your Expression number tells you what you're here to express — the talent set you arrived with. Unlock to compute it from your full birth name."
               lyraSeed="What's my Expression number, and how is it different from my Life Path? Give me the read."
-            />
+            >
+              <CachedAiSection section="expression" title="Your Expression Number" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 3 — Soul Urge (premium) */}
@@ -120,7 +123,9 @@ const Numerology = () => {
               title="What your heart actually wants"
               teaser="The motivation underneath your choices — what you're really reaching for when you choose a job, a partner, a city. Unlock to compute and read your Soul Urge."
               lyraSeed="What's my Soul Urge number, and what does it say I'm actually after underneath the surface?"
-            />
+            >
+              <CachedAiSection section="soul_urge" title="Your Soul Urge" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 4 — Personality (premium) */}
@@ -131,7 +136,9 @@ const Numerology = () => {
               title="The mask others meet first"
               teaser="Derived from the consonants in your name. It describes the first impression you give off — often very different from who you are on the inside."
               lyraSeed="What's my Personality number and what first impression does it create?"
-            />
+            >
+              <CachedAiSection section="personality" title="Your Personality Number" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 5 — Birthday (premium-ish, value shown if available) */}
@@ -177,7 +184,9 @@ const Numerology = () => {
                     title="Personal Month & Personal Day"
                     teaser="Zoom in further — every month and every day inside your Personal Year has its own number and theme. Unlock the daily lens."
                     lyraSeed="What's my Personal Month and Personal Day today, and what should I do with them?"
-                  />
+                  >
+                    <CachedAiSection section="personal_year_detail" title="Personal Year · Month · Day" />
+                  </PremiumLock>
                 </div>
               </div>
             ) : (

@@ -428,10 +428,13 @@ const CosmicGuide = () => {
       <div className="relative z-10 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2">
         <button
           onClick={() => setShowHistory(true)}
-          className="p-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#7a6a9a] hover:text-[#c9b8f0] transition-colors"
-          aria-label="Open conversation history"
+          className="inline-flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#a89cc9] hover:text-[#e0d4ff] transition-colors"
+          aria-label="Open recent chats"
         >
           <MessageSquare className="w-5 h-5" />
+          <span className="text-xs tracking-wide" style={{ fontFamily: "Poppins, sans-serif" }}>
+            Recent{conversations.length > 0 ? ` · ${conversations.length}` : ""}
+          </span>
         </button>
         {voice.supported ? (
           <button

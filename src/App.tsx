@@ -171,7 +171,8 @@ const LegacyMobileLaunchRouteFix = () => {
     if (checkedRef.current || typeof window === "undefined") return;
     checkedRef.current = true;
 
-    const isLegacyProfileLaunch = location.pathname === "/profile" && !location.search && !location.hash;
+    const legacyLaunchPaths = new Set(["/profile", "/inner-world", "/my-chart", "/saved-charts", "/my-cosmos"]);
+    const isLegacyProfileLaunch = legacyLaunchPaths.has(location.pathname) && !location.search && !location.hash;
     if (!isLegacyProfileLaunch) return;
 
     const isStandalonePwa =

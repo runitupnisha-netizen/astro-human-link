@@ -19,6 +19,15 @@ workflows:
         script: npx cap sync ios
       - name: Pod install
         script: cd ios/App && pod install --repo-update
+      - name: Set build number
+        script: |
+          cd ios/App
+          # Derive a monotonically increasing build number from Codemagic's
+          # project build counter. Falls back to current ASC build + 1 if
+          # BUILD_NUMBER isn't set (e.g. local runs).
+          NEW_BUILD_NUMBER=$(($BUILD_NUMBER + 1))
+          agvtool new-version -all $NEW_BUILD_NUMBER
+          echo "Set CFBundleVersion to $NEW_BUILD_NUMBER"
       - name: Build and export IPA
         script: |
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | \

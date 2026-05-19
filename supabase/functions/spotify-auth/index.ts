@@ -134,12 +134,33 @@ Deno.serve(async (req) => {
 
   // ACTION: get currently playing / top tracks for a user
   if (action === "now_playing" || action === "top_tracks") {
-    const targetUserId = url.searchParams.get("user_id") || body.user_id || userId;
-    if (!targetUserId) {
-      return new Response(JSON.stringify({ error: "Missing user_id" }), {
-        status: 400,
+    // Require authentication — these actions expose a user's stored access token / listening data.
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    const requestedUserId = url.searchParams.get("user_id") || body.user_id || userId;
+
+    // Allow fetching own data, OR a match partner's data (for "now playing on a match's profile").
+    let targetUserId = userId;
+    if (requestedUserId && requestedUserId !== userId) {
+      const { data: match } = await supabase
+        .from("matches")
+        .select("id")
+        .or(
+          `and(user_a.eq.${userId},user_b.eq.${requestedUserId}),and(user_a.eq.${requestedUserId},user_b.eq.${userId})`,
+        )
+        .maybeSingle();
+      if (!match) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      targetUserId = requestedUserId;
     }
 
     // Get stored tokens

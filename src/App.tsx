@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -162,6 +162,31 @@ const ReferralCapture = () => {
   return null;
 };
 
+const LegacyMobileLaunchRouteFix = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const checkedRef = useRef(false);
+
+  useEffect(() => {
+    if (checkedRef.current || typeof window === "undefined") return;
+    checkedRef.current = true;
+
+    const isLegacyProfileLaunch = location.pathname === "/profile" && !location.search && !location.hash;
+    if (!isLegacyProfileLaunch) return;
+
+    const isStandalonePwa =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      ("standalone" in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
+    const isNativeShell = window.location.protocol === "capacitor:";
+
+    if (isStandalonePwa || isNativeShell) {
+      navigate("/", { replace: true });
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
+
+  return null;
+};
+
 const AuthCallback = () => {
   const navigate = useNavigate();
 
@@ -245,6 +270,7 @@ const AppRoutes = () => {
     <>
       <AnalyticsTracker />
       <ReferralCapture />
+      <LegacyMobileLaunchRouteFix />
       <KeyboardInsetTracker />
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}

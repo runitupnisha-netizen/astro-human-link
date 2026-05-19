@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Zap, Hash, ArrowRight } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
+import SynthesisCard from "@/components/blueprint/SynthesisCard";
 
 const SECTIONS = [
   {
@@ -49,6 +50,9 @@ const Blueprint = () => {
               Strategy is what you do. Alignment is when you do it.
             </p>
           </header>
+
+          {/* HERO — Cross-science Synthesis (premium-gated) */}
+          <SynthesisCard />
 
           <div className="flex flex-col gap-4">
             {SECTIONS.map((s, i) => {

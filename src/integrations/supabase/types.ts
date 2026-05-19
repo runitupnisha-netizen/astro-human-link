@@ -92,6 +92,42 @@ export type Database = {
         }
         Relationships: []
       }
+      blueprint_ai_cache: {
+        Row: {
+          cached_until: string | null
+          content: string
+          created_at: string
+          generated_at: string
+          id: string
+          model: string | null
+          section_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cached_until?: string | null
+          content: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          model?: string | null
+          section_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cached_until?: string | null
+          content?: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          model?: string | null
+          section_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       briefing_reflections: {
         Row: {
           briefing_id: string
@@ -1239,6 +1275,33 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      saved_insights: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          source: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          source: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          source?: string
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }

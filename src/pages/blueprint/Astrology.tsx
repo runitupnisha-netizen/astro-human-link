@@ -9,6 +9,7 @@ import NatalWheel from "@/components/blueprint/NatalWheel";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
+import CachedAiSection from "@/components/blueprint/CachedAiSection";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -133,17 +134,11 @@ const Astrology = () => {
               teaser="Your Mercury shows how you think and speak. Venus runs love, money, and taste. Mars is how you fight and want. Outer planets — Jupiter through Pluto — describe your generation and your fate. Unlock to see all eight personalized to your chart."
               lyraSeed="Walk me through my Mercury, Venus, and Mars placements — what sign and house, and what each one says about me."
             >
-              <div className="space-y-3">
-                {["Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"].map((p) => (
-                  <article key={p} className="rounded-xl bg-background/40 border border-border/30 p-4">
-                    <h3 className="font-display text-base font-semibold mb-1">{p}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Ask Lyra to compute and interpret your {p} placement from your birth chart.
-                    </p>
-                    <AskLyraButton seed={`What sign and house is my ${p} in, and what does it say about me?`} label={`Get my ${p}`} />
-                  </article>
-                ))}
-              </div>
+              <CachedAiSection
+                section="planets"
+                title="Your Personal & Outer Planets"
+                lyraSeedFallback="Walk me through my Mercury, Venus, and Mars placements."
+              />
             </PremiumLock>
           </section>
 
@@ -157,7 +152,9 @@ const Astrology = () => {
               title="All 12 Life Houses"
               teaser="What planets sit in your 7th house tells you a lot about partnership. An empty house isn't dead — it's ruled by another planet. Unlock to see what's in each of your twelve houses and what each one means for you."
               lyraSeed="Walk me through all 12 houses of my natal chart — what's in each and what the empty ones mean."
-            />
+            >
+              <CachedAiSection section="houses" title="Your 12 Life Houses" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 4 — Aspects */}
@@ -170,7 +167,9 @@ const Astrology = () => {
               title="Your Personalized Aspects"
               teaser="Your Mars square Saturn means you feel held back when you act — and learning to act anyway is your work. Unlock to see all the major aspects in your chart with a plain-English read on each."
               lyraSeed="What are the major aspects in my chart, and what do they mean for how I move through life?"
-            />
+            >
+              <CachedAiSection section="aspects" title="Your Major Aspects" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 5 — Today's Sky */}
@@ -183,7 +182,9 @@ const Astrology = () => {
               title="Live transits over your chart"
               teaser="Right now Mars is moving through one of your houses, kicking up energy in a specific life area. Mercury is highlighting a different one. Unlock to get today's sky read against your personal chart, every day."
               lyraSeed="What's the sky doing today against my natal chart? Give me the top three transits to pay attention to and what to do about each."
-            />
+            >
+              <CachedAiSection section="transits" title="Today's Sky over your chart" />
+            </PremiumLock>
           </section>
 
           {/* SECTION 6 — Learn */}

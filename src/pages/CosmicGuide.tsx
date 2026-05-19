@@ -504,6 +504,12 @@ const CosmicGuide = () => {
         >
           your cosmic guide · always here
         </p>
+        <p
+          className="mt-2 max-w-xs text-center text-[11px] tracking-wide"
+          style={{ color: "#a89cc9", fontFamily: "Lora, Georgia, serif" }}
+        >
+          Strategy is what you do. Alignment is when you do it.
+        </p>
         <button
           type="button"
           onClick={() => setShowDisclaimer(true)}

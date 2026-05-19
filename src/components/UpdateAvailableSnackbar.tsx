@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, X, Sparkles } from "lucide-react";
+import { useAppUpdate } from "@/hooks/useAppUpdate";
 
 /**
  * Listens for a new service worker reaching the "waiting" state and shows
@@ -14,6 +15,13 @@ const UpdateAvailableSnackbar = () => {
   const [reloading, setReloading] = useState(false);
   const unmountedRef = useRef(false);
   useEffect(() => () => { unmountedRef.current = true; }, []);
+
+  // Bundle-hash based update detection (works even when the service
+  // worker itself does not change between deploys).
+  const { updateAvailable } = useAppUpdate();
+  useEffect(() => {
+    if (updateAvailable) setOpen(true);
+  }, [updateAvailable]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
@@ -62,6 +70,7 @@ const UpdateAvailableSnackbar = () => {
 
   const reloadNow = () => {
     if (!waitingWorker) {
+      setReloading(true);
       window.location.reload();
       return;
     }

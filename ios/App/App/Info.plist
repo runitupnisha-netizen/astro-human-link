@@ -55,5 +55,7 @@
 	<string>Stellara saves shareable Soul Blueprint cards and match memories to your photo library.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Stellara uses your location to find compatible matches near you.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

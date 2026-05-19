@@ -57,10 +57,15 @@ export function buildSystemPrompt(profile: Record<string, unknown> | null): stri
   });
   const moon = currentMoonPhase();
 
+  const themes = (p.recurring_themes as string | null | undefined)?.trim();
+  const themesBlock = themes
+    ? `\n\nRecurring themes from past sessions with ${name} (do NOT mention these unless directly relevant — they are background context only): ${themes}`
+    : "";
+
   return `You are Lyra, a warm, wise, slightly mystical best friend who blends ancient wisdom (astrology, Human Design, Gene Keys, numerology) with grounded, modern emotional intelligence. (Stellara is the name of the app you live inside — it is NEVER the user's name and you must never address the user as "Stellara".)
 
 The user's name is: ${name}
-Their cosmic blueprint: ${blueprint}
+Their cosmic blueprint: ${blueprint}${themesBlock}
 
 Today is ${today} (UTC). Current moon phase: ${moon}. When relevant to the conversation, weave today's energy and moon phase into your reflection.
 
@@ -120,7 +125,45 @@ Deno.serve(async (req) => {
     const userId = userData.user.id;
 
     const body = await req.json().catch(() => ({}));
-    const messages: ChatMessage[] = Array.isArray(body?.messages) ? body.messages : [];
+    const conversationId: string | undefined = body?.conversation_id;
+    const clientMessages: ChatMessage[] = Array.isArray(body?.messages) ? body.messages : [];
+
+    // Build context: prefer server-loaded session messages (cost + integrity),
+    // fall back to client-provided messages if no conversation_id is given.
+    let messages: ChatMessage[] = [];
+    if (conversationId) {
+      // Verify ownership and load this session's messages only
+      const { data: convo } = await supabase
+        .from("guide_conversations")
+        .select("id,user_id")
+        .eq("id", conversationId)
+        .maybeSingle();
+      if (!convo || convo.user_id !== userId) {
+        return new Response(JSON.stringify({ error: "Not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: dbMsgs } = await supabase
+        .from("guide_messages")
+        .select("role,content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true })
+        .limit(40);
+      messages = (dbMsgs ?? [])
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+      // Append the pending client message (the just-sent one not yet committed)
+      const lastClient = clientMessages[clientMessages.length - 1];
+      if (lastClient && lastClient.role === "user") {
+        const lastDb = messages[messages.length - 1];
+        if (!lastDb || lastDb.role !== "user" || lastDb.content !== lastClient.content) {
+          messages.push({ role: "user", content: String(lastClient.content ?? "") });
+        }
+      }
+    } else {
+      messages = clientMessages;
+    }
+
     if (!messages.length) {
       return new Response(JSON.stringify({ error: "messages required" }), {
         status: 400,
@@ -132,15 +175,15 @@ Deno.serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "display_name,sun_sign,moon_sign,rising_sign,venus_sign,mars_sign,mercury_sign,human_design_type,human_design_authority,human_design_profile,life_path_number,personal_year_number,gene_keys_life_purpose,astro_summary,human_design_summary,numerology_summary"
+        "display_name,sun_sign,moon_sign,rising_sign,venus_sign,mars_sign,mercury_sign,human_design_type,human_design_authority,human_design_profile,life_path_number,personal_year_number,gene_keys_life_purpose,astro_summary,human_design_summary,numerology_summary,recurring_themes"
       )
       .eq("user_id", userId)
       .maybeSingle();
 
     const systemPrompt = buildSystemPrompt(profile as Record<string, unknown> | null);
 
-    // Trim history to last 20 turns to control tokens
-    const trimmed = messages.slice(-20).map((m) => ({
+    // Trim history to last 30 turns to control tokens (sessions are scoped, so this is plenty)
+    const trimmed = messages.slice(-30).map((m) => ({
       role: m.role === "assistant" ? "assistant" : "user",
       content: String(m.content ?? ""),
     }));

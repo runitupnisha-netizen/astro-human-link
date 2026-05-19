@@ -518,24 +518,39 @@ export type Database = {
       guide_conversations: {
         Row: {
           created_at: string
+          ended_at: string | null
           id: string
+          is_active: boolean
           last_message_at: string
+          message_count: number
+          seed_topic: string | null
+          summary: string | null
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          ended_at?: string | null
           id?: string
+          is_active?: boolean
           last_message_at?: string
+          message_count?: number
+          seed_topic?: string | null
+          summary?: string | null
           title?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          ended_at?: string | null
           id?: string
+          is_active?: boolean
           last_message_at?: string
+          message_count?: number
+          seed_topic?: string | null
+          summary?: string | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -960,6 +975,7 @@ export type Database = {
           preferred_hd_types: string[] | null
           preferred_language: string | null
           push_primer_shown: boolean
+          recurring_themes: string | null
           referral_redeemed_at: string | null
           referred_by_code: string | null
           relationship_goal: string | null
@@ -1040,6 +1056,7 @@ export type Database = {
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
           push_primer_shown?: boolean
+          recurring_themes?: string | null
           referral_redeemed_at?: string | null
           referred_by_code?: string | null
           relationship_goal?: string | null
@@ -1120,6 +1137,7 @@ export type Database = {
           preferred_hd_types?: string[] | null
           preferred_language?: string | null
           push_primer_shown?: boolean
+          recurring_themes?: string | null
           referral_redeemed_at?: string | null
           referred_by_code?: string | null
           relationship_goal?: string | null

@@ -333,25 +333,8 @@ const Profile = () => {
             <span>Preview as a new user · replay welcome tour</span>
           </button>
 
-          {/* Quick links grid */}
-          <div className="mb-6 grid grid-cols-5 gap-2">
-            {[
-              { label: "Briefing", icon: Sun, path: "/briefing" },
-              { label: "Premium", icon: Crown, path: "/premium" },
-              { label: "Insights", icon: Star, path: "/insights" },
-              { label: "Wins", icon: Trophy, path: "/achievements" },
-              { label: "Referrals", icon: Gift, path: "/referral" },
-            ].map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 px-2 py-3 min-h-[64px] transition-all hover:bg-primary/10 hover:border-primary/30 active:scale-95 touch-manipulation"
-              >
-                <item.icon className="h-5 w-5 text-primary" />
-                <span className="text-[11px] font-medium text-foreground leading-none">{item.label}</span>
-              </button>
-            ))}
-          </div>
+          {/* Quick-links grid removed per spec 6h — Briefing/Insights/Wins now
+              live in the Growth tab; Premium and Referrals remain inside Profile. */}
 
           {/* Spotify Quick Connect */}
           <Card className="mb-6 bg-card/80 backdrop-blur-sm border-border/50 glow-border">

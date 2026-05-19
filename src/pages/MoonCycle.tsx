@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import BackButton from "@/components/BackButton";
-import { useNavigate } from "react-router-dom";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -18,7 +18,7 @@ interface MoonEntry {
 }
 
 const MoonCycle = () => {
-  const navigate = useNavigate();
+
   const { user } = useAuth();
   const phaseInfo = useMemo(() => getMoonPhase(), []);
   const [content, setContent] = useState("");

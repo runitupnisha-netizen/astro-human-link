@@ -129,11 +129,11 @@ const Navigation = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-0 flex-1 justify-center min-w-0 px-1">
-              {desktopNavItems.map((item) => {
+            {desktopNavItems.map((item) => {
                 const Icon = item.icon;
-            const isActive = item.path === "/profile"
-              ? location.pathname === "/profile" || location.pathname.startsWith("/profile/")
-              : location.pathname === item.path;
+            const isActive = item.path === "/"
+              ? location.pathname === "/"
+              : location.pathname === item.path || location.pathname.startsWith(item.path + "/");
             
             return (
               <Link
@@ -317,9 +317,9 @@ const Navigation = () => {
         <div className="grid grid-cols-4 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
-            const isActive = item.path === "/profile"
-              ? location.pathname === "/profile" || location.pathname.startsWith("/profile/")
-              : location.pathname === item.path;
+            const isActive = item.path === "/"
+              ? location.pathname === "/"
+              : location.pathname === item.path || location.pathname.startsWith(item.path + "/");
             
             return (
               <Link

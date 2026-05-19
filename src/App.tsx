@@ -16,7 +16,7 @@ import OfflineIndicator from "./components/OfflineIndicator";
 import UpdateAvailableSnackbar from "./components/UpdateAvailableSnackbar";
 import EmailVerificationReminder from "./components/EmailVerificationReminder";
 import InAppFeedback from "./components/InAppFeedback";
-import CosmicNudge from "./components/CosmicNudge";
+import LyraFAB from "./components/LyraFAB";
 import SparkleLoader from "./components/SparkleLoader";
 import { TranslationProvider } from "@/hooks/useTranslation";
 import { AccessibilityProvider } from "@/hooks/useAccessibility";
@@ -62,6 +62,11 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const MyChart = lazy(() => import("./pages/MyChart"));
 const FindMatch = lazy(() => import("./pages/FindMatch"));
 const Growth = lazy(() => import("./pages/Growth"));
+const Today = lazy(() => import("./pages/Today"));
+const Blueprint = lazy(() => import("./pages/Blueprint"));
+const BlueprintAstrology = lazy(() => import("./pages/blueprint/Astrology"));
+const BlueprintHumanDesign = lazy(() => import("./pages/blueprint/HumanDesign"));
+const BlueprintNumerology = lazy(() => import("./pages/blueprint/Numerology"));
 const DailyRitual = lazy(() => import("./pages/DailyRitual"));
 const ShadowJournal = lazy(() => import("./pages/ShadowJournal"));
 const MoonCycle = lazy(() => import("./pages/MoonCycle"));
@@ -244,7 +249,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
       {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <CosmicNudge />}
+      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <LyraFAB />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
@@ -255,7 +260,8 @@ const AppRoutes = () => {
             <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
             <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding skipVerificationCheck><VerificationGate /></ProtectedRoute></PageTransition>} />
             <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
-            <Route path="/" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
+            <Route path="/" element={<PageTransition><ProtectedRoute><Today /></ProtectedRoute></PageTransition>} />
+            <Route path="/today" element={<Navigate to="/" replace />} />
             <Route path="/discover" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />
             <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
             <Route path="/connections" element={<PageTransition><ProtectedRoute><Connections /></ProtectedRoute></PageTransition>} />
@@ -278,7 +284,10 @@ const AppRoutes = () => {
             {/* Legacy routes — redirected to /profile (My Cosmos merged screen) */}
             <Route path="/inner-world" element={<Navigate to="/profile" replace />} />
             <Route path="/my-chart" element={<Navigate to="/profile" replace />} />
-            <Route path="/blueprint" element={<Navigate to="/profile" replace />} />
+            <Route path="/blueprint" element={<PageTransition><ProtectedRoute><Blueprint /></ProtectedRoute></PageTransition>} />
+            <Route path="/blueprint/astrology" element={<PageTransition><ProtectedRoute><BlueprintAstrology /></ProtectedRoute></PageTransition>} />
+            <Route path="/blueprint/human-design" element={<PageTransition><ProtectedRoute><BlueprintHumanDesign /></ProtectedRoute></PageTransition>} />
+            <Route path="/blueprint/numerology" element={<PageTransition><ProtectedRoute><BlueprintNumerology /></ProtectedRoute></PageTransition>} />
             <Route path="/saved-charts" element={<Navigate to="/profile" replace />} />
             <Route path="/my-cosmos" element={<Navigate to="/profile" replace />} />
             <Route path="/find-match" element={<PageTransition><ProtectedRoute><FindMatch /></ProtectedRoute></PageTransition>} />

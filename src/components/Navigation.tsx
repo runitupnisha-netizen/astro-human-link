@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2, Diamond, Phone } from "lucide-react";
+import { Heart, User, MessageCircle, Settings, Sparkles, LogOut, Crown, Users, Menu, Trophy, Gift, Shield, Mail, Sun, Moon, Wand2, Diamond, Phone, Compass, Sunrise } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sheet,
@@ -94,23 +94,21 @@ const Navigation = () => {
   }, [user]);
 
   const desktopNavItems = [
-    { path: "/", label: t("nav.profile"), icon: User },
-    { path: "/discover", label: t("nav.discover"), icon: Sparkles },
+    { path: "/", label: "Today", icon: Sunrise },
+    { path: "/blueprint", label: "Blueprint", icon: Compass },
+    { path: "/growth", label: "Growth", icon: Diamond },
     { path: "/connections", label: t("nav.connections"), icon: Heart },
-    { path: "/inner-world", label: "My Cosmos", icon: Moon },
-    { path: "/lyra", label: "Lyra", icon: Wand2 },
-    { path: "/feed", label: "Community", icon: Users },
     { path: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: unreadCount },
     { path: "/premium", label: t("premium.title"), icon: Crown, premium: true },
     { path: "/settings", label: t("nav.settings"), icon: Settings },
   ];
 
-  // Bottom tab bar items — 4 key tabs for mobile (Profile via top-right avatar)
+  // Bottom tab bar items — 4 tabs (Profile via top-right avatar, Lyra via floating FAB)
   const bottomTabs: Array<{ path: string; label: string; icon: typeof Sparkles; badge?: number }> = [
-    { path: "/discover", label: t("nav.discover"), icon: Sparkles },
-    { path: "/connections", label: "Connections", icon: Heart },
+    { path: "/", label: "Today", icon: Sunrise },
+    { path: "/blueprint", label: "Blueprint", icon: Compass },
     { path: "/growth", label: "Growth", icon: Diamond },
-    { path: "/lyra", label: "Lyra", icon: Moon },
+    { path: "/connections", label: "Connections", icon: Heart },
   ];
 
   return (
@@ -131,11 +129,11 @@ const Navigation = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-0 flex-1 justify-center min-w-0 px-1">
-              {desktopNavItems.map((item) => {
+            {desktopNavItems.map((item) => {
                 const Icon = item.icon;
-            const isActive = item.path === "/profile"
-              ? location.pathname === "/profile" || location.pathname.startsWith("/profile/")
-              : location.pathname === item.path;
+            const isActive = item.path === "/"
+              ? location.pathname === "/"
+              : location.pathname === item.path || location.pathname.startsWith(item.path + "/");
             
             return (
               <Link
@@ -319,9 +317,9 @@ const Navigation = () => {
         <div className="grid grid-cols-4 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;
-            const isActive = item.path === "/profile"
-              ? location.pathname === "/profile" || location.pathname.startsWith("/profile/")
-              : location.pathname === item.path;
+            const isActive = item.path === "/"
+              ? location.pathname === "/"
+              : location.pathname === item.path || location.pathname.startsWith(item.path + "/");
             
             return (
               <Link

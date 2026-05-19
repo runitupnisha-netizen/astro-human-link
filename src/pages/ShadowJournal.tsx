@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Pencil } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Sparkles, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import LyraStrip from "@/components/lyra/LyraStrip";
+import BackButton from "@/components/BackButton";
 import { getDailyPrompt, getDailyPromptIndex } from "@/data/shadowPrompts";
 
 interface JournalEntry {
@@ -17,7 +17,6 @@ interface JournalEntry {
 }
 
 const ShadowJournal = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const todaysPrompt = useMemo(() => getDailyPrompt(), []);
   const promptIndex = useMemo(() => getDailyPromptIndex(), []);
@@ -29,6 +28,9 @@ const ShadowJournal = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [profile, setProfile] = useState<{ moon_sign: string | null; sun_sign: string | null } | null>(null);
+  /** ID of the most recently saved entry — drives the inline "Lyra reflection" surface. */
+  const [lastSavedEntryId, setLastSavedEntryId] = useState<string | null>(null);
+  const [lastSavedEntryText, setLastSavedEntryText] = useState<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -58,13 +60,14 @@ const ShadowJournal = () => {
   const save = async () => {
     if (!user || !entry.trim()) return;
     setSaving(true);
+    const text = entry.trim();
     const { data, error } = await supabase
       .from("shadow_journal_entries")
       .insert({
         user_id: user.id,
         prompt: todaysPrompt,
         prompt_index: promptIndex,
-        entry: entry.trim(),
+        entry: text,
       })
       .select("id, prompt, entry, created_at, updated_at")
       .single();
@@ -75,6 +78,8 @@ const ShadowJournal = () => {
     }
     setEntries((prev) => [data as JournalEntry, ...prev]);
     setEntry("");
+    setLastSavedEntryId((data as JournalEntry).id);
+    setLastSavedEntryText(text);
     toast({ title: "Saved ✦", description: "Your reflection is held safely." });
   };
 
@@ -111,14 +116,7 @@ const ShadowJournal = () => {
 
       {/* Header */}
       <header className="relative z-10 px-5 pt-[max(env(safe-area-inset-top),1rem)]">
-        <button
-          onClick={() => navigate("/growth")}
-          className="inline-flex items-center gap-1.5 py-2 text-sm transition-colors min-h-[44px]"
-          style={{ color: "#9b84c8", fontFamily: "Poppins, sans-serif" }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Growth
-        </button>
+        <BackButton fallback="/growth" />
 
         <div className="mt-3">
           <h1 className="text-[22px] leading-tight" style={{ fontFamily: "Lora, Georgia, serif", color: "#e0d4ff" }}>
@@ -212,6 +210,40 @@ const ShadowJournal = () => {
         >
           {saving ? "Saving…" : "Save this reflection ✦"}
         </button>
+
+        {/* Lyra reflection on the most recent save — meaningful "what happened" */}
+        {lastSavedEntryId && (
+          <motion.div
+            key={lastSavedEntryId}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-5 rounded-2xl p-4"
+            style={{
+              backgroundColor: "rgba(109, 40, 217, 0.12)",
+              border: "1px solid rgba(208, 180, 247, 0.25)",
+            }}
+          >
+            <p
+              className="text-[11px] uppercase mb-2"
+              style={{ color: "#9b84c8", fontFamily: "Poppins, sans-serif", letterSpacing: "0.08em" }}
+            >
+              Saved ✦ Lyra is reflecting…
+            </p>
+            <LyraStrip
+              context="shadow_reflection"
+              contextKey={lastSavedEntryId}
+              payload={{
+                prompt: todaysPrompt,
+                entry: lastSavedEntryText,
+                moon: profile?.moon_sign,
+                sun: profile?.sun_sign,
+              }}
+              size="md"
+              fallback="One breath. Your words are held."
+            />
+          </motion.div>
+        )}
+
         <button
           onClick={() => setEntry("")}
           className="w-full mt-2 py-2 text-center text-sm transition-colors min-h-[44px]"

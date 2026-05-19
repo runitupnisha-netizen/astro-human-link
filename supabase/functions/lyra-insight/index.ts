@@ -55,6 +55,16 @@ Address them by first name. One sentence only.`;
       return `Write one short Lyra-voice greeting introducing yourself as their cosmic guide, referencing their chart.
 Sun ${ctx.sun ?? "?"}, Moon ${ctx.moon ?? "?"}, Rising ${ctx.rising ?? "?"}.
 Make it warm and personal. One sentence only.`;
+    case "shadow_reflection": {
+      // Mirror the user's shadow-journal entry back with one warm Lyra sentence.
+      // Truncate to keep prompt bounded — entries can be long.
+      const raw = String(ctx.entry ?? "").slice(0, 1200);
+      const prompt = String(ctx.prompt ?? "");
+      return `The user just journaled in response to a shadow-work prompt. Reflect on what they shared in one warm, specific Lyra-voice sentence — name the feeling or pattern you hear, tie it gently to their Moon ${ctx.moon ?? "?"} or Sun ${ctx.sun ?? "?"} if relevant. Do not advise. Do not summarize. Mirror with care.
+Prompt: "${prompt}"
+Their words: "${raw}"
+One sentence only.`;
+    }
     default:
       return `Write one short Lyra-voice sentence of cosmic insight for ${ctx.name ?? "the user"}. One sentence only.`;
   }

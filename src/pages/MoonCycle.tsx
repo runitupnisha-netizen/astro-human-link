@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import BackButton from "@/components/BackButton";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -18,7 +18,7 @@ interface MoonEntry {
 }
 
 const MoonCycle = () => {
-  const navigate = useNavigate();
+
   const { user } = useAuth();
   const phaseInfo = useMemo(() => getMoonPhase(), []);
   const [content, setContent] = useState("");
@@ -85,14 +85,7 @@ const MoonCycle = () => {
       />
 
       <header className="relative z-10 px-5 pt-[max(env(safe-area-inset-top),1rem)]">
-        <button
-          onClick={() => navigate("/growth")}
-          className="inline-flex items-center gap-1.5 py-2 text-sm transition-colors min-h-[44px]"
-          style={{ color: "#9b84c8", fontFamily: "Poppins, sans-serif" }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Growth
-        </button>
+        <BackButton fallback="/growth" />
       </header>
 
       <main className="relative z-10 px-5 pb-32 max-w-2xl mx-auto">

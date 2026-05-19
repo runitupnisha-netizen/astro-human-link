@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ChevronLeft, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import LyraStrip from "@/components/lyra/LyraStrip";
@@ -187,7 +187,10 @@ const DailyRitual = () => {
   };
 
   const goBack = () => {
-    if (step === 1) navigate("/growth");
+    if (step === 1) {
+      if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
+      else navigate("/growth");
+    }
     else setStep((step - 1) as 1 | 2 | 3);
   };
 
@@ -219,7 +222,7 @@ const DailyRitual = () => {
           className="p-2 -ml-2 rounded-full transition-colors hover:bg-white/5"
           style={{ color: ACCENT }}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
         <div className="w-9" />
       </div>

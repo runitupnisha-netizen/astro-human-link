@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Moon, Sun, Zap, Flame, Droplets, Wind, Mountain, Heart, TrendingUp, Calendar, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { markInsightRead } from "@/hooks/useFoundationStatus";
+import BackButton from "@/components/BackButton";
 
 const ZODIAC_SYMBOLS: Record<string, string> = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋", Leo: "♌", Virgo: "♍",
@@ -153,6 +154,9 @@ const WeeklyInsights = () => {
           desktop where the tab bar isn't shown. */}
       <div className="relative z-10 pt-20 pb-24 md:pb-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="mb-2">
+            <BackButton fallback="/growth" />
+          </div>
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mb-2">
               Weekly Alignment

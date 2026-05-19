@@ -19,7 +19,9 @@ const PrivacyPolicy = () => (
           <CardContent className="p-6 sm:p-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">1. Information We Collect</h2>
-              <p>We collect information you provide directly: name, email, birth details, photos, location, and profile preferences. We also collect usage data including app interactions, device information, and IP addresses to improve our services.</p>
+              <p>We collect information you provide directly when you create an account and use Stellara, including: email address and password (stored as a salted hash), display name and username, date and time of birth, birth location (city and coordinates), current city and approximate coordinates for proximity-based matching, gender, sexual/relationship preferences, profile photos, written bio prompts, voice intros and voice messages, music preferences (when you connect Spotify), and lifestyle answers such as kids, drinking, smoking, and spiritual practice.</p>
+              <p className="mt-2">We automatically derive astrological, Human Design, and numerology data (Sun/Moon/Rising, planets, type, strategy, authority, Life Path, etc.) from the birth data you provide and store it on your profile.</p>
+              <p className="mt-2">We also collect usage data: matches, likes, swipes, blocks, reports, profile views, messages and reactions, call session metadata, AI (Lyra) conversations, notification preferences, analytics events (page views, feature interactions), device information, last-seen timestamps, and IP address.</p>
             </section>
 
             <section>
@@ -29,7 +31,19 @@ const PrivacyPolicy = () => (
 
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">3. Information Sharing</h2>
-              <p>We share your profile information with other users as part of the matching experience. We do not sell your personal data to third parties. We may share anonymized, aggregated data for analytics purposes. We will disclose information when required by law.</p>
+              <p>We share your profile (name, photos, age, city, blueprint highlights, bio, voice intro) with other users as part of the discovery and matching experience. We do not sell your personal data and do not use it for cross-app or cross-site advertising tracking.</p>
+              <p className="mt-2">We use the following sub-processors strictly to operate the service:</p>
+              <ul className="list-disc ml-5 mt-1 space-y-1">
+                <li><strong>Supabase</strong> — authentication, database, file storage, edge functions, push notifications</li>
+                <li><strong>Stripe</strong> — subscription billing on the web (Stripe receives payment details directly; we never store card numbers)</li>
+                <li><strong>Apple StoreKit</strong> — subscription billing on iOS (handled entirely by Apple)</li>
+                <li><strong>Google Gemini via Lovable AI Gateway</strong> — generating cosmic readings and powering the Lyra AI guide; prompts containing your blueprint data and chat messages are sent for inference and are not used to train models</li>
+                <li><strong>Twilio</strong> — phone verification and (when activated) voice/video calls</li>
+                <li><strong>Spotify</strong> — optional music integration via OAuth, only when you connect your account</li>
+                <li><strong>Tenor</strong> — GIF search (queries only, no personal data attached)</li>
+                <li><strong>Resend</strong> — transactional email delivery</li>
+              </ul>
+              <p className="mt-2">We may disclose information when required by law or to protect the safety of our users.</p>
             </section>
 
             <section>
@@ -39,7 +53,7 @@ const PrivacyPolicy = () => (
 
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">5. Your Rights</h2>
-              <p>You have the right to: access your personal data; correct inaccurate data; delete your account and all associated data; export your data; and opt out of marketing communications. Exercise these rights through the Settings page.</p>
+              <p>You have the right to access, correct, export, and permanently delete your personal data. You can delete your account and all associated data (profile, photos, messages, matches, AI history, and analytics linked to your user ID) at any time from <strong>Settings → Delete Account</strong>. Deletion is immediate and irreversible. You may also email <a href="mailto:info@stellaraapp.net" className="text-primary hover:underline">info@stellaraapp.net</a> to request deletion.</p>
             </section>
 
             <section>

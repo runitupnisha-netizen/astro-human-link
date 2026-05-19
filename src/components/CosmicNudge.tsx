@@ -136,6 +136,11 @@ const CosmicNudge = ({ className = "" }: CosmicNudgeProps) => {
                   Message {matchName}
                 </Button>
               )}
+
+              {/* Brand line footer */}
+              <p className="mt-3 pt-2 border-t border-border/40 text-[10.5px] font-display tracking-wide text-muted-foreground/80">
+                Strategy is what you do. Alignment is when you do it.
+              </p>
             </div>
 
             {/* Floating stars decoration — bottom-right, non-interactive */}

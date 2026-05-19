@@ -80,7 +80,7 @@ const CallHistory = lazy(() => import("./pages/CallHistory"));
 const queryClient = new QueryClient();
 
 const LoadingScreen = () => (
-  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6" data-release="lyra-sessions-v1">
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6" data-release={`lyra-sessions-${__BUILD_TIME__}`}>
     <SparkleLoader size={36} />
     <p className="font-display text-sm md:text-base bg-gradient-golden bg-clip-text text-transparent text-center">
       Self-discovery first. Connection follows.

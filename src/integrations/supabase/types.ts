@@ -1763,12 +1763,11 @@ export type Database = {
           birth_place: string | null
           birth_time: string | null
           birthday_number: number | null
-          boost_until: string | null
           compatibility_tags: string[] | null
           created_at: string | null
           current_city: string | null
-          current_latitude: number | null
-          current_longitude: number | null
+          current_latitude_rounded: number | null
+          current_longitude_rounded: number | null
           display_name: string | null
           drinking: string | null
           gender: string | null
@@ -1823,12 +1822,11 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
-          boost_until?: string | null
           compatibility_tags?: string[] | null
           created_at?: string | null
           current_city?: string | null
-          current_latitude?: never
-          current_longitude?: never
+          current_latitude_rounded?: never
+          current_longitude_rounded?: never
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -1883,12 +1881,11 @@ export type Database = {
           birth_place?: string | null
           birth_time?: string | null
           birthday_number?: number | null
-          boost_until?: string | null
           compatibility_tags?: string[] | null
           created_at?: string | null
           current_city?: string | null
-          current_latitude?: never
-          current_longitude?: never
+          current_latitude_rounded?: never
+          current_longitude_rounded?: never
           display_name?: string | null
           drinking?: string | null
           gender?: string | null
@@ -1959,95 +1956,23 @@ export type Database = {
         Returns: number
       }
       generate_referral_code: { Args: never; Returns: string }
-      get_my_full_profile: {
+      get_my_private_profile: {
         Args: never
         Returns: {
-          about_me: string | null
-          age_max: number | null
-          age_min: number | null
-          astro_summary: string | null
-          avatar_url: string | null
-          bio_prompt_1: string | null
-          bio_prompt_1_answer: string | null
-          bio_prompt_2: string | null
-          bio_prompt_2_answer: string | null
-          bio_prompt_3: string | null
-          bio_prompt_3_answer: string | null
-          birth_date: string | null
-          birth_latitude: number | null
-          birth_longitude: number | null
-          birth_place: string | null
-          birth_time: string | null
-          birthday_number: number | null
-          bonus_pro_until: string | null
-          boost_until: string | null
+          bonus_pro_until: string
+          boost_until: string
           briefing_email_reminder: boolean
-          briefing_last_reminder_date: string | null
+          briefing_last_reminder_date: string
           briefing_push_reminder: boolean
           briefing_reminder_hour: number
           briefing_reminder_timezone: string
-          compatibility_tags: string[] | null
-          created_at: string
-          current_city: string | null
-          current_latitude: number | null
-          current_longitude: number | null
-          daily_ritual_last_completed: string | null
-          display_name: string | null
-          drinking: string | null
-          gender: string | null
-          gene_keys_evolution: string | null
-          gene_keys_life_purpose: string | null
-          gene_keys_radiance: string | null
-          gene_keys_summary: string | null
-          growth_commitment: string | null
-          human_design_authority: string | null
-          human_design_profile: string | null
-          human_design_strategy: string | null
-          human_design_summary: string | null
-          human_design_type: string | null
-          id: string
-          interests: string[] | null
-          is_incognito: boolean
-          is_paused: boolean
+          current_latitude: number
+          current_longitude: number
           is_suspended: boolean
-          kids_preference: string | null
-          last_seen_at: string | null
-          life_path_number: number | null
-          mars_sign: string | null
-          max_distance_km: number | null
-          mercury_sign: string | null
-          moon_sign: string | null
-          numerology_summary: string | null
-          onboarding_complete: boolean | null
-          personal_year_number: number | null
-          phone: string | null
-          preferred_elements: string[] | null
-          preferred_genders: string[] | null
-          preferred_hd_types: string[] | null
-          preferred_language: string | null
-          push_primer_shown: boolean
-          recurring_themes: string | null
-          referral_redeemed_at: string | null
-          referred_by_code: string | null
-          relationship_goal: string | null
-          rising_sign: string | null
-          smoking: string | null
-          social_energy: number | null
-          spiritual_practice: string | null
-          substances: string | null
-          sun_sign: string | null
-          updated_at: string
-          user_id: string
-          username: string | null
-          venus_sign: string | null
-          voice_intro_url: string | null
+          phone: string
+          referral_redeemed_at: string
+          referred_by_code: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       has_role: {
         Args: {

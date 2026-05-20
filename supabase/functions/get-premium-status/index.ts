@@ -54,6 +54,36 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id });
 
+    // 1) Check native IAP first (App Store / Play Store). If the user has an
+    //    active iap_subscriptions row, return premium immediately and skip Stripe.
+    //    This is the source of truth for iOS / Android subscribers.
+    const { data: iapRows, error: iapErr } = await supabase
+      .from("iap_subscriptions")
+      .select("product_id, expires_at, status, platform, environment")
+      .eq("user_id", user.id)
+      .in("status", ["active", "in_grace"])
+      .order("expires_at", { ascending: false, nullsFirst: false })
+      .limit(1);
+    if (iapErr) {
+      logStep("iap lookup error", { error: iapErr.message });
+    } else if (iapRows && iapRows.length > 0) {
+      const row = iapRows[0];
+      const expiresAt = row.expires_at ? new Date(row.expires_at) : null;
+      const stillActive = !expiresAt || expiresAt.getTime() > Date.now();
+      if (stillActive) {
+        logStep("Premium active via IAP", { platform: row.platform, productId: row.product_id });
+        return json({
+          premium: true,
+          product_id: row.product_id,
+          price_id: null,
+          subscription_end: expiresAt ? expiresAt.toISOString() : null,
+          source: row.platform === "ios" ? "apple_iap" : "google_iap",
+          environment: row.environment,
+          reason: "active",
+        });
+      }
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       logStep("STRIPE_SECRET_KEY not set");

@@ -174,6 +174,8 @@ const Settings = () => {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [deletionScheduledAt, setDeletionScheduledAt] = useState<string | null>(null);
+  const [cancellingDeletion, setCancellingDeletion] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);

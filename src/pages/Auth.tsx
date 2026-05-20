@@ -60,6 +60,26 @@ const usernameSchema = z
   .max(30, { message: "Username must be 30 characters or fewer" })
   .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
 
+const EULA_VERSION = "2026-05-20";
+
+/** Strict 18+ check from a yyyy-mm-dd string. Apple UGC requirement. */
+const dobSchema = z
+  .string()
+  .min(1, { message: "Date of birth is required" })
+  .refine((s) => /^\d{4}-\d{2}-\d{2}$/.test(s), { message: "Use the date picker" })
+  .refine(
+    (s) => {
+      const dob = new Date(s + "T00:00:00");
+      if (Number.isNaN(dob.getTime())) return false;
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      return age >= 18;
+    },
+    { message: "You must be 18 or older to use Stellara" },
+  );
+
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
 const AUTH_CALLBACK_URL = `${PRODUCTION_ORIGIN}/auth/callback`;
 

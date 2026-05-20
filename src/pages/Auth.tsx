@@ -205,6 +205,9 @@ const Auth = () => {
         const userResult = usernameSchema.safeParse(username);
         if (!userResult.success) errors.username = userResult.error.issues[0].message;
       }
+      const dobResult = dobSchema.safeParse(dob);
+      if (!dobResult.success) errors.dob = dobResult.error.issues[0].message;
+      if (!agreedToTerms) errors.terms = "You must accept the Terms to continue";
     }
 
     if (Object.keys(errors).length > 0) {

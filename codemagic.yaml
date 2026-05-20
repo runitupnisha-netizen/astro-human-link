@@ -58,5 +58,7 @@ workflows:
       - /tmp/ipa/*.ipa
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: D9QU8TNU74
+        issuer_id: fa782600-e1c3-477c-82de-16bb87c42a3d
         submit_to_testflight: true

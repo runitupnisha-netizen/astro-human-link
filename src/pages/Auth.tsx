@@ -273,6 +273,17 @@ const Auth = () => {
         if (!error && data.user && username.trim()) {
           await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
         }
+        // Persist DOB + EULA acceptance (Apple UGC compliance).
+        if (!error && data.user) {
+          await supabase
+            .from("profiles")
+            .update({
+              date_of_birth: dob,
+              eula_accepted_at: new Date().toISOString(),
+              eula_version: EULA_VERSION,
+            } as never)
+            .eq("user_id", data.user.id);
+        }
         // If session is null, email confirmation is required
         if (!data.session) {
           toast.success(`Check ${email.trim()} to confirm your account ✨`, {

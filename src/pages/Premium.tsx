@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Crown, Star, Sparkles, Zap, Heart, Eye, Shield, Check, Loader2, X, CheckCircle2, RotateCcw } from "lucide-react";
+import { Crown, Star, Sparkles, Zap, Compass, BookOpen, MessageCircle, Check, Loader2, X, CheckCircle2, RotateCcw } from "lucide-react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,12 +44,14 @@ const tierDetails: Record<TierKey, {
     description: (price) => `7-day free trial · then ${price ?? "$9.99"}/mo`,
     badge: "7-Day Free Trial",
     features: [
-      "Unlimited cosmic connections",
-      "See who likes you",
-      "Full synastry charts",
-      "Advanced filters",
-      "Unlimited Super Likes & Boosts",
-      "Cancel anytime during trial",
+      "Full Cosmic Blueprint (all planets, houses, aspects)",
+      "Complete Human Design (centers, channels, gates, incarnation cross)",
+      "Full Numerology (Expression, Soul Urge, Personal Year + more)",
+      "Cross-Science Synthesis readings",
+      "Daily transits & personalized guidance",
+      "Unlimited Lyra AI conversations",
+      "Cosmic Connections (when unlocked)",
+      "Cancel anytime",
     ],
   },
   yearly: {
@@ -62,16 +64,17 @@ const tierDetails: Record<TierKey, {
       "Everything in Monthly",
       "Save 33% vs monthly billing",
       "Locked-in price for 12 months",
-      "Priority profile visibility",
+      "Annual deep-dive reading",
+      "Priority Lyra response time",
     ],
   },
 };
 
 const premiumPerks = [
-  { icon: <Heart className="w-5 h-5" />, title: "Unlimited Connections", desc: "No daily limits on cosmic connections" },
-  { icon: <Eye className="w-5 h-5" />, title: "See Who Resonates", desc: "Know who's aligned with you before you swipe" },
-  { icon: <Sparkles className="w-5 h-5" />, title: "Deep Compatibility", desc: "Full synastry charts & soul blueprints" },
-  { icon: <Shield className="w-5 h-5" />, title: "Priority Visibility", desc: "Your profile gets seen first" },
+  { icon: <Compass className="w-5 h-5" />, title: "Full Blueprint", desc: "Astrology, Human Design & Numerology — unlocked" },
+  { icon: <Sparkles className="w-5 h-5" />, title: "Cross-Science Synthesis", desc: "See how all three systems weave together" },
+  { icon: <MessageCircle className="w-5 h-5" />, title: "Unlimited Lyra", desc: "Ask your AI cosmic guide anything, anytime" },
+  { icon: <BookOpen className="w-5 h-5" />, title: "Daily Guidance", desc: "Personalized transits & readings every day" },
 ];
 
 const Premium = () => {
@@ -426,14 +429,14 @@ const Premium = () => {
             <Crown className="w-12 h-12 text-accent mx-auto mb-4" />
           </motion.div>
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-            Stellara Premium
+            Unlock Your Full Blueprint
           </h1>
           <p className="text-muted-foreground font-body text-lg">
-            Unlock the full power of{" "}
-            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }} className="text-accent hover:underline underline-offset-2 transition-colors cursor-pointer">cosmic connection ↓</a>
+            Go deeper with{" "}
+            <a href="#plans" onClick={(e) => { e.preventDefault(); document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" }); }} className="text-accent hover:underline underline-offset-2 transition-colors cursor-pointer">Stellara Premium ↓</a>
           </p>
           <p className="mt-4 font-display text-sm text-accent/90 tracking-wide">
-            Strategy is what you do. Alignment is when you do it.
+            Know yourself through the ancient sciences.
           </p>
 
           {subscribed && currentTier && (

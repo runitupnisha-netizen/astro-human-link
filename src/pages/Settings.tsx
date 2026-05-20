@@ -982,14 +982,47 @@ const Settings = () => {
                 <Separator />
 
                 <div className="flex gap-2 flex-wrap">
-                  <Button
-                    variant="outline"
-                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Account
-                  </Button>
+                  {deletionScheduledAt ? (
+                    <div className="w-full rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-2">
+                      <p className="text-sm font-medium text-destructive">
+                        Deletion scheduled
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Your account will be permanently deleted on{" "}
+                        <strong>{new Date(deletionScheduledAt).toLocaleString()}</strong>.
+                        You can cancel any time before then to restore access.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={cancellingDeletion}
+                        onClick={async () => {
+                          setCancellingDeletion(true);
+                          try {
+                            const { error } = await supabase.rpc("cancel_account_deletion" as never);
+                            if (error) throw error;
+                            setDeletionScheduledAt(null);
+                            toast.success("Deletion cancelled. Welcome back ✨");
+                          } catch (err: any) {
+                            toast.error(err?.message ?? "Couldn't cancel deletion");
+                          } finally {
+                            setCancellingDeletion(false);
+                          }
+                        }}
+                      >
+                        {cancellingDeletion ? "Cancelling…" : "Cancel deletion"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                      onClick={() => setShowDeleteDialog(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Account
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

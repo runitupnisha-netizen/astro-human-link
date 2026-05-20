@@ -5,6 +5,7 @@ import {
   type PurchasesPackage,
   type CustomerInfo,
 } from "@revenuecat/purchases-capacitor";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * RevenueCat product identifiers — must match exactly what's configured
@@ -102,6 +103,49 @@ export type PurchaseResult =
   | { ok: true; subscribed: boolean; productId: string }
   | { ok: false; userCancelled: boolean; error?: string };
 
+/**
+ * Best-effort extraction of the Apple `originalTransactionId` from a
+ * RevenueCat purchase result. The exact path varies across SDK minor
+ * versions, so we probe several known locations. If none resolve we log
+ * and skip server-side Apple verification (RC's local entitlement is
+ * still authoritative for UX; the cron-driven /verify-apple-iap path
+ * picks it up on the next checkSubscription call).
+ */
+function extractAppleOriginalTransactionId(result: unknown): string | null {
+  const r = result as Record<string, unknown> | null;
+  if (!r) return null;
+  const candidates = [
+    (r as any)?.transaction?.transactionIdentifier,
+    (r as any)?.transaction?.originalTransactionIdentifier,
+    (r as any)?.transaction?.originalTransactionId,
+    (r as any)?.customerInfo?.originalAppUserId,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.length > 0) return c;
+  }
+  return null;
+}
+
+/**
+ * After a successful Apple purchase, ask our backend to independently
+ * verify the transaction against the App Store Server API and persist
+ * the verified subscription row. Non-fatal on failure — the user's
+ * client-side entitlement (from RevenueCat / StoreKit) still grants
+ * access; the server row will be reconciled later.
+ */
+async function verifyWithBackend(originalTransactionId: string | null): Promise<void> {
+  if (!originalTransactionId) return;
+  if (Capacitor.getPlatform() !== "ios") return;
+  try {
+    const { error } = await supabase.functions.invoke("verify-apple-iap", {
+      body: { originalTransactionId },
+    });
+    if (error) console.warn("[IAP] verify-apple-iap returned error", error);
+  } catch (err) {
+    console.warn("[IAP] verify-apple-iap invoke failed", err);
+  }
+}
+
 /** Trigger the native StoreKit / Play Billing purchase flow. */
 export const purchaseProduct = async (planKey: RcPlanKey): Promise<PurchaseResult> => {
   if (!isNativePurchasePlatform()) {
@@ -114,6 +158,8 @@ export const purchaseProduct = async (planKey: RcPlanKey): Promise<PurchaseResul
       return { ok: false, userCancelled: false, error: `Product ${productId} not found in offerings.` };
     }
     const result = await Purchases.purchasePackage({ aPackage: pkg });
+    // Fire-and-forget server-side Apple verification (iOS only).
+    void verifyWithBackend(extractAppleOriginalTransactionId(result));
     return {
       ok: true,
       subscribed: hasProEntitlement(result.customerInfo),
@@ -130,7 +176,9 @@ export const purchaseProduct = async (planKey: RcPlanKey): Promise<PurchaseResul
 export const restorePurchases = async (): Promise<{ subscribed: boolean } | null> => {
   if (!isNativePurchasePlatform()) return null;
   try {
-    const { customerInfo } = await Purchases.restorePurchases();
+    const restored = await Purchases.restorePurchases();
+    const { customerInfo } = restored;
+    void verifyWithBackend(extractAppleOriginalTransactionId(restored));
     return { subscribed: hasProEntitlement(customerInfo) };
   } catch (err) {
     console.error("[RevenueCat] restorePurchases failed", err);

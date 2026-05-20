@@ -656,6 +656,30 @@ const Auth = () => {
                   </motion.div>
                 )}
 
+                {!isLogin && (
+                  <div className="space-y-1">
+                    <Input
+                      type="date"
+                      value={dob}
+                      max={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => {
+                        setDob(e.target.value);
+                        if (fieldErrors.dob) setFieldErrors((p) => ({ ...p, dob: "" }));
+                      }}
+                      className={`h-12 bg-muted/50 border-border ${fieldErrors.dob ? "border-destructive" : ""}`}
+                      aria-label="Date of birth"
+                      aria-invalid={!!fieldErrors.dob}
+                    />
+                    {fieldErrors.dob ? (
+                      <p className="text-xs text-destructive ml-1">{fieldErrors.dob}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground ml-1">
+                        Date of birth — Stellara is 18+ only.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="relative">
                   <Mail className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
                   <Input

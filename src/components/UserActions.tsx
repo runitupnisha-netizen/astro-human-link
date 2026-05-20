@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ShieldAlert, Ban, Flag, UserX } from "lucide-react";
+import { moderateContent } from "@/lib/moderation";
 
 interface UserActionsProps {
   targetUserId: string;
@@ -14,6 +15,14 @@ interface UserActionsProps {
   matchId?: string;
   onBlock?: () => void;
   onUnmatch?: () => void;
+  /**
+   * Optional content metadata. When provided (e.g. when reporting an
+   * individual message), it is persisted to the moderation queue so
+   * reviewers see exactly what was flagged.
+   */
+  contentType?: "profile" | "message" | "photo" | "voice" | "bio";
+  contentId?: string;
+  contentSnapshot?: string;
 }
 
 const REPORT_REASONS = [
@@ -26,7 +35,16 @@ const REPORT_REASONS = [
   "Other",
 ];
 
-const UserActions = ({ targetUserId, targetName, matchId, onBlock, onUnmatch }: UserActionsProps) => {
+const UserActions = ({
+  targetUserId,
+  targetName,
+  matchId,
+  onBlock,
+  onUnmatch,
+  contentType = "profile",
+  contentId,
+  contentSnapshot,
+}: UserActionsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showReport, setShowReport] = useState(false);
@@ -55,12 +73,45 @@ const UserActions = ({ targetUserId, targetName, matchId, onBlock, onUnmatch }: 
     if (!user || !reportReason) return;
     setLoading(true);
     try {
+      // 1. Persist the report (legacy table, kept for backwards compatibility).
       await supabase.from("reports").insert({
         reporter_id: user.id,
         reported_id: targetUserId,
         reason: reportReason,
         details: reportDetails || null,
-      });
+        content_type: contentType,
+        content_id: contentId ?? null,
+        content_snapshot: contentSnapshot ?? null,
+      } as never);
+
+      // 2. Run the vendor-agnostic moderation adapter (currently a no-op
+      //    placeholder — see src/lib/moderation/index.ts). Result is best-effort
+      //    and never blocks the report from being filed for human review.
+      const moderation = contentSnapshot
+        ? await moderateContent({
+            type: contentType === "photo" ? "image"
+                : contentType === "voice" ? "audio"
+                : "text",
+            content: contentSnapshot,
+            meta: { contentId, targetUserId, reason: reportReason },
+          })
+        : null;
+
+      // 3. Always enqueue for human review.
+      await supabase.from("moderation_queue").insert({
+        reporter_id: user.id,
+        target_user_id: targetUserId,
+        content_type: contentType,
+        content_id: contentId ?? null,
+        content_snapshot: contentSnapshot ?? null,
+        reason: reportReason,
+        details: reportDetails || null,
+        ai_provider: moderation?.provider ?? null,
+        ai_flagged: moderation?.flagged ?? null,
+        ai_categories: moderation?.categories ?? null,
+        ai_score: moderation?.score ?? null,
+      } as never);
+
       toast({ title: "Report submitted", description: "Thank you. We'll review this shortly." });
       setShowReport(false);
       setReportReason("");

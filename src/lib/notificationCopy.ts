@@ -12,8 +12,8 @@ export const NOTIFICATION_COPY = {
     body: "Good morning. Lyra has today's planetary insight waiting for you.",
   },
   newMatch: (name: string, score: number) => ({
-    title: "A cosmic match found you ✦",
-    body: `${name} and you are ${score}% cosmically compatible. Say hello.`,
+    title: "A new Connection ✦",
+    body: `${name} and you are ${score}% aligned. Say hello when you're ready.`,
   }),
   newMessage: (name: string, preview: string) => ({
     title: `${name} sent you a message`,
@@ -21,7 +21,7 @@ export const NOTIFICATION_COPY = {
   }),
   newMoon: {
     title: "New moon tonight ✦",
-    body: "Set your love life intention before midnight. Lyra is holding space.",
+    body: "Set your intention before midnight. Lyra is holding space.",
   },
   fullMoon: {
     title: "Full moon rising ✦",
@@ -37,7 +37,7 @@ export const NOTIFICATION_COPY = {
   },
   weeklyReport: {
     title: "Your weekly cosmic report is ready ✦",
-    body: "See what the planets have planned for your love life this week.",
+    body: "See what the planets have planned for you this week.",
   },
 } as const;
 

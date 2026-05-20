@@ -174,6 +174,8 @@ const Settings = () => {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [deletionScheduledAt, setDeletionScheduledAt] = useState<string | null>(null);
+  const [cancellingDeletion, setCancellingDeletion] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
@@ -234,11 +236,12 @@ const Settings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused, is_incognito")
+      .select("display_name, birth_date, birth_time, birth_place, current_city, max_distance_km, relationship_goal, preferred_genders, preferred_elements, preferred_hd_types, is_paused, is_incognito, deletion_scheduled_at")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         setProfile(data);
+        setDeletionScheduledAt((data as any)?.deletion_scheduled_at ?? null);
         setLoadingProfile(false);
       });
 
@@ -979,14 +982,47 @@ const Settings = () => {
                 <Separator />
 
                 <div className="flex gap-2 flex-wrap">
-                  <Button
-                    variant="outline"
-                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Account
-                  </Button>
+                  {deletionScheduledAt ? (
+                    <div className="w-full rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-2">
+                      <p className="text-sm font-medium text-destructive">
+                        Deletion scheduled
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Your account will be permanently deleted on{" "}
+                        <strong>{new Date(deletionScheduledAt).toLocaleString()}</strong>.
+                        You can cancel any time before then to restore access.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={cancellingDeletion}
+                        onClick={async () => {
+                          setCancellingDeletion(true);
+                          try {
+                            const { error } = await supabase.rpc("cancel_account_deletion" as never);
+                            if (error) throw error;
+                            setDeletionScheduledAt(null);
+                            toast.success("Deletion cancelled. Welcome back ✨");
+                          } catch (err: any) {
+                            toast.error(err?.message ?? "Couldn't cancel deletion");
+                          } finally {
+                            setCancellingDeletion(false);
+                          }
+                        }}
+                      >
+                        {cancellingDeletion ? "Cancelling…" : "Cancel deletion"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                      onClick={() => setShowDeleteDialog(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Account
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1145,7 +1181,10 @@ const Settings = () => {
               <Trash2 className="w-5 h-5" /> Delete Your Account
             </DialogTitle>
             <DialogDescription>
-              This is permanent and can't be undone. All your data, matches, messages, and profile will be deleted.
+              Your account will be hidden immediately and permanently deleted 7 days from now.
+              You can cancel deletion from Settings at any time during this window to restore access.
+              After 7 days, all your data — profile, photos, messages, Connections, journal entries —
+              will be permanently removed and cannot be recovered.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -1166,10 +1205,15 @@ const Settings = () => {
                 if (!user) return;
                 setDeleting(true);
                 try {
-                  const { error } = await supabase.rpc("delete_user_data", { target_user_id: user.id });
+                  const { data: scheduledAt, error } = await supabase.rpc(
+                    "request_account_deletion" as never,
+                  );
                   if (error) throw error;
+                  setDeletionScheduledAt((scheduledAt as unknown as string) ?? null);
+                  setShowDeleteDialog(false);
+                  setDeleteConfirm("");
+                  toast.success("Deletion scheduled. You have 7 days to change your mind. 🌙");
                   await signOut();
-                  toast.success("Your account has been deleted. Take care out there. 🌙");
                   navigate("/sign-in");
                 } catch (err: any) {
                   toast.error(err.message || "Failed to delete account");
@@ -1178,7 +1222,7 @@ const Settings = () => {
                 }
               }}
             >
-              {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Deleting...</> : "Permanently Delete"}
+              {deleting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Scheduling…</> : "Schedule Deletion"}
             </Button>
           </DialogFooter>
         </DialogContent>

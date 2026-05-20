@@ -19,7 +19,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
   },
   who_liked_me: {
     title: "See Who Resonates",
-    description: "Skip the guessing game — see who's already into you",
+    description: "See who's already aligned with you in Connections.",
     icon: <Eye className="w-6 h-6" />,
   },
   synastry: {
@@ -34,7 +34,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
   },
   unlimited_swipes: {
     title: "Unlimited Connections",
-    description: "No daily limits — explore as many connections as the cosmos offer",
+    description: "No daily limits — explore as many profiles as you'd like.",
     icon: <Heart className="w-6 h-6" />,
   },
   undo: {
@@ -44,7 +44,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
   },
   daily_likes: {
     title: "Unlimited Likes",
-    description: "You've used all your daily likes — upgrade for unlimited cosmic connections",
+    description: "You've used all your daily likes — upgrade for unlimited Connections.",
     icon: <Heart className="w-6 h-6" />,
   },
   boost: {
@@ -70,11 +70,11 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
 };
 
 const allPerks = [
-  { icon: <Heart className="w-4 h-4" />, label: "Unlimited cosmic connections" },
-  { icon: <Eye className="w-4 h-4" />, label: "See who likes you" },
-  { icon: <Sparkles className="w-4 h-4" />, label: "Full synastry charts" },
-  { icon: <Star className="w-4 h-4" />, label: "Unlimited Super Likes" },
-  { icon: <Shield className="w-4 h-4" />, label: "Priority profile visibility" },
+  { icon: <Sparkles className="w-4 h-4" />, label: "Full Cosmic Blueprint" },
+  { icon: <Star className="w-4 h-4" />, label: "Complete Human Design & Numerology" },
+  { icon: <Heart className="w-4 h-4" />, label: "Cross-Science Synthesis readings" },
+  { icon: <Eye className="w-4 h-4" />, label: "Unlimited Lyra AI conversations" },
+  { icon: <Shield className="w-4 h-4" />, label: "Cosmic Connections (when unlocked)" },
 ];
 
 const PremiumUpsellModal = ({ open, onClose, feature = "super_like" }: PremiumUpsellModalProps) => {

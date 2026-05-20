@@ -60,6 +60,26 @@ const usernameSchema = z
   .max(30, { message: "Username must be 30 characters or fewer" })
   .regex(/^[a-zA-Z0-9_]*$/, { message: "Username can only use letters, numbers, and underscores" });
 
+const EULA_VERSION = "2026-05-20";
+
+/** Strict 18+ check from a yyyy-mm-dd string. Apple UGC requirement. */
+const dobSchema = z
+  .string()
+  .min(1, { message: "Date of birth is required" })
+  .refine((s) => /^\d{4}-\d{2}-\d{2}$/.test(s), { message: "Use the date picker" })
+  .refine(
+    (s) => {
+      const dob = new Date(s + "T00:00:00");
+      if (Number.isNaN(dob.getTime())) return false;
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      return age >= 18;
+    },
+    { message: "You must be 18 or older to use Stellara" },
+  );
+
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
 const AUTH_CALLBACK_URL = `${PRODUCTION_ORIGIN}/auth/callback`;
 
@@ -96,6 +116,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [dob, setDob] = useState(""); // yyyy-mm-dd, signup only
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
@@ -184,6 +205,9 @@ const Auth = () => {
         const userResult = usernameSchema.safeParse(username);
         if (!userResult.success) errors.username = userResult.error.issues[0].message;
       }
+      const dobResult = dobSchema.safeParse(dob);
+      if (!dobResult.success) errors.dob = dobResult.error.issues[0].message;
+      if (!agreedToTerms) errors.terms = "You must accept the Terms to continue";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -248,6 +272,17 @@ const Auth = () => {
         if (error) throw error;
         if (!error && data.user && username.trim()) {
           await supabase.from("profiles").update({ username: username.trim() }).eq("user_id", data.user.id);
+        }
+        // Persist DOB + EULA acceptance (Apple UGC compliance).
+        if (!error && data.user) {
+          await supabase
+            .from("profiles")
+            .update({
+              date_of_birth: dob,
+              eula_accepted_at: new Date().toISOString(),
+              eula_version: EULA_VERSION,
+            } as never)
+            .eq("user_id", data.user.id);
         }
         // If session is null, email confirmation is required
         if (!data.session) {
@@ -619,6 +654,30 @@ const Auth = () => {
                       )}
                     </div>
                   </motion.div>
+                )}
+
+                {!isLogin && (
+                  <div className="space-y-1">
+                    <Input
+                      type="date"
+                      value={dob}
+                      max={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => {
+                        setDob(e.target.value);
+                        if (fieldErrors.dob) setFieldErrors((p) => ({ ...p, dob: "" }));
+                      }}
+                      className={`h-12 bg-muted/50 border-border ${fieldErrors.dob ? "border-destructive" : ""}`}
+                      aria-label="Date of birth"
+                      aria-invalid={!!fieldErrors.dob}
+                    />
+                    {fieldErrors.dob ? (
+                      <p className="text-xs text-destructive ml-1">{fieldErrors.dob}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground ml-1">
+                        Date of birth — Stellara is 18+ only.
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 <div className="relative">

@@ -689,6 +689,66 @@ export type Database = {
           },
         ]
       }
+      moderation_queue: {
+        Row: {
+          action_taken: string | null
+          ai_categories: Json | null
+          ai_flagged: boolean | null
+          ai_provider: string | null
+          ai_score: number | null
+          content_id: string | null
+          content_snapshot: string | null
+          content_type: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: string | null
+          reporter_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          ai_categories?: Json | null
+          ai_flagged?: boolean | null
+          ai_provider?: string | null
+          ai_score?: number | null
+          content_id?: string | null
+          content_snapshot?: string | null
+          content_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string | null
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          ai_categories?: Json | null
+          ai_flagged?: boolean | null
+          ai_provider?: string | null
+          ai_score?: number | null
+          content_id?: string | null
+          content_snapshot?: string | null
+          content_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string | null
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       moon_journal_entries: {
         Row: {
           content: string
@@ -941,8 +1001,12 @@ export type Database = {
           current_latitude: number | null
           current_longitude: number | null
           daily_ritual_last_completed: string | null
+          date_of_birth: string | null
+          deletion_scheduled_at: string | null
           display_name: string | null
           drinking: string | null
+          eula_accepted_at: string | null
+          eula_version: string | null
           gender: string | null
           gene_keys_evolution: string | null
           gene_keys_life_purpose: string | null
@@ -956,6 +1020,7 @@ export type Database = {
           human_design_type: string | null
           id: string
           interests: string[] | null
+          is_apple_reviewer: boolean
           is_incognito: boolean
           is_paused: boolean
           is_suspended: boolean
@@ -1022,8 +1087,12 @@ export type Database = {
           current_latitude?: number | null
           current_longitude?: number | null
           daily_ritual_last_completed?: string | null
+          date_of_birth?: string | null
+          deletion_scheduled_at?: string | null
           display_name?: string | null
           drinking?: string | null
+          eula_accepted_at?: string | null
+          eula_version?: string | null
           gender?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
@@ -1037,6 +1106,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_apple_reviewer?: boolean
           is_incognito?: boolean
           is_paused?: boolean
           is_suspended?: boolean
@@ -1103,8 +1173,12 @@ export type Database = {
           current_latitude?: number | null
           current_longitude?: number | null
           daily_ritual_last_completed?: string | null
+          date_of_birth?: string | null
+          deletion_scheduled_at?: string | null
           display_name?: string | null
           drinking?: string | null
+          eula_accepted_at?: string | null
+          eula_version?: string | null
           gender?: string | null
           gene_keys_evolution?: string | null
           gene_keys_life_purpose?: string | null
@@ -1118,6 +1192,7 @@ export type Database = {
           human_design_type?: string | null
           id?: string
           interests?: string[] | null
+          is_apple_reviewer?: boolean
           is_incognito?: boolean
           is_paused?: boolean
           is_suspended?: boolean
@@ -1262,9 +1337,13 @@ export type Database = {
       }
       reports: {
         Row: {
+          content_id: string | null
+          content_snapshot: string | null
+          content_type: string | null
           created_at: string
           details: string | null
           id: string
+          moderation_status: string
           reason: string
           reported_id: string
           reporter_id: string
@@ -1273,9 +1352,13 @@ export type Database = {
           status: string
         }
         Insert: {
+          content_id?: string | null
+          content_snapshot?: string | null
+          content_type?: string | null
           created_at?: string
           details?: string | null
           id?: string
+          moderation_status?: string
           reason: string
           reported_id: string
           reporter_id: string
@@ -1284,9 +1367,13 @@ export type Database = {
           status?: string
         }
         Update: {
+          content_id?: string | null
+          content_snapshot?: string | null
+          content_type?: string | null
           created_at?: string
           details?: string | null
           id?: string
+          moderation_status?: string
           reason?: string
           reported_id?: string
           reporter_id?: string
@@ -1960,6 +2047,7 @@ export type Database = {
       }
     }
     Functions: {
+      cancel_account_deletion: { Args: never; Returns: undefined }
       cleanup_rate_limits: { Args: never; Returns: undefined }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -1971,6 +2059,7 @@ export type Database = {
         Returns: number
       }
       generate_referral_code: { Args: never; Returns: string }
+      hard_delete_expired_accounts: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2001,6 +2090,7 @@ export type Database = {
         }[]
       }
       redeem_referral_code: { Args: { _code: string }; Returns: Json }
+      request_account_deletion: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

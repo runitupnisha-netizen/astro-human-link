@@ -592,6 +592,57 @@ export type Database = {
           },
         ]
       }
+      iap_subscriptions: {
+        Row: {
+          auto_renew: boolean
+          created_at: string
+          environment: string
+          expires_at: string | null
+          id: string
+          latest_transaction_id: string | null
+          original_transaction_id: string
+          platform: string
+          product_id: string
+          purchased_at: string | null
+          raw: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean
+          created_at?: string
+          environment?: string
+          expires_at?: string | null
+          id?: string
+          latest_transaction_id?: string | null
+          original_transaction_id: string
+          platform: string
+          product_id: string
+          purchased_at?: string | null
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean
+          created_at?: string
+          environment?: string
+          expires_at?: string | null
+          id?: string
+          latest_transaction_id?: string | null
+          original_transaction_id?: string
+          platform?: string
+          product_id?: string
+          purchased_at?: string | null
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           compatibility_score: number | null
@@ -2060,6 +2111,7 @@ export type Database = {
       }
       generate_referral_code: { Args: never; Returns: string }
       hard_delete_expired_accounts: { Args: never; Returns: number }
+      has_active_iap: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

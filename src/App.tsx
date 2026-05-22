@@ -333,6 +333,7 @@ const AppRoutes = () => {
             <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
+            <Route path="/admin/moderation" element={<Suspense fallback={<LoadingScreen />}><AdminModeration /></Suspense>} />
             <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />

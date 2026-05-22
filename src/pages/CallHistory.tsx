@@ -79,13 +79,13 @@ const CallHistory = () => {
       .limit(100);
 
     const peerIds = Array.from(new Set((sessions ?? []).map((s: any) => peerByMatch.get(s.match_id)).filter(Boolean))) as string[];
-    const { data: profiles } = peerIds.length
+    const { data: profilesRaw } = peerIds.length
       ? await supabase
           .from("public_profiles" as any)
           .select("user_id, display_name, avatar_url, sun_sign")
           .in("user_id", peerIds)
       : { data: [] as any[] };
-    const profileMap = new Map<string, any>((profiles ?? []).map((p: any) => [p.user_id, p]));
+    const profileMap = new Map<string, any>(((profilesRaw ?? []) as any[]).map((p: any) => [p.user_id, p]));
 
     // Resolve avatars (signed when relative).
     const resolved: CallEntry[] = await Promise.all(

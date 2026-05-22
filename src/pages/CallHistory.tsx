@@ -81,7 +81,7 @@ const CallHistory = () => {
     const peerIds = Array.from(new Set((sessions ?? []).map((s: any) => peerByMatch.get(s.match_id)).filter(Boolean))) as string[];
     const { data: profiles } = peerIds.length
       ? await supabase
-          .from("profiles")
+          .from("public_profiles" as any)
           .select("user_id, display_name, avatar_url, sun_sign")
           .in("user_id", peerIds)
       : { data: [] as any[] };

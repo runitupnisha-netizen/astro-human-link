@@ -59,36 +59,20 @@ const ViewProfile = () => {
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const { isVerified } = useVerificationStatus(userId);
 
-  // Haversine distance calculation
-  const calcDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371;
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  };
-
   useEffect(() => {
     if (!userId) return;
     const load = async () => {
       const { data } = await supabase
-        .from("profiles")
-        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, current_latitude, current_longitude, last_seen_at")
+        .from("public_profiles" as any)
+        .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, last_seen_at")
         .eq("user_id", userId)
         .maybeSingle();
       setProfile(data);
 
-      // Calculate distance from current user
-      if (user && data?.current_latitude && data?.current_longitude) {
-        const { data: myProfile } = await supabase
-          .from("profiles")
-          .select("current_latitude, current_longitude")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (myProfile?.current_latitude && myProfile?.current_longitude) {
-          const dist = calcDistance(myProfile.current_latitude, myProfile.current_longitude, data.current_latitude, data.current_longitude);
-          setDistanceKm(Math.round(dist));
-        }
+      // Distance from current user via server-side RPC (coordinates stay private)
+      if (user && userId && user.id !== userId) {
+        const { data: km } = await supabase.rpc("distance_to_user" as any, { target_user_id: userId });
+        if (typeof km === "number") setDistanceKm(km);
       }
 
       // Record profile view

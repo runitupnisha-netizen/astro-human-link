@@ -73,7 +73,7 @@ const AlignmentFeed = () => {
 
     const userIds = [...new Set(postsData.map(p => p.user_id))];
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles" as any)
       .select("user_id, display_name, username, avatar_url, sun_sign")
       .in("user_id", userIds);
 

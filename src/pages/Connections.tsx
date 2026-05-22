@@ -127,13 +127,13 @@ const Connections = () => {
     }
 
     try {
-    const [matchResult, myProfileResult] = await Promise.all([
-      supabase.from("matches").select("*").or(`user_a.eq.${user.id},user_b.eq.${user.id}`).order("created_at", { ascending: false }),
-      supabase.from("profiles").select("current_latitude, current_longitude").eq("user_id", user.id).maybeSingle(),
-    ]);
+    const matchResult = await supabase
+      .from("matches")
+      .select("*")
+      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+      .order("created_at", { ascending: false });
 
     const matchRows = matchResult.data;
-    const myCoords = myProfileResult.data;
 
     if (!matchRows || matchRows.length === 0) {
       // No matches but still cache empty state + recent checks
@@ -154,8 +154,8 @@ const Connections = () => {
     );
 
     const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, display_name, username, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, current_latitude, current_longitude, interests, relationship_goal, spiritual_practice")
+      .from("public_profiles" as any)
+      .select("user_id, display_name, username, sun_sign, moon_sign, rising_sign, human_design_type, compatibility_tags, avatar_url, life_path_number, interests, relationship_goal, spiritual_practice")
       .in("user_id", otherIds);
 
     const matchIds = matchRows.map((m) => m.id);
@@ -173,18 +173,24 @@ const Connections = () => {
     });
 
     const profileMap = new Map(
-      (profiles || []).map((p) => [p.user_id, p])
+      (profiles || []).map((p: any) => [p.user_id, p])
     );
+
+    // Fetch distances via server-side RPC (coordinates stay private)
+    const distanceEntries = await Promise.all(
+      otherIds.map(async (oid) => {
+        const { data } = await supabase.rpc("distance_to_user" as any, { target_user_id: oid });
+        return [oid, typeof data === "number" ? data : null] as const;
+      })
+    );
+    const distanceMap = new Map(distanceEntries);
 
     const results: MatchWithProfile[] = matchRows.map((m) => {
       const otherId = m.user_a === user.id ? m.user_b : m.user_a;
       const prof = profileMap.get(otherId);
       const lastMsg = lastMessageMap.get(m.id);
 
-      let distanceKm: number | null = null;
-      if (myCoords?.current_latitude && myCoords?.current_longitude && prof?.current_latitude && prof?.current_longitude) {
-        distanceKm = Math.round(calcDistance(myCoords.current_latitude, myCoords.current_longitude, prof.current_latitude, prof.current_longitude));
-      }
+      const distanceKm: number | null = distanceMap.get(otherId) ?? null;
 
       return {
         id: m.id,

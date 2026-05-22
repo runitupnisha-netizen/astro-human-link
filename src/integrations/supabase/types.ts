@@ -2105,6 +2105,7 @@ export type Database = {
         Returns: boolean
       }
       delete_user_data: { Args: { target_user_id: string }; Returns: undefined }
+      distance_to_user: { Args: { target_user_id: string }; Returns: number }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number

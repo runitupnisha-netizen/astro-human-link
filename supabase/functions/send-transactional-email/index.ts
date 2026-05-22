@@ -21,6 +21,20 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type',
 }
 
+// Decode a JWT payload without verification (signature is already verified by
+// the Supabase gateway because verify_jwt = true). We only need the role claim.
+function parseJwtClaims(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length < 2) return null
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = payload + '='.repeat((4 - (payload.length % 4)) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
   const bytes = new Uint8Array(32)
@@ -31,13 +45,30 @@ function generateToken(): string {
 }
 
 // Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// gateway validates the JWT signature. We additionally require the caller to
+// present a service_role JWT — otherwise anyone with the public anon key could
+// send arbitrary emails from our verified sending domain.
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
+  }
+
+  // Service-role guard: reject anon/user JWTs.
+  const authHeader = req.headers.get('Authorization') || req.headers.get('authorization') || ''
+  const token = authHeader.toLowerCase().startsWith('bearer ')
+    ? authHeader.slice(7).trim()
+    : ''
+  const claims = parseJwtClaims(token)
+  if (claims?.role !== 'service_role') {
+    return new Response(
+      JSON.stringify({ error: 'Forbidden: service_role required' }),
+      {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')

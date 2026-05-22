@@ -1,14 +1,20 @@
 /**
- * Content moderation adapter.
+ * Content moderation client.
  *
- * Vendor-agnostic interface. Tomorrow we pick Hive / OpenAI / Rekognition and
- * swap the `activeModerator` export below. No call site needs to change.
+ * All moderation runs server-side via the `moderate-content` edge function so
+ * vendor API keys (OpenAI Moderation, Hive) never ship in the client bundle.
  *
- * Decision deferred to operator (vendor memo in /mnt/documents/MODERATION_VENDOR_MEMO.md).
- * Until then, `placeholderModerator` returns `flagged=false` for everything — so
- * Report and Block continue to populate the moderation_queue with the raw content
- * for human review, but no automated takedowns occur.
+ * Routing (server-side):
+ *   text  -> OpenAI Moderation
+ *   image -> Hive visual moderation
+ *   audio -> Hive audio moderation
+ *
+ * On adapter failure we fail CLOSED for text (treat as flagged) and OPEN for
+ * image/audio while Hive is being provisioned. Call sites should block on
+ * `flagged === true` and additionally write to `moderation_queue` so a human
+ * can review.
  */
+import { supabase } from "@/integrations/supabase/client";
 
 export type ModerationContentType =
   | "text"
@@ -41,26 +47,37 @@ export interface ModerationAdapter {
 }
 
 /**
- * Placeholder that never flags anything. Production replacement is a one-line
- * swap of `activeModerator` below. Keeps the queue populated for human review.
+ * Placeholder fallback — used only when the edge function is unreachable.
+ * For text we fail CLOSED (caller blocks the action). For image/audio we fail OPEN
+ * until Hive is fully wired so legitimate uploads aren't blocked during rollout.
  */
 export const placeholderModerator: ModerationAdapter = {
   name: "placeholder",
-  async moderate(_input: ModerationInput): Promise<ModerationResult> {
+  async moderate(input: ModerationInput): Promise<ModerationResult> {
+    const failClosed = input.type === "text";
     return {
-      flagged: false,
+      flagged: failClosed,
       categories: {},
-      score: 0,
+      score: failClosed ? 1 : 0,
       provider: "placeholder",
     };
   },
 };
 
-/**
- * Single swap point. Replace with hiveModerator / openAIModerator / rekognitionModerator
- * once the vendor is picked. Call sites only ever reference `activeModerator`.
- */
-export const activeModerator: ModerationAdapter = placeholderModerator;
+/** Edge-function backed moderator. Single swap point for vendor changes. */
+export const activeModerator: ModerationAdapter = {
+  name: "edge:moderate-content",
+  async moderate(input: ModerationInput): Promise<ModerationResult> {
+    const { data, error } = await supabase.functions.invoke("moderate-content", {
+      body: { type: input.type, content: input.content },
+    });
+    if (error || !data) {
+      // Fall through to placeholder's fail-closed/open policy.
+      return placeholderModerator.moderate(input);
+    }
+    return data as ModerationResult;
+  },
+};
 
 /**
  * Convenience wrapper used by ReportDialog / chat send paths.
@@ -72,12 +89,43 @@ export async function moderateContent(input: ModerationInput): Promise<Moderatio
     return await activeModerator.moderate(input);
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn("[moderation] adapter failed, falling back to unflagged", err);
-    return {
-      flagged: false,
-      categories: {},
-      score: 0,
-      provider: `${activeModerator.name}:error`,
-    };
+    console.warn("[moderation] adapter threw, applying placeholder policy", err);
+    return placeholderModerator.moderate(input);
   }
+}
+
+/**
+ * Convenience: moderate, and if flagged, also write a row to `moderation_queue`
+ * so a human admin can review. Returns the moderation result so the caller can
+ * decide whether to block the user action.
+ */
+export async function moderateAndQueue(
+  input: ModerationInput & {
+    contentId?: string;
+    targetUserId?: string;
+    reporterId?: string | null;
+  },
+): Promise<ModerationResult> {
+  const result = await moderateContent(input);
+  if (result.flagged) {
+    try {
+      await supabase.from("moderation_queue").insert({
+        reporter_id: input.reporterId ?? null,
+        target_user_id: input.targetUserId ?? null,
+        content_type: input.type,
+        content_id: input.contentId ?? null,
+        content_snapshot: input.type === "text" ? input.content.slice(0, 4000) : input.content,
+        reason: "ai_flagged",
+        ai_provider: result.provider,
+        ai_flagged: true,
+        ai_categories: result.categories as any,
+        ai_score: result.score,
+        status: "pending",
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn("[moderation] queue insert failed", err);
+    }
+  }
+  return result;
 }

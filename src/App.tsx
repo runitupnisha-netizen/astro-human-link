@@ -74,6 +74,7 @@ const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
+const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 const CallHistory = lazy(() => import("./pages/CallHistory"));
 
@@ -332,6 +333,7 @@ const AppRoutes = () => {
             <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
+            <Route path="/admin/moderation" element={<Suspense fallback={<LoadingScreen />}><AdminModeration /></Suspense>} />
             <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />

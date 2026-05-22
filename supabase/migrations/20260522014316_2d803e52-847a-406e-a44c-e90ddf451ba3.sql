@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.distance_to_user(uuid) FROM PUBLIC, anon;

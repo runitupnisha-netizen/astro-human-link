@@ -62,11 +62,12 @@ const ViewProfile = () => {
   useEffect(() => {
     if (!userId) return;
     const load = async () => {
-      const { data } = await supabase
+      const { data: dataRaw } = await supabase
         .from("public_profiles" as any)
         .select("display_name, avatar_url, sun_sign, moon_sign, rising_sign, human_design_type, human_design_strategy, human_design_authority, human_design_profile, human_design_summary, life_path_number, birthday_number, personal_year_number, numerology_summary, gene_keys_life_purpose, gene_keys_evolution, gene_keys_radiance, gene_keys_summary, astro_summary, compatibility_tags, interests, relationship_goal, spiritual_practice, growth_commitment, gender, birth_date, birth_place, current_city, last_seen_at")
         .eq("user_id", userId)
         .maybeSingle();
+      const data = dataRaw as any;
       setProfile(data);
 
       // Distance from current user via server-side RPC (coordinates stay private)

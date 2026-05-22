@@ -47,10 +47,11 @@ const WhoViewedMe = () => {
       );
 
       const ids = uniqueViewers.map((v) => v.viewer_id);
-      const { data: profiles } = await supabase
+      const { data: profilesRaw } = await supabase
         .from("public_profiles" as any)
         .select("user_id, display_name, avatar_url, sun_sign")
         .in("user_id", ids);
+      const profiles = (profilesRaw ?? []) as any[];
 
       const profileMap = new Map(
         (profiles || []).map((p) => [p.user_id, p])

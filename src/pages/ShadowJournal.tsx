@@ -61,6 +61,20 @@ const ShadowJournal = () => {
     if (!user || !entry.trim()) return;
     setSaving(true);
     const text = entry.trim();
+    // Private content: still scan for self-harm crisis patterns so we can route
+    // to a crisis-response queue. We do NOT block the user — journaling about
+    // dark feelings is the whole point. We just flag for human follow-up.
+    try {
+      const { moderateAndQueue } = await import("@/lib/moderation");
+      void moderateAndQueue({
+        type: "text",
+        content: text,
+        targetUserId: user.id,
+        reporterId: null,
+      });
+    } catch {
+      // Never block the journal save on moderation failure.
+    }
     const { data, error } = await supabase
       .from("shadow_journal_entries")
       .insert({

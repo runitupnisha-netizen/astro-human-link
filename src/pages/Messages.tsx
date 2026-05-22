@@ -495,6 +495,25 @@ const Messages = () => {
     setMessages((prev) => [...prev, optimisticMsg]);
 
     try {
+      // Server-side moderation — block before DB insert if flagged.
+      const { moderateAndQueue } = await import("@/lib/moderation");
+      const mod = await moderateAndQueue({
+        type: "text",
+        content,
+        targetUserId: undefined,
+        reporterId: user.id,
+      });
+      if (mod.flagged && mod.provider !== "openai:not_configured" && mod.provider !== "placeholder") {
+        toast({
+          title: "Message can't be sent",
+          description: "This message was flagged by our safety system. A moderator will review it.",
+          variant: "destructive",
+        });
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+        setNewMessage(content);
+        setSending(false);
+        return;
+      }
       const { error } = await supabase.from("messages").insert({
         match_id: selectedMatchId,
         sender_id: user.id,

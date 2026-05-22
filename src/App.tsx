@@ -74,6 +74,7 @@ const SoulmateSketch = lazy(() => import("./pages/SoulmateSketch"));
 const CheckConnection = lazy(() => import("./pages/CheckConnection"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
+const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 const CallHistory = lazy(() => import("./pages/CallHistory"));
 

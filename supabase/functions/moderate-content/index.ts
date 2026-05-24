@@ -5,7 +5,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
  * Server-side content moderation router.
  *
  * Routes:
- *   text  -> OpenAI Moderation (omni-moderation-latest)
+ *   text  -> Lovable AI Gateway (Gemini) structured classifier via tool calling
  *   image -> Hive visual moderation  (if HIVE_API_KEY set, else not_configured)
  *   audio -> Hive audio moderation   (if HIVE_API_KEY set, else not_configured)
  *
@@ -29,62 +29,127 @@ interface Result {
   reasons?: string[];
 }
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const HIVE_API_KEY = Deno.env.get("HIVE_API_KEY");
 
-/** Categories that should flag at a much lower threshold. */
-const ZERO_TOLERANCE = new Set([
-  "sexual/minors",
-  "csam",
-  "child_sexual_content",
-]);
+/**
+ * Text moderation via Lovable AI Gateway (Gemini).
+ * Uses tool calling to force a strict JSON shape with per-category 0-1 scores.
+ * Zero-tolerance on sexual_minors: ANY non-trivial score => flagged.
+ */
+const TEXT_CATEGORIES = [
+  "sexual",
+  "sexual_minors",
+  "harassment",
+  "hate",
+  "self_harm",
+  "violence",
+  "dangerous",
+  "illegal",
+] as const;
 
 async function moderateText(content: string): Promise<Result> {
-  if (!OPENAI_API_KEY) {
-    return { flagged: true, categories: {}, score: 1, provider: "openai:not_configured" };
+  if (!LOVABLE_API_KEY) {
+    return { flagged: true, categories: {}, score: 1, provider: "gemini:not_configured" };
   }
   try {
-    const res = await fetch("https://api.openai.com/v1/moderations", {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ model: "omni-moderation-latest", input: content }),
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a strict content safety classifier for a dating app. " +
+              "Score the user content from 0.0 (safe) to 1.0 (severe violation) for each category. " +
+              "Be especially strict and conservative for sexual_minors: ANY sexualization, reference, " +
+              "roleplay, or grooming involving anyone under 18 (or ambiguous age) MUST score >= 0.9. " +
+              "Return ONLY the tool call. Do not narrate.",
+          },
+          { role: "user", content: content.slice(0, 4000) },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "classify_content",
+              description: "Return safety scores per category.",
+              parameters: {
+                type: "object",
+                properties: Object.fromEntries(
+                  TEXT_CATEGORIES.map((c) => [
+                    c,
+                    { type: "number", minimum: 0, maximum: 1 },
+                  ]),
+                ),
+                required: [...TEXT_CATEGORIES],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "classify_content" } },
+      }),
     });
     if (!res.ok) {
       const errText = await res.text();
-      console.error("[moderate-content] openai error", res.status, errText);
-      return { flagged: true, categories: {}, score: 1, provider: "openai:error" };
+      console.error("[moderate-content] gemini error", res.status, errText);
+      if (res.status === 429 || res.status === 402) {
+        // Don't permanently block users on transient gateway throttle/credit issues
+        return { flagged: false, categories: {}, score: 0, provider: `gemini:${res.status}` };
+      }
+      return { flagged: true, categories: {}, score: 1, provider: "gemini:error" };
     }
     const json = await res.json();
-    const r = json.results?.[0];
-    const categoryScores: Record<string, number> = r?.category_scores ?? {};
-    const categoryFlags: Record<string, boolean> = r?.categories ?? {};
-    const reasons: string[] = [];
-    let flagged = !!r?.flagged;
-    for (const [k, v] of Object.entries(categoryFlags)) {
-      if (v) reasons.push(k);
+    const argStr = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!argStr) {
+      console.error("[moderate-content] gemini no tool_call", JSON.stringify(json).slice(0, 500));
+      return { flagged: true, categories: {}, score: 1, provider: "gemini:no_tool_call" };
     }
-    // Lower threshold on zero-tolerance categories
-    for (const k of ZERO_TOLERANCE) {
-      const score = categoryScores[k];
-      if (typeof score === "number" && score > 0.1) {
+    let parsed: Record<string, number> = {};
+    try {
+      parsed = JSON.parse(argStr);
+    } catch {
+      return { flagged: true, categories: {}, score: 1, provider: "gemini:bad_json" };
+    }
+    const scores: Record<string, number> = {};
+    for (const c of TEXT_CATEGORIES) {
+      const v = Number(parsed[c]);
+      scores[c] = Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
+    }
+    const reasons: string[] = [];
+    let flagged = false;
+    // Zero-tolerance: sexual_minors at very low threshold.
+    if (scores.sexual_minors >= 0.2) {
+      flagged = true;
+      reasons.push("sexual_minors");
+    }
+    // Standard thresholds for other categories.
+    const STANDARD_THRESHOLDS: Record<string, number> = {
+      sexual: 0.85,
+      harassment: 0.8,
+      hate: 0.8,
+      self_harm: 0.8,
+      violence: 0.85,
+      dangerous: 0.85,
+      illegal: 0.8,
+    };
+    for (const [k, t] of Object.entries(STANDARD_THRESHOLDS)) {
+      if (scores[k] >= t) {
         flagged = true;
         if (!reasons.includes(k)) reasons.push(k);
       }
     }
-    const maxScore = Object.values(categoryScores).reduce((m, v) => (v > m ? v : m), 0);
-    return {
-      flagged,
-      categories: categoryScores,
-      score: maxScore,
-      provider: "openai",
-      reasons,
-    };
+    const maxScore = Object.values(scores).reduce((m, v) => (v > m ? v : m), 0);
+    return { flagged, categories: scores, score: maxScore, provider: "gemini", reasons };
   } catch (err) {
-    console.error("[moderate-content] openai exception", err);
-    return { flagged: true, categories: {}, score: 1, provider: "openai:exception" };
+    console.error("[moderate-content] gemini exception", err);
+    return { flagged: true, categories: {}, score: 1, provider: "gemini:exception" };
   }
 }
 

@@ -156,10 +156,9 @@ async function moderateText(content: string): Promise<Result> {
 /** Hive image moderation. Expects a publicly fetchable image URL. */
 async function moderateImage(url: string): Promise<Result> {
   if (!HIVE_API_KEY) {
-    // Not configured yet — fail OPEN for images during initial rollout so legitimate
-    // avatar/photo uploads aren't blocked. The Report flow still routes to the queue.
-    // TODO(hive): switch to fail-closed once HIVE_API_KEY is provisioned and tested.
-    return { flagged: false, categories: {}, score: 0, provider: "hive:not_configured" };
+    // Fail CLOSED for image moderation — photos are the highest-risk vector
+    // and must never bypass scanning, even during configuration gaps.
+    return { flagged: true, categories: {}, score: 1, provider: "hive:not_configured" };
   }
   try {
     const form = new FormData();
@@ -211,8 +210,9 @@ async function moderateImage(url: string): Promise<Result> {
 
 async function moderateAudio(url: string): Promise<Result> {
   if (!HIVE_API_KEY) {
-    // TODO(hive): wire audio moderation once HIVE_API_KEY is provisioned.
-    return { flagged: false, categories: {}, score: 0, provider: "hive:not_configured" };
+    // Fail CLOSED for voice moderation — audio is high-risk and must never
+    // bypass scanning, even during configuration gaps.
+    return { flagged: true, categories: {}, score: 1, provider: "hive:not_configured" };
   }
   try {
     const form = new FormData();

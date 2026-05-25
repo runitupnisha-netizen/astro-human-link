@@ -8,7 +8,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
-import { useVerificationGate } from "@/hooks/useVerificationGate";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";

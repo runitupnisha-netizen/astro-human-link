@@ -29,8 +29,6 @@ const PHONE_AUTH_ENABLED = false;
  */
 const SOCIAL_AUTH_ENABLED = false;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
-import soulConnection from "@/assets/soul-connection.jpg";
-import stellaraHeroLogo from "@/assets/stellara-hero-logo.png";
 import { motion } from "framer-motion";
 import { z } from "zod";
 

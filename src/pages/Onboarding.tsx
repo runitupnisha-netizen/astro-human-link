@@ -1446,12 +1446,12 @@ const Onboarding = () => {
                   <div className="flex-1">
                     <h3 className="text-base font-semibold text-foreground">How we use your data</h3>
                     <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                      Your birth data and answers power your cosmic blueprint and compatibility matching. We never sell your data — ever.
+                      Your birth data and answers power your cosmic blueprint and connection insights. We never sell your data — ever.
                     </p>
                     <ul className="mt-2 text-xs text-muted-foreground/90 space-y-1">
                       <li>• Birth details → astrology, Human Design, numerology readings</li>
-                      <li>• Location → distance to potential matches (approximate, never exact)</li>
-                      <li>• Messages → encrypted in transit & at rest, visible only to you and your match</li>
+                      <li>• Location → approximate distance to nearby members (never exact)</li>
+                      <li>• Messages → encrypted in transit & at rest, visible only to you and the person you're connecting with</li>
                       <li>• You can pause your profile, go incognito, or delete everything anytime</li>
                     </ul>
                     <p className="mt-2 text-xs">
@@ -1464,7 +1464,7 @@ const Onboarding = () => {
                 <label className="flex items-start gap-2 cursor-pointer rounded-xl border border-border/40 bg-background/40 p-3">
                   <Checkbox checked={consentDataUsage} onCheckedChange={(v) => setConsentDataUsage(!!v)} className="mt-0.5" />
                   <span className="text-sm text-foreground">
-                    I consent to Stellara using my data to generate my blueprint and surface compatible matches.
+                    I consent to Stellara using my data to generate my blueprint and surface aligned connections.
                   </span>
                 </label>
               </motion.div>
@@ -1520,14 +1520,14 @@ const Onboarding = () => {
                 </Button>
                 <Button
                   onClick={() => setShowFinishConfirm(true)}
-                  disabled={!consentVerification || !consentDataUsage || !consentSafetyTools}
+                  disabled={!consentDataUsage || !consentSafetyTools}
                   className="flex-1 h-12 text-base font-semibold group relative overflow-hidden disabled:opacity-50"
                   style={{ background: "var(--gradient-aurora)" }}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <ShieldCheck className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    {!consentVerification || !consentDataUsage || !consentSafetyTools
-                      ? "Acknowledge all 3 to continue"
+                    {!consentDataUsage || !consentSafetyTools
+                      ? "Acknowledge both to continue"
                       : "Enter Stellara"}
                   </span>
                 </Button>

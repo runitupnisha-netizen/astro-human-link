@@ -350,24 +350,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen relative flex flex-col">
-      {/* Soul connection hero background */}
-      <div className="absolute inset-0 z-0">
-        <img src={soulConnection} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
-      </div>
       <CosmicBackground />
-
-      {/* Silhouette overlay */}
-      <div className="absolute inset-0 z-[1] flex items-start justify-center pt-16 md:pt-0 md:items-center pointer-events-none select-none">
-        <motion.img
-          src={stellaraHeroLogo}
-          alt=""
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 0.18, scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="w-[90vw] md:w-[55vw] lg:w-[45vw] max-w-[700px] object-contain mix-blend-screen"
-        />
-      </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <motion.div
@@ -390,14 +373,12 @@ const Auth = () => {
               <img src={stellaraAppIcon} alt="Stellara" className="relative w-20 h-20 object-contain rounded-xl shadow-2xl shadow-primary/50 ring-1 ring-primary/20" />
             </div>
             <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">
-              {showForgotPassword ? "Reset password" : isLogin ? "Welcome back" : "Find your alignment"}
+              {showForgotPassword ? "Reset password" : isLogin ? "Welcome back" : "Begin your self-discovery"}
             </h1>
             <p className="text-muted-foreground mt-2 text-sm md:text-base">
               {showForgotPassword
                 ? "We'll send a reset link to your inbox"
-                : isLogin
-                ? "Self-discovery first. Connection follows."
-                : "Real connections, written in the stars"}
+                : "Self-discovery first. Connection follows."}
             </p>
           </motion.div>
 

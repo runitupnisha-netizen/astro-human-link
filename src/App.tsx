@@ -8,7 +8,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
-import { useVerificationGate } from "@/hooks/useVerificationGate";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -108,13 +107,13 @@ const isPasswordResetUrl = (hash: string) => {
 
 const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificationCheck = false }: { children: ReactNode; allowDuringOnboarding?: boolean; skipVerificationCheck?: boolean }) => {
   const { user, onboardingComplete, loading } = useOnboardingStatus();
-  const { verified, loading: verLoading } = useVerificationGate(user?.id);
 
-  if (loading || (!skipVerificationCheck && verLoading)) return <LoadingScreen />;
+  if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/sign-in" replace />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
-  // After onboarding, require verification before accessing the app
-  if (!skipVerificationCheck && onboardingComplete && verified === false) return <Navigate to="/verify" replace />;
+  // Photo/selfie verification is OPTIONAL — never a hard gate. Users can verify
+  // voluntarily from Profile/Settings to earn a verified badge.
+  void skipVerificationCheck;
 
   return <>{children}</>;
 };

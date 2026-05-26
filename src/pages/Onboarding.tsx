@@ -437,8 +437,13 @@ const Onboarding = () => {
 
   const handleFinish = async () => {
     try {
+      console.log("[Onboarding] handleFinish: start");
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        console.warn("[Onboarding] handleFinish: no session, aborting");
+        toast.error("Session expired — please sign in again");
+        return;
+      }
 
       const { error } = await supabase
         .from("profiles")
@@ -461,9 +466,11 @@ const Onboarding = () => {
 
       if (error) throw error;
 
+      console.log("[Onboarding] handleFinish: profile updated, navigating to /");
       toast.success("Your Stellara blueprint is complete! ✨");
       navigate("/");
     } catch (err: any) {
+      console.error("[Onboarding] handleFinish failed:", err);
       toast.error("Failed to save preferences");
     }
   };

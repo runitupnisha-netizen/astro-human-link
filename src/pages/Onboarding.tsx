@@ -445,7 +445,7 @@ const Onboarding = () => {
         return;
       }
 
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from("profiles")
         .update({
           gender: gender || null,
@@ -462,13 +462,36 @@ const Onboarding = () => {
           preferred_language: preferredLanguage || null,
           onboarding_complete: true,
         })
-        .eq("user_id", session.user.id);
+        .eq("user_id", session.user.id)
+        .select("user_id, onboarding_complete");
 
       if (error) throw error;
 
-      console.log("[Onboarding] handleFinish: profile updated, navigating to /");
+      console.log("[Onboarding] handleFinish: update returned rows=", updated?.length, "row=", updated?.[0]);
+
+      if (!updated || updated.length === 0) {
+        console.error("[Onboarding] handleFinish: 0 rows updated — profile row missing for user", session.user.id);
+        toast.error("Could not finalize your profile. Please sign out and back in.");
+        return;
+      }
+
+      // Verify the write is readable back (catches RLS/replica issues)
+      const { data: verify, error: verifyErr } = await supabase
+        .from("profiles")
+        .select("onboarding_complete")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+      console.log("[Onboarding] handleFinish: verify read =", verify, "err=", verifyErr);
+
+      // Stash a short-lived flag so ProtectedRoute trusts completion immediately,
+      // bypassing any stale hook state / read lag on the very next route mount.
+      try {
+        sessionStorage.setItem("stellara:onboarding-just-completed", String(Date.now()));
+      } catch {}
+
       toast.success("Your Stellara blueprint is complete! ✨");
-      navigate("/");
+      console.log("[Onboarding] handleFinish: navigating to /");
+      navigate("/", { replace: true });
     } catch (err: any) {
       console.error("[Onboarding] handleFinish failed:", err);
       toast.error("Failed to save preferences");

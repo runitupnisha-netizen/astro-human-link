@@ -437,8 +437,13 @@ const Onboarding = () => {
 
   const handleFinish = async () => {
     try {
+      console.log("[Onboarding] handleFinish: start");
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        console.warn("[Onboarding] handleFinish: no session, aborting");
+        toast.error("Session expired — please sign in again");
+        return;
+      }
 
       const { error } = await supabase
         .from("profiles")
@@ -461,9 +466,11 @@ const Onboarding = () => {
 
       if (error) throw error;
 
+      console.log("[Onboarding] handleFinish: profile updated, navigating to /");
       toast.success("Your Stellara blueprint is complete! ✨");
       navigate("/");
     } catch (err: any) {
+      console.error("[Onboarding] handleFinish failed:", err);
       toast.error("Failed to save preferences");
     }
   };
@@ -1519,7 +1526,13 @@ const Onboarding = () => {
                   Back
                 </Button>
                 <Button
-                  onClick={() => setShowFinishConfirm(true)}
+                  onClick={() => {
+                    console.log("[Onboarding] Enter Stellara tapped", {
+                      consentDataUsage,
+                      consentSafetyTools,
+                    });
+                    handleFinish();
+                  }}
                   disabled={!consentDataUsage || !consentSafetyTools}
                   className="flex-1 h-12 text-base font-semibold group relative overflow-hidden disabled:opacity-50"
                   style={{ background: "var(--gradient-aurora)" }}

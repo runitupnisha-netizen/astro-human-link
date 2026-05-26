@@ -1519,7 +1519,13 @@ const Onboarding = () => {
                   Back
                 </Button>
                 <Button
-                  onClick={() => setShowFinishConfirm(true)}
+                  onClick={() => {
+                    console.log("[Onboarding] Enter Stellara tapped", {
+                      consentDataUsage,
+                      consentSafetyTools,
+                    });
+                    handleFinish();
+                  }}
                   disabled={!consentDataUsage || !consentSafetyTools}
                   className="flex-1 h-12 text-base font-semibold group relative overflow-hidden disabled:opacity-50"
                   style={{ background: "var(--gradient-aurora)" }}

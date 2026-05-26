@@ -32,9 +32,9 @@ const BoostButton = ({ isPremium, boostUntil, onBoostActivated, onUpsell }: Boos
       const { error } = await supabase.from("profiles").update({ boost_until: until }).eq("user_id", user.id);
       if (error) throw error;
       onBoostActivated(until);
-      toast({ title: "🚀 Boost Activated!", description: "You'll appear at the top of discovery for 30 minutes" });
+      toast({ title: "✦ Amplify Activated!", description: "You'll appear at the top of discovery for 30 minutes" });
     } catch (e: any) {
-      toast({ title: "Boost failed", description: e.message, variant: "destructive" });
+      toast({ title: "Amplify failed", description: e.message, variant: "destructive" });
     } finally {
       setBoosting(false);
     }
@@ -49,7 +49,7 @@ const BoostButton = ({ isPremium, boostUntil, onBoostActivated, onUpsell }: Boos
         className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/15 border border-accent/30"
       >
         <Rocket className="w-4 h-4 text-accent" />
-        <span className="text-xs font-medium text-accent">Boosted • {remaining}m left</span>
+        <span className="text-xs font-medium text-accent">Amplified • {remaining}m left</span>
       </motion.div>
     );
   }
@@ -63,7 +63,7 @@ const BoostButton = ({ isPremium, boostUntil, onBoostActivated, onUpsell }: Boos
       disabled={boosting}
     >
       {boosting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
-      Boost
+      Amplify
       {!isPremium && <Crown className="w-3 h-3 text-accent" />}
     </Button>
   );

@@ -234,8 +234,8 @@ const TOUR_STEPS: TourStep[] = [
   {
     icon: Sparkles,
     iconWrapClass: "bg-green-400/15 text-green-400 border-green-400/30",
-    title: "Discover · swipe with intention",
-    body: "Swipe through soul-matched profiles curated by your cosmic compatibility. Right to like, left to pass, up to super-like.",
+    title: "Discover · explore with intention",
+    body: "Browse aligned profiles curated by your cosmic compatibility. Right to like, left to pass, up to spotlight.",
     cta: { label: "Open Discover", path: "/discover", highlight: "swipe-deck" },
   },
   {

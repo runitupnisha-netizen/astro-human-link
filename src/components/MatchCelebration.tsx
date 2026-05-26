@@ -177,7 +177,7 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               transition={{ delay: 0.5, type: "spring", damping: 15 }}
               className="font-display text-4xl md:text-5xl font-bold bg-gradient-golden bg-clip-text text-transparent mb-1"
             >
-              It's a Match!
+              You're Aligned!
             </motion.h1>
 
             <motion.p
@@ -234,7 +234,7 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
               className="mb-4"
             >
               <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wide ${tierClass}`}>
-                {profile.connection_type || "Cosmic Match"}
+                {profile.connection_type || "Cosmic Connection"}
               </span>
             </motion.div>
 

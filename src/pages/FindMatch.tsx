@@ -160,7 +160,7 @@ const FindMatch = () => {
           <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-amber-400/80">
             <Sparkles className="w-3 h-3" /> Cosmic Calculator
           </div>
-          <h1 className="text-4xl font-display">Find My Match</h1>
+          <h1 className="text-4xl font-display">Explore Connections</h1>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
             Drop in anyone's birth details — Lyra reads the energy between your charts in seconds.
           </p>

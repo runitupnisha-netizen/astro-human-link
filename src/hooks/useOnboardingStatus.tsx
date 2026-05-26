@@ -4,8 +4,20 @@ import { useAuth } from "./useAuth";
 
 export const useOnboardingStatus = () => {
   const { user, loading: authLoading } = useAuth();
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Trust a freshly-set completion flag (set by Onboarding.handleFinish) to avoid
+  // a race where ProtectedRoute reads stale `false` between the DB write and the
+  // refetch on the next route mount.
+  const justCompleted = (() => {
+    try {
+      const ts = sessionStorage.getItem("stellara:onboarding-just-completed");
+      if (!ts) return false;
+      return Date.now() - Number(ts) < 60_000;
+    } catch { return false; }
+  })();
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean | null>(
+    justCompleted ? true : null,
+  );
+  const [loading, setLoading] = useState(!justCompleted);
 
   useEffect(() => {
     if (authLoading) return;
@@ -28,15 +40,26 @@ export const useOnboardingStatus = () => {
         if (cancelled) return;
 
         if (error) {
-          console.error("Error checking onboarding:", error);
+          console.error("[useOnboardingStatus] select error:", error);
           // If RLS blocks access, still show content rather than blank page
           setOnboardingComplete(true);
         } else {
-          setOnboardingComplete(data?.onboarding_complete ?? false);
+          const dbValue = data?.onboarding_complete ?? false;
+          console.log("[useOnboardingStatus] read onboarding_complete =", dbValue, "row=", data);
+          // Honor the just-completed flag if DB read lags
+          if (!dbValue && justCompleted) {
+            console.log("[useOnboardingStatus] DB says false but justCompleted flag set — trusting flag");
+            setOnboardingComplete(true);
+          } else {
+            setOnboardingComplete(dbValue);
+            if (dbValue) {
+              try { sessionStorage.removeItem("stellara:onboarding-just-completed"); } catch {}
+            }
+          }
         }
       } catch (err) {
         if (cancelled) return;
-        console.error("Onboarding check failed:", err);
+        console.error("[useOnboardingStatus] check failed:", err);
         setOnboardingComplete(true);
       }
       setLoading(false);
@@ -45,7 +68,7 @@ export const useOnboardingStatus = () => {
     checkOnboarding();
 
     return () => { cancelled = true; };
-  }, [user, authLoading]);
+  }, [user, authLoading, justCompleted]);
 
   return { onboardingComplete, loading: authLoading || loading, user };
 };

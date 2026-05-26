@@ -1060,7 +1060,7 @@ const Settings = () => {
                 ) : (
                   <>
                     <p className="text-sm text-muted-foreground">
-                      Unlock Lyra deep readings, Soulmate Sketch, who liked you, boosts, and more. ✦
+                      Unlock Lyra deep readings, Connection Vision, who's interested in you, amplify, and more. ✦
                     </p>
                     <button
                       onClick={() => navigate("/premium")}

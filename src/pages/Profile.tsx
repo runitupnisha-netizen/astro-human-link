@@ -373,7 +373,7 @@ const Profile = () => {
                 Voice Intro
                 <Badge variant="outline" className="border-accent/30 text-accent text-xs ml-auto">15s max</Badge>
               </h2>
-              <p className="text-sm text-muted-foreground mb-3">Record a short voice intro so matches can hear your vibe.</p>
+              <p className="text-sm text-muted-foreground mb-3">Record a short voice intro so connections can hear your vibe.</p>
               <VoiceIntro
                 userId={user!.id}
                 currentUrl={profile.voice_intro_url}
@@ -404,7 +404,7 @@ const Profile = () => {
                   await refreshProfile();
                   toast({ title: "About Me saved ✨" });
                 }}
-                placeholder="Tell potential matches a little about yourself…"
+                placeholder="Tell others a little about yourself…"
                 rows={4}
                 className="flex w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                 maxLength={500}

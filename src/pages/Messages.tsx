@@ -1369,7 +1369,7 @@ const Messages = () => {
         <CallScreen
           open={showCallScreen}
           onClose={() => setShowCallScreen(false)}
-          callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          callerName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Connection"}
           callerAvatar={selectedConvo.otherProfile.avatar_url}
           callType={callType}
           matchId={selectedConvo.match.id}
@@ -1386,7 +1386,7 @@ const Messages = () => {
             moon: otherProfileFull?.moon_sign || null,
             rising: otherProfileFull?.rising_sign || null,
           }}
-          theirName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Match"}
+          theirName={sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "Your Connection"}
           score={selectedConvo.match.compatibility_score || 0}
         />
       )}

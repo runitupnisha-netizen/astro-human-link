@@ -61,16 +61,16 @@ const WhoLikedMe = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
             <Heart className="w-4 h-4 text-primary" fill="currentColor" />
-            <span className="text-sm font-medium text-primary">Who Liked You</span>
+            <span className="text-sm font-medium text-primary">Who's Interested</span>
           </div>
           <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-            {count > 0 ? `${count} ${count !== 1 ? "people" : "person"} liked you` : "Your likes will show up here"}
+            {count > 0 ? `${count} ${count !== 1 ? "people are" : "person is"} interested in you` : "Interested connections will show up here"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {count > 0 ? (
               <>
                 <button onClick={() => isPremium ? null : setShowUpsell(true)} className="text-primary hover:underline underline-offset-2 transition-colors font-medium">Upgrade</button>{" "}
-                to see who's into you
+                to see who's drawn to your energy
               </>
             ) : (
               <>
@@ -94,9 +94,9 @@ const WhoLikedMe = () => {
             <div className="w-20 h-20 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
               <Heart className="w-10 h-10 text-muted-foreground/50" />
             </div>
-            <p className="text-muted-foreground">No pending likes yet</p>
+            <p className="text-muted-foreground">No interested connections yet</p>
             <p className="text-sm text-muted-foreground/60 mt-1">
-              New likes will appear as others{" "}
+              They'll appear here as others{" "}
               <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">discover your profile</button>
             </p>
           </motion.div>
@@ -115,9 +115,9 @@ const WhoLikedMe = () => {
                       <Crown className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-foreground text-sm">Unlock Who Liked You</h3>
+                      <h3 className="font-semibold text-foreground text-sm">Unlock Who's Interested</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        See full profiles, photos, and cosmic compatibility of everyone who swiped right on you.
+                        See full profiles, photos, and cosmic compatibility of everyone aligned with you.
                       </p>
                     </div>
                     <Button size="sm" className="shrink-0 bg-primary hover:bg-primary/90" onClick={() => setShowUpsell(true)}>
@@ -163,12 +163,12 @@ const WhoLikedMe = () => {
                           </div>
                         )}
 
-                        {/* Super like badge */}
+                        {/* Spotlight badge */}
                         {liker.action === "super_like" && (
                           <div className="absolute top-2 right-2">
                             <Badge className="bg-primary/90 text-primary-foreground border-0 text-[10px] px-1.5 py-0.5">
                               <Star className="w-3 h-3 mr-0.5" fill="currentColor" />
-                              Super
+                              Spotlight
                             </Badge>
                           </div>
                         )}

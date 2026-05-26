@@ -17,23 +17,23 @@ const steps: Step[] = [
   {
     icon: Heart,
     iconWrapClass: "bg-green-400/15 text-green-400 border-green-400/30",
-    title: "Like a soul",
-    body: "Swipe right or tap the heart to send a like. If they like you back, the stars align ✨",
+    title: "Show interest",
+    body: "Swipe right or tap the heart to send a like. If you're both aligned, a new connection opens ✨",
     hint: "Swipe → · Tap ❤",
   },
   {
     icon: XIcon,
     iconWrapClass: "bg-destructive/15 text-destructive border-destructive/30",
     title: "Pass with grace",
-    body: "Not feeling the connection? Swipe left or tap the X. Their journey continues elsewhere.",
+    body: "Not feeling aligned? Swipe left or tap the X. Their journey continues elsewhere.",
     hint: "Swipe ← · Tap ✕",
   },
   {
     icon: Star,
     iconWrapClass:
       "text-accent-foreground border-accent/40 [background:var(--gradient-golden)]",
-    title: "Super like (Premium)",
-    body: "Swipe up or tap the gold star to stand out. They'll know you're seriously interested.",
+    title: "Spotlight (Premium)",
+    body: "Swipe up or tap the gold star to stand out. They'll see you took notice.",
     hint: "Swipe ↑ · Tap ⭐",
   },
   {

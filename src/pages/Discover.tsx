@@ -153,7 +153,7 @@ const Discover = () => {
           const matchedId = match.user_a === user.id ? match.user_b : match.user_a;
           const matchedProfile = profiles.find((p) => p.user_id === matchedId);
           if (matchedProfile) setMatchPopup(matchedProfile);
-          else toast({ title: "✨ New Soul Match!", description: "You both liked each other — go say hi!" });
+          else toast({ title: "✨ New Connection!", description: "You're both aligned — say hello when you're ready." });
         }
       })
       .subscribe();
@@ -217,7 +217,7 @@ const Discover = () => {
     });
 
     if (direction === "super") {
-      toast({ title: "⭐ Super Like Sent!", description: `${sanitizeName(topProfile.display_name) || "Someone special"} will notice this one` });
+      toast({ title: "⭐ Spotlight Sent!", description: `${sanitizeName(topProfile.display_name) || "Someone aligned"} will see you stand out` });
     }
 
     const isDemo = topProfile.user_id.startsWith("demo-");
@@ -410,9 +410,9 @@ const Discover = () => {
           border: "0.5px solid rgba(208,180,247,0.35)",
           backdropFilter: "blur(8px)",
         }}
-        aria-label="Open Soulmate Sketch"
+        aria-label="Open Connection Vision"
       >
-        <span aria-hidden>✦</span> Soulmate Sketch
+        <span aria-hidden>✦</span> Connection Vision
       </button>
     </div>
   );

@@ -182,9 +182,9 @@ const SoulmateSketch = () => {
   const handleShare = async () => {
     if (!sketch) return;
     const firstTwo = sketch.split(/(?<=[.!?])\s+/).slice(0, 2).join(" ");
-    const text = `STELLARA — My Cosmic Match Energy ✦\n\n${firstTwo}\n\nFind yours at stellara.app`;
+    const text = `STELLARA — My Connection Vision ✦\n\n${firstTwo}\n\nDiscover yours at stellara.app`;
     if (navigator.share) {
-      try { await navigator.share({ title: "My Cosmic Match Energy", text }); } catch { /* dismissed */ }
+      try { await navigator.share({ title: "My Connection Vision", text }); } catch { /* dismissed */ }
     } else {
       await navigator.clipboard.writeText(text);
     }
@@ -274,7 +274,7 @@ const SoulmateSketch = () => {
                     className="w-full py-3.5 rounded-full text-sm font-medium transition-all active:scale-[0.98]"
                     style={{ backgroundColor: PURPLE, color: "white", boxShadow: "0 0 32px rgba(109,40,217,0.4)" }}
                   >
-                    Unlock Soulmate Sketch ✦
+                    Unlock Connection Vision ✦
                   </button>
                   <p className="mt-3 text-xs" style={{ color: BODY }}>
                     Available with Stellara Pro
@@ -322,7 +322,7 @@ const SoulmateSketch = () => {
                 className="text-center mb-3"
                 style={{ fontFamily: "Lora, Georgia, serif", color: TITLE, fontSize: 18 }}
               >
-                Your Cosmic Match Energy
+                Your Connection Vision
               </h2>
               <div
                 className="mx-auto mb-5"
@@ -354,7 +354,7 @@ const SoulmateSketch = () => {
                   className="w-full py-3.5 rounded-full text-sm font-medium transition-all active:scale-[0.98]"
                   style={{ backgroundColor: PURPLE, color: "white" }}
                 >
-                  Find them in my matches ✦
+                  Explore aligned connections ✦
                 </button>
                 <button
                   onClick={handleShare}

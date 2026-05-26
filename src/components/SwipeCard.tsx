@@ -378,7 +378,7 @@ const SwipeCard = ({
               </svg>
               <span className="font-display text-xs font-bold text-accent">{profile.compatibility_score}%</span>
             </div>
-            <span className="text-[7px] uppercase tracking-wider text-white/80 mt-0.5 drop-shadow">Match</span>
+            <span className="text-[7px] uppercase tracking-wider text-white/80 mt-0.5 drop-shadow">Aligned</span>
           </div>
 
           {/* Name & basics overlaid on gradient */}
@@ -421,7 +421,7 @@ const SwipeCard = ({
             )}
           </div>
 
-          {/* Your cosmic overlap — explains *why* this match was suggested */}
+          {/* Your cosmic overlap — explains *why* this connection was suggested */}
           {showOverlap && (
             <div className="rounded-xl border border-accent/25 bg-gradient-to-br from-accent/10 via-primary/5 to-transparent p-3 [@media(max-height:700px)]:p-2.5">
               <div className="flex items-center gap-1.5 mb-1.5">
@@ -642,7 +642,7 @@ const SwipeCard = ({
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={() => { haptic([10, 30, 20]); onSwipe("super"); }}
-              aria-label={isPremium ? "Super like" : "Super like (premium)"}
+              aria-label={isPremium ? "Spotlight" : "Spotlight (premium)"}
               className={`relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent/40 hover:border-accent/70 shadow-lg transition-all touch-manipulation ${!isPremium ? "opacity-70" : ""} [@media(max-height:700px)]:h-14 [@media(max-height:700px)]:w-14`}
               style={{ background: "var(--gradient-golden)", boxShadow: "var(--shadow-golden)" }}
             >

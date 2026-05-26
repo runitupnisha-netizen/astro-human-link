@@ -13,8 +13,8 @@ interface PremiumUpsellModalProps {
 
 const featureContent: Record<FeatureKey, { title: string; description: string; icon: React.ReactNode }> = {
   super_like: {
-    title: "Super Likes",
-    description: "Stand out from the crowd — let them know you're truly interested",
+    title: "Spotlights",
+    description: "Stand out from the crowd — let them know you took notice",
     icon: <Star className="w-6 h-6" />,
   },
   who_liked_me: {
@@ -48,7 +48,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     icon: <Heart className="w-6 h-6" />,
   },
   boost: {
-    title: "Profile Boost",
+    title: "Profile Amplify",
     description: "Appear at the top of discovery for 30 minutes — get seen by more people",
     icon: <Rocket className="w-6 h-6" />,
   },

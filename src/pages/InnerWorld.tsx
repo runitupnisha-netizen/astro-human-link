@@ -147,7 +147,7 @@ const InnerWorld = () => {
               className="bg-gradient-to-r from-amber-400 to-rose-400 text-background hover:opacity-90"
             >
               <Heart className="w-4 h-4 mr-1.5" />
-              Find my match
+              Explore connections
             </Button>
           </div>
         </motion.div>

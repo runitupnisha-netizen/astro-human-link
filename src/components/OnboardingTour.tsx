@@ -277,7 +277,7 @@ const TOUR_STEPS: TourStep[] = [
     icon: Crown,
     iconWrapClass: "text-background border-amber-300/40 [background:var(--gradient-golden)]",
     title: "Stellara Premium (optional)",
-    body: "Unlock unlimited likes, see who liked you, profile boosts, incognito mode and full synastry deep-dives whenever you're ready.",
+    body: "Unlock unlimited likes, see who's interested in you, profile amplify, incognito mode and full synastry deep-dives whenever you're ready.",
     cta: { label: "Explore Premium", path: "/premium", highlight: "premium-tiers" },
   },
   {

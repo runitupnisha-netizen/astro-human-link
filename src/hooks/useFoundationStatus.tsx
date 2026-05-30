@@ -89,7 +89,7 @@ export const useFoundationStatus = (): FoundationStatus => {
       const { data: profile } = await supabase
         .from("profiles")
         .select("id, avatar_url, birth_date, birth_time, birth_place, bio_prompt_1_answer, bio_prompt_2_answer, kids_preference, drinking, smoking, interests")
-        .eq("id", user.id)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       const { count: photoCount } = await supabase
@@ -98,7 +98,14 @@ export const useFoundationStatus = (): FoundationStatus => {
         .eq("user_id", user.id);
 
       const score = computeProfileScore(profile, photoCount || 0);
-      const chartComplete = !!(profile?.birth_date && profile?.birth_time && profile?.birth_place);
+      const chartComplete = !!(profile?.birth_date && profile?.birth_place);
+      console.log("[useFoundationStatus] profile read", {
+        hasProfile: !!profile,
+        birth_date: profile?.birth_date,
+        birth_time: profile?.birth_time,
+        birth_place: profile?.birth_place,
+        chartComplete,
+      });
 
       let insightsRead = 0;
       let lyraAck = false;

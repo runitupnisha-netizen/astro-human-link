@@ -118,6 +118,18 @@ const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificat
   return <>{children}</>;
 };
 
+const OnboardingRoute = () => {
+  const { user, onboardingComplete, loading } = useOnboardingStatus();
+
+  console.log("[OnboardingRoute] guard", { loading, hasUser: !!user, onboardingComplete });
+
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  if (onboardingComplete === true) return <Navigate to="/" replace />;
+
+  return <Onboarding />;
+};
+
 const AuthRoute = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
 
@@ -217,6 +229,7 @@ const AppRoutes = () => {
   const isAuthCallbackRoute = location.pathname === "/auth/callback";
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isVerificationRoute = location.pathname === "/verify";
+  const isOnboardingRoute = location.pathname === "/onboarding";
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -273,10 +286,10 @@ const AppRoutes = () => {
       <ReferralCapture />
       <LegacyMobileLaunchRouteFix />
       <KeyboardInsetTracker />
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
-      {!isRecoveryRoute && !isVerificationRoute && !isAdminRoute && user && onboardingComplete && <LyraFAB />}
+      {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}
+      {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <EmailVerificationReminder />}
+      {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <InAppFeedback />}
+      {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <LyraFAB />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
@@ -286,7 +299,7 @@ const AppRoutes = () => {
             <Route path="/recover-access" element={<Navigate to="/sign-in" replace />} />
             <Route path="/recover-access/*" element={<Navigate to="/sign-in" replace />} />
             <Route path="/verify" element={<PageTransition><ProtectedRoute allowDuringOnboarding skipVerificationCheck><VerificationGate /></ProtectedRoute></PageTransition>} />
-            <Route path="/onboarding" element={<PageTransition><ProtectedRoute allowDuringOnboarding><Onboarding /></ProtectedRoute></PageTransition>} />
+            <Route path="/onboarding" element={<PageTransition><OnboardingRoute /></PageTransition>} />
             <Route path="/" element={<PageTransition><ProtectedRoute><Today /></ProtectedRoute></PageTransition>} />
             <Route path="/today" element={<Navigate to="/" replace />} />
             <Route path="/discover" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />

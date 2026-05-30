@@ -33,7 +33,7 @@ export const useOnboardingStatus = () => {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("onboarding_complete")
+          .select("onboarding_complete, birth_date, birth_time, birth_place")
           .eq("user_id", user.id)
           .maybeSingle();
 
@@ -45,7 +45,12 @@ export const useOnboardingStatus = () => {
           setOnboardingComplete(true);
         } else {
           const dbValue = data?.onboarding_complete ?? false;
-          console.log("[useOnboardingStatus] read onboarding_complete =", dbValue, "row=", data);
+          console.log("[useOnboardingStatus] read profile gate fields", {
+            onboarding_complete: dbValue,
+            birth_date: data?.birth_date,
+            birth_time: data?.birth_time,
+            birth_place: data?.birth_place,
+          });
           // Honor the just-completed flag if DB read lags
           if (!dbValue && justCompleted) {
             console.log("[useOnboardingStatus] DB says false but justCompleted flag set — trusting flag");

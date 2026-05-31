@@ -21,7 +21,11 @@ const Big3Block = ({ icon: Icon, label, sign, body }: { icon: any; label: string
       <h3 className="font-display text-base font-semibold">{label}</h3>
       {sign && <span className="text-sm text-muted-foreground">in {sign}</span>}
     </div>
-    <ReadMore text={body} className="text-sm leading-relaxed text-foreground/90 font-serif" collapsedChars={160} />
+    <ReadMore
+      text={body}
+      className="text-sm leading-relaxed text-foreground/90 font-serif whitespace-pre-line"
+      collapsedChars={260}
+    />
   </article>
 );
 

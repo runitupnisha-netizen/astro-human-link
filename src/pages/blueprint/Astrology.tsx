@@ -190,6 +190,21 @@ const Astrology = () => {
             </PremiumLock>
           </section>
 
+          {/* SECTION 5b — Progressed Chart */}
+          <section className="mb-10">
+            <h2 className="font-display text-xl font-semibold mb-1">Progressed Chart</h2>
+            <p className="text-xs text-muted-foreground mb-4">
+              Your <TermTooltip term="secondary progressions" definition="A symbolic technique where each day after your birth represents one year of life — showing how your inner chart matures over time." /> — the slow inner clock of who you're becoming.
+            </p>
+            <PremiumLock
+              title="Your Progressed Chart"
+              teaser="Your progressed Moon changes sign every ~2.5 years and quietly rewrites what you need emotionally. A progressed Sun sign change is a once-in-30-years identity shift. Unlock to see where your progressed Sun, Moon, Mercury, Venus, and Mars sit right now — and what life chapter you're actually in."
+              lyraSeed="Walk me through my current progressed chart — especially my progressed Sun, Moon, and any planet that's changed sign recently. What life chapter does this put me in?"
+            >
+              <CachedAiSection section="progressions" title="Your Progressed Chart" />
+            </PremiumLock>
+          </section>
+
           {/* SECTION 6 — Learn */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold mb-1 flex items-center gap-2">

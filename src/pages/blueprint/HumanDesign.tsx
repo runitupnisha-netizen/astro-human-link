@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Zap, BookOpen, Sparkles } from "lucide-react";
+import { Zap, BookOpen, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +9,8 @@ import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
+import BackButton from "@/components/BackButton";
+import ReadMore from "@/components/blueprint/ReadMore";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -39,7 +40,6 @@ const AUTHORITY_BLURBS: Record<string, string> = {
 };
 
 const HumanDesign = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
 
@@ -57,11 +57,9 @@ const HumanDesign = () => {
   return (
     <div className="min-h-[100svh] relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
+      <div className="relative z-10 pt-24 md:pt-28 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto">
-          <button onClick={() => navigate("/blueprint")} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="w-4 h-4" /> Blueprint
-          </button>
+          <BackButton fallback="/blueprint" label="Blueprint" className="mb-2" />
 
           <header className="mb-8">
             <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">Science of self · II</p>
@@ -82,9 +80,9 @@ const HumanDesign = () => {
             <p className="text-xs text-muted-foreground mb-4">How you're energetically built.</p>
             <div className={SECTION_CLASS}>
               <h3 className="font-display text-2xl font-bold text-primary mb-3">{type || "—"}</h3>
-              <p className="text-sm text-foreground/90 leading-relaxed font-serif whitespace-pre-line">
-                {TYPE_BLURBS[type] || "Your type tells you how your aura works and how you're meant to use your energy. Ask Lyra for a personalized read."}
-              </p>
+              <ReadMore
+                text={TYPE_BLURBS[type] || "Your type tells you how your aura works and how you're meant to use your energy. Ask Lyra for a personalized read."}
+              />
               <AskLyraButton seed={`I'm a ${type}. What does that mean for how I work, rest, and move through life day-to-day?`} />
             </div>
           </section>
@@ -95,9 +93,10 @@ const HumanDesign = () => {
             <p className="text-xs text-muted-foreground mb-4">The way you're designed to move.</p>
             <div className={SECTION_CLASS}>
               <h3 className="font-display text-lg font-semibold text-accent mb-2">{strategy || "—"}</h3>
-              <p className="text-sm text-foreground/90 leading-relaxed font-serif">
-                {STRATEGY_BLURBS[strategy] || "Your strategy is how you avoid resistance and find flow. Ask Lyra what it looks like in practice for you."}
-              </p>
+              <ReadMore
+                text={STRATEGY_BLURBS[strategy] || "Your strategy is how you avoid resistance and find flow. Ask Lyra what it looks like in practice for you."}
+                className="text-sm text-foreground/90 leading-relaxed font-serif"
+              />
               <AskLyraButton seed={`My HD strategy is "${strategy}". Give me three concrete examples of what this looks like in real life this week.`} />
             </div>
           </section>
@@ -108,9 +107,10 @@ const HumanDesign = () => {
             <p className="text-xs text-muted-foreground mb-4">How you make decisions you can trust.</p>
             <div className={SECTION_CLASS}>
               <h3 className="font-display text-lg font-semibold text-accent mb-2">{authority || "—"}</h3>
-              <p className="text-sm text-foreground/90 leading-relaxed font-serif">
-                {AUTHORITY_BLURBS[authority?.replace(/ Authority$/, "")] || "Your authority is your inner compass. Ask Lyra how to use it on real decisions you're sitting with."}
-              </p>
+              <ReadMore
+                text={AUTHORITY_BLURBS[authority?.replace(/ Authority$/, "")] || "Your authority is your inner compass. Ask Lyra how to use it on real decisions you're sitting with."}
+                className="text-sm text-foreground/90 leading-relaxed font-serif"
+              />
               <AskLyraButton seed={`My authority is ${authority}. I'm sitting with a decision — walk me through how to use my authority on it.`} />
             </div>
           </section>

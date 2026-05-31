@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Star, BookOpen, Sun, Moon, ArrowUpRight, Sparkles } from "lucide-react";
+import { Star, BookOpen, Sun, Moon, ArrowUpRight, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +9,8 @@ import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
+import BackButton from "@/components/BackButton";
+import ReadMore from "@/components/blueprint/ReadMore";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -20,7 +21,7 @@ const Big3Block = ({ icon: Icon, label, sign, body }: { icon: any; label: string
       <h3 className="font-display text-base font-semibold">{label}</h3>
       {sign && <span className="text-sm text-muted-foreground">in {sign}</span>}
     </div>
-    <p className="text-sm leading-relaxed text-foreground/90 font-serif">{body}</p>
+    <ReadMore text={body} className="text-sm leading-relaxed text-foreground/90 font-serif" collapsedChars={160} />
   </article>
 );
 
@@ -72,7 +73,6 @@ const RISING_BLURBS: Record<string, string> = {
 };
 
 const Astrology = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
 
@@ -89,11 +89,9 @@ const Astrology = () => {
   return (
     <div className="min-h-[100svh] relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
+      <div className="relative z-10 pt-24 md:pt-28 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto">
-          <button onClick={() => navigate("/blueprint")} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="w-4 h-4" /> Blueprint
-          </button>
+          <BackButton fallback="/blueprint" label="Blueprint" className="mb-2" />
 
           <header className="mb-8">
             <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">Science of self · I</p>

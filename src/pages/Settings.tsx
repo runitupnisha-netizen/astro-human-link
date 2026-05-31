@@ -12,6 +12,7 @@ import { Settings as SettingsIcon, Bell, Heart, Shield, Star, Moon, Sun, Smartph
 import { useTranslation, Language } from "@/hooks/useTranslation";
 import CosmicBackground from "@/components/CosmicBackground";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { Capacitor } from "@capacitor/core";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getBriefingCacheCount, clearBriefingCache } from "@/hooks/useDailyBriefing";
@@ -169,6 +170,7 @@ const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isSupported, permission, subscribe } = usePushNotifications();
+  const isNative = Capacitor.isNativePlatform();
   const { subscribed: isPro, manageSubscription, refreshSubscription } = usePremium();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -626,37 +628,43 @@ const Settings = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Push Notifications */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium flex items-center gap-2">
-                      <Smartphone className="w-4 h-4" /> {t("settings.push_notifications")}
-                    </span>
-                    <p className="text-sm text-muted-foreground">
-                      {!isSupported
-                        ? "Not supported in this browser"
-                        : permission === "granted"
-                        ? "Enabled — you'll receive daily cosmic intentions"
-                        : permission === "denied"
-                        ? "Blocked — update in browser settings"
-                        : "Get daily insights even when the app is closed"}
-                    </p>
-                  </div>
-                  {isSupported && permission !== "granted" && (
-                    <Button
-                      variant="outline"
-                      onClick={handleEnablePush}
-                      className="border-primary/30 text-primary hover:bg-primary/10 min-h-[44px] px-5 active:scale-95 transition-transform"
-                    >
-                      Enable
-                    </Button>
-                  )}
-                  {permission === "granted" && (
-                    <Badge className="bg-green-500/20 text-green-400 px-3 py-1">Active</Badge>
-                  )}
-                </div>
+                {/* Push Notifications — web only. On native iOS/Android the system
+                    handles permission and the granular toggles below cover preferences,
+                    so we hide this card to avoid browser-specific language inside the app. */}
+                {!isNative && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-medium flex items-center gap-2">
+                          <Smartphone className="w-4 h-4" /> {t("settings.push_notifications")}
+                        </span>
+                        <p className="text-sm text-muted-foreground">
+                          {!isSupported
+                            ? "Not supported on this device"
+                            : permission === "granted"
+                            ? "Enabled — you'll receive daily cosmic intentions"
+                            : permission === "denied"
+                            ? "Blocked — update in your device's notification settings"
+                            : "Get daily insights even when the app is closed"}
+                        </p>
+                      </div>
+                      {isSupported && permission !== "granted" && (
+                        <Button
+                          variant="outline"
+                          onClick={handleEnablePush}
+                          className="border-primary/30 text-primary hover:bg-primary/10 min-h-[44px] px-5 active:scale-95 transition-transform"
+                        >
+                          Enable
+                        </Button>
+                      )}
+                      {permission === "granted" && (
+                        <Badge className="bg-green-500/20 text-green-400 px-3 py-1">Active</Badge>
+                      )}
+                    </div>
 
-                <Separator />
+                    <Separator />
+                  </>
+                )}
 
                 {/* Daily Cosmic Briefing reminders */}
                 <div className="space-y-3">

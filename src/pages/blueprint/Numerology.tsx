@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Hash, BookOpen, Sparkles } from "lucide-react";
+import { Hash, BookOpen, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +8,8 @@ import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
+import BackButton from "@/components/BackButton";
+import ReadMore from "@/components/blueprint/ReadMore";
 
 const SECTION_CLASS = "rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-6";
 
@@ -28,7 +29,6 @@ const LIFE_PATH_BLURBS: Record<number, string> = {
 };
 
 const Numerology = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
 
@@ -57,11 +57,9 @@ const Numerology = () => {
   return (
     <div className="min-h-[100svh] relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
+      <div className="relative z-10 pt-24 md:pt-28 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto">
-          <button onClick={() => navigate("/blueprint")} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="w-4 h-4" /> Blueprint
-          </button>
+          <BackButton fallback="/blueprint" label="Blueprint" className="mb-2" />
 
           <header className="mb-8">
             <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">Science of self · III</p>
@@ -91,9 +89,9 @@ const Numerology = () => {
                 <span className="font-display text-5xl font-bold text-primary">{lp ?? "—"}</span>
                 <span className="text-sm text-muted-foreground">Life Path</span>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed font-serif whitespace-pre-line">
-                {lp ? LIFE_PATH_BLURBS[lp] || "Your Life Path number carries a specific archetype. Ask Lyra for a personalized read." : "Ask Lyra to compute your Life Path from your birth date."}
-              </p>
+              <ReadMore
+                text={lp ? LIFE_PATH_BLURBS[lp] || "Your Life Path number carries a specific archetype. Ask Lyra for a personalized read." : "Ask Lyra to compute your Life Path from your birth date."}
+              />
               <AskLyraButton seed={`My Life Path number is ${lp}. Give me the unvarnished read — strengths, blind spots, and the work this lifetime is asking of me.`} />
             </div>
           </section>

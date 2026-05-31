@@ -33,6 +33,10 @@ const SECTIONS: Record<
     ttlHours: 24,
     prompt: (p) => `Given today is ${new Date().toUTCString()}, name the top 3 current planetary transits affecting ${p.display_name || "this person"}'s chart (Sun ${p.sun_sign}, Moon ${p.moon_sign}, Rising ${p.rising_sign}, Mercury ${p.mercury_sign}, Venus ${p.venus_sign}, Mars ${p.mars_sign}). For each transit: bold the transit, name which natal placement and house it's hitting, then 2-3 sentences on what's being activated and one concrete piece of advice for the next few days. End with one sentence about the dominant weather of the week.`,
   },
+  progressions: {
+    ttlHours: 720,
+    prompt: (p) => `Today is ${new Date().toUTCString()}. ${p.display_name || "This person"} was born on ${p.birth_date || "an unknown date"}${p.birth_place ? ` in ${p.birth_place}` : ""}. Using secondary progressions (one day after birth = one year of life), estimate their current progressed Sun, Moon, Mercury, Venus, and Mars signs given a natal Sun in ${p.sun_sign}, Moon in ${p.moon_sign}, Rising in ${p.rising_sign}, Mercury ${p.mercury_sign}, Venus ${p.venus_sign}, Mars ${p.mars_sign}. For each progressed placement: bold the planet, name the progressed sign (and note if it has recently changed sign or is about to), and write 2-3 sentences on the inner shift this represents — what life chapter it puts them in. Pay special attention to the progressed Moon (which moves through a sign every ~2.5 years and is the most actionable). End with one paragraph naming the overall chapter of their life right now, in plain language.`,
+  },
   centers: {
     prompt: (p) => `Walk through ${p.display_name || "the user"}'s 9 Human Design centers based on their type ${p.human_design_type} with ${p.human_design_authority} authority and profile ${p.human_design_profile}. For each of the 9 centers (Head, Ajna, Throat, G, Heart, Spleen, Solar Plexus, Sacral, Root): name it bold, say whether it's likely defined or undefined for their type, and 1-2 sentences on what that means in practice for them. Honest, not vague.`,
   },

@@ -79,20 +79,92 @@ async function generateReading(args: {
     ? `${userName} is a Human Design ${userHdType}${userHdAuthority ? ` with ${userHdAuthority} authority` : ""}.`
     : "";
 
-  const prompt = `You are Lyra, a warm cosmic guide. Read the connection between two people. Return ONLY a JSON object with these exact keys, no markdown fences:
-{
-  "score": number between 40 and 99,
-  "summary": "3-4 sentences in Lyra's warm, personal voice — reference both people by name and at least one of their actual placements. Never generic.",
-  "highlight": "ONE short sentence — the single most important aspect of this connection.",
-  "chartHighlights": ["3 short bullets (max 14 words each) on the natal-chart dynamics — Sun/element interplay, Moon emotional fit, and Rising first-impression chemistry. Reference the actual signs."],
-  "humanDesignNotes": ["2-3 short bullets (max 14 words each) on how ${userName}'s Human Design type and authority meet this person's energy. If HD info is missing, give grounded relational guidance instead."]
-}
+  // Forced-JSON tool-call schema (same pattern as blueprint-synthesis) — the
+  // model MUST call `emit_synastry_reading` so the response always parses.
+  const tools = [
+    {
+      type: "function",
+      function: {
+        name: "emit_synastry_reading",
+        description: "Return Lyra's full Bonds-style synastry reading for two people.",
+        parameters: {
+          type: "object",
+          additionalProperties: false,
+          required: [
+            "score", "summary", "highlight",
+            "chartHighlights", "humanDesignNotes",
+            "synastry_overview", "cross_aspects",
+            "strengths", "friction_points", "lessons",
+          ],
+          properties: {
+            score: { type: "integer", minimum: 40, maximum: 99 },
+            summary: { type: "string" },
+            highlight: { type: "string" },
+            chartHighlights: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 3 },
+            humanDesignNotes: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 3 },
+            synastry_overview: { type: "string", description: "One short paragraph (2-4 sentences) on how the two charts interact overall, in Lyra's warm, grounded voice." },
+            cross_aspects: {
+              type: "array",
+              minItems: 3, maxItems: 6,
+              items: {
+                type: "object",
+                additionalProperties: false,
+                required: ["person_a_planet", "person_b_planet", "aspect_type", "orb", "short_read"],
+                properties: {
+                  person_a_planet: { type: "string", description: `${userName}'s planet, e.g. "Sun", "Moon", "Venus", "Mars"` },
+                  person_b_planet: { type: "string", description: `${theirName}'s planet` },
+                  aspect_type: { type: "string", enum: ["conjunction", "sextile", "square", "trine", "opposition", "quincunx"] },
+                  orb: { type: "string", description: "Approximate orb in degrees (e.g. \"3°\"). Estimate when exact orb is unknowable — never invent precision." },
+                  short_read: { type: "string", description: "1-2 sentences, Lyra's voice, on what this cross-aspect actually feels like for them." },
+                },
+              },
+            },
+            strengths: {
+              type: "array",
+              minItems: 3, maxItems: 4,
+              items: {
+                type: "object",
+                additionalProperties: false,
+                required: ["title", "read"],
+                properties: {
+                  title: { type: "string", description: "Short label, 3-6 words." },
+                  read: { type: "string", description: "1-2 sentences." },
+                },
+              },
+            },
+            friction_points: {
+              type: "array",
+              minItems: 2, maxItems: 3,
+              items: {
+                type: "object",
+                additionalProperties: false,
+                required: ["title", "read"],
+                properties: {
+                  title: { type: "string", description: "Short label, 3-6 words." },
+                  read: { type: "string", description: "1-2 sentences. Frame constructively as a growth edge — never \"this won't work\"." },
+                },
+              },
+            },
+            lessons: { type: "string", description: "One short closing paragraph (2-4 sentences) on what this connection is here to teach the user." },
+          },
+        },
+      },
+    },
+  ];
 
-Person 1: ${userLine}
-Person 2: ${theirLine}
+  const degradedNote = theirHasTime
+    ? ""
+    : `\n\nNOTE: ${theirName}'s birth time is unknown — degrade to sign-level synastry. Use Sun, Venus, Mars, Mercury cross-aspects only (never Moon, Rising, or house-based placements for them). Mark orbs as approximate ("~"). Never invent a birth time.`;
+
+  const systemPrompt = `You are Lyra, a warm, grounded cosmic guide who speaks like a wise best friend — never generic, never flattering. You always read TWO charts against each other (synastry), not one chart in isolation. Compute cross-aspects from the actual placements you are given; never fabricate planets, signs, or houses you weren't told about. When a placement is unknown, work with what you have and say so plainly.`;
+
+  const userPrompt = `Read the connection between these two charts and call emit_synastry_reading with the full structured output.
+
+Person A (the user): ${userLine}
+Person B: ${theirLine}
 ${hdLine}
 
-Use ${baseScore} as a strong baseline for the score; nudge it up or down based on the placements. Be honest, never flatter. Bullets must be specific, never generic filler.`;
+Baseline elemental score: ${baseScore} — use this as a strong anchor, then nudge up or down based on the cross-aspects you identify. Reference both people by name in the prose fields.${degradedNote}`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -102,8 +174,12 @@ Use ${baseScore} as a strong baseline for the score; nudge it up or down based o
     },
     body: JSON.stringify({
       model: "google/gemini-2.5-flash",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      tools,
+      tool_choice: { type: "function", function: { name: "emit_synastry_reading" } },
     }),
   });
 
@@ -114,19 +190,59 @@ Use ${baseScore} as a strong baseline for the score; nudge it up or down based o
   }
 
   const data = await resp.json();
-  const content = data.choices?.[0]?.message?.content ?? "{}";
+  const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+  const rawArgs = toolCall?.function?.arguments ?? data.choices?.[0]?.message?.content ?? "{}";
+  type CrossAspect = { person_a_planet: string; person_b_planet: string; aspect_type: string; orb: string; short_read: string };
+  type LabeledItem = { title: string; read: string };
   let parsed: {
     score?: number;
     summary?: string;
     highlight?: string;
     chartHighlights?: string[];
     humanDesignNotes?: string[];
+    synastry_overview?: string;
+    cross_aspects?: CrossAspect[];
+    strengths?: LabeledItem[];
+    friction_points?: LabeledItem[];
+    lessons?: string;
   };
   try {
-    parsed = JSON.parse(content);
-  } catch {
+    parsed = typeof rawArgs === "string" ? JSON.parse(rawArgs) : rawArgs;
+  } catch (e) {
+    console.error("synastry tool-call parse failed", e, rawArgs);
     parsed = {};
   }
+
+  const sanitizeAspects = (arr: unknown): CrossAspect[] => {
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((it): it is CrossAspect =>
+        !!it && typeof it === "object" &&
+        typeof (it as CrossAspect).person_a_planet === "string" &&
+        typeof (it as CrossAspect).person_b_planet === "string" &&
+        typeof (it as CrossAspect).aspect_type === "string" &&
+        typeof (it as CrossAspect).short_read === "string"
+      )
+      .slice(0, 6)
+      .map((it) => ({
+        person_a_planet: String(it.person_a_planet),
+        person_b_planet: String(it.person_b_planet),
+        aspect_type: String(it.aspect_type),
+        orb: String(it.orb ?? "~"),
+        short_read: String(it.short_read),
+      }));
+  };
+  const sanitizeLabeled = (arr: unknown, max: number): LabeledItem[] => {
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((it): it is LabeledItem =>
+        !!it && typeof it === "object" &&
+        typeof (it as LabeledItem).title === "string" &&
+        typeof (it as LabeledItem).read === "string"
+      )
+      .slice(0, max)
+      .map((it) => ({ title: String(it.title), read: String(it.read) }));
+  };
 
   return {
     score: Math.max(40, Math.min(99, Math.round(parsed.score ?? baseScore))),
@@ -150,6 +266,14 @@ Use ${baseScore} as a strong baseline for the score; nudge it up or down based o
             "Move at the speed of your nervous system, not theirs.",
             "Notice when you feel expanded around them — that's information.",
           ],
+    synastry_overview: parsed.synastry_overview ??
+      `${userName} and ${theirName} bring two distinct rhythms together — ${userSun ?? "your"} energy meets ${theirSun} in a way worth paying attention to.`,
+    cross_aspects: sanitizeAspects(parsed.cross_aspects),
+    strengths: sanitizeLabeled(parsed.strengths, 4),
+    friction_points: sanitizeLabeled(parsed.friction_points, 3),
+    lessons: parsed.lessons ??
+      `This connection is asking ${userName} to notice what shifts in their nervous system around ${theirName}. Pay attention to the texture, not just the spark.`,
+    degraded: !theirHasTime,
   };
 }
 
@@ -240,6 +364,11 @@ Deno.serve(async (req) => {
         compatibility_score: reading.score,
         summary: reading.summary,
         highlight: reading.highlight,
+        synastry_overview: reading.synastry_overview,
+        cross_aspects: reading.cross_aspects,
+        strengths: reading.strengths,
+        friction_points: reading.friction_points,
+        lessons: reading.lessons,
       })
       .select("id")
       .single();

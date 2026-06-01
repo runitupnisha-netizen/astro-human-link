@@ -315,9 +315,14 @@ export type Database = {
         Row: {
           compatibility_score: number | null
           created_at: string
+          cross_aspects: Json | null
+          friction_points: Json | null
           highlight: string | null
           id: string
+          lessons: string | null
+          strengths: Json | null
           summary: string | null
+          synastry_overview: string | null
           their_birth_date: string
           their_birth_place: string
           their_birth_time: string | null
@@ -330,9 +335,14 @@ export type Database = {
         Insert: {
           compatibility_score?: number | null
           created_at?: string
+          cross_aspects?: Json | null
+          friction_points?: Json | null
           highlight?: string | null
           id?: string
+          lessons?: string | null
+          strengths?: Json | null
           summary?: string | null
+          synastry_overview?: string | null
           their_birth_date: string
           their_birth_place: string
           their_birth_time?: string | null
@@ -345,9 +355,14 @@ export type Database = {
         Update: {
           compatibility_score?: number | null
           created_at?: string
+          cross_aspects?: Json | null
+          friction_points?: Json | null
           highlight?: string | null
           id?: string
+          lessons?: string | null
+          strengths?: Json | null
           summary?: string | null
+          synastry_overview?: string | null
           their_birth_date?: string
           their_birth_place?: string
           their_birth_time?: string | null

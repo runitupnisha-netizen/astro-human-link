@@ -285,8 +285,15 @@ const Premium = () => {
     setPollingTimedOut(false);
     try {
       await checkout(STELLARA_TIERS[tierKey].price_id, redirectTo);
-    } catch {
-      toast({ title: "Error", description: "Could not start checkout. Please try again.", variant: "destructive" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Please try again.";
+      toast({
+        title: IS_NATIVE
+          ? "Could not open Apple purchase sheet"
+          : "Could not start checkout",
+        description: msg,
+        variant: "destructive",
+      });
     } finally {
       setCheckoutLoading(null);
     }

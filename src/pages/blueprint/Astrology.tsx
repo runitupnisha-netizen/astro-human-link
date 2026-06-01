@@ -10,7 +10,6 @@ import NatalWheel from "@/components/blueprint/NatalWheel";
 import InteractiveNatalWheel from "@/components/blueprint/InteractiveNatalWheel";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
-import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
 import BackButton from "@/components/BackButton";
 import ReadMore from "@/components/blueprint/ReadMore";

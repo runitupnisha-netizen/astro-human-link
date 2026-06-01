@@ -8,7 +8,6 @@ import CosmicBackground from "@/components/CosmicBackground";
 import BodyGraph from "@/components/blueprint/BodyGraph";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
-import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
 import BackButton from "@/components/BackButton";
 import ReadMore from "@/components/blueprint/ReadMore";

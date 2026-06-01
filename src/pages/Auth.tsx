@@ -746,7 +746,7 @@ const Auth = () => {
                       <Link to="/disclaimer" className="text-primary hover:underline" target="_blank">
                         Disclaimer &amp; Terms of Use
                       </Link>
-                      , including that AI-generated content is for entertainment only and Stellara is not responsible for meetups or shared information.
+                      , including that AI-generated content is for entertainment only and Stellara is not responsible for interactions or shared information.
                     </label>
                   </div>
                 )}

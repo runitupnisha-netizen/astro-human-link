@@ -183,7 +183,11 @@ const LegacyMobileLaunchRouteFix = () => {
     if (checkedRef.current || typeof window === "undefined") return;
     checkedRef.current = true;
 
-    const legacyLaunchPaths = new Set(["/profile", "/inner-world", "/my-chart", "/saved-charts", "/my-cosmos"]);
+    // Only true legacy paths — do NOT include "/profile" (live route used by the
+    // Foundation checklist) or "/my-cosmos" (live route). Adding them here caused
+    // taps on "Reach 80% profile score" to bounce users back to Home in the
+    // Capacitor/PWA shell.
+    const legacyLaunchPaths = new Set(["/inner-world", "/my-chart", "/saved-charts"]);
     const isLegacyProfileLaunch = legacyLaunchPaths.has(location.pathname) && !location.search && !location.hash;
     if (!isLegacyProfileLaunch) return;
 

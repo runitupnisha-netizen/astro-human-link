@@ -364,6 +364,11 @@ Deno.serve(async (req) => {
         compatibility_score: reading.score,
         summary: reading.summary,
         highlight: reading.highlight,
+        synastry_overview: reading.synastry_overview,
+        cross_aspects: reading.cross_aspects,
+        strengths: reading.strengths,
+        friction_points: reading.friction_points,
+        lessons: reading.lessons,
       })
       .select("id")
       .single();

@@ -678,6 +678,214 @@ const CheckConnection = () => {
                 </p>
               </div>
 
+              {/* 1. Synastry overview — hero paragraph (free + premium) */}
+              {reading.synastry_overview && (
+                <section
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(109,40,217,0.22), rgba(77,58,92,0.35))",
+                    border: "1px solid rgba(208, 180, 247, 0.28)",
+                  }}
+                  aria-labelledby="synastry-overview-heading"
+                >
+                  <h2
+                    id="synastry-overview-heading"
+                    className="text-xs uppercase tracking-wider mb-2"
+                    style={{ color: "#d0b4f7" }}
+                  >
+                    ✦ Synastry Overview
+                  </h2>
+                  <CollapsibleText text={reading.synastry_overview} />
+                  {reading.degraded && (
+                    <p className="mt-3 text-[11px]" style={{ color: "#7a6a9a" }}>
+                      Birth time unknown — reading is sign-level only.
+                    </p>
+                  )}
+                </section>
+              )}
+
+              {/* 2-5. Premium-gated deep sections */}
+              {!isPremium ? (
+                <div
+                  className="rounded-2xl p-5 text-center"
+                  style={{
+                    backgroundColor: "rgba(217, 119, 6, 0.10)",
+                    border: "1px solid rgba(249, 214, 151, 0.30)",
+                  }}
+                >
+                  <Lock className="w-5 h-5 mx-auto" style={{ color: "#f9d697" }} />
+                  <p
+                    className="mt-2 text-sm"
+                    style={{ color: "#f9d697", fontFamily: "Lora, Georgia, serif" }}
+                  >
+                    Cross-aspects, strengths, friction edges, and the closing lesson are part of Stellara Pro.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/premium")}
+                    className="mt-3 w-full rounded-full py-3 text-sm font-medium"
+                    style={{
+                      background: "linear-gradient(135deg, #f9d697 0%, #d4a854 100%)",
+                      color: "#0c0b13",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  >
+                    Unlock the full reading ✦
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* 2. Key Cross-Aspects */}
+                  {reading.cross_aspects.length > 0 && (
+                    <section
+                      className="rounded-2xl p-5"
+                      style={{
+                        backgroundColor: "rgba(77, 58, 92, 0.4)",
+                        border: "1px solid rgba(208, 180, 247, 0.2)",
+                      }}
+                      aria-labelledby="cross-aspects-heading"
+                    >
+                      <h2
+                        id="cross-aspects-heading"
+                        className="text-xs uppercase tracking-wider mb-3"
+                        style={{ color: "#d0b4f7" }}
+                      >
+                        ✦ Key Cross-Aspects
+                      </h2>
+                      <ul className="space-y-3">
+                        {reading.cross_aspects.map((a, i) => (
+                          <li
+                            key={i}
+                            className="rounded-xl p-3"
+                            style={{
+                              backgroundColor: "rgba(12, 11, 19, 0.45)",
+                              border: "1px solid rgba(208, 180, 247, 0.12)",
+                            }}
+                          >
+                            <div
+                              className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[12px]"
+                              style={{ fontFamily: "Poppins, sans-serif" }}
+                            >
+                              <span style={{ color: "#d0b4f7" }}>{reading.theirName}'s {a.person_b_planet}</span>
+                              <span style={{ color: "#7a6a9a" }}>{a.aspect_type}</span>
+                              <span style={{ color: "#d0b4f7" }}>your {a.person_a_planet}</span>
+                              <span style={{ color: "#7a6a9a" }}>· {a.orb}</span>
+                            </div>
+                            <p
+                              className="mt-1.5 text-sm leading-relaxed"
+                              style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                            >
+                              {a.short_read}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+
+                  {/* 3. Strengths */}
+                  {reading.strengths.length > 0 && (
+                    <section
+                      className="rounded-2xl p-5"
+                      style={{
+                        backgroundColor: "rgba(34, 197, 94, 0.06)",
+                        border: "1px solid rgba(134, 239, 172, 0.20)",
+                      }}
+                      aria-labelledby="strengths-heading"
+                    >
+                      <h2
+                        id="strengths-heading"
+                        className="text-xs uppercase tracking-wider mb-3"
+                        style={{ color: "#86efac" }}
+                      >
+                        ✦ Strengths
+                      </h2>
+                      <div className="space-y-3">
+                        {reading.strengths.map((s, i) => (
+                          <div
+                            key={i}
+                            className="rounded-xl p-3"
+                            style={{
+                              backgroundColor: "rgba(12, 11, 19, 0.45)",
+                              border: "1px solid rgba(134, 239, 172, 0.15)",
+                            }}
+                          >
+                            <p
+                              className="text-sm font-medium mb-1"
+                              style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                            >
+                              {s.title}
+                            </p>
+                            <CollapsibleText text={s.read} color="#c9b8f0" />
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* 4. Friction & Growth Edges */}
+                  {reading.friction_points.length > 0 && (
+                    <section
+                      className="rounded-2xl p-5"
+                      style={{
+                        backgroundColor: "rgba(249, 168, 168, 0.06)",
+                        border: "1px solid rgba(249, 168, 168, 0.22)",
+                      }}
+                      aria-labelledby="friction-heading"
+                    >
+                      <h2
+                        id="friction-heading"
+                        className="text-xs uppercase tracking-wider mb-3"
+                        style={{ color: "#fda4af" }}
+                      >
+                        ✦ Friction & Growth Edges
+                      </h2>
+                      <div className="space-y-3">
+                        {reading.friction_points.map((f, i) => (
+                          <div
+                            key={i}
+                            className="rounded-xl p-3"
+                            style={{
+                              backgroundColor: "rgba(12, 11, 19, 0.45)",
+                              border: "1px solid rgba(249, 168, 168, 0.15)",
+                            }}
+                          >
+                            <p
+                              className="text-sm font-medium mb-1"
+                              style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                            >
+                              {f.title}
+                            </p>
+                            <CollapsibleText text={f.read} color="#c9b8f0" />
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* 5. What this connection is here to teach you */}
+                  {reading.lessons && (
+                    <section
+                      className="rounded-2xl p-5"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(249,214,151,0.10), rgba(109,40,217,0.16))",
+                        border: "1px solid rgba(249, 214, 151, 0.28)",
+                      }}
+                      aria-labelledby="lessons-heading"
+                    >
+                      <h2
+                        id="lessons-heading"
+                        className="text-xs uppercase tracking-wider mb-2"
+                        style={{ color: "#f9d697" }}
+                      >
+                        ✦ What This Connection Is Here to Teach You
+                      </h2>
+                      <CollapsibleText text={reading.lessons} />
+                    </section>
+                  )}
+                </>
+              )}
+
               {/* Synastry wheel — only renders if user has at least their Sun */}
               {reading.userSun && (
                 <div

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { RefreshCw, Bookmark, Wand2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { RefreshCw, Bookmark, Wand2, Loader2, ChevronDown, ChevronUp, Crown, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -21,9 +21,17 @@ interface Props {
   title: string;
   /** Lyra seed prefix; the reading itself will be appended. */
   lyraSeedFallback?: string;
+  /**
+   * When true, render a teaser preview only — first ~260 chars visible,
+   * the rest fades behind a paywall CTA. Used for free users so they can
+   * see the value of premium without the section being a dead lock.
+   */
+  gated?: boolean;
+  /** Optional shorter teaser shown above the preview while loading (free users only). */
+  upsellTeaser?: string;
 }
 
-const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
+const CachedAiSection = ({ section, title, lyraSeedFallback, gated = false, upsellTeaser }: Props) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [content, setContent] = useState("");
@@ -68,7 +76,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke("blueprint-synthesis", {
-          body: { section, force_refresh: force, tier: "premium" },
+          body: { section, force_refresh: force, tier: gated ? "free" : "premium" },
         });
         if (error) throw error;
         if (data?.content) {
@@ -87,7 +95,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
         setLoading(false);
       }
     },
-    [user, section],
+    [user, section, gated],
   );
 
   useEffect(() => {
@@ -120,8 +128,12 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
   return (
     <div id={sectionId} className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-5 scroll-mt-24">
       <div className="flex items-start justify-between gap-2 mb-3">
-        <h3 className="font-display text-base font-semibold">{title}</h3>
-        <button
+        <h3 className="font-display text-base font-semibold flex items-center gap-2">
+          {gated && <Lock className="w-3.5 h-3.5 text-amber-400" />}
+          {title}
+        </h3>
+        {!gated && (
+          <button
           type="button"
           onClick={() => generate(true)}
           disabled={loading}
@@ -130,7 +142,8 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
           title="Regenerate"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-        </button>
+          </button>
+        )}
       </div>
 
       {loading && !content ? (
@@ -139,6 +152,15 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
           Lyra is reading…
         </div>
       ) : content ? (
+        gated ? (
+          <div className="relative">
+            <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-2">
+              <ReactMarkdown>{previewContent}</ReactMarkdown>
+            </div>
+            {/* Fade overlay over the (hidden) remainder */}
+            <div className="pointer-events-none mt-1 h-12 -mb-2 bg-gradient-to-b from-transparent to-card/95" />
+          </div>
+        ) : (
         <>
           <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-2">
             <ReactMarkdown>{expanded || !needsTruncation ? content : previewContent}</ReactMarkdown>
@@ -158,11 +180,14 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
             </button>
           )}
         </>
+        )
       ) : (
-        <p className="text-xs text-muted-foreground py-2">Tap refresh to generate.</p>
+        <p className="text-xs text-muted-foreground py-2">
+          {gated && upsellTeaser ? upsellTeaser : "Tap refresh to generate."}
+        </p>
       )}
 
-      {content && (
+      {content && !gated && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -185,6 +210,29 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
             <span className="text-[10px] text-muted-foreground/60 ml-auto">
               {new Date(generatedAt).toLocaleDateString()}
             </span>
+          )}
+        </div>
+      )}
+
+      {gated && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate("/premium")}
+            className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[11px] font-semibold text-background bg-gradient-golden shadow-golden hover:opacity-90 transition-opacity"
+          >
+            <Crown className="w-3.5 h-3.5" />
+            Unlock the full reading
+          </button>
+          {lyraSeedFallback && (
+            <button
+              type="button"
+              onClick={askLyra}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-card/60 px-2.5 py-1.5 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Wand2 className="w-3 h-3" />
+              Ask Lyra for a preview
+            </button>
           )}
         </div>
       )}

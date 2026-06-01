@@ -706,33 +706,130 @@ const CheckConnection = () => {
 
               {/* 2-5. Premium-gated deep sections */}
               {!isPremium ? (
-                <div
-                  className="rounded-2xl p-5 text-center"
-                  style={{
-                    backgroundColor: "rgba(217, 119, 6, 0.10)",
-                    border: "1px solid rgba(249, 214, 151, 0.30)",
-                  }}
-                >
-                  <Lock className="w-5 h-5 mx-auto" style={{ color: "#f9d697" }} />
-                  <p
-                    className="mt-2 text-sm"
-                    style={{ color: "#f9d697", fontFamily: "Lora, Georgia, serif" }}
-                  >
-                    Cross-aspects, strengths, friction edges, and the closing lesson are part of Stellara Pro.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/premium")}
-                    className="mt-3 w-full rounded-full py-3 text-sm font-medium"
+                <>
+                  {/* Free teaser: show first cross-aspect + first strength, blur rest */}
+                  {reading.cross_aspects.length > 0 && (
+                    <section
+                      className="relative rounded-2xl p-5"
+                      style={{
+                        backgroundColor: "rgba(77, 58, 92, 0.4)",
+                        border: "1px solid rgba(208, 180, 247, 0.2)",
+                      }}
+                      aria-labelledby="cross-aspects-teaser-heading"
+                    >
+                      <h2
+                        id="cross-aspects-teaser-heading"
+                        className="text-xs uppercase tracking-wider mb-3 flex items-center gap-2"
+                        style={{ color: "#d0b4f7" }}
+                      >
+                        <Lock className="w-3.5 h-3.5" style={{ color: "#f9d697" }} />
+                        ✦ Key Cross-Aspects · preview
+                      </h2>
+                      <ul className="space-y-3">
+                        {reading.cross_aspects.slice(0, 1).map((a, i) => (
+                          <li
+                            key={i}
+                            className="rounded-xl p-3"
+                            style={{
+                              backgroundColor: "rgba(12, 11, 19, 0.45)",
+                              border: "1px solid rgba(208, 180, 247, 0.12)",
+                            }}
+                          >
+                            <div
+                              className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[12px]"
+                              style={{ fontFamily: "Poppins, sans-serif" }}
+                            >
+                              <span style={{ color: "#d0b4f7" }}>{reading.theirName}'s {a.person_b_planet}</span>
+                              <span style={{ color: "#7a6a9a" }}>{a.aspect_type}</span>
+                              <span style={{ color: "#d0b4f7" }}>your {a.person_a_planet}</span>
+                              <span style={{ color: "#7a6a9a" }}>· {a.orb}</span>
+                            </div>
+                            <p
+                              className="mt-1.5 text-sm leading-relaxed"
+                              style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                            >
+                              {a.short_read}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                      {reading.cross_aspects.length > 1 && (
+                        <p className="mt-3 text-xs" style={{ color: "#a89cc9", fontStyle: "italic" }}>
+                          + {reading.cross_aspects.length - 1} more cross-aspect{reading.cross_aspects.length - 1 === 1 ? "" : "s"} in the full reading…
+                        </p>
+                      )}
+                    </section>
+                  )}
+                  {reading.strengths.length > 0 && (
+                    <section
+                      className="relative rounded-2xl p-5"
+                      style={{
+                        backgroundColor: "rgba(34, 197, 94, 0.06)",
+                        border: "1px solid rgba(134, 239, 172, 0.20)",
+                      }}
+                      aria-labelledby="strengths-teaser-heading"
+                    >
+                      <h2
+                        id="strengths-teaser-heading"
+                        className="text-xs uppercase tracking-wider mb-3 flex items-center gap-2"
+                        style={{ color: "#86efac" }}
+                      >
+                        <Lock className="w-3.5 h-3.5" style={{ color: "#f9d697" }} />
+                        ✦ Strengths · preview
+                      </h2>
+                      {reading.strengths.slice(0, 1).map((s, i) => (
+                        <div
+                          key={i}
+                          className="rounded-xl p-3"
+                          style={{
+                            backgroundColor: "rgba(12, 11, 19, 0.45)",
+                            border: "1px solid rgba(134, 239, 172, 0.15)",
+                          }}
+                        >
+                          <p
+                            className="text-sm font-medium mb-1"
+                            style={{ color: "#e0d4ff", fontFamily: "Lora, Georgia, serif" }}
+                          >
+                            {s.title}
+                          </p>
+                          <p
+                            className="text-sm leading-relaxed line-clamp-2"
+                            style={{ color: "#c9b8f0", fontFamily: "Lora, Georgia, serif" }}
+                          >
+                            {s.read}
+                          </p>
+                        </div>
+                      ))}
+                    </section>
+                  )}
+                  <div
+                    className="rounded-2xl p-5 text-center"
                     style={{
-                      background: "linear-gradient(135deg, #f9d697 0%, #d4a854 100%)",
-                      color: "#0c0b13",
-                      fontFamily: "Poppins, sans-serif",
+                      backgroundColor: "rgba(217, 119, 6, 0.10)",
+                      border: "1px solid rgba(249, 214, 151, 0.30)",
                     }}
                   >
-                    Unlock the full reading ✦
-                  </button>
-                </div>
+                    <Lock className="w-5 h-5 mx-auto" style={{ color: "#f9d697" }} />
+                    <p
+                      className="mt-2 text-sm"
+                      style={{ color: "#f9d697", fontFamily: "Lora, Georgia, serif" }}
+                    >
+                      You're seeing a preview. Unlock all cross-aspects, every strength, friction edges, and the closing lesson with Stellara Pro.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/premium")}
+                      className="mt-3 w-full rounded-full py-3 text-sm font-medium"
+                      style={{
+                        background: "linear-gradient(135deg, #f9d697 0%, #d4a854 100%)",
+                        color: "#0c0b13",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Unlock the full reading ✦
+                    </button>
+                  </div>
+                </>
               ) : (
                 <>
                   {/* 2. Key Cross-Aspects */}

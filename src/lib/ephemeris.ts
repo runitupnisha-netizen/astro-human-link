@@ -115,6 +115,115 @@ export function calcMercurySign(date: Date): ZodiacSign {
 }
 
 /**
+ * Full set of planetary ecliptic longitudes (degrees, 0–360) used by the
+ * interactive natal wheel and the transit timeline. Lightweight wrapper
+ * around `GeoVector` for every body the chart cares about.
+ */
+export const FULL_PLANET_BODIES = [
+  { key: "sun", body: Body.Sun, glyph: "☉", name: "Sun" },
+  { key: "moon", body: Body.Moon, glyph: "☽", name: "Moon" },
+  { key: "mercury", body: Body.Mercury, glyph: "☿", name: "Mercury" },
+  { key: "venus", body: Body.Venus, glyph: "♀", name: "Venus" },
+  { key: "mars", body: Body.Mars, glyph: "♂", name: "Mars" },
+  { key: "jupiter", body: Body.Jupiter, glyph: "♃", name: "Jupiter" },
+  { key: "saturn", body: Body.Saturn, glyph: "♄", name: "Saturn" },
+  { key: "uranus", body: Body.Uranus, glyph: "♅", name: "Uranus" },
+  { key: "neptune", body: Body.Neptune, glyph: "♆", name: "Neptune" },
+  { key: "pluto", body: Body.Pluto, glyph: "♇", name: "Pluto" },
+] as const;
+
+export type PlanetKey = (typeof FULL_PLANET_BODIES)[number]["key"];
+
+export function planetLongitudes(date: Date): Record<PlanetKey, number> {
+  const out = {} as Record<PlanetKey, number>;
+  for (const p of FULL_PLANET_BODIES) {
+    const lon = ((eclipticLongitude(p.body, date) % 360) + 360) % 360;
+    out[p.key] = lon;
+  }
+  return out;
+}
+
+/**
+ * Sign + integer degree within sign for a 0–360 longitude.
+ */
+export function signAndDegree(lonDeg: number): { sign: ZodiacSign; degree: number; minute: number } {
+  const norm = ((lonDeg % 360) + 360) % 360;
+  const sign = ZODIAC[Math.floor(norm / 30)];
+  const inSign = norm - Math.floor(norm / 30) * 30;
+  const degree = Math.floor(inSign);
+  const minute = Math.floor((inSign - degree) * 60);
+  return { sign, degree, minute };
+}
+
+/**
+ * Compute the Ascendant longitude (0–360) — same math as `calcRisingSign`
+ * but returning the raw degree for use in the wheel.
+ */
+export function ascendantLongitude(
+  date: Date,
+  latitudeDeg: number,
+  longitudeDeg: number,
+): number {
+  const gst = SiderealTime(date);
+  const lstHours = (gst + longitudeDeg / 15 + 24) % 24;
+  const lstDeg = lstHours * 15;
+  const epsilonDeg = trueObliquityDeg(date);
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const toDeg = (r: number) => (r * 180) / Math.PI;
+  const ε = toRad(epsilonDeg);
+  const φ = toRad(latitudeDeg);
+  const lst = toRad(lstDeg);
+  const y = -Math.cos(lst);
+  const x = Math.sin(ε) * Math.tan(φ) + Math.cos(ε) * Math.sin(lst);
+  let asc = toDeg(Math.atan2(y, x));
+  asc = ((asc % 360) + 360) % 360;
+  const diff = ((asc - lstDeg + 540) % 360) - 180;
+  if (diff < 0) asc = (asc + 180) % 360;
+  return asc;
+}
+
+/** Standard aspect set with orbs. */
+export const ASPECTS = [
+  { key: "conjunction", angle: 0, orb: 8, color: "hsl(45 90% 65%)", symbol: "☌" },
+  { key: "opposition", angle: 180, orb: 8, color: "hsl(0 75% 65%)", symbol: "☍" },
+  { key: "trine", angle: 120, orb: 7, color: "hsl(140 60% 60%)", symbol: "△" },
+  { key: "square", angle: 90, orb: 7, color: "hsl(20 80% 60%)", symbol: "□" },
+  { key: "sextile", angle: 60, orb: 5, color: "hsl(200 70% 65%)", symbol: "✶" },
+] as const;
+
+export type AspectKey = (typeof ASPECTS)[number]["key"];
+
+export interface ComputedAspect {
+  a: PlanetKey;
+  b: PlanetKey;
+  type: AspectKey;
+  orb: number; // |actual - exact| in degrees
+  exact: number;
+}
+
+/** Compute all major aspects between the supplied planet longitudes. */
+export function computeAspects(longs: Record<PlanetKey, number>): ComputedAspect[] {
+  const keys = Object.keys(longs) as PlanetKey[];
+  const out: ComputedAspect[] = [];
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const a = keys[i];
+      const b = keys[j];
+      let diff = Math.abs(longs[a] - longs[b]);
+      if (diff > 180) diff = 360 - diff;
+      for (const asp of ASPECTS) {
+        const delta = Math.abs(diff - asp.angle);
+        if (delta <= asp.orb) {
+          out.push({ a, b, type: asp.key, orb: +delta.toFixed(2), exact: asp.angle });
+          break;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * True obliquity of the ecliptic in degrees, including nutation in obliquity.
  * Wraps astronomy-engine's `e_tilt` (which returns {mobl, tobl, ee, ...}).
  * Falls back to mean obliquity at J2000 if the helper ever throws.

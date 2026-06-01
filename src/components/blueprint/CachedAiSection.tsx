@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { RefreshCw, Bookmark, Wand2, Loader2 } from "lucide-react";
+import { RefreshCw, Bookmark, Wand2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -30,6 +30,37 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Long Lyra readings collapse behind a Show more / Show less toggle so the
+  // Blueprint deep-detail screens don't open with walls of text.
+  const [expanded, setExpanded] = useState(false);
+  const COLLAPSED_CHARS = 480;
+  const needsTruncation = content.length > COLLAPSED_CHARS;
+
+  // Truncate at a paragraph/sentence boundary near the threshold for a clean preview.
+  const previewContent = (() => {
+    if (!needsTruncation) return content;
+    let cut = content.indexOf("\n\n", Math.floor(COLLAPSED_CHARS * 0.6));
+    if (cut < 0 || cut > COLLAPSED_CHARS * 1.4) {
+      cut = content.lastIndexOf(". ", COLLAPSED_CHARS);
+      if (cut > 0) cut += 1; // keep the period
+    }
+    if (cut < COLLAPSED_CHARS * 0.4) cut = content.lastIndexOf(" ", COLLAPSED_CHARS);
+    if (cut < 0) cut = COLLAPSED_CHARS;
+    return content.slice(0, cut).trimEnd() + "…";
+  })();
+
+  // Collapsing scrolls back to the section heading so the user isn't stranded mid-text.
+  const sectionId = `cached-ai-${section}`;
+  const handleToggle = () => {
+    const willCollapse = expanded;
+    setExpanded((v) => !v);
+    if (willCollapse) {
+      // wait a frame so the DOM shrinks before we scroll
+      requestAnimationFrame(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
 
   const generate = useCallback(
     async (force = false) => {
@@ -44,6 +75,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
           setContent(data.content);
           setGeneratedAt(data.generated_at ?? null);
           setSaved(false);
+          setExpanded(false);
         }
       } catch (e) {
         toast({
@@ -86,7 +118,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
   };
 
   return (
-    <div className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-5">
+    <div id={sectionId} className="rounded-2xl border border-border/40 bg-card/70 backdrop-blur-md p-5 scroll-mt-24">
       <div className="flex items-start justify-between gap-2 mb-3">
         <h3 className="font-display text-base font-semibold">{title}</h3>
         <button
@@ -107,9 +139,25 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
           Lyra is reading…
         </div>
       ) : content ? (
-        <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-2">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
+        <>
+          <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-2">
+            <ReactMarkdown>{expanded || !needsTruncation ? content : previewContent}</ReactMarkdown>
+          </div>
+          {needsTruncation && (
+            <button
+              type="button"
+              onClick={handleToggle}
+              aria-expanded={expanded}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 min-h-[44px] -mx-1 px-1"
+            >
+              {expanded ? (
+                <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
+              ) : (
+                <>Read more <ChevronDown className="w-3.5 h-3.5" /></>
+              )}
+            </button>
+          )}
+        </>
       ) : (
         <p className="text-xs text-muted-foreground py-2">Tap refresh to generate.</p>
       )}

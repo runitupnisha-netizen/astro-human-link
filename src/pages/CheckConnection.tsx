@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass } from "lucide-react";
+import { ArrowLeft, Sparkles, Heart, Loader2, Trash2, Star, Moon, Sunrise, Compass, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +26,18 @@ type Reading = {
   userHdAuthority: string | null;
   chartHighlights: string[];
   humanDesignNotes: string[];
+  synastry_overview: string;
+  cross_aspects: Array<{
+    person_a_planet: string;
+    person_b_planet: string;
+    aspect_type: string;
+    orb: string;
+    short_read: string;
+  }>;
+  strengths: Array<{ title: string; read: string }>;
+  friction_points: Array<{ title: string; read: string }>;
+  lessons: string;
+  degraded?: boolean;
 };
 
 type SavedCheck = {
@@ -202,6 +214,12 @@ const CheckConnection = () => {
         userHdAuthority: data.userHdAuthority ?? null,
         chartHighlights: Array.isArray(data.chartHighlights) ? data.chartHighlights : [],
         humanDesignNotes: Array.isArray(data.humanDesignNotes) ? data.humanDesignNotes : [],
+        synastry_overview: typeof data.synastry_overview === "string" ? data.synastry_overview : "",
+        cross_aspects: Array.isArray(data.cross_aspects) ? data.cross_aspects : [],
+        strengths: Array.isArray(data.strengths) ? data.strengths : [],
+        friction_points: Array.isArray(data.friction_points) ? data.friction_points : [],
+        lessons: typeof data.lessons === "string" ? data.lessons : "",
+        degraded: !!data.degraded,
       });
       setMonthCount((c) => c + 1);
       setStep("result");

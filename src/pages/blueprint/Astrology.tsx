@@ -172,6 +172,7 @@ const Astrology = () => {
                 section="planets"
                 title="Your Personal & Outer Planets"
                 lyraSeedFallback="Walk me through my Mercury, Venus, and Mars placements."
+                gated={!isPremium}
               />
             </PremiumLock>
           </section>
@@ -187,7 +188,7 @@ const Astrology = () => {
               teaser="What planets sit in your 7th house tells you a lot about partnership. An empty house isn't dead — it's ruled by another planet. Unlock to see what's in each of your twelve houses and what each one means for you."
               lyraSeed="Walk me through all 12 houses of my natal chart — what's in each and what the empty ones mean."
             >
-              <CachedAiSection section="houses" title="Your 12 Life Houses" />
+              <CachedAiSection section="houses" title="Your 12 Life Houses" gated={!isPremium} lyraSeedFallback="What's in each of my 12 houses?" />
             </PremiumLock>
           </section>
 
@@ -202,7 +203,7 @@ const Astrology = () => {
               teaser="Your Mars square Saturn means you feel held back when you act — and learning to act anyway is your work. Unlock to see all the major aspects in your chart with a plain-English read on each."
               lyraSeed="What are the major aspects in my chart, and what do they mean for how I move through life?"
             >
-              <CachedAiSection section="aspects" title="Your Major Aspects" />
+              <CachedAiSection section="aspects" title="Your Major Aspects" gated={!isPremium} lyraSeedFallback="What are the major aspects in my chart?" />
             </PremiumLock>
           </section>
 
@@ -217,7 +218,7 @@ const Astrology = () => {
               teaser="Right now Mars is moving through one of your houses, kicking up energy in a specific life area. Mercury is highlighting a different one. Unlock to get today's sky read against your personal chart, every day."
               lyraSeed="What's the sky doing today against my natal chart? Give me the top three transits to pay attention to and what to do about each."
             >
-              <CachedAiSection section="transits" title="Today's Sky over your chart" />
+              <CachedAiSection section="transits" title="Today's Sky over your chart" gated={!isPremium} lyraSeedFallback="What's the sky doing today over my chart?" />
             </PremiumLock>
           </section>
 
@@ -232,7 +233,7 @@ const Astrology = () => {
               teaser="Your progressed Moon changes sign every ~2.5 years and quietly rewrites what you need emotionally. A progressed Sun sign change is a once-in-30-years identity shift. Unlock to see where your progressed Sun, Moon, Mercury, Venus, and Mars sit right now — and what life chapter you're actually in."
               lyraSeed="Walk me through my current progressed chart — especially my progressed Sun, Moon, and any planet that's changed sign recently. What life chapter does this put me in?"
             >
-              <CachedAiSection section="progressions" title="Your Progressed Chart" />
+              <CachedAiSection section="progressions" title="Your Progressed Chart" gated={!isPremium} lyraSeedFallback="Walk me through my progressed chart." />
             </PremiumLock>
           </section>
 

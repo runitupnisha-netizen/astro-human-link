@@ -163,18 +163,12 @@ const Astrology = () => {
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold mb-1">The Planets</h2>
             <p className="text-xs text-muted-foreground mb-4">Each planet runs a part of your inner government.</p>
-            <PremiumLock
-              title="Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto"
-              teaser="Your Mercury shows how you think and speak. Venus runs love, money, and taste. Mars is how you fight and want. Outer planets — Jupiter through Pluto — describe your generation and your fate. Unlock to see all eight personalized to your chart."
-              lyraSeed="Walk me through my Mercury, Venus, and Mars placements — what sign and house, and what each one says about me."
-            >
-              <CachedAiSection
-                section="planets"
-                title="Your Personal & Outer Planets"
-                lyraSeedFallback="Walk me through my Mercury, Venus, and Mars placements."
-                gated={!isPremium}
-              />
-            </PremiumLock>
+            <CachedAiSection
+              section="planets"
+              title="Your Personal & Outer Planets"
+              lyraSeedFallback="Walk me through my Mercury, Venus, and Mars placements."
+              gated={!isPremium}
+            />
           </section>
 
           {/* SECTION 3 — Houses */}
@@ -183,13 +177,7 @@ const Astrology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Twelve <TermTooltip term="houses" definition="The 12 life areas of the natal chart — self, money, communication, home, creativity, work, partnership, depth, philosophy, career, community, the unconscious." /> — every area of your life sits in one.
             </p>
-            <PremiumLock
-              title="All 12 Life Houses"
-              teaser="What planets sit in your 7th house tells you a lot about partnership. An empty house isn't dead — it's ruled by another planet. Unlock to see what's in each of your twelve houses and what each one means for you."
-              lyraSeed="Walk me through all 12 houses of my natal chart — what's in each and what the empty ones mean."
-            >
-              <CachedAiSection section="houses" title="Your 12 Life Houses" gated={!isPremium} lyraSeedFallback="What's in each of my 12 houses?" />
-            </PremiumLock>
+            <CachedAiSection section="houses" title="Your 12 Life Houses" gated={!isPremium} lyraSeedFallback="What's in each of my 12 houses?" />
           </section>
 
           {/* SECTION 4 — Aspects */}
@@ -198,13 +186,7 @@ const Astrology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               The angles between your planets — <TermTooltip term="conjunction" definition="Two planets in roughly the same spot — they fuse and act as one." />, <TermTooltip term="square" definition="A 90° tension between two planets — friction that forces growth." />, <TermTooltip term="trine" definition="A 120° harmony — gifts that come easily and need to be used on purpose." />, <TermTooltip term="opposition" definition="A 180° face-off — you have to integrate two opposite drives." />, <TermTooltip term="sextile" definition="A 60° opportunity — talent that activates when you reach for it." />.
             </p>
-            <PremiumLock
-              title="Your Personalized Aspects"
-              teaser="Your Mars square Saturn means you feel held back when you act — and learning to act anyway is your work. Unlock to see all the major aspects in your chart with a plain-English read on each."
-              lyraSeed="What are the major aspects in my chart, and what do they mean for how I move through life?"
-            >
-              <CachedAiSection section="aspects" title="Your Major Aspects" gated={!isPremium} lyraSeedFallback="What are the major aspects in my chart?" />
-            </PremiumLock>
+            <CachedAiSection section="aspects" title="Your Major Aspects" gated={!isPremium} lyraSeedFallback="What are the major aspects in my chart?" />
           </section>
 
           {/* SECTION 5 — Today's Sky */}
@@ -213,13 +195,7 @@ const Astrology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Current <TermTooltip term="transits" definition="Where the planets are right now relative to your natal positions — the live weather over your chart." /> across your chart. Refreshes daily.
             </p>
-            <PremiumLock
-              title="Live transits over your chart"
-              teaser="Right now Mars is moving through one of your houses, kicking up energy in a specific life area. Mercury is highlighting a different one. Unlock to get today's sky read against your personal chart, every day."
-              lyraSeed="What's the sky doing today against my natal chart? Give me the top three transits to pay attention to and what to do about each."
-            >
-              <CachedAiSection section="transits" title="Today's Sky over your chart" gated={!isPremium} lyraSeedFallback="What's the sky doing today over my chart?" />
-            </PremiumLock>
+            <CachedAiSection section="transits" title="Today's Sky over your chart" gated={!isPremium} lyraSeedFallback="What's the sky doing today over my chart?" />
           </section>
 
           {/* SECTION 5b — Progressed Chart */}
@@ -228,13 +204,7 @@ const Astrology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Your <TermTooltip term="secondary progressions" definition="A symbolic technique where each day after your birth represents one year of life — showing how your inner chart matures over time." /> — the slow inner clock of who you're becoming.
             </p>
-            <PremiumLock
-              title="Your Progressed Chart"
-              teaser="Your progressed Moon changes sign every ~2.5 years and quietly rewrites what you need emotionally. A progressed Sun sign change is a once-in-30-years identity shift. Unlock to see where your progressed Sun, Moon, Mercury, Venus, and Mars sit right now — and what life chapter you're actually in."
-              lyraSeed="Walk me through my current progressed chart — especially my progressed Sun, Moon, and any planet that's changed sign recently. What life chapter does this put me in?"
-            >
-              <CachedAiSection section="progressions" title="Your Progressed Chart" gated={!isPremium} lyraSeedFallback="Walk me through my progressed chart." />
-            </PremiumLock>
+            <CachedAiSection section="progressions" title="Your Progressed Chart" gated={!isPremium} lyraSeedFallback="Walk me through my progressed chart." />
           </section>
 
           {/* SECTION 6 — Learn */}

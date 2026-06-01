@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Star, BookOpen, Sun, Moon, ArrowUpRight, Sparkles } from "lucide-react";
+import { Star, BookOpen, Sun, Moon, ArrowUpRight, Sparkles, Crown, Lock } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
+import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
 import NatalWheel from "@/components/blueprint/NatalWheel";
+import InteractiveNatalWheel from "@/components/blueprint/InteractiveNatalWheel";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
 import PremiumLock from "@/components/blueprint/PremiumLock";
@@ -79,6 +82,8 @@ const RISING_BLURBS: Record<string, string> = {
 
 const Astrology = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -90,6 +95,7 @@ const Astrology = () => {
   const sun = profile?.sun_sign;
   const moon = profile?.moon_sign;
   const rising = profile?.rising_sign;
+  const hasBirthData = !!profile?.birth_date;
 
   return (
     <div className="min-h-[100svh] relative">
@@ -103,12 +109,37 @@ const Astrology = () => {
             <h1 className="font-display text-4xl font-bold bg-gradient-aurora bg-clip-text text-transparent mt-1">Astrology</h1>
           </header>
 
-          {/* HERO — Natal wheel */}
+          {/* HERO — Natal wheel (premium = interactive) */}
           <section className={`${SECTION_CLASS} mb-8 flex flex-col items-center`}>
-            <NatalWheel sun={sun} moon={moon} rising={rising} />
-            <p className="mt-4 text-center text-xs text-muted-foreground max-w-xs leading-relaxed">
-              Your natal chart — a snapshot of the sky the moment you were born.
-            </p>
+            {isPremium && hasBirthData ? (
+              <>
+                <div className="flex items-center gap-1.5 text-[10px] text-amber-400 mb-2 uppercase tracking-wider">
+                  <Crown className="w-3 h-3" /> Interactive Chart
+                </div>
+                <InteractiveNatalWheel
+                  birthDate={profile.birth_date}
+                  birthTime={profile.birth_time ?? null}
+                  latitude={profile.birth_latitude ?? null}
+                  longitude={profile.birth_longitude ?? null}
+                />
+              </>
+            ) : (
+              <>
+                <NatalWheel sun={sun} moon={moon} rising={rising} />
+                <p className="mt-4 text-center text-xs text-muted-foreground max-w-xs leading-relaxed">
+                  Your natal chart — a snapshot of the sky the moment you were born.
+                </p>
+                {!isPremium && (
+                  <button
+                    onClick={() => navigate("/premium")}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-[11px] font-medium text-amber-400 hover:bg-amber-400/20 transition-colors"
+                  >
+                    <Lock className="w-3 h-3" />
+                    Unlock tappable planets, aspects & degrees
+                  </button>
+                )}
+              </>
+            )}
           </section>
 
           {/* SECTION 1 — Big 3 */}

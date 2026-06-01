@@ -33,7 +33,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback }: Props) => {
   // Long Lyra readings collapse behind a Show more / Show less toggle so the
   // Blueprint deep-detail screens don't open with walls of text.
   const [expanded, setExpanded] = useState(false);
-  const COLLAPSED_CHARS = 480;
+  const COLLAPSED_CHARS = 260;
   const needsTruncation = content.length > COLLAPSED_CHARS;
 
   // Truncate at a paragraph/sentence boundary near the threshold for a clean preview.

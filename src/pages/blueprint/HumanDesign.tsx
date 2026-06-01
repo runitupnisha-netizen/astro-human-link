@@ -3,11 +3,11 @@ import { Zap, BookOpen, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import BodyGraph from "@/components/blueprint/BodyGraph";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
-import PremiumLock from "@/components/blueprint/PremiumLock";
 import CachedAiSection from "@/components/blueprint/CachedAiSection";
 import BackButton from "@/components/BackButton";
 import ReadMore from "@/components/blueprint/ReadMore";
@@ -41,6 +41,7 @@ const AUTHORITY_BLURBS: Record<string, string> = {
 
 const HumanDesign = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -124,22 +125,20 @@ const HumanDesign = () => {
             {hdProfile ? (
               <div className={SECTION_CLASS}>
                 <h3 className="font-display text-2xl font-bold text-primary mb-3">{hdProfile}</h3>
-                <PremiumLock
-                  title={`What ${hdProfile} actually means`}
-                  teaser={`Your ${hdProfile} profile describes two distinct lines that show up together: a conscious personality you operate from and an unconscious design others feel. Unlock the full read.`}
-                  lyraSeed={`My HD profile is ${hdProfile}. Break down what each line means, how they interact, and what my life theme is.`}
-                >
-                  <CachedAiSection section="profile_detail" title={`Profile ${hdProfile} — full read`} />
-                </PremiumLock>
+                <CachedAiSection
+                  section="profile_detail"
+                  title={`Profile ${hdProfile} — full read`}
+                  gated={!isPremium}
+                  lyraSeedFallback={`Break down what my ${hdProfile} profile means.`}
+                />
               </div>
             ) : (
-              <PremiumLock
-                title="Your Profile"
-                teaser="Your profile is your personality archetype — the role you play in relationships and the life theme you're here to live. Unlock to get yours."
-                lyraSeed="What's my HD profile and what does it mean for how I live?"
-              >
-                <CachedAiSection section="profile_detail" title="Your HD Profile" />
-              </PremiumLock>
+              <CachedAiSection
+                section="profile_detail"
+                title="Your HD Profile"
+                gated={!isPremium}
+                lyraSeedFallback="What's my HD profile and what does it mean?"
+              />
             )}
           </section>
 
@@ -147,13 +146,7 @@ const HumanDesign = () => {
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold mb-1">Defined & Undefined Centers</h2>
             <p className="text-xs text-muted-foreground mb-4">Where you're consistent — and where you take in the room.</p>
-            <PremiumLock
-              title="Your 9 Centers"
-              teaser="Defined centers are your fixed traits — the way you reliably operate. Undefined centers are where you take in and amplify other people's energy. Unlock to see all nine centers personalized to you."
-              lyraSeed="Walk me through my nine centers — which are defined, which are undefined, and what each one means for how I show up."
-            >
-              <CachedAiSection section="centers" title="Your 9 Centers" />
-            </PremiumLock>
+            <CachedAiSection section="centers" title="Your 9 Centers" gated={!isPremium} lyraSeedFallback="Walk me through my nine centers." />
           </section>
 
           {/* SECTION 6 — Channels & Gates */}
@@ -162,26 +155,14 @@ const HumanDesign = () => {
             <p className="text-xs text-muted-foreground mb-4">
               <TermTooltip term="Channels" definition="Connections between two defined centers — they create consistent themes in your design." /> and <TermTooltip term="gates" definition="64 archetypes (mirroring the I Ching) activated in your bodygraph. Each gate has a name and a theme." /> — the wiring of your design.
             </p>
-            <PremiumLock
-              title="Your active channels & gates"
-              teaser="Each active gate carries a specific theme. Active channels turn pairs of gates into life-long signatures. Unlock to see what's wired in your design and what it means."
-              lyraSeed="What channels and gates are active in my design, and what are the headline themes I should know?"
-            >
-              <CachedAiSection section="channels" title="Your Channels & Gates" />
-            </PremiumLock>
+            <CachedAiSection section="channels" title="Your Channels & Gates" gated={!isPremium} lyraSeedFallback="What channels and gates are active in my design?" />
           </section>
 
           {/* SECTION 7 — Incarnation Cross */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold mb-1">Incarnation Cross</h2>
             <p className="text-xs text-muted-foreground mb-4">Your HD life-purpose theme.</p>
-            <PremiumLock
-              title="What you're here to embody"
-              teaser="Your Incarnation Cross is built from your Sun and Earth — conscious and unconscious. It names the larger theme you're here to live out across this lifetime."
-              lyraSeed="What's my Incarnation Cross, and what is it asking me to embody in this lifetime?"
-            >
-              <CachedAiSection section="incarnation_cross" title="Your Incarnation Cross" />
-            </PremiumLock>
+            <CachedAiSection section="incarnation_cross" title="Your Incarnation Cross" gated={!isPremium} lyraSeedFallback="What's my Incarnation Cross?" />
           </section>
 
           {/* SECTION 8 — Learn */}

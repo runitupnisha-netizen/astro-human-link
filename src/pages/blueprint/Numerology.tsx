@@ -3,6 +3,7 @@ import { Hash, BookOpen, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremium } from "@/hooks/usePremium";
 import CosmicBackground from "@/components/CosmicBackground";
 import TermTooltip from "@/components/blueprint/TermTooltip";
 import AskLyraButton from "@/components/blueprint/AskLyraButton";
@@ -30,6 +31,7 @@ const LIFE_PATH_BLURBS: Record<number, string> = {
 
 const Numerology = () => {
   const { user } = useAuth();
+  const { subscribed: isPremium } = usePremium();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -102,13 +104,7 @@ const Numerology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Also called <TermTooltip term="Destiny number" definition="The Expression number — derived from your full birth name. It names what you're here to express in the world." />.
             </p>
-            <PremiumLock
-              title="Your Expression / Destiny"
-              teaser="Your Life Path tells you what you're here to learn. Your Expression number tells you what you're here to express — the talent set you arrived with. Unlock to compute it from your full birth name."
-              lyraSeed="What's my Expression number, and how is it different from my Life Path? Give me the read."
-            >
-              <CachedAiSection section="expression" title="Your Expression Number" />
-            </PremiumLock>
+            <CachedAiSection section="expression" title="Your Expression Number" gated={!isPremium} lyraSeedFallback="What's my Expression number?" />
           </section>
 
           {/* SECTION 3 — Soul Urge (premium) */}
@@ -117,26 +113,14 @@ const Numerology = () => {
             <p className="text-xs text-muted-foreground mb-4">
               Also called <TermTooltip term="Heart's Desire" definition="The Soul Urge number — derived from the vowels in your name. It names what your heart actually wants, sometimes beneath conscious awareness." />.
             </p>
-            <PremiumLock
-              title="What your heart actually wants"
-              teaser="The motivation underneath your choices — what you're really reaching for when you choose a job, a partner, a city. Unlock to compute and read your Soul Urge."
-              lyraSeed="What's my Soul Urge number, and what does it say I'm actually after underneath the surface?"
-            >
-              <CachedAiSection section="soul_urge" title="Your Soul Urge" />
-            </PremiumLock>
+            <CachedAiSection section="soul_urge" title="Your Soul Urge" gated={!isPremium} lyraSeedFallback="What's my Soul Urge number?" />
           </section>
 
           {/* SECTION 4 — Personality (premium) */}
           <section className="mb-10">
             <h2 className="font-display text-xl font-semibold mb-1">Personality Number</h2>
             <p className="text-xs text-muted-foreground mb-4">The outer mask — how others perceive you first.</p>
-            <PremiumLock
-              title="The mask others meet first"
-              teaser="Derived from the consonants in your name. It describes the first impression you give off — often very different from who you are on the inside."
-              lyraSeed="What's my Personality number and what first impression does it create?"
-            >
-              <CachedAiSection section="personality" title="Your Personality Number" />
-            </PremiumLock>
+            <CachedAiSection section="personality" title="Your Personality Number" gated={!isPremium} lyraSeedFallback="What's my Personality number?" />
           </section>
 
           {/* SECTION 5 — Birthday (premium-ish, value shown if available) */}
@@ -178,13 +162,7 @@ const Numerology = () => {
                 </p>
                 <AskLyraButton seed={`I'm in Personal Year ${py}. What's this year asking of me, and what should I focus on between now and my next birthday?`} />
                 <div className="mt-5 pt-5 border-t border-border/40">
-                  <PremiumLock
-                    title="Personal Month & Personal Day"
-                    teaser="Zoom in further — every month and every day inside your Personal Year has its own number and theme. Unlock the daily lens."
-                    lyraSeed="What's my Personal Month and Personal Day today, and what should I do with them?"
-                  >
-                    <CachedAiSection section="personal_year_detail" title="Personal Year · Month · Day" />
-                  </PremiumLock>
+                  <CachedAiSection section="personal_year_detail" title="Personal Year · Month · Day" gated={!isPremium} lyraSeedFallback="What's my Personal Month and Day?" />
                 </div>
               </div>
             ) : (

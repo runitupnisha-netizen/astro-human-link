@@ -9,6 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
 import TourHighlight from "@/components/TourHighlight";
+import { Capacitor } from "@capacitor/core";
+
+const IS_IOS_NATIVE = Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios";
+const IS_ANDROID_NATIVE = Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+const IS_NATIVE = IS_IOS_NATIVE || IS_ANDROID_NATIVE;
+const STORE_LABEL = IS_IOS_NATIVE ? "Apple" : IS_ANDROID_NATIVE ? "Google Play" : "Stripe";
 
 /**
  * Lightweight tagged logger for the post-checkout verification flow.
@@ -279,8 +285,15 @@ const Premium = () => {
     setPollingTimedOut(false);
     try {
       await checkout(STELLARA_TIERS[tierKey].price_id, redirectTo);
-    } catch {
-      toast({ title: "Error", description: "Could not start checkout. Please try again.", variant: "destructive" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Please try again.";
+      toast({
+        title: IS_NATIVE
+          ? "Could not open Apple purchase sheet"
+          : "Could not start checkout",
+        description: msg,
+        variant: "destructive",
+      });
     } finally {
       setCheckoutLoading(null);
     }
@@ -599,7 +612,7 @@ const Premium = () => {
           transition={{ delay: 0.7 }}
           className="text-center text-xs text-muted-foreground font-body pt-4 px-4 leading-relaxed"
         >
-          🔒 Secure checkout via Stripe · Cancel anytime · No hidden fees
+          🔒 Secure checkout via {STORE_LABEL} · Cancel anytime · No hidden fees
         </motion.p>
 
         {/* Restore Purchase */}
@@ -658,7 +671,7 @@ const Premium = () => {
               {restoreState.status === "checking" ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Checking with Stripe…
+                  Checking with {STORE_LABEL}…
                 </>
               ) : (
                 <>

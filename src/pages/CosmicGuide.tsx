@@ -11,6 +11,7 @@ import { useLyraVoice } from "@/hooks/useLyraVoice";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { markLyraIntroAck } from "@/hooks/useFoundationStatus";
+import BackButton from "@/components/BackButton";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Conversation = {
@@ -576,17 +577,20 @@ const CosmicGuide = () => {
       </div>
 
       {/* Top bar */}
-      <div className="relative z-10 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2">
-        <button
-          onClick={() => setShowHistory(true)}
-          className="inline-flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#a89cc9] hover:text-[#e0d4ff] transition-colors"
-          aria-label="Open recent chats"
-        >
-          <MessageSquare className="w-5 h-5" />
-          <span className="text-xs tracking-wide" style={{ fontFamily: "Poppins, sans-serif" }}>
-            Recent{conversations.length > 0 ? ` · ${conversations.length}` : ""}
-          </span>
-        </button>
+      <div className="relative z-10 flex items-center justify-between gap-2 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-2">
+        <div className="flex items-center gap-1">
+          <BackButton fallback="/" label="Back" color="#a89cc9" />
+          <button
+            onClick={() => setShowHistory(true)}
+            className="inline-flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full hover:bg-[#4d3a5c]/40 text-[#a89cc9] hover:text-[#e0d4ff] transition-colors"
+            aria-label="Open recent chats"
+          >
+            <MessageSquare className="w-5 h-5" />
+            <span className="text-xs tracking-wide" style={{ fontFamily: "Poppins, sans-serif" }}>
+              Recent{conversations.length > 0 ? ` · ${conversations.length}` : ""}
+            </span>
+          </button>
+        </div>
         <div className="flex items-center gap-1">
           {activeConvo?.is_active && messages.length > 0 && (
             <button

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ReadMoreProps {
   text: string;
-  /** Number of characters shown when collapsed. Defaults to 180. */
+  /** Number of characters shown when collapsed. Defaults to 260. */
   collapsedChars?: number;
   /** Tailwind classes for the paragraph. */
   className?: string;
@@ -16,10 +16,11 @@ interface ReadMoreProps {
  */
 const ReadMore = ({
   text,
-  collapsedChars = 180,
+  collapsedChars = 260,
   className = "text-sm text-foreground/90 leading-relaxed font-serif whitespace-pre-line",
 }: ReadMoreProps) => {
   const [expanded, setExpanded] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const needsTruncation = text.length > collapsedChars;
 
   if (!needsTruncation) {
@@ -32,14 +33,24 @@ const ReadMore = ({
   if (cutIndex < 0) cutIndex = collapsedChars;
   const preview = text.slice(0, cutIndex).trimEnd();
 
+  const handleToggle = () => {
+    const willCollapse = expanded;
+    setExpanded((v) => !v);
+    if (willCollapse) {
+      requestAnimationFrame(() => {
+        rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
+
   return (
-    <div>
+    <div ref={rootRef} className="scroll-mt-24">
       <p className={className}>
         {expanded ? text : `${preview}…`}
       </p>
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={handleToggle}
         className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 min-h-[44px] -mx-1 px-1"
         aria-expanded={expanded}
       >

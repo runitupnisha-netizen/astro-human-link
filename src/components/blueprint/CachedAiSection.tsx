@@ -76,7 +76,9 @@ const CachedAiSection = ({ section, title, lyraSeedFallback, gated = false, upse
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke("blueprint-synthesis", {
-          body: { section, force_refresh: force, tier: gated ? "free" : "premium" },
+          // Always request the full reading and cache it — gating is UI-only,
+          // so cache hits across free/premium loads save AI credits.
+          body: { section, force_refresh: force, tier: "premium" },
         });
         if (error) throw error;
         if (data?.content) {
@@ -95,7 +97,7 @@ const CachedAiSection = ({ section, title, lyraSeedFallback, gated = false, upse
         setLoading(false);
       }
     },
-    [user, section, gated],
+    [user, section],
   );
 
   useEffect(() => {

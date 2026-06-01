@@ -5,6 +5,7 @@ import { Sparkles, Wand2, Compass, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
+import TransitTimeline from "@/components/TransitTimeline";
 
 const COSMIC_PROMPTS = [
   "Mercury is direct — communication flows effortlessly today. Speak the thing you've been holding.",
@@ -156,6 +157,17 @@ const Today = () => {
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform mt-1" />
             </div>
           </motion.button>
+
+          {/* Transit timeline cards */}
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <h2 className="font-display text-lg font-semibold text-foreground mb-1">Your Transits</h2>
+            <p className="text-xs text-muted-foreground mb-3">The sky's calendar over your chart.</p>
+            <TransitTimeline compact />
+          </motion.section>
         </div>
       </div>
     </div>

@@ -85,6 +85,48 @@ const checkSchema = z.object({
 
 type FieldErrors = Partial<Record<"theirName" | "birthDate" | "birthTime" | "birthPlace" | "confirmed", string>>;
 
+/**
+ * Local Read more / Show less, styled for the CheckConnection palette so it
+ * blends with the bespoke purple cosmic surfaces. Collapses at 260 chars to
+ * match the app-wide threshold used in CachedAiSection.
+ */
+const COLLAPSED_CHARS = 260;
+const CollapsibleText = ({ text, color = "#e0d4ff" }: { text: string; color?: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const needsTrunc = text.length > COLLAPSED_CHARS;
+  if (!needsTrunc) {
+    return (
+      <p className="text-sm leading-relaxed" style={{ color, fontFamily: "Lora, Georgia, serif" }}>
+        {text}
+      </p>
+    );
+  }
+  let cut = text.lastIndexOf(". ", COLLAPSED_CHARS);
+  if (cut < COLLAPSED_CHARS * 0.6) cut = text.lastIndexOf(" ", COLLAPSED_CHARS);
+  if (cut < 0) cut = COLLAPSED_CHARS;
+  const preview = text.slice(0, cut).trimEnd();
+  return (
+    <div>
+      <p className="text-sm leading-relaxed" style={{ color, fontFamily: "Lora, Georgia, serif" }}>
+        {expanded ? text : `${preview}…`}
+      </p>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="mt-2 inline-flex items-center gap-1 text-xs min-h-[36px]"
+        style={{ color: "#d0b4f7", fontFamily: "Poppins, sans-serif" }}
+        aria-expanded={expanded}
+      >
+        {expanded ? (
+          <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
+        ) : (
+          <>Read more <ChevronDown className="w-3.5 h-3.5" /></>
+        )}
+      </button>
+    </div>
+  );
+};
+
 const CheckConnection = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();

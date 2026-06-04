@@ -95,6 +95,25 @@ export const usePremium = () => {
         }
       }
 
+      // Admin role → always treated as Pro app-wide, never paywalled.
+      let adminActive = false;
+      if (user?.id) {
+        const { data: adminRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        if (adminRow) {
+          adminActive = true;
+          setSubscribed(true);
+          setCurrentTier("yearly");
+          setSubscriptionEnd("2099-12-31T23:59:59.000Z");
+          setLoading(false);
+          return;
+        }
+      }
+
       // On native iOS/Android, the source of truth is RevenueCat.
       if (isNativePurchasePlatform()) {
         const info = await getCustomerInfo();

@@ -56,6 +56,8 @@ serve(async (req) => {
     // Demo / reviewer accounts get permanent Pro (App Store + Play Store reviewers)
     const DEMO_PRO_EMAILS = new Set([
       "demo@stellara.app",
+      "chef.tinisha@gmail.com",
+      "runitupnisha@gmail.com",
     ]);
     if (user.email && DEMO_PRO_EMAILS.has(user.email.toLowerCase())) {
       logStep("Demo reviewer account, granting Pro", { email: user.email });
@@ -63,7 +65,27 @@ serve(async (req) => {
         subscribed: true,
         product_id: "prod_URoqBFRb0G2Kg2", // yearly tier (live)
         price_id: "price_1TSvCqGjQT3v2NNSiycEinsh",
-        subscription_end: "2027-12-31T23:59:59.000Z",
+        subscription_end: "2099-12-31T23:59:59.000Z",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Admin role also grants permanent Pro app-wide.
+    const { data: adminRow } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (adminRow) {
+      logStep("Admin role granting Pro", { userId: user.id });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        product_id: "prod_URoqBFRb0G2Kg2",
+        price_id: "price_1TSvCqGjQT3v2NNSiycEinsh",
+        subscription_end: "2099-12-31T23:59:59.000Z",
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

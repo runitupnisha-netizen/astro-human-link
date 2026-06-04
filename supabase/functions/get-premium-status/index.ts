@@ -54,6 +54,44 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id });
 
+    // Permanent Pro for demo/reviewer/admin accounts. Source of truth so
+    // these emails are never paywalled regardless of Stripe/IAP state.
+    const DEMO_PRO_EMAILS = new Set([
+      "demo@stellara.app",
+      "chef.tinisha@gmail.com",
+      "runitupnisha@gmail.com",
+    ]);
+    if (user.email && DEMO_PRO_EMAILS.has(user.email.toLowerCase())) {
+      logStep("Demo/admin permanent Pro", { email: user.email });
+      return json({
+        premium: true,
+        product_id: "prod_URoqBFRb0G2Kg2",
+        price_id: "price_1TSvCqGjQT3v2NNSiycEinsh",
+        subscription_end: "2099-12-31T23:59:59.000Z",
+        source: "permanent_grant",
+        reason: "active",
+      });
+    }
+
+    // Admin role also implies permanent Pro access app-wide.
+    const { data: adminRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (adminRow) {
+      logStep("Admin role permanent Pro", { userId: user.id });
+      return json({
+        premium: true,
+        product_id: "prod_URoqBFRb0G2Kg2",
+        price_id: "price_1TSvCqGjQT3v2NNSiycEinsh",
+        subscription_end: "2099-12-31T23:59:59.000Z",
+        source: "admin_grant",
+        reason: "active",
+      });
+    }
+
     // 1) Check native IAP first (App Store / Play Store). If the user has an
     //    active iap_subscriptions row, return premium immediately and skip Stripe.
     //    This is the source of truth for iOS / Android subscribers.

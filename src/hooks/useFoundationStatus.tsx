@@ -86,6 +86,25 @@ export const useFoundationStatus = (): FoundationStatus => {
     }
     let cancelled = false;
     (async () => {
+      // Admin role → bypass Foundation gate entirely (full app access).
+      const { data: adminRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (adminRow) {
+        if (cancelled) return;
+        setSteps([
+          { id: "chart",    label: "Complete your birth chart",    description: "Admin bypass active.", done: true, path: "/onboarding" },
+          { id: "profile",  label: "Reach 80% profile score",      description: "Admin bypass active.", done: true, path: "/profile" },
+          { id: "insights", label: "Read your first 3 Insights",   description: "Admin bypass active.", done: true, path: "/insights" },
+          { id: "lyra",     label: "Meet Lyra, your cosmic guide", description: "Admin bypass active.", done: true, path: "/lyra" },
+        ]);
+        setLoading(false);
+        return;
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("id, avatar_url, birth_date, birth_time, birth_place, bio_prompt_1_answer, bio_prompt_2_answer, kids_preference, drinking, smoking, interests")

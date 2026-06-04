@@ -108,9 +108,22 @@ const AccessibilityCard = () => {
     reducedMotion,
     highContrast,
     systemReducedMotion,
+    textSize,
+    followSystemTextSize,
+    systemFontScale,
     setReducedMotion,
     setHighContrast,
+    setTextSize,
+    setFollowSystemTextSize,
   } = useAccessibility();
+
+  const sizes: { value: "sm" | "md" | "lg" | "xl"; label: string; sample: string }[] = [
+    { value: "sm", label: "Small", sample: "text-xs" },
+    { value: "md", label: "Medium", sample: "text-sm" },
+    { value: "lg", label: "Large", sample: "text-base" },
+    { value: "xl", label: "Extra Large", sample: "text-lg" },
+  ];
+  const systemScalePct = Math.round((systemFontScale - 1) * 100);
 
   return (
     <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
@@ -121,6 +134,52 @@ const AccessibilityCard = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        <div>
+          <span className="font-medium">Text size</span>
+          <p className="text-sm text-muted-foreground mt-0.5 mb-3">
+            Scales every text size in the app. You can also pinch-to-zoom on any screen for a quick boost.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {sizes.map((s) => (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => setTextSize(s.value)}
+                aria-pressed={textSize === s.value}
+                className={`px-3 py-2 rounded-xl border transition-all text-center ${
+                  textSize === s.value
+                    ? "bg-primary/15 border-primary/40 text-primary"
+                    : "bg-card/50 border-border/50 text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                <span className={`${s.sample} font-semibold block leading-none`}>Aa</span>
+                <span className="text-[11px] block mt-1">{s.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-start justify-between gap-4 mt-4">
+            <div className="flex-1">
+              <span className="font-medium text-sm">Follow my device text size</span>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Honors iOS Dynamic Type and Android font scale on top of the size above.
+                {systemFontScale !== 1 && (
+                  <span className="block text-accent mt-1">
+                    Device currently set to {systemScalePct > 0 ? "+" : ""}{systemScalePct}%.
+                  </span>
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={followSystemTextSize}
+              onCheckedChange={(v) => setFollowSystemTextSize(v)}
+              aria-label="Follow device text size"
+            />
+          </div>
+        </div>
+
+        <Separator className="bg-border/40" />
+
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <span className="font-medium flex items-center gap-2">

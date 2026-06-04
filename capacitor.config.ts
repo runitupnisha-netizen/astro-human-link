@@ -8,15 +8,10 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   ios: {
-    // Allow pinch-to-zoom inside the iOS WKWebView so the viewport meta
-    // (maximum-scale=5, user-scalable=yes) actually takes effect on device.
-    // Apple's accessibility guidance: never lock zoom.
-    limitsNavigationsToAppBoundDomains: false,
+    // WKWebView honors the viewport meta in index.html
+    // (maximum-scale=5, user-scalable=yes), so pinch-to-zoom is enabled
+    // on device. No extra config required.
     scrollEnabled: true,
-  },
-  android: {
-    // Mirror the iOS behavior on Android WebViews.
-    allowMixedContent: false,
   },
 };
 

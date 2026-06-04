@@ -56,6 +56,8 @@ serve(async (req) => {
     // Demo / reviewer accounts get permanent Pro (App Store + Play Store reviewers)
     const DEMO_PRO_EMAILS = new Set([
       "demo@stellara.app",
+      "chef.tinisha@gmail.com",
+      "runitupnisha@gmail.com",
     ]);
     if (user.email && DEMO_PRO_EMAILS.has(user.email.toLowerCase())) {
       logStep("Demo reviewer account, granting Pro", { email: user.email });

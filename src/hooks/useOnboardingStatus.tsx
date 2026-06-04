@@ -41,8 +41,14 @@ export const useOnboardingStatus = () => {
 
         if (error) {
           console.error("[useOnboardingStatus] select error:", error);
-          // If RLS blocks access, still show content rather than blank page
-          setOnboardingComplete(true);
+          // SAFER DEFAULT: on read error, route to onboarding rather than
+          // skipping it. Previously this defaulted to `true`, which let
+          // brand-new accounts bypass the birth-time/location step whenever
+          // the very first profile read failed (auth-token race, RLS hiccup,
+          // network blip) — the chart then had no birth data.
+          // Honor justCompleted so users finishing onboarding aren't bounced
+          // back into it on a transient post-write error.
+          setOnboardingComplete(justCompleted ? true : false);
         } else {
           const dbValue = data?.onboarding_complete ?? false;
           console.log("[useOnboardingStatus] read profile gate fields", {
@@ -65,7 +71,7 @@ export const useOnboardingStatus = () => {
       } catch (err) {
         if (cancelled) return;
         console.error("[useOnboardingStatus] check failed:", err);
-        setOnboardingComplete(true);
+        setOnboardingComplete(justCompleted ? true : false);
       }
       setLoading(false);
     };

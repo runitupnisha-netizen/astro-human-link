@@ -7,7 +7,9 @@ const corsHeaders = {
 };
 
 const DEMO_EMAIL = "demo@stellara.app";
-const DEMO_PASSWORD = "StellaraDemo2026!";
+// Password is loaded from the DEMO_ACCOUNT_PASSWORD secret. Never hardcode it —
+// the demo account has permanent Pro access and must not be loginable from source.
+const DEMO_PASSWORD = Deno.env.get("DEMO_ACCOUNT_PASSWORD") ?? "";
 
 // Diverse fake match profiles
 const FAKE_PROFILES = [
@@ -36,6 +38,12 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  if (!DEMO_PASSWORD || DEMO_PASSWORD.length < 12) {
+    return new Response(JSON.stringify({
+      error: "DEMO_ACCOUNT_PASSWORD secret is not configured (must be >=12 chars).",
+    }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   const admin = createClient(

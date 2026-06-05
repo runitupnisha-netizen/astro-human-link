@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "authenticated_only_realtime" ON public.messages;

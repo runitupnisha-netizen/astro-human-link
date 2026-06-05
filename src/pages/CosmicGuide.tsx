@@ -521,7 +521,7 @@ const CosmicGuide = () => {
               <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
               <div className="flex-1 min-w-0">
                 <div className="truncate">{c.title}</div>
-                <div className="text-[10px] text-[#7a6a9a]/80 mt-0.5 flex items-center gap-1.5">
+                <div className="text-[0.625rem] text-[#7a6a9a]/80 mt-0.5 flex items-center gap-1.5">
                   <span>{relativeTime(c.last_message_at)}</span>
                   {c.is_active && (
                     <span className="text-[#d0b4f7]">· active</span>
@@ -678,7 +678,7 @@ const CosmicGuide = () => {
         </p>
         {activeConvo && activeConvo.is_active && messages.length > 0 && (
           <p
-            className="mt-2 max-w-xs text-center text-[11px] tracking-wide truncate"
+            className="mt-2 max-w-xs text-center text-[0.6875rem] tracking-wide truncate"
             style={{ color: "#a89cc9", fontFamily: "Lora, Georgia, serif" }}
             title={activeConvo.title}
           >
@@ -693,7 +693,7 @@ const CosmicGuide = () => {
         >
           <Info className="w-3 h-3 text-amber-400" />
           <span
-            className="text-[10.5px] tracking-wide text-amber-300/90"
+            className="text-[0.656rem] tracking-wide text-amber-300/90"
             style={{ fontFamily: "Poppins, sans-serif" }}
           >
             AI guidance · for entertainment · tap to learn more
@@ -706,7 +706,7 @@ const CosmicGuide = () => {
               <span className="w-[3px] rounded-full animate-pulse" style={{ backgroundColor: "#7F77DD", height: "100%", animationDuration: "0.5s", animationDelay: "0.1s" }} />
               <span className="w-[3px] rounded-full animate-pulse" style={{ backgroundColor: "#7F77DD", height: "70%", animationDuration: "0.6s", animationDelay: "0.2s" }} />
             </div>
-            <span className="text-[11px]" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
+            <span className="text-[0.6875rem]" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
               Lyra is speaking…
             </span>
           </div>
@@ -751,7 +751,7 @@ const CosmicGuide = () => {
                 </button>
               </div>
               <div className="w-full max-w-lg">
-                <div className="text-[11px] uppercase tracking-[0.15em] mb-2 px-1 text-left" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
+                <div className="text-[0.6875rem] uppercase tracking-[0.15em] mb-2 px-1 text-left" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
                   Recent
                 </div>
                 <div className="space-y-1.5">
@@ -766,7 +766,7 @@ const CosmicGuide = () => {
                       <span className="flex-1 truncate text-sm" style={{ color: "#c9b8f0", fontFamily: "Poppins, sans-serif" }}>
                         {c.title}
                       </span>
-                      <span className="text-[10px] shrink-0" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
+                      <span className="text-[0.625rem] shrink-0" style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}>
                         {relativeTime(c.last_message_at)}
                       </span>
                     </button>
@@ -871,7 +871,7 @@ const CosmicGuide = () => {
                   className="flex justify-start"
                 >
                   <p
-                    className="text-[11px] px-4 py-2 rounded-full"
+                    className="text-[0.6875rem] px-4 py-2 rounded-full"
                     style={{
                       color: "#d0b4f7",
                       backgroundColor: "rgba(77, 58, 92, 0.35)",
@@ -977,7 +977,7 @@ const CosmicGuide = () => {
                 </button>
               </div>
               <p
-                className="text-[10px] mt-2 text-center"
+                className="text-[0.625rem] mt-2 text-center"
                 style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
               >
                 Lyra offers reflection, not prediction. For entertainment & insight only.

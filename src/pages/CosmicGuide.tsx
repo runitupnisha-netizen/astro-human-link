@@ -205,26 +205,38 @@ const CosmicGuide = () => {
     }
   }, [streaming, messages, voice]);
 
-  // Start a brand-new session, deactivating any current active one first
+  // Resume the user's active session if one exists, otherwise start a fresh one.
+  // The DB has a partial unique index (one_active_per_user) — so we MUST NOT blindly
+  // insert another active row. If a unique violation still fires (race / stale row),
+  // we fall back to fetching the existing active conversation silently.
   const startNewSession = async (seedTopic?: string): Promise<string | null> => {
     if (!user) return null;
-    // End any currently-active session (server will summarize)
-    const { data: active } = await supabase
-      .from("guide_conversations")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .maybeSingle();
-    if (active?.id) {
-      // Deactivate locally first so the partial unique index doesn't trip
-      await supabase
+
+    const fetchActive = async () => {
+      const { data } = await supabase
         .from("guide_conversations")
-        .update({ is_active: false, ended_at: new Date().toISOString() })
-        .eq("id", active.id);
-      // Fire-and-forget AI summary
-      void finalize(active.id, "end");
+        .select("id,title,last_message_at,is_active,ended_at,message_count")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("last_message_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return (data as Conversation | null) ?? null;
+    };
+
+    // (a) Look up existing active conversation and (b) resume it if found.
+    const existing = await fetchActive();
+    if (existing) {
+      setConversations((prev) => {
+        const without = prev.filter((c) => c.id !== existing.id);
+        return [existing, ...without];
+      });
+      setActiveId(existing.id);
+      if (seedTopic) setInput(seedTopic);
+      return existing.id;
     }
 
+    // (c) None active — insert a new row.
     const title = seedTopic
       ? seedTopic.slice(0, 60) + (seedTopic.length > 60 ? "…" : "")
       : "New conversation";
@@ -238,7 +250,25 @@ const CosmicGuide = () => {
       })
       .select("id,title,last_message_at,is_active,ended_at,message_count")
       .single();
+
     if (error || !data) {
+      // 23505 = unique_violation. A stale active row exists — resume it instead
+      // of surfacing an error toast.
+      const isUniqueViolation =
+        (error as any)?.code === "23505" ||
+        /one_active_per_user|duplicate key/i.test(error?.message ?? "");
+      if (isUniqueViolation) {
+        const fallback = await fetchActive();
+        if (fallback) {
+          setConversations((prev) => {
+            const without = prev.filter((c) => c.id !== fallback.id);
+            return [fallback, ...without];
+          });
+          setActiveId(fallback.id);
+          if (seedTopic) setInput(seedTopic);
+          return fallback.id;
+        }
+      }
       toast({ title: "Couldn't start session", description: error?.message, variant: "destructive" });
       return null;
     }

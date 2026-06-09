@@ -133,7 +133,26 @@ const Connections = () => {
       .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
       .order("created_at", { ascending: false });
 
-    const matchRows = matchResult.data;
+    let matchRows = matchResult.data;
+
+    // Exclude any matches with users you have blocked or who have blocked you,
+    // so blocked accounts disappear from Connections (App Store UGC requirement).
+    if (matchRows && matchRows.length > 0) {
+      const [{ data: myBlocks }, { data: blocksAgainstMe }] = await Promise.all([
+        supabase.from("blocks").select("blocked_id").eq("blocker_id", user.id),
+        supabase.from("blocks").select("blocker_id").eq("blocked_id", user.id),
+      ]);
+      const blockedIds = new Set<string>([
+        ...((myBlocks || []).map((b: any) => b.blocked_id)),
+        ...((blocksAgainstMe || []).map((b: any) => b.blocker_id)),
+      ]);
+      if (blockedIds.size > 0) {
+        matchRows = matchRows.filter((m: any) => {
+          const other = m.user_a === user.id ? m.user_b : m.user_a;
+          return !blockedIds.has(other);
+        });
+      }
+    }
 
     if (!matchRows || matchRows.length === 0) {
       // No matches but still cache empty state + recent checks

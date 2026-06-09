@@ -38,7 +38,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
     icon: <Heart className="w-6 h-6" />,
   },
   undo: {
-    title: "Undo Last Swipe",
+    title: "Undo Last Action",
     description: "Accidentally passed on someone? Go back and give them another chance",
     icon: <Undo2 className="w-6 h-6" />,
   },

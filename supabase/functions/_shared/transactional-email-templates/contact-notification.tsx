@@ -75,7 +75,7 @@ export const template = {
   component: ContactNotificationEmail,
   subject: (data: Record<string, any>) =>
     `[Stellara Contact] ${data?.subject || 'New message'}${data?.name ? ` from ${data.name}` : ''}`,
-  to: 'stellaradating@gmail.com',
+  to: 'info@stellaraapp.net',
   displayName: 'Contact form notification (admin)',
   previewData: {
     name: 'Luna Starborn',

@@ -59,7 +59,7 @@ export const useAchievements = () => {
     { id: "matches_25", title: "Constellation Builder", description: "Reach 25 Connections", icon: "🌌", category: "social", unlocked: stats.matchCount >= 25, progress: Math.min(stats.matchCount, 25), target: 25 },
     { id: "messages_10", title: "Cosmic Messenger", description: "Send 10 messages", icon: "💬", category: "social", unlocked: stats.messagesSent >= 10, progress: Math.min(stats.messagesSent, 10), target: 10 },
     { id: "messages_100", title: "Galactic Communicator", description: "Send 100 messages", icon: "📡", category: "social", unlocked: stats.messagesSent >= 100, progress: Math.min(stats.messagesSent, 100), target: 100 },
-    { id: "swipes_50", title: "Star Explorer", description: "Swipe through 50 profiles", icon: "🚀", category: "cosmic", unlocked: stats.swipeCount >= 50, progress: Math.min(stats.swipeCount, 50), target: 50 },
+    { id: "swipes_50", title: "Star Explorer", description: "Explore 50 profiles", icon: "🚀", category: "cosmic", unlocked: stats.swipeCount >= 50, progress: Math.min(stats.swipeCount, 50), target: 50 },
     { id: "first_post", title: "Alignment Voice", description: "Create your first alignment post", icon: "📝", category: "cosmic", unlocked: stats.postCount >= 1, progress: Math.min(stats.postCount, 1), target: 1 },
   ], [stats]);
 

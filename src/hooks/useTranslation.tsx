@@ -14,16 +14,16 @@ const LANGUAGE_LABELS: Record<Language, string> = {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navigation
-    "nav.discover": "Discover",
+    "nav.discover": "Connect",
     "nav.connections": "Connections",
     "nav.profile": "Profile",
     "nav.settings": "Settings",
     "nav.messages": "Messages",
 
-    // Discover page
-    "discover.title": "Discover",
+    // Connect page (internal route still /discover)
+    "discover.title": "Connect",
     "discover.subtitle": "Souls aligned with your unique cosmic blueprint",
-    "discover.no_profiles": "No more profiles to discover",
+    "discover.no_profiles": "No more profiles to explore",
     "discover.refresh": "Refresh",
     "discover.loading": "Finding aligned souls...",
     "discover.filters": "Filters",
@@ -65,8 +65,8 @@ const translations: Record<Language, Record<string, string>> = {
     "settings.sign_out": "Sign Out",
     "settings.pause_profile": "Pause Profile",
     "settings.incognito": "Incognito Mode",
-    "settings.connection_prefs": "Match Preferences",
-    "settings.discovery_distance": "Discovery Distance",
+    "settings.connection_prefs": "Connection Preferences",
+    "settings.discovery_distance": "Connection Distance",
     "settings.looking_for": "What are you looking for?",
     "settings.new_matches": "New Connections",
     "settings.new_matches_desc": "When someone likes you back",
@@ -104,12 +104,12 @@ const translations: Record<Language, Record<string, string>> = {
     "connections.title": "Connections",
     "connections.matches": "Connections",
     "connections.no_connections": "Your soul connections will manifest here.",
-    "connections.start_discovering": "Start discovering",
-    "connections.discover_more": "Discover more",
+    "connections.start_discovering": "Start exploring",
+    "connections.discover_more": "Explore more",
     "connections.message": "Message",
     "connections.view_compatibility": "View Compatibility",
     "connections.empty_title": "No Connections Yet",
-    "connections.empty_desc": "When you match with someone, they'll appear here",
+    "connections.empty_desc": "When you connect with someone, they'll appear here",
 
     // Achievements
     "achievements.title": "Achievements",

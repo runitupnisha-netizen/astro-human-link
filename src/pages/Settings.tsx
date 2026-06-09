@@ -673,7 +673,7 @@ const Settings = () => {
                     />
                     <span className="text-sm text-muted-foreground">miles</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1.5">How far from you we'll search for matches</p>
+                  <p className="text-xs text-muted-foreground mt-1.5">How far we'll look for compatible connections</p>
                 </div>
               </CardContent>
             </Card>

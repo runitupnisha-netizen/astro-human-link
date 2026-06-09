@@ -1061,10 +1061,10 @@ const Messages = () => {
                               </div>
                             </div>
                             <h3 className="font-display text-lg font-bold text-foreground mb-2">
-                              You're a match ✨
+                              You're connected ✨
                             </h3>
                             <p className="text-muted-foreground text-sm mb-5 max-w-xs mx-auto font-serif">
-                              Slide into their DMs — {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "they"} swiped right too.
+                              Say hello — {sanitizeDisplayName(selectedConvo.otherProfile.display_name) || "they"} chose you back.
                             </p>
                             <Button
                               onClick={handleGenerateIcebreakers}

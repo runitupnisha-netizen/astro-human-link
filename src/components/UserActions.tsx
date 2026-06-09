@@ -130,11 +130,11 @@ const UserActions = ({
       // Delete messages first, then the match
       await supabase.from("messages").delete().eq("match_id", matchId);
       await supabase.from("matches").delete().eq("id", matchId);
-      toast({ title: `Unmatched from ${targetName}` });
+      toast({ title: `Removed connection with ${targetName}` });
       setShowUnmatch(false);
       onUnmatch?.();
     } catch {
-      toast({ title: "Failed to unmatch", variant: "destructive" });
+      toast({ title: "Failed to remove connection", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -215,17 +215,17 @@ const UserActions = ({
         </DialogContent>
       </Dialog>
 
-      {/* Unmatch Dialog */}
+      {/* Remove Connection Dialog */}
       <Dialog open={showUnmatch} onOpenChange={setShowUnmatch}>
         <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><UserX className="w-5 h-5 text-destructive" /> Unmatch from {targetName}?</DialogTitle>
-            <DialogDescription>This will remove the match and delete all messages. This cannot be undone.</DialogDescription>
+            <DialogTitle className="flex items-center gap-2"><UserX className="w-5 h-5 text-destructive" /> Remove connection with {targetName}?</DialogTitle>
+            <DialogDescription>This will remove the connection and delete all messages. This cannot be undone.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowUnmatch(false)}>Cancel</Button>
             <Button variant="destructive" onClick={handleUnmatch} disabled={loading}>
-              {loading ? "Unmatching..." : "Unmatch"}
+              {loading ? "Removing..." : "Remove Connection"}
             </Button>
           </DialogFooter>
         </DialogContent>

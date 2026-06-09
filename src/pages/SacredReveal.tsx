@@ -136,7 +136,7 @@ const SacredReveal = () => {
       });
       toast({ title: "💜 You liked them!" });
     } catch (e: any) {
-      toast({ title: "Already swiped", variant: "destructive" });
+      toast({ title: "Already responded", variant: "destructive" });
     }
   };
 

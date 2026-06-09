@@ -284,7 +284,7 @@ const MatchCelebration = ({ profile, onClose, onMessage, myAvatar }: MatchCelebr
                 className="flex-1 border-border/50 h-12 min-h-[3rem] touch-manipulation"
                 onClick={onClose}
               >
-                Keep Swiping
+                Keep Exploring
               </Button>
               <Button
                 className="flex-1 gap-2 h-12 min-h-[3rem] font-semibold touch-manipulation"

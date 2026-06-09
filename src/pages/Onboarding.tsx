@@ -1010,7 +1010,7 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 4: Identity & Dating Preferences */}
+          {/* STEP 4: Identity & Connection Preferences */}
           {step === "identity" && (
             <motion.div
               key="identity"
@@ -1029,7 +1029,7 @@ const Onboarding = () => {
                 >
                   <Heart className="w-8 h-8 text-primary" />
                 </motion.div>
-                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Identity & Dating</h1>
+                <h1 className="font-display text-2xl md:text-3xl font-bold bg-gradient-golden bg-clip-text text-transparent">Identity & Preferences</h1>
                 <p className="text-muted-foreground mt-2 max-w-md mx-auto text-sm md:text-base">
                   Tell us about yourself and who you're looking to connect with ✨
                 </p>
@@ -1090,7 +1090,7 @@ const Onboarding = () => {
                 />
               </motion.div>
 
-              {/* Dating Preferences */}
+              {/* Connection Preferences */}
               <motion.div {...staggerCard(0.25)} className="glass-card glow-border p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Heart className="w-5 h-5 text-primary" />

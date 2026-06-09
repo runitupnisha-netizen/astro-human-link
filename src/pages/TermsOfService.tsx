@@ -35,6 +35,7 @@ const TermsOfService = () => (
             <section>
               <h2 className="text-lg font-semibold text-foreground mb-2">4. Acceptable Use</h2>
               <p>You agree not to: harass, bully, or threaten other users; post illegal, harmful, or offensive content; use automated systems to access the platform; attempt to circumvent security measures; or engage in any activity that violates local, state, or federal laws.</p>
+              <p className="mt-2"><strong>Zero-tolerance policy for objectionable content and abusive behavior.</strong> Stellara has zero tolerance for objectionable user-generated content (including but not limited to harassment, hate speech, sexual content involving minors, threats, nudity, or content that is unlawful, deceptive, or abusive) and for abusive users. We review reports and act on violations — including removing content and banning accounts — within 24 hours. By using Stellara you agree to these standards and acknowledge that violations may result in immediate, permanent account termination without refund.</p>
             </section>
 
             <section>

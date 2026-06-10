@@ -12,8 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
  * in App Store Connect and Google Play Console.
  */
 export const RC_PRODUCT_IDS = {
-  monthly: "com.stellara.pro.monthly",
-  annual: "com.stellara.pro.annual",
+  monthly: "com.runitupmedia.stellara.premium.monthly",
+  annual: "com.runitupmedia.stellara.premium.annual",
 } as const;
 
 export type RcPlanKey = keyof typeof RC_PRODUCT_IDS;

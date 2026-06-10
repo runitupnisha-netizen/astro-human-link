@@ -37,7 +37,7 @@ const emptyStates = {
     icon: Star,
     title: "All Caught Up",
     description: "No new notifications. Check back soon — the universe has surprises in store!",
-    cta: "Go Discover",
+    cta: "Explore Connections",
     route: "/discover",
     gradient: "from-accent/20 via-primary/10 to-pink-500/20",
   },

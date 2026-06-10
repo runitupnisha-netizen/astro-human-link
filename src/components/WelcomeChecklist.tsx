@@ -106,9 +106,9 @@ const WelcomeChecklist = ({ onReplayTour }: Props) => {
       {
         id: "connect",
         label: "Make your first connection",
-        description: "Discover aligned souls and send your first like.",
+        description: "Find aligned souls and send your first like.",
         icon: Heart,
-        cta: "Open Discover",
+        cta: "Open Connect",
         done: hasMatch === true,
         action: () => navigate("/discover"),
       },

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,7 +23,6 @@ import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { completeAuthRedirectFromUrl } from "@/lib/authRedirect";
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -150,6 +149,18 @@ const FallbackRoute = () => {
 
   if (loading) return <LoadingScreen />;
   return user ? <NotFound /> : <Navigate to="/sign-in" replace />;
+};
+
+// Admin gate — requires an authenticated user AND an `admin` row in
+// user_roles. Falls back to the public NotFound for non-admins so the
+// /admin/* surface area is never enumerable.
+const AdminRoute = ({ children }: { children: ReactNode }) => {
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  if (authLoading || adminLoading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return <Suspense fallback={<LoadingScreen />}>{children}</Suspense>;
 };
 
 const AnalyticsTracker = () => {
@@ -330,13 +341,13 @@ const AppRoutes = () => {
             <Route path="/lyra" element={<PageTransition><ProtectedRoute skipVerificationCheck><ErrorBoundary><CosmicGuide /></ErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<Navigate to="/lyra" replace />} />
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
-            <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
-            <Route path="/admin/lyra" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/admin/lyra" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/admin/chart-parity" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
-            <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
-            <Route path="/admin/moderation" element={<Suspense fallback={<LoadingScreen />}><AdminModeration /></Suspense>} />
+            <Route path="/admin/sms-logs" element={<AdminRoute><AdminSmsLogs /></AdminRoute>} />
+            <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
             <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />

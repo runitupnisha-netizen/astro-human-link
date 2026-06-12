@@ -572,7 +572,7 @@ const CosmicGuide = () => {
           ))}
           {filteredConvos.length === 0 && (
             <p className="text-xs text-[#7a6a9a] px-2 py-4 text-center">
-              {historySearch ? "No matches." : "No conversations yet. Lyra is waiting."}
+              {historySearch ? "No results." : "No conversations yet. Lyra is waiting."}
             </p>
           )}
         </div>

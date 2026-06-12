@@ -1063,7 +1063,7 @@ const Onboarding = () => {
                 <textarea
                   value={aboutMe}
                   onChange={(e) => setAboutMe(e.target.value.slice(0, 500))}
-                  placeholder="Tell potential matches a little about yourself — what makes you, you?"
+                  placeholder="Tell potential connections a little about yourself — what makes you, you?"
                   rows={4}
                   className="flex w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                   maxLength={500}

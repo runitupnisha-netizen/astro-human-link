@@ -87,15 +87,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } }
     );
-    const { data: claims, error: claimsErr } = await supabaseAuth.auth.getClaims(
+    const { data: userData, error: userErr } = await supabaseAuth.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
-    if (claimsErr || !claims?.claims?.sub) {
+    if (userErr || !userData?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const rl = checkRateLimit(getIdentifier(req, claims.claims.sub), "lyra-insight", corsHeaders);
+    const rl = checkRateLimit(getIdentifier(req, userData.user.id), "lyra-insight", corsHeaders);
     if (rl) return rl;
 
     const { context, payload } = await req.json().catch(() => ({ context: "", payload: null }));

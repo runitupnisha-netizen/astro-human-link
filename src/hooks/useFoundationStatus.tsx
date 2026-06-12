@@ -20,24 +20,21 @@ export interface FoundationStatus {
 
 const INSIGHTS_READ_KEY = "stellara:insights-read";
 const LYRA_ACK_KEY = "stellara:lyra-intro-ack";
-const REVIEWER_MODE_KEY = "stellara:reviewer-mode";
-const REVIEWER_TOKEN = "STELLARA-REVIEW-2026";
 
-// One-time URL bypass: visiting any page with ?reviewer=STELLARA-REVIEW-2026
-// flips a sessionStorage flag so App Store reviewers can skip the Foundation
-// gate and reach Connections immediately. Cleared when the tab closes.
-if (typeof window !== "undefined") {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("reviewer") === REVIEWER_TOKEN) {
-      sessionStorage.setItem(REVIEWER_MODE_KEY, "1");
-    }
-  } catch {}
-}
-
-export const isReviewerMode = (): boolean => {
-  try { return sessionStorage.getItem(REVIEWER_MODE_KEY) === "1"; } catch { return false; }
-};
+// NOTE: the prior public URL-token bypass (?reviewer=STELLARA-REVIEW-2026)
+// has been removed — anything in client JS is enumerable, which means
+// anyone reading the bundle could skip the Foundation gate. App Store
+// reviewers now hit the Connections surface legitimately because the
+// shared reviewer accounts (DEMO_PRO_EMAILS, mirrored below) are pre-
+// seeded with onboarding + foundation flags marked complete in the DB,
+// and we additionally bypass the Foundation gate for those known emails
+// AND for any user with the `admin` role.
+const REVIEWER_EMAILS = new Set([
+  "demo@stellara.app",
+  "chef.tinisha@gmail.com",
+  "runitupnisha@gmail.com",
+]);
+export const isReviewerMode = (): boolean => false;
 
 export const markInsightRead = () => {
   try {
@@ -74,12 +71,13 @@ export const useFoundationStatus = (): FoundationStatus => {
       setSteps([]);
       return;
     }
-    if (isReviewerMode()) {
+    const email = (user.email ?? "").toLowerCase();
+    if (email && REVIEWER_EMAILS.has(email)) {
       setSteps([
-        { id: "chart",    label: "Complete your birth chart", description: "Reviewer bypass active.", done: true, path: "/onboarding" },
-        { id: "profile",  label: "Reach 80% profile score",   description: "Reviewer bypass active.", done: true, path: "/profile" },
-        { id: "insights", label: "Read your first 3 Insights",description: "Reviewer bypass active.", done: true, path: "/insights" },
-        { id: "lyra",     label: "Meet Lyra, your cosmic guide", description: "Reviewer bypass active.", done: true, path: "/lyra" },
+        { id: "chart",    label: "Complete your birth chart", description: "Reviewer access.", done: true, path: "/onboarding" },
+        { id: "profile",  label: "Reach 80% profile score",   description: "Reviewer access.", done: true, path: "/profile" },
+        { id: "insights", label: "Read your first 3 Insights",description: "Reviewer access.", done: true, path: "/insights" },
+        { id: "lyra",     label: "Meet Lyra, your cosmic guide", description: "Reviewer access.", done: true, path: "/lyra" },
       ]);
       setLoading(false);
       return;

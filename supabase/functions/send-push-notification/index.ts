@@ -36,8 +36,8 @@ Deno.serve(async (req) => {
       const userA = record.user_a;
       const userB = record.user_b;
       targetUserIds = [userA, userB];
-      title = "🎉 New Match!";
-      body = "You have a new cosmic connection! Start a conversation now.";
+      title = "✨ New Connection!";
+      body = "Your charts just aligned with someone new — say hello when you're ready.";
       url = "/connections";
     } else if (type === "new_message") {
       // Notify the recipient (not the sender)

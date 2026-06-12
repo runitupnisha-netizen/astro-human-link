@@ -118,7 +118,10 @@ function extractAppleOriginalTransactionId(result: unknown): string | null {
     (r as any)?.transaction?.transactionIdentifier,
     (r as any)?.transaction?.originalTransactionIdentifier,
     (r as any)?.transaction?.originalTransactionId,
-    (r as any)?.customerInfo?.originalAppUserId,
+    (r as any)?.customerInfo?.nonSubscriptionTransactions?.[0]?.transactionIdentifier,
+    // NOTE: do NOT fall back to customerInfo.originalAppUserId — that is the
+    // RevenueCat app-user identifier, NOT Apple's originalTransactionId.
+    // Sending it to /verify-apple-iap caused Apple's API to reject the lookup.
   ];
   for (const c of candidates) {
     if (typeof c === "string" && c.length > 0) return c;

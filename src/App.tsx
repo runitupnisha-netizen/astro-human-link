@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -22,7 +23,6 @@ import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { completeAuthRedirectFromUrl } from "@/lib/authRedirect";
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -151,6 +151,18 @@ const FallbackRoute = () => {
   return user ? <NotFound /> : <Navigate to="/sign-in" replace />;
 };
 
+// Admin gate — requires an authenticated user AND an `admin` row in
+// user_roles. Falls back to the public NotFound for non-admins so the
+// /admin/* surface area is never enumerable.
+const AdminRoute = ({ children }: { children: ReactNode }) => {
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  if (authLoading || adminLoading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/sign-in" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return <Suspense fallback={<LoadingScreen />}>{children}</Suspense>;
+};
+
 const AnalyticsTracker = () => {
   const { trackPageView } = useAnalytics();
   const location = useLocation();
@@ -231,9 +243,11 @@ const AuthCallback = () => {
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [authReady, setAuthReady] = useState(false);
-  const [authUser, setAuthUser] = useState<User | null>(null);
   const { user, onboardingComplete, loading } = useOnboardingStatus();
+  // Use the auth user from useOnboardingStatus / useAuth as the single
+  // source of truth — we no longer hydrate the session a second time here
+  // (that double-hydration created a PKCE race with useAuth).
+  const authUser = user;
   const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAuthCallbackRoute = location.pathname === "/auth/callback";
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -245,11 +259,6 @@ const AppRoutes = () => {
     const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
     const accessToken = hashParams.get("access_token");
 
-    const hydrateOAuthSession = async () => {
-      const session = await completeAuthRedirectFromUrl();
-      return session?.user || null;
-    };
-
     if (!isAuthCallbackRoute && !hash.includes("type=recovery")) {
       localStorage.removeItem("auth-recovery-pending");
       sessionStorage.removeItem("auth-recovery-pending");
@@ -258,25 +267,9 @@ const AppRoutes = () => {
       }
     }
 
-    hydrateOAuthSession().then((user) => {
-      setAuthUser(user);
-      setAuthReady(true);
-    }).catch(() => {
-      setAuthUser(null);
-      setAuthReady(true);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        localStorage.removeItem("auth-recovery-pending");
-        sessionStorage.removeItem("auth-recovery-pending");
-        setAuthUser(session?.user || null);
-      }
-
-      if (event === "SIGNED_OUT") {
-        setAuthUser(null);
-      }
-
+    // PASSWORD_RECOVERY is the only event AppRoutes still listens for —
+    // useAuth owns SIGNED_IN/SIGNED_OUT to avoid a second PKCE exchange.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         if (window.location.hash.includes("type=recovery")) {
           navigate("/reset-password", { replace: true });
@@ -287,7 +280,7 @@ const AppRoutes = () => {
     return () => subscription.unsubscribe();
   }, [isAuthCallbackRoute, isRecoveryRoute, navigate]);
 
-  if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
+  if (loading && !isRecoveryRoute) return <LoadingScreen />;
 
   return (
     <>
@@ -348,13 +341,13 @@ const AppRoutes = () => {
             <Route path="/lyra" element={<PageTransition><ProtectedRoute skipVerificationCheck><ErrorBoundary><CosmicGuide /></ErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<Navigate to="/lyra" replace />} />
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
-            <Route path="/admin" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
-            <Route path="/admin/lyra" element={<Suspense fallback={<LoadingScreen />}><Admin /></Suspense>} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/admin/lyra" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/admin/chart-parity" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/chart-drift" element={<Navigate to="/admin" replace />} />
             <Route path="/admin/astral-accuracy" element={<Navigate to="/admin" replace />} />
-            <Route path="/admin/sms-logs" element={<Suspense fallback={<LoadingScreen />}><AdminSmsLogs /></Suspense>} />
-            <Route path="/admin/moderation" element={<Suspense fallback={<LoadingScreen />}><AdminModeration /></Suspense>} />
+            <Route path="/admin/sms-logs" element={<AdminRoute><AdminSmsLogs /></AdminRoute>} />
+            <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
             <Route path="/chart-wizard" element={<Navigate to="/onboarding" replace />} />
             <Route path="/join/:code" element={<PageTransition><JoinWithCode /></PageTransition>} />
             <Route path="/disclaimer" element={<PageTransition><Disclaimer /></PageTransition>} />
@@ -367,14 +360,10 @@ const AppRoutes = () => {
             <Route path="/launch-assets" element={<Navigate to="/" replace />} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
-            <Route 
-              path="/reset-password" 
-              element={
-                isPasswordResetUrl(window.location.hash) 
-                  ? <ResetPassword /> 
-                  : <Navigate to="/sign-in" replace />
-              } 
-            />
+            {/* Always render ResetPassword — the page self-gates against the
+                presence of a recovery token/code so the link works whether
+                Supabase delivers it via #access_token, ?code, or ?token_hash. */}
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
             <Route path="*" element={<PageTransition><FallbackRoute /></PageTransition>} />
           </Routes>

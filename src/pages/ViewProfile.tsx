@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation, Music } from "lucide-react";
+import { ArrowLeft, Star, Sun, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,8 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import SpotifyNowPlaying from "@/components/SpotifyNowPlaying";
+import { useConnectionActions, type ConnectionAction } from "@/hooks/useConnectionActions";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 
 interface ProfileData {
   display_name: string | null;
@@ -58,6 +60,29 @@ const ViewProfile = () => {
   const [loading, setLoading] = useState(true);
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const { isVerified } = useVerificationStatus(userId);
+  const { isPremium, likesLeft, sendAction } = useConnectionActions();
+  const [actionLoading, setActionLoading] = useState<ConnectionAction | null>(null);
+  const [actionTaken, setActionTaken] = useState<ConnectionAction | null>(null);
+  const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellFeature, setUpsellFeature] = useState<"super_like" | "daily_likes">("super_like");
+  const isSelf = !!user && !!userId && user.id === userId;
+
+  const handleAction = async (action: ConnectionAction) => {
+    if (!userId || actionLoading || actionTaken) return;
+    setActionLoading(action);
+    const result = await sendAction(userId, action, {
+      onUpsell: (feature) => {
+        setUpsellFeature(feature);
+        setShowUpsell(true);
+      },
+    });
+    setActionLoading(null);
+    if (result.ok) {
+      setActionTaken(action);
+      // After a brief beat, return to the browse grid
+      setTimeout(() => navigate(-1), 700);
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -152,7 +177,7 @@ const ViewProfile = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-24">
+      <div className={`relative z-10 pt-20 ${isSelf ? "pb-24" : "pb-48"}`}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Back + Actions */}
           <div className="flex items-center justify-between mb-4">
@@ -351,6 +376,65 @@ const ViewProfile = () => {
           )}
         </div>
       </div>
+
+      {/* Connection action bar — shown only when viewing someone else's profile.
+          Replaces the old swipe-card drag verdict with explicit, accessible
+          buttons that map to the same backend actions (Send a Like / Not aligned /
+          Spotlight). Daily-limit & premium gating runs through useConnectionActions. */}
+      {!isSelf && userId && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 bg-background/85 backdrop-blur-md border-t border-border/40"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 76px)" }}
+        >
+          <div className="max-w-2xl mx-auto px-4 pt-3 pb-3">
+            {!isPremium && (
+              <p className="text-center text-[11px] text-muted-foreground mb-2">
+                {likesLeft} {likesLeft === 1 ? "like" : "likes"} left today
+              </p>
+            )}
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => handleAction("pass")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12 border-destructive/30 text-destructive hover:bg-destructive/10"
+              >
+                {actionLoading === "pass" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1.5" /> Not aligned</>}
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => handleAction("like")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12"
+                style={{ background: "var(--gradient-aurora)" }}
+              >
+                {actionLoading === "like" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Heart className="w-4 h-4 mr-1.5" /> Send a Like</>}
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => handleAction("super_like")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12 text-accent-foreground"
+                style={{ background: "var(--gradient-golden)" }}
+              >
+                {actionLoading === "super_like" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Star className="w-4 h-4 mr-1.5" /> Spotlight</>}
+              </Button>
+            </div>
+            {actionTaken && (
+              <p className="text-center text-xs text-accent mt-2">
+                Sent — returning to the feed…
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature={upsellFeature}
+      />
     </div>
   );
 };

@@ -50,7 +50,9 @@ const Discover = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("discover-profiles", { body: {} });
+      const { data, error } = await supabase.functions.invoke("discover-profiles", {
+        body: { advancedFilters: advancedFilters ?? null },
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const fetched = data.profiles || [];
@@ -61,7 +63,7 @@ const Discover = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, advancedFilters]);
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 

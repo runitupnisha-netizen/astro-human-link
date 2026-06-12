@@ -1292,7 +1292,6 @@ const Settings = () => {
                   setDeleteConfirm("");
                   toast.success("Deletion scheduled. You have 7 days to change your mind. 🌙");
                   await signOut();
-                  navigate("/sign-in");
                 } catch (err: any) {
                   toast.error(err.message || "Failed to delete account");
                 } finally {

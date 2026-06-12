@@ -132,9 +132,9 @@ const CosmicGuide = () => {
         const next = new URLSearchParams(searchParams);
         next.delete("seed");
         setSearchParams(next, { replace: true });
-        setInput(seed);
-        // Start a new session immediately
+        // Start a new session AND actually send the seed message so Lyra responds.
         await startNewSession(seed);
+        await send(seed);
       }
       setBootstrapped(true);
     })();

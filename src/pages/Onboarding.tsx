@@ -442,6 +442,7 @@ const Onboarding = () => {
       if (!session) {
         console.warn("[Onboarding] handleFinish: no session, aborting");
         toast.error("Session expired — please sign in again");
+        navigate("/sign-in", { replace: true });
         return;
       }
 

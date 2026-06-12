@@ -10,8 +10,8 @@ export type TextSize = "sm" | "md" | "lg" | "xl";
 const TEXT_SIZE_PX: Record<TextSize, number> = {
   sm: 14, // Small
   md: 16, // Medium (default browser size)
-  lg: 19, // Large
-  xl: 22, // Extra Large
+  lg: 18, // Large
+  xl: 20, // Extra Large — capped low so layouts don't break / trap the user.
 };
 
 export interface AccessibilityPrefs {
@@ -136,13 +136,20 @@ export const AccessibilityProvider = ({ children }: { children: ReactNode }) => 
   // device system scale so iOS Dynamic Type / Android font scale is honored.
   const effectiveBaseFontPx = useMemo(() => {
     const base = TEXT_SIZE_PX[prefs.textSize] ?? TEXT_SIZE_PX.md;
-    const scale = prefs.followSystemTextSize ? systemFontScale : 1;
-    // Clamp so a wildly large system scale can't break layouts.
-    const px = Math.max(12, Math.min(28, base * scale));
+    // Cap the system-scale contribution: iOS Dynamic Type can report >1.5x,
+    // which combined with XL would push the UI to 30px+ and trap users on
+    // small screens. Limit the system multiplier to 1.15x.
+    const rawScale = prefs.followSystemTextSize ? systemFontScale : 1;
+    const scale = Math.max(0.9, Math.min(1.15, rawScale));
+    // Hard clamp on the final px so layouts never break badly enough to
+    // hide the Text Size control itself.
+    const px = Math.max(13, Math.min(20, base * scale));
     return Math.round(px * 10) / 10;
   }, [prefs.textSize, prefs.followSystemTextSize, systemFontScale]);
 
-  // Apply classes to <html> so CSS in index.css can react globally.
+  // Apply classes + CSS vars to <html> so CSS in index.css can react globally.
+  // `--a11y-scale` exposes the active scale so navigation / the accessibility
+  // control itself can counter-scale and stay reachable at any text size.
   useEffect(() => {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
@@ -150,6 +157,7 @@ export const AccessibilityProvider = ({ children }: { children: ReactNode }) => 
     root.classList.toggle("reduce-motion", motionOn);
     root.classList.toggle("high-contrast", prefs.highContrast);
     root.style.fontSize = `${effectiveBaseFontPx}px`;
+    root.style.setProperty("--a11y-scale", String(effectiveBaseFontPx / 16));
     root.dataset.textSize = prefs.textSize;
   }, [prefs.reducedMotion, prefs.highContrast, systemReducedMotion, effectiveBaseFontPx, prefs.textSize]);
 

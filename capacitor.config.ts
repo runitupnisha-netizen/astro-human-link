@@ -9,15 +9,13 @@ const config: CapacitorConfig = {
   },
   ios: {
     scrollEnabled: true,
-    // WKWebView ignores user-scalable=yes by default — Apple disables pinch-zoom
-    // inside WKWebView regardless of the viewport meta. Setting this flag tells
-    // Capacitor to enable WKWebView's native zoom gesture so pinch-to-zoom works
-    // on device. Layout already respects the in-app Text Size control, so this
-    // is purely additive.
     webContentsDebuggingEnabled: false,
     limitsNavigationsToAppBoundDomains: false,
-    // @ts-expect-error — supported by @capacitor/ios runtime; types lag behind.
-    zoomEnabled: true,
+    // Note: Capacitor iOS has no public `zoomEnabled` option — the previous
+    // flag was a no-op. Enabling WKWebView pinch-zoom requires a native
+    // override (subclassing the WebView delegate in AppDelegate.swift), which
+    // we're deferring. The in-app Text Size control in Settings is the
+    // supported escape hatch for legibility.
   },
 };
 

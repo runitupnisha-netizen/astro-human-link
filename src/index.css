@@ -233,6 +233,7 @@
 
 :root {
   --keyboard-inset: 0px;
+  --a11y-scale: 1;
 }
 
 @keyframes pageEnter {
@@ -339,4 +340,15 @@ html.high-contrast .text-muted-foreground {
 html.high-contrast :focus-visible {
   outline: 2px solid hsl(var(--ring)) !important;
   outline-offset: 2px !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * a11y-fixed-size — counter-scales an element so it stays at the default
+ * size regardless of the user's Text Size choice. Applied to primary
+ * navigation (top bar, bottom tab bar) and to the Text Size control itself,
+ * so the user can ALWAYS reach the control to change it back. Uses CSS
+ * `zoom`, which is supported by WebKit (iOS WKWebView) and Blink.
+ * ------------------------------------------------------------------------- */
+.a11y-fixed-size {
+  zoom: calc(1 / var(--a11y-scale, 1));
 }

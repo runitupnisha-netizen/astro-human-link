@@ -114,7 +114,7 @@ const Navigation = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30 pt-[env(safe-area-inset-top,0px)]" role="navigation" aria-label="Main navigation">
+      <nav className="a11y-fixed-size fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/30 pt-[env(safe-area-inset-top,0px)]" role="navigation" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-3 md:px-5 lg:px-6">
           <div className="flex items-center justify-between h-14 gap-2">
             <Link to="/" className="flex items-center gap-2.5 group shrink-0">
@@ -313,7 +313,7 @@ const Navigation = () => {
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30" role="navigation" aria-label="Bottom navigation" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+      <nav className="a11y-fixed-size md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/30" role="navigation" aria-label="Bottom navigation" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <div className="grid grid-cols-4 h-[72px] px-1 pb-[env(safe-area-inset-bottom,0px)]">
           {bottomTabs.map((item) => {
             const Icon = item.icon;

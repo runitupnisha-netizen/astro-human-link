@@ -110,6 +110,11 @@ const ProtectedRoute = ({ children, allowDuringOnboarding = false, skipVerificat
 
   if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/sign-in" replace />;
+  // Treat an indeterminate (null) onboarding value as still-loading rather
+  // than rendering the protected child. Without this, a transient profile
+  // read could flash the child UI for one frame before the guard decided
+  // to redirect — the exact bounce reported on /profile and /connections.
+  if (!allowDuringOnboarding && onboardingComplete === null) return <LoadingScreen />;
   if (!allowDuringOnboarding && onboardingComplete === false) return <Navigate to="/onboarding" replace />;
   // Photo/selfie verification is OPTIONAL — never a hard gate. Users can verify
   // voluntarily from Profile/Settings to earn a verified badge.

@@ -384,7 +384,7 @@ const Connections = () => {
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0 ? (
                 <>
-                  You have {matches.length} cosmic {matches.length > 1 ? "matches" : "match"} aligned with your energy.{" "}
+                  You have {matches.length} cosmic {matches.length > 1 ? "connections" : "connection"} aligned with your energy.{" "}
                   <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">{t("connections.discover_more")}</button>
                 </>
               ) : (

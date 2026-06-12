@@ -361,7 +361,7 @@ const Connections = () => {
             >
               <WifiOff className="w-3.5 h-3.5" />
               <span>
-                Offline · Showing your saved matches
+                Offline · Showing your saved connections
                 {cacheTimestamp ? ` from ${formatTime(cacheTimestamp)}` : ""}
               </span>
             </motion.div>

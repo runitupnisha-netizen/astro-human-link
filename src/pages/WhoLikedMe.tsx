@@ -64,7 +64,7 @@ const WhoLikedMe = () => {
             <span className="text-sm font-medium text-primary">Who's Interested</span>
           </div>
           <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-            {count > 0 ? `${count} ${count !== 1 ? "people are" : "person is"} interested in you` : "Interested connections will show up here"}
+            {count > 0 ? `${count} ${count !== 1 ? "people are" : "person is"} aligned with you` : "Aligned souls will show up here"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {count > 0 ? (
@@ -94,7 +94,7 @@ const WhoLikedMe = () => {
             <div className="w-20 h-20 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
               <Heart className="w-10 h-10 text-muted-foreground/50" />
             </div>
-            <p className="text-muted-foreground">No interested connections yet</p>
+              <p className="text-muted-foreground">No aligned souls yet</p>
             <p className="text-sm text-muted-foreground/60 mt-1">
               They'll appear here as others{" "}
               <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">discover your profile</button>

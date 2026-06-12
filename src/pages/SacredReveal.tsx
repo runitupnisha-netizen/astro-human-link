@@ -233,8 +233,8 @@ const SacredReveal = () => {
                     transition={{ delay: 0.5 }}
                     className="relative z-10 mt-6 text-center"
                   >
-                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Someone's Waiting for You</h3>
-                    <p className="text-muted-foreground text-sm font-serif">Your daily curated match is ready to reveal</p>
+                    <h3 className="font-display text-xl font-bold text-foreground mb-2">Someone's Aligned With You Today</h3>
+                    <p className="text-muted-foreground text-sm font-serif">Your daily cosmic alignment is ready to reveal</p>
                   </motion.div>
                 </div>
 
@@ -245,7 +245,7 @@ const SacredReveal = () => {
                     style={{ background: "var(--gradient-golden)" }}
                   >
                     <Eye className="w-5 h-5 mr-2" />
-                    Reveal Your Match
+                    Reveal Today's Alignment
                   </Button>
                 </div>
               </CardContent>

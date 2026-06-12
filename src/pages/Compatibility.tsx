@@ -370,7 +370,7 @@ const Compatibility = () => {
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                   <div className="text-muted-foreground">You</div>
                   <div className="text-accent font-semibold">Aspect</div>
-                  <div className="text-muted-foreground">Match</div>
+                  <div className="text-muted-foreground">Them</div>
                   
                   <div className="font-medium text-foreground">☉ {profiles.mine.sun_sign}</div>
                   <div className="text-accent">Sun</div>

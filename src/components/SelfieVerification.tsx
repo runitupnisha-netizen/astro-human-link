@@ -257,7 +257,7 @@ const SelfieVerification = () => {
               </div>
               <p className="text-foreground font-semibold">You're verified!</p>
               <p className="text-sm text-muted-foreground text-center">
-                Your trust badge is now visible on your profile, discover cards, and messages.
+                Your trust badge is now visible on your profile, connection cards, and messages.
               </p>
             </motion.div>
           ) : status === "pending" ? (

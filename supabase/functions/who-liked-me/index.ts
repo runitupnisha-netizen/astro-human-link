@@ -40,6 +40,44 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
+    // ─── Server-side premium check ──────────────────────────────
+    // Free users get ONLY the count + opaque placeholder cards —
+    // names, avatars, signs, etc. NEVER leave the function for free
+    // accounts. (Previously we returned full data and only CSS-blurred
+    // it client-side, which leaked private profile data via DevTools.)
+    const DEMO_PRO_EMAILS = new Set([
+      "demo@stellara.app",
+      "chef.tinisha@gmail.com",
+      "runitupnisha@gmail.com",
+    ]);
+    let isPremium = false;
+    if (user.email && DEMO_PRO_EMAILS.has(user.email.toLowerCase())) {
+      isPremium = true;
+    }
+    if (!isPremium) {
+      const { data: adminRow } = await adminClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (adminRow) isPremium = true;
+    }
+    if (!isPremium) {
+      const { data: iapActive } = await adminClient.rpc("has_active_iap", { _user_id: user.id });
+      if (iapActive === true) isPremium = true;
+    }
+    if (!isPremium) {
+      const { data: profileBonus } = await adminClient
+        .from("profiles")
+        .select("bonus_pro_until")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (profileBonus?.bonus_pro_until && new Date(profileBonus.bonus_pro_until as string) > new Date()) {
+        isPremium = true;
+      }
+    }
+
     // Get users who liked/super_liked the current user
     const { data: likers, error: swipeError } = await adminClient
       .from('swipes')
@@ -79,7 +117,26 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get profiles for unswiped likers
+    if (!isPremium) {
+      // Return opaque placeholder cards — count + action only.
+      const result = likers
+        .filter(l => !alreadySwiped.has(l.user_id))
+        .map((l, i) => ({
+          user_id: `obscured-${i}`,
+          display_name: null,
+          avatar_url: null,
+          sun_sign: null,
+          human_design_type: null,
+          life_path_number: null,
+          action: l.action,
+          liked_at: l.created_at,
+        }));
+      return new Response(JSON.stringify({ likers: result, count: result.length, premium: false }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Premium → full data
     const { data: profiles } = await adminClient
       .from('profiles')
       .select('user_id, display_name, avatar_url, sun_sign, human_design_type, life_path_number')
@@ -103,7 +160,7 @@ Deno.serve(async (req) => {
         };
       });
 
-    return new Response(JSON.stringify({ likers: result, count: result.length }), {
+    return new Response(JSON.stringify({ likers: result, count: result.length, premium: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

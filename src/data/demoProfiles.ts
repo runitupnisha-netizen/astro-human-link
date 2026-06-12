@@ -1,4 +1,4 @@
-import type { DiscoverProfile } from "@/components/SwipeCard";
+import type { DiscoverProfile } from "@/types/discoverProfile";
 
 export const demoProfiles: DiscoverProfile[] = [
   {

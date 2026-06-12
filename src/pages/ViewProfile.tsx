@@ -376,6 +376,65 @@ const ViewProfile = () => {
           )}
         </div>
       </div>
+
+      {/* Connection action bar — shown only when viewing someone else's profile.
+          Replaces the old swipe-card drag verdict with explicit, accessible
+          buttons that map to the same backend actions (Send a Like / Not aligned /
+          Spotlight). Daily-limit & premium gating runs through useConnectionActions. */}
+      {!isSelf && userId && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 bg-background/85 backdrop-blur-md border-t border-border/40"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 76px)" }}
+        >
+          <div className="max-w-2xl mx-auto px-4 pt-3 pb-3">
+            {!isPremium && (
+              <p className="text-center text-[11px] text-muted-foreground mb-2">
+                {likesLeft} {likesLeft === 1 ? "like" : "likes"} left today
+              </p>
+            )}
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => handleAction("pass")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12 border-destructive/30 text-destructive hover:bg-destructive/10"
+              >
+                {actionLoading === "pass" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1.5" /> Not aligned</>}
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => handleAction("like")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12"
+                style={{ background: "var(--gradient-aurora)" }}
+              >
+                {actionLoading === "like" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Heart className="w-4 h-4 mr-1.5" /> Send a Like</>}
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => handleAction("super_like")}
+                disabled={!!actionLoading || !!actionTaken}
+                className="h-12 text-accent-foreground"
+                style={{ background: "var(--gradient-golden)" }}
+              >
+                {actionLoading === "super_like" ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Star className="w-4 h-4 mr-1.5" /> Spotlight</>}
+              </Button>
+            </div>
+            {actionTaken && (
+              <p className="text-center text-xs text-accent mt-2">
+                Sent — returning to the feed…
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <PremiumUpsellModal
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        feature={upsellFeature}
+      />
     </div>
   );
 };

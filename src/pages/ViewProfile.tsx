@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Sun, Moon, Sunrise, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation, Music } from "lucide-react";
+import { ArrowLeft, Star, Sun, Dna, Hash, Heart, Sparkles, User, MapPin, Navigation, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,8 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import { useVerificationStatus } from "@/hooks/useVerification";
 import { sanitizeDisplayName } from "@/lib/utils";
 import SpotifyNowPlaying from "@/components/SpotifyNowPlaying";
+import { useConnectionActions, type ConnectionAction } from "@/hooks/useConnectionActions";
+import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 
 interface ProfileData {
   display_name: string | null;
@@ -58,6 +60,29 @@ const ViewProfile = () => {
   const [loading, setLoading] = useState(true);
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
   const { isVerified } = useVerificationStatus(userId);
+  const { isPremium, likesLeft, sendAction } = useConnectionActions();
+  const [actionLoading, setActionLoading] = useState<ConnectionAction | null>(null);
+  const [actionTaken, setActionTaken] = useState<ConnectionAction | null>(null);
+  const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellFeature, setUpsellFeature] = useState<"super_like" | "daily_likes">("super_like");
+  const isSelf = !!user && !!userId && user.id === userId;
+
+  const handleAction = async (action: ConnectionAction) => {
+    if (!userId || actionLoading || actionTaken) return;
+    setActionLoading(action);
+    const result = await sendAction(userId, action, {
+      onUpsell: (feature) => {
+        setUpsellFeature(feature);
+        setShowUpsell(true);
+      },
+    });
+    setActionLoading(null);
+    if (result.ok) {
+      setActionTaken(action);
+      // After a brief beat, return to the browse grid
+      setTimeout(() => navigate(-1), 700);
+    }
+  };
 
   useEffect(() => {
     if (!userId) return;

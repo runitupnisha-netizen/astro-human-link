@@ -177,7 +177,7 @@ const ViewProfile = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <CosmicBackground />
-      <div className="relative z-10 pt-20 pb-24">
+      <div className={`relative z-10 pt-20 ${isSelf ? "pb-24" : "pb-48"}`}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Back + Actions */}
           <div className="flex items-center justify-between mb-4">

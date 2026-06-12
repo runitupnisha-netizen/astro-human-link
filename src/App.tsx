@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { useAuth } from "@/hooks/useAuth";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import Navigation from "./components/Navigation";
 import PageTransition from "./components/PageTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -231,9 +232,11 @@ const AuthCallback = () => {
 const AppRoutes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [authReady, setAuthReady] = useState(false);
-  const [authUser, setAuthUser] = useState<User | null>(null);
   const { user, onboardingComplete, loading } = useOnboardingStatus();
+  // Use the auth user from useOnboardingStatus / useAuth as the single
+  // source of truth — we no longer hydrate the session a second time here
+  // (that double-hydration created a PKCE race with useAuth).
+  const authUser = user;
   const isRecoveryRoute = location.pathname === "/reset-password" && isPasswordResetUrl(location.hash);
   const isAuthCallbackRoute = location.pathname === "/auth/callback";
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -245,11 +248,6 @@ const AppRoutes = () => {
     const hashParams = new URLSearchParams(hash.replace(/^#/, ""));
     const accessToken = hashParams.get("access_token");
 
-    const hydrateOAuthSession = async () => {
-      const session = await completeAuthRedirectFromUrl();
-      return session?.user || null;
-    };
-
     if (!isAuthCallbackRoute && !hash.includes("type=recovery")) {
       localStorage.removeItem("auth-recovery-pending");
       sessionStorage.removeItem("auth-recovery-pending");
@@ -258,25 +256,9 @@ const AppRoutes = () => {
       }
     }
 
-    hydrateOAuthSession().then((user) => {
-      setAuthUser(user);
-      setAuthReady(true);
-    }).catch(() => {
-      setAuthUser(null);
-      setAuthReady(true);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        localStorage.removeItem("auth-recovery-pending");
-        sessionStorage.removeItem("auth-recovery-pending");
-        setAuthUser(session?.user || null);
-      }
-
-      if (event === "SIGNED_OUT") {
-        setAuthUser(null);
-      }
-
+    // PASSWORD_RECOVERY is the only event AppRoutes still listens for —
+    // useAuth owns SIGNED_IN/SIGNED_OUT to avoid a second PKCE exchange.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         if (window.location.hash.includes("type=recovery")) {
           navigate("/reset-password", { replace: true });
@@ -287,7 +269,7 @@ const AppRoutes = () => {
     return () => subscription.unsubscribe();
   }, [isAuthCallbackRoute, isRecoveryRoute, navigate]);
 
-  if (!authReady || (loading && !isRecoveryRoute)) return <LoadingScreen />;
+  if (loading && !isRecoveryRoute) return <LoadingScreen />;
 
   return (
     <>
@@ -367,14 +349,10 @@ const AppRoutes = () => {
             <Route path="/launch-assets" element={<Navigate to="/" replace />} />
             <Route path="/sms-consent" element={<PageTransition><SmsConsent /></PageTransition>} />
             <Route path="/callback/spotify" element={<PageTransition><ProtectedRoute><SpotifyCallback /></ProtectedRoute></PageTransition>} />
-            <Route 
-              path="/reset-password" 
-              element={
-                isPasswordResetUrl(window.location.hash) 
-                  ? <ResetPassword /> 
-                  : <Navigate to="/sign-in" replace />
-              } 
-            />
+            {/* Always render ResetPassword — the page self-gates against the
+                presence of a recovery token/code so the link works whether
+                Supabase delivers it via #access_token, ?code, or ?token_hash. */}
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/unsubscribe" element={<PageTransition><Unsubscribe /></PageTransition>} />
             <Route path="*" element={<PageTransition><FallbackRoute /></PageTransition>} />
           </Routes>

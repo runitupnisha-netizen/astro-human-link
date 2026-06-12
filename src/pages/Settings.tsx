@@ -115,6 +115,7 @@ const AccessibilityCard = () => {
     setHighContrast,
     setTextSize,
     setFollowSystemTextSize,
+    reset,
   } = useAccessibility();
 
   const sizes: { value: "sm" | "md" | "lg" | "xl"; label: string; sample: string }[] = [
@@ -126,7 +127,7 @@ const AccessibilityCard = () => {
   const systemScalePct = Math.round((systemFontScale - 1) * 100);
 
   return (
-    <Card className="bg-card/80 backdrop-blur-sm border-border/50 glow-border">
+    <Card className="a11y-fixed-size bg-card/80 backdrop-blur-sm border-border/50 glow-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Accessibility className="w-5 h-5 text-primary" />
@@ -135,9 +136,19 @@ const AccessibilityCard = () => {
       </CardHeader>
       <CardContent className="space-y-5">
         <div>
-          <span className="font-medium">Text size</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-medium">Text size</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => reset()}
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+            >
+              Reset to default
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground mt-0.5 mb-3">
-            Scales every text size in the app. You can also pinch-to-zoom on any screen for a quick boost.
+            Scales every text size in the app. Navigation and this control stay at their normal size so you can always get back here.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {sizes.map((s) => (

@@ -788,7 +788,7 @@ const Messages = () => {
                   <MessageCircle className="w-10 h-10 text-foreground" />
                 </div>
               </div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-2">No matches yet</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground mb-2">No connections yet</h2>
               <p className="text-muted-foreground max-w-md font-serif mb-5">
                 Once you and someone both like each other, your conversation lands here.
               </p>
@@ -798,7 +798,7 @@ const Messages = () => {
                 style={{ background: "var(--gradient-aurora)" }}
               >
                 <Sparkles className="w-4 h-4" />
-                Start Discovering
+                Explore Connections
               </Button>
             </motion.div>
           ) : (

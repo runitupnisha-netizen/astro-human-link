@@ -1021,7 +1021,7 @@ const Settings = () => {
                     </span>
                     <p className="text-sm text-muted-foreground">
                       {profile?.is_paused
-                        ? "Your profile is hidden from discovery"
+                  ? "Your profile is hidden from the feed"
                         : "Temporarily hide your profile from others"}
                     </p>
                   </div>
@@ -1030,7 +1030,7 @@ const Settings = () => {
                     onCheckedChange={async (checked) => {
                       setProfile({ ...profile, is_paused: checked });
                       await supabase.from("profiles").update({ is_paused: checked }).eq("user_id", user!.id);
-                      toast.success(checked ? "Profile paused — you're hidden from discovery 🌙" : "Profile unpaused — you're back in the cosmos ✨");
+                      toast.success(checked ? "Profile paused — you're hidden from the feed 🌙" : "Profile unpaused — you're back in the cosmos ✨");
                     }}
                   />
                 </div>
@@ -1044,7 +1044,7 @@ const Settings = () => {
                       <Shield className="w-4 h-4" /> Incognito Mode
                     </span>
                     <p className="text-sm text-muted-foreground">
-                      {profile?.is_incognito ? "You're invisible in discovery" : "Browse without appearing in others' stacks"}
+                      {profile?.is_incognito ? "You're invisible in the feed" : "Browse without appearing in others' stacks"}
                     </p>
                   </div>
                   <Switch

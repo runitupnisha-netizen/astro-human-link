@@ -167,7 +167,7 @@ const PremiumRequiredScreen = ({
       badge: { label: "Premium required", icon: Lock },
       title: `${featureLabel} are a Premium Ritual`,
       description:
-        "Connect heart-to-heart with your matches through secure, end-to-end calls. Unlock with Stellara Premium and meet the soul behind the stars.",
+        "Connect heart-to-heart with your connections through secure, end-to-end calls. Unlock with Stellara Premium and meet the soul behind the stars.",
       upgradeLabel: "Upgrade to Premium",
     },
     expired: {
@@ -189,7 +189,7 @@ const PremiumRequiredScreen = ({
       badge: { label: "Sign in required", icon: Lock },
       title: "Sign in to start a call",
       description:
-        "Your session expired. Sign back in to verify your Premium status and reconnect with your match.",
+        "Your session expired. Sign back in to verify your Premium status and reconnect.",
       upgradeLabel: "Go to Premium",
     },
     unavailable: {
@@ -304,7 +304,7 @@ const PremiumRequiredScreen = ({
         <ul className="text-left space-y-2 mb-7 mx-auto max-w-[280px]">
           {[
             "Unlimited private voice & video calls",
-            "Priority match visibility & boosts",
+            "Priority visibility & boosts in the feed",
             "Full Synastry & compatibility insights",
           ].map((b) => (
             <li

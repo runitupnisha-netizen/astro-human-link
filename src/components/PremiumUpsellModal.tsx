@@ -49,7 +49,7 @@ const featureContent: Record<FeatureKey, { title: string; description: string; i
   },
   boost: {
     title: "Profile Amplify",
-    description: "Appear at the top of discovery for 30 minutes — get seen by more people",
+    description: "Appear at the top of the feed for 30 minutes — get seen by more people",
     icon: <Rocket className="w-6 h-6" />,
   },
   incognito: {

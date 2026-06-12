@@ -16,7 +16,7 @@ const COSMIC_PROMPTS = [
   "Venus is trine your chart — love energy is amplified. Don't hold back!",
   "Today's cosmic weather favors meaningful conversation. Send that first message.",
   "The stars align for new connections today. Who's been on your mind?",
-  "A Grand Trine forms today — harmonious energy for deepening bonds. Message your match!",
+  "A Grand Trine forms today — harmonious energy for deepening bonds. Reach out to a connection!",
   "Neptune softens hearts today — romance is in the air. Say something sweet.",
   "Jupiter expands your social circle today — be open to new conversations.",
 ];
@@ -59,7 +59,7 @@ const CosmicNudge = ({ className = "" }: CosmicNudgeProps) => {
       const name = profile?.display_name;
       if (name && name.includes("@")) return; // Skip email names
 
-      setMatchName(name || "your match");
+      setMatchName(name || "your connection");
       setMatchId(match.id);
       setNudgeText(COSMIC_PROMPTS[Math.floor(Math.random() * COSMIC_PROMPTS.length)]);
 

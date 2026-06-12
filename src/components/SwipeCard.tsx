@@ -86,7 +86,7 @@ const cleanText = (v: string | null | undefined): string | null =>
 
 const DEFAULT_PROMPT = "A little about me";
 const BIO_PLACEHOLDER = "This soul hasn't shared their story yet — open the full profile to learn more.";
-const NO_INFO_PLACEHOLDER = "New profile · still discovering their cosmic blueprint ✨";
+const NO_INFO_PLACEHOLDER = "New profile · still revealing their cosmic blueprint ✨";
 
 const SWIPE_THRESHOLD = 100;
 

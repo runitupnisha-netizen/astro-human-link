@@ -294,7 +294,7 @@ const Compatibility = () => {
               </motion.div>
               <div className="text-center">
                 <ProfileAvatar profile={profiles.theirs} size="w-20 h-20" />
-                <p className="text-xs text-muted-foreground mt-2 font-medium">{profiles.theirs.display_name || "Match"}</p>
+                <p className="text-xs text-muted-foreground mt-2 font-medium">{profiles.theirs.display_name || "Connection"}</p>
               </div>
             </div>
 

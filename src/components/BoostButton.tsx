@@ -32,7 +32,7 @@ const BoostButton = ({ isPremium, boostUntil, onBoostActivated, onUpsell }: Boos
       const { error } = await supabase.from("profiles").update({ boost_until: until }).eq("user_id", user.id);
       if (error) throw error;
       onBoostActivated(until);
-      toast({ title: "✦ Amplify Activated!", description: "You'll appear at the top of discovery for 30 minutes" });
+      toast({ title: "✦ Amplify Activated!", description: "You'll appear at the top of the feed for 30 minutes" });
     } catch (e: any) {
       toast({ title: "Amplify failed", description: e.message, variant: "destructive" });
     } finally {

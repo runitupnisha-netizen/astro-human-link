@@ -218,7 +218,7 @@ const Connections = () => {
         created_at: m.created_at,
         otherUserId: otherId,
         otherProfile: prof || {
-          display_name: "New Match",
+          display_name: "New Connection",
           username: null,
           sun_sign: null,
           moon_sign: null,
@@ -303,11 +303,11 @@ const Connections = () => {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return "Amazing Match";
-    if (score >= 80) return "Great Match";
-    if (score >= 70) return "Strong Match";
-    if (score >= 60) return "Good Match";
-    return "New Match";
+    if (score >= 90) return "Amazing Connection";
+    if (score >= 80) return "Great Connection";
+    if (score >= 70) return "Strong Connection";
+    if (score >= 60) return "Good Connection";
+    return "New Connection";
   };
 
   if (foundation.loading) {
@@ -384,7 +384,7 @@ const Connections = () => {
             <p className="text-muted-foreground max-w-lg mx-auto">
               {matches.length > 0 ? (
                 <>
-                  You have {matches.length} cosmic {matches.length > 1 ? "matches" : "match"} aligned with your energy.{" "}
+                  You have {matches.length} cosmic {matches.length > 1 ? "connections" : "connection"} aligned with your energy.{" "}
                   <button onClick={() => navigate("/")} className="text-primary hover:underline underline-offset-2 transition-colors">{t("connections.discover_more")}</button>
                 </>
               ) : (
@@ -422,7 +422,7 @@ const Connections = () => {
                       minWidth: "150px",
                       maxWidth: "190px",
                     }}
-                    aria-label={`Rerun cosmic check for ${c.their_name || "previous match"}`}
+                    aria-label={`Rerun cosmic check for ${c.their_name || "previous connection"}`}
                   >
                     <div className="flex items-center justify-between w-full gap-2">
                       <span
@@ -525,7 +525,7 @@ const Connections = () => {
                               className="text-lg font-semibold text-foreground truncate cursor-pointer hover:text-primary transition-colors"
                               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${match.otherUserId}`); }}
                             >
-                              {sanitizeConnectionName(match.otherProfile.display_name) || (match.otherProfile.username ? `@${match.otherProfile.username}` : "New Match")}
+                              {sanitizeConnectionName(match.otherProfile.display_name) || (match.otherProfile.username ? `@${match.otherProfile.username}` : "New Connection")}
                             </h3>
                             {verifiedUsers.has(match.otherUserId) && <VerifiedBadge size="sm" />}
                           </div>

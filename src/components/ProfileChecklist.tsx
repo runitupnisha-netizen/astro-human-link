@@ -52,13 +52,13 @@ const ProfileChecklist = ({ profile, photoCount }: ProfileChecklistProps) => {
     {
       label: "Set your lifestyle preferences",
       done: !!(profile.kids_preference && profile.drinking && profile.smoking),
-      tip: "Helps match you with compatible people.",
+      tip: "Helps align you with compatible people.",
       scrollTarget: "[data-section='lifestyle']",
     },
     {
       label: "Choose your interests",
       done: !!(profile.interests && profile.interests.length >= 3),
-      tip: "Pick 3+ interests for better discovery.",
+      tip: "Pick 3+ interests for better alignment.",
       scrollTarget: "[data-section='interests']",
     },
   ];

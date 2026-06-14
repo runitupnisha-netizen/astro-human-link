@@ -612,7 +612,7 @@ const Premium = () => {
           transition={{ delay: 0.7 }}
           className="text-center text-xs text-muted-foreground font-body pt-4 px-4 leading-relaxed"
         >
-          🔒 Secure checkout via {STORE_LABEL} · Cancel anytime · No hidden fees
+          🔒 Secure checkout · Cancel anytime · No hidden fees
         </motion.p>
 
         {/* Restore Purchase */}
@@ -671,7 +671,7 @@ const Premium = () => {
               {restoreState.status === "checking" ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Checking with {STORE_LABEL}…
+                  Checking…
                 </>
               ) : (
                 <>

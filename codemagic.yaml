@@ -10,6 +10,11 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.runitupmedia.stellara
       node: 22.0.0
+      vars:
+        # RevenueCat iOS public SDK key. This is a publishable client key
+        # (safe to ship in the app bundle) consumed by Vite at build time
+        # via import.meta.env.VITE_REVENUECAT_IOS_KEY in src/lib/revenuecat.ts.
+        VITE_REVENUECAT_IOS_KEY: "appl_aUqQJpyfpgxzzSJcVFyxGCEZEBJ"
     scripts:
       - name: Install dependencies
         script: npm install

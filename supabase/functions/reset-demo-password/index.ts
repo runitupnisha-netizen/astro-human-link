@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const NEW_PASSWORD = "StellaraReview2026!";
-const DEMO_EMAIL = "demo@stellara.app";
+const DEMO_USER_ID = "ae068da1-aa01-4e3f-bddd-6cc76b307660";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -19,20 +19,12 @@ serve(async (req) => {
   );
 
   try {
-    const { data: existing } = await admin.auth.admin.listUsers();
-    const found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL);
-    if (!found) {
-      return new Response(JSON.stringify({ error: "Demo user not found" }), {
-        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    await admin.auth.admin.updateUserById(found.id, {
+    await admin.auth.admin.updateUserById(DEMO_USER_ID, {
       password: NEW_PASSWORD,
       email_confirm: true,
     });
 
-    return new Response(JSON.stringify({ ok: true, email: DEMO_EMAIL, password: NEW_PASSWORD }), {
+    return new Response(JSON.stringify({ ok: true, email: "demo@stellara.app", password: NEW_PASSWORD }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200,
     });
   } catch (e) {

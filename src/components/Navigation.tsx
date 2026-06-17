@@ -238,7 +238,7 @@ const Navigation = () => {
                       <span>Ask Lyra</span>
                     </Link>
                     <Link
-                      to="/inner-world"
+                      to="/profile"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground hover:bg-muted/30 transition-colors"
                     >

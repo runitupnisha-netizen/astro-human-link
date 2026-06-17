@@ -271,7 +271,7 @@ const TOUR_STEPS: TourStep[] = [
     iconWrapClass: "bg-indigo-400/15 text-indigo-300 border-indigo-400/30",
     title: "My Cosmos",
     body: "Your private sanctuary: daily briefings, reflections, weekly cosmic insights, the astro calendar & alignment journal.",
-    cta: { label: "Visit My Cosmos", path: "/inner-world", highlight: "inner-world-first-tool" },
+    cta: { label: "Visit My Cosmos", path: "/profile", highlight: "inner-world-first-tool" },
   },
   {
     icon: Crown,

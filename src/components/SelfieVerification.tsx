@@ -33,7 +33,11 @@ const TIPS: { icon: typeof Sun; label: string; ok: boolean }[] = [
   { icon: Glasses, label: "Remove sunglasses", ok: false },
 ];
 
-const SelfieVerification = () => {
+interface SelfieVerificationProps {
+  redirectOnVerified?: boolean;
+}
+
+const SelfieVerification = ({ redirectOnVerified = false }: SelfieVerificationProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -64,8 +68,10 @@ const SelfieVerification = () => {
       if (data) {
         const s = data.status === "approved" || data.status === "verified" ? "verified" : data.status === "pending" || data.status === "rejected" ? data.status as VerificationStatus : "none";
         setStatus(s);
-        // If already verified, redirect to app
-        if (s === "verified") {
+        // Only the dedicated /verify gate should redirect once a user is
+        // verified. Profile embeds this component inline; redirecting there
+        // caused the Profile page to flash and bounce back to Today on mount.
+        if (s === "verified" && redirectOnVerified) {
           navigate("/", { replace: true });
           return;
         }
@@ -73,7 +79,7 @@ const SelfieVerification = () => {
       setLoading(false);
     };
     check();
-  }, [user, navigate]);
+  }, [user, navigate, redirectOnVerified]);
 
   const stopCamera = useCallback(() => {
     const video = videoRef.current;
@@ -206,15 +212,16 @@ const SelfieVerification = () => {
       setCapturedImage(null);
       markSessionVerified();
       toast({ title: "You're verified ✨", description: "Your trust badge is now active." });
-      // Redirect to main app after a brief moment
-      setTimeout(() => navigate("/", { replace: true }), 1500);
+      if (redirectOnVerified) {
+        setTimeout(() => navigate("/", { replace: true }), 1500);
+      }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Please try again.";
       toast({ title: "Verification failed", description: message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
-  }, [capturedImage, navigate, user, toast]);
+  }, [capturedImage, navigate, redirectOnVerified, user, toast]);
 
   if (loading) {
     return (

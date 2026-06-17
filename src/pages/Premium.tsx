@@ -10,6 +10,7 @@ import { usePremium, STELLARA_TIERS, TierKey } from "@/hooks/usePremium";
 import { useToast } from "@/hooks/use-toast";
 import TourHighlight from "@/components/TourHighlight";
 import { Capacitor } from "@capacitor/core";
+import BackButton from "@/components/BackButton";
 
 const IS_IOS_NATIVE = Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios";
 const IS_ANDROID_NATIVE = Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
@@ -310,6 +311,9 @@ const Premium = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );

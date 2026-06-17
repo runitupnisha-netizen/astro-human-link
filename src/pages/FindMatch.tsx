@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
+import BackButton from "@/components/BackButton";
 
 type Signs = { sun: string | null; moon: string | null; rising: string | null };
 type Result = {
@@ -143,6 +144,9 @@ const FindMatch = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/discover" />
+      </div>
       <CosmicBackground />
       <div className="relative z-10 max-w-2xl mx-auto px-4 pt-24 pb-32 md:pt-32">
         <button

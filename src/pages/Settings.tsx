@@ -24,6 +24,7 @@ import { useAccessibility } from "@/hooks/useAccessibility";
 import { usePremium } from "@/hooks/usePremium";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
+import BackButton from "@/components/BackButton";
 
 const APP_VERSION = "1.0.0";
 
@@ -471,6 +472,9 @@ const Settings = () => {
   if (loadingProfile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );

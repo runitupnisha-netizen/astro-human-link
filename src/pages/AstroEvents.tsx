@@ -5,6 +5,7 @@ import { useAstroEvents, AstroEvent } from "@/hooks/useAstroEvents";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import BackButton from "@/components/BackButton";
 
 const typeColors: Record<string, string> = {
   retrograde: "bg-destructive/15 border-destructive/30 text-destructive",
@@ -73,6 +74,9 @@ const AstroEvents = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <CosmicBackground />
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-8">
         <div className="text-center mb-6">

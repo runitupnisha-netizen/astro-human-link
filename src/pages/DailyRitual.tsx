@@ -9,6 +9,7 @@ import { getDailyTarotCard } from "@/data/tarotDeck";
 import PushPermissionPrimer from "@/components/PushPermissionPrimer";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
+import BackButton from "@/components/BackButton";
   PUSH_PRIMER_RESOLVED_KEY,
   PUSH_PRIMER_DISMISS_COUNT_KEY,
   PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY,
@@ -196,6 +197,9 @@ const DailyRitual = () => {
 
   return (
     <div className="min-h-[100svh] relative overflow-hidden flex flex-col" style={{ backgroundColor: BG }}>
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/growth" />
+      </div>
       {/* Wash + stars */}
       <div
         className="pointer-events-none absolute inset-0"

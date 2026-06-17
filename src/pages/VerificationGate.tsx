@@ -34,7 +34,7 @@ const VerificationGate = () => {
           </p>
         </motion.div>
 
-        <SelfieVerification />
+        <SelfieVerification redirectOnVerified />
 
         <div className="text-center mt-6">
           <Button

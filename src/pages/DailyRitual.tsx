@@ -9,11 +9,11 @@ import { getDailyTarotCard } from "@/data/tarotDeck";
 import PushPermissionPrimer from "@/components/PushPermissionPrimer";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
-import BackButton from "@/components/BackButton";
   PUSH_PRIMER_RESOLVED_KEY,
   PUSH_PRIMER_DISMISS_COUNT_KEY,
   PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY,
 } from "@/lib/notificationCopy";
+import BackButton from "@/components/BackButton";
 
 const BG = "#0c0b13";
 const CARD_BG = "rgba(77, 58, 92, 0.35)";

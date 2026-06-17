@@ -25,6 +25,7 @@ const MoonCycle = () => {
   const [saving, setSaving] = useState(false);
   const [entries, setEntries] = useState<MoonEntry[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
   const [hoveredPhase, setHoveredPhase] = useState<string | null>(null);
   const [profile, setProfile] = useState<{ sun_sign: string | null; moon_sign: string | null } | null>(null);
 
@@ -290,7 +291,8 @@ const MoonCycle = () => {
                 No moon entries yet. Your first intention or release will appear here.
               </p>
             ) : (
-              entries.map((e) => (
+              <>
+              {entries.slice(0, visibleCount).map((e) => (
                 <div
                   key={e.id}
                   className="rounded-xl p-4"
@@ -314,7 +316,25 @@ const MoonCycle = () => {
                     {e.content}
                   </p>
                 </div>
-              ))
+              ))}
+              {visibleCount < entries.length && (
+                <button
+                  onClick={() => setVisibleCount((c) => c + 5)}
+                  className="block mx-auto mt-2 text-sm py-2 min-h-[44px]"
+                  style={{ color: "#9b84c8", fontFamily: "Poppins, sans-serif" }}
+                >
+                  View more ({entries.length - visibleCount} remaining) →
+                </button>
+              )}
+              {visibleCount >= entries.length && entries.length > 5 && (
+                <p
+                  className="text-center text-[11px] pt-2"
+                  style={{ color: "#7a6a9a", fontFamily: "Poppins, sans-serif" }}
+                >
+                  You've reached the beginning of your moon journal.
+                </p>
+              )}
+              </>
             )}
           </section>
         )}

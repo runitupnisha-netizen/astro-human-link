@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Compass, ArrowRight } from "lucide-react";
+import { Sparkles, Wand2, Compass, ArrowRight, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -103,6 +103,35 @@ const Today = () => {
               </p>
             </div>
           </motion.section>
+
+          {/* Daily Briefing — featured CTA */}
+          <motion.button
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.04 }}
+            onClick={() => navigate("/briefing")}
+            className="group text-left rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/10 via-card/70 to-primary/5 backdrop-blur-md p-5 hover:border-amber-400/60 transition-all active:scale-[0.99]"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0">
+                <Sun className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-base font-semibold text-foreground">
+                    Your Daily Briefing
+                  </h2>
+                  <span className="text-[9px] uppercase tracking-[0.15em] text-amber-400 font-semibold">
+                    Today
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Open your full cosmic reading — transits, focus areas, and a reflection prompt for today.
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform mt-1" />
+            </div>
+          </motion.button>
 
           {/* Ask Lyra */}
           <motion.button

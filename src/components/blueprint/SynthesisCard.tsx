@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
-import { Sparkles, Crown, RefreshCw, Bookmark, Wand2, Loader2 } from "lucide-react";
+import { Sparkles, Crown, RefreshCw, Bookmark, Wand2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
@@ -57,6 +57,17 @@ const SynthesisCard = () => {
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const COLLAPSE_THRESHOLD = 600;
+  const isLong = content.length > COLLAPSE_THRESHOLD;
+  const visibleContent = useMemo(() => {
+    if (!isLong || expanded) return content;
+    // Truncate at a paragraph boundary if possible.
+    const slice = content.slice(0, COLLAPSE_THRESHOLD);
+    const lastBreak = slice.lastIndexOf("\n\n");
+    return (lastBreak > 200 ? slice.slice(0, lastBreak) : slice) + "…";
+  }, [content, expanded, isLong]);
 
   // Load profile + (if premium) cached synthesis
   useEffect(() => {
@@ -211,9 +222,28 @@ const SynthesisCard = () => {
           Lyra is reading your full chart…
         </div>
       ) : content ? (
-        <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-3">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
+        <>
+          <div className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed text-foreground/90 [&_strong]:text-foreground [&_p]:mb-3">
+            <ReactMarkdown>{visibleContent}</ReactMarkdown>
+          </div>
+          {isLong && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+            >
+              {expanded ? (
+                <>
+                  Show less <ChevronUp className="w-3 h-3" />
+                </>
+              ) : (
+                <>
+                  Read more <ChevronDown className="w-3 h-3" />
+                </>
+              )}
+            </button>
+          )}
+        </>
       ) : (
         <p className="text-sm text-muted-foreground py-4">No reading yet. Tap refresh.</p>
       )}

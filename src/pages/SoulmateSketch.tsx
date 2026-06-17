@@ -5,6 +5,7 @@ import { ArrowLeft, Share2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremium } from "@/hooks/usePremium";
+import BackButton from "@/components/BackButton";
 
 const BG = "#0c0b13";
 const TITLE = "#e0d4ff";
@@ -192,6 +193,9 @@ const SoulmateSketch = () => {
 
   return (
     <div className="min-h-[100svh] relative overflow-hidden" style={{ backgroundColor: BG }}>
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/profile" />
+      </div>
       {/* Star field */}
       <div className="pointer-events-none absolute inset-0">
         {STARS.map((s, i) => (

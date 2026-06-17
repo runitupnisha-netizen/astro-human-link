@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import PremiumUpsellModal from "@/components/PremiumUpsellModal";
 import { useNavigate } from "react-router-dom";
 import CosmicBackground from "@/components/CosmicBackground";
+import BackButton from "@/components/BackButton";
 
 interface Liker {
   user_id: string;
@@ -51,6 +52,9 @@ const WhoLikedMe = () => {
 
   return (
     <div className="min-h-screen bg-background pt-20 pb-8 px-4">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/connections" />
+      </div>
       <CosmicBackground />
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}

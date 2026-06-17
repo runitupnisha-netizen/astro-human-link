@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
 import { ReflectionsTimeline } from "@/components/ReflectionsTimeline";
 import { useOfflineReflections } from "@/hooks/useOfflineReflections";
+import BackButton from "@/components/BackButton";
 
 // Decode a `data:` URL to a Blob without going through `fetch()`. Works
 // fully offline and avoids any service-worker interception path.
@@ -390,6 +391,9 @@ const DailyBriefing = () => {
 
   return (
     <div className="min-h-screen bg-background pt-20 md:pt-24 pb-24 px-4">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <div className="max-w-2xl mx-auto">
         <motion.header
           initial={{ y: -10, opacity: 0 }}

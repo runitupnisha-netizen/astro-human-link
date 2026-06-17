@@ -13,6 +13,7 @@ import {
   PUSH_PRIMER_DISMISS_COUNT_KEY,
   PUSH_PRIMER_RITUALS_SINCE_DISMISS_KEY,
 } from "@/lib/notificationCopy";
+import BackButton from "@/components/BackButton";
 
 const BG = "#0c0b13";
 const CARD_BG = "rgba(77, 58, 92, 0.35)";
@@ -196,6 +197,9 @@ const DailyRitual = () => {
 
   return (
     <div className="min-h-[100svh] relative overflow-hidden flex flex-col" style={{ backgroundColor: BG }}>
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/growth" />
+      </div>
       {/* Wash + stars */}
       <div
         className="pointer-events-none absolute inset-0"

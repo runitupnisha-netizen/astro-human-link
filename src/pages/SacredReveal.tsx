@@ -10,6 +10,7 @@ import { Sparkles, Star, Heart, User, Loader2, Eye, MessageCircle, Zap } from "l
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import SparkleLoader from "@/components/SparkleLoader";
+import BackButton from "@/components/BackButton";
 
 interface RevealProfile {
   user_id: string;
@@ -142,6 +143,9 @@ const SacredReveal = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <CosmicBackground />
       {/* pb-24 reserves space for the fixed mobile bottom tab bar. */}
       <div className="relative z-10 pt-20 pb-24 md:pb-12 flex flex-col items-center">

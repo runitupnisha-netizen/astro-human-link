@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Star, Zap, Hash, ArrowRight } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SynthesisCard from "@/components/blueprint/SynthesisCard";
+import BackButton from "@/components/BackButton";
 
 const SECTIONS = [
   {
@@ -38,6 +39,9 @@ const Blueprint = () => {
   const navigate = useNavigate();
   return (
     <div className="min-h-[100svh] relative">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/profile" />
+      </div>
       <CosmicBackground />
       <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto">

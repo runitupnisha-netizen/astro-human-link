@@ -11,6 +11,7 @@ import { Heart, Send, Sparkles, BookOpen, Flame, Leaf, Star, User, Loader2, Tras
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { getDisplayIdentity } from "@/lib/utils";
+import BackButton from "@/components/BackButton";
 
 const CATEGORIES = [
   { value: "reflection", label: "Reflection", icon: BookOpen, color: "bg-primary/15 text-primary border-primary/30" },
@@ -176,6 +177,9 @@ const AlignmentFeed = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <CosmicBackground />
       {/* pb-24 reserves space for the fixed mobile bottom tab bar; pb-12 on
           desktop where the tab bar isn't shown. */}

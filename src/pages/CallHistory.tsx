@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import CosmicBackground from "@/components/CosmicBackground";
 import CallScreen from "@/components/CallScreen";
 import { sanitizeDisplayName } from "@/lib/utils";
+import BackButton from "@/components/BackButton";
 
 type Direction = "incoming" | "outgoing" | "missed";
 
@@ -135,6 +136,9 @@ const CallHistory = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <CosmicBackground />
       <div className="relative z-10 pt-20 pb-24 lg:pb-8">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">

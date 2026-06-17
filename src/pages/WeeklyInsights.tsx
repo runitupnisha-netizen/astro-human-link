@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Moon, Sun, Zap, Flame, Droplets, Wind, Mountain, Heart, TrendingUp, Calendar, RefreshCw, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { markInsightRead } from "@/hooks/useFoundationStatus";
 import BackButton from "@/components/BackButton";
@@ -49,6 +50,7 @@ const WeeklyInsights = () => {
   const [loading, setLoading] = useState(true);
   const [aiInsights, setAiInsights] = useState<AIInsights | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     if (!user) return;
@@ -298,6 +300,55 @@ const WeeklyInsights = () => {
                               </span>
                             </div>
                             <p className="text-sm text-foreground/80 font-serif leading-relaxed">{day.intention}</p>
+                            {expandedDays[i] && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                className="mt-3 pt-3 border-t border-border/30 space-y-2"
+                              >
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  <span className="font-semibold text-foreground/80">Tone:</span>{" "}
+                                  {day.energy === "high"
+                                    ? "Your battery runs full today. Initiate the bold thing — the cosmos is wind at your back."
+                                    : day.energy === "medium"
+                                    ? "Steady, even pacing. Choose one meaningful action and let smaller things wait."
+                                    : "Slow current. Conserve, listen, restore. Rest is productive today."}
+                                </p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  <span className="font-semibold text-foreground/80">Practice:</span>{" "}
+                                  {day.energy === "high"
+                                    ? "Move your body before noon. Make the call you've been putting off."
+                                    : day.energy === "medium"
+                                    ? "A 10-minute reset between tasks. Hydrate, walk, breathe."
+                                    : "Permission to take it easy. Journal, nap, or read — no output required."}
+                                </p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  <span className="font-semibold text-foreground/80">Watch for:</span>{" "}
+                                  {day.energy === "high"
+                                    ? "Burning out by overcommitting. Pick one main thing, not five."
+                                    : day.energy === "medium"
+                                    ? "Drifting on autopilot. Stay present with the small choices."
+                                    : "Pushing through when your body is asking you to pause."}
+                                </p>
+                              </motion.div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedDays((prev) => ({ ...prev, [i]: !prev[i] }))
+                              }
+                              className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:text-accent/80 transition-colors"
+                            >
+                              {expandedDays[i] ? (
+                                <>
+                                  Show less <ChevronUp className="w-3 h-3" />
+                                </>
+                              ) : (
+                                <>
+                                  View more <ChevronDown className="w-3 h-3" />
+                                </>
+                              )}
+                            </button>
                           </motion.div>
                         ) : null
                       ))}

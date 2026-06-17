@@ -5,6 +5,7 @@ import { useAchievements, Achievement } from "@/hooks/useAchievements";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/useTranslation";
+import BackButton from "@/components/BackButton";
 
 const AchievementCard = ({ achievement }: { achievement: Achievement }) => {
   const progressPct = (achievement.progress / achievement.target) * 100;
@@ -57,6 +58,9 @@ const Achievements = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/profile" />
+      </div>
       <CosmicBackground />
       <div className="relative z-10 max-w-lg mx-auto px-4 pt-8">
         <div className="text-center mb-6">

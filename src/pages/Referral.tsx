@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ReferralShareCard from "@/components/ReferralShareCard";
+import BackButton from "@/components/BackButton";
 
 type CodeRow = {
   code: string;
@@ -95,6 +96,9 @@ const Referral = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0c0b13" }}>
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/profile" />
+      </div>
         <Loader2 className="w-7 h-7 animate-spin" style={{ color: "#d0b4f7" }} />
       </div>
     );

@@ -632,7 +632,7 @@ const Profile = () => {
                     variant="outline"
                     size="sm"
                     className="border-border/60 hover:bg-muted/30"
-                    onClick={() => navigate("/profile")}
+                    onClick={() => navigate("/blueprint")}
                   >
                     Full results
                   </Button>

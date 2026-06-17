@@ -8,6 +8,7 @@ import { usePremium } from "@/hooks/usePremium";
 import LyraStrip from "@/components/lyra/LyraStrip";
 import TransitAlertCard from "@/components/TransitAlertCard";
 import TransitTimeline from "@/components/TransitTimeline";
+import BackButton from "@/components/BackButton";
 
 /** Background colour spec from Prompt 2: dark cosmic #0c0b13. */
 const BG = "#0c0b13";
@@ -74,6 +75,9 @@ const Growth = () => {
 
   return (
     <div className="min-h-[100svh] relative overflow-hidden" style={{ backgroundColor: BG }}>
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/profile" />
+      </div>
       {/* Radial wash */}
       <div
         className="pointer-events-none absolute inset-0"

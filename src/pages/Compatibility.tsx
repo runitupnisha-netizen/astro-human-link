@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import BackButton from "@/components/BackButton";
 
 interface AnalysisProfile {
   display_name: string | null;
@@ -232,6 +233,9 @@ const Compatibility = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background relative">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/connections" />
+      </div>
         <CosmicBackground />
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen gap-6">
           <SparkleLoader size={48} label="Mapping your synastry..." />

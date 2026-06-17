@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import CosmicBackground from "@/components/CosmicBackground";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 
 const sections = [
   {
@@ -63,6 +64,9 @@ const sections = [
 const SafetyCenter = () => {
   return (
     <div className="min-h-screen bg-background pt-20 pb-24 px-4">
+      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
+        <BackButton fallback="/" />
+      </div>
       <CosmicBackground />
       <div className="max-w-2xl mx-auto relative z-10 space-y-6">
         {/* Header */}

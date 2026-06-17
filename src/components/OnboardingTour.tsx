@@ -22,7 +22,7 @@ export const TOUR_HIGHLIGHT_PARAM = "tour";
 const LYRA_DEMO_PROMPTS = [
   "What's my chart saying today?",
   "How do I trust my Human Design strategy?",
-  "Send me a small love affirmation",
+  "Send me a grounding affirmation",
 ];
 
 const LYRA_DEMO_REPLIES: Record<string, string> = {
@@ -30,8 +30,8 @@ const LYRA_DEMO_REPLIES: Record<string, string> = {
     "Your chart is humming softly today — Venus is asking you to receive, not chase. Open one door and let beauty walk in. ✨",
   "How do I trust my Human Design strategy?":
     "Strategy is your body whispering yes or wait. Trust the small clues — a breath, a pull, a hesitation. Your design is already wise. 🌙",
-  "Send me a small love affirmation":
-    "You are not behind. The love that's meant for you moves at the speed of your becoming — and you are right on time. 💗",
+  "Send me a grounding affirmation":
+    "You are not behind. Your becoming unfolds at exactly the pace your soul needs — and you are right on time. 🌿",
 };
 
 const LYRA_DEFAULT_REPLY =
@@ -221,7 +221,7 @@ const TOUR_STEPS: TourStep[] = [
     icon: ShieldCheck,
     iconWrapClass: "bg-primary/15 text-primary border-primary/30",
     title: "Welcome to Stellara ✨",
-    body: "You're now part of a community where love aligns with the stars. Let's take a quick tour of what makes Stellara special.",
+    body: "You're now part of a community for understanding yourself through astrology, Human Design and numerology. Let's take a quick tour of what makes Stellara special.",
     hint: "Takes ~30 seconds",
   },
   {
@@ -235,14 +235,14 @@ const TOUR_STEPS: TourStep[] = [
     icon: Sparkles,
     iconWrapClass: "bg-green-400/15 text-green-400 border-green-400/30",
     title: "Connect · explore with intention",
-    body: "Browse aligned profiles curated by your cosmic compatibility. Right to like, left to pass, up to spotlight.",
+    body: "Browse a curated grid of cosmically aligned souls. Tap any profile to view their full blueprint, then choose Send a Like, Not aligned, or Spotlight — no swiping, no guesswork.",
     cta: { label: "Open Connect", path: "/discover", highlight: "swipe-deck" },
   },
   {
     icon: Wand2,
     iconWrapClass: "bg-violet-500/15 text-violet-300 border-violet-400/30",
     title: "Meet Lyra · your AI cosmic guide",
-    body: "Lyra is your personal cosmic confidante. Ask her about your chart, a connection, your week, or anything weighing on your heart — she knows you.",
+    body: "Lyra is your personal cosmic confidante. Ask her about your chart, your patterns, your week, or anything weighing on your heart — she knows you.",
     cta: { label: "Message Lyra", path: "/lyra", highlight: "lyra-input" },
   },
   {
@@ -256,7 +256,7 @@ const TOUR_STEPS: TourStep[] = [
     icon: Heart,
     iconWrapClass: "bg-pink-500/15 text-pink-300 border-pink-400/30",
     title: "Connections & Sacred Reveal",
-    body: "Mutual likes appear in Connections (unlocked once your Self-Knowledge Foundation is complete). Each day, one curated soul is unveiled to you in the Sacred Reveal — slow alignment, the cosmic way.",
+    body: "Once your Self-Knowledge Foundation is complete, Connections opens — a quiet space for compatibility-led conversations. Each day, one cosmically aligned profile is gently surfaced in the Sacred Reveal.",
     cta: { label: "View Connections", path: "/connections", highlight: "connections-list" },
   },
   {
@@ -277,7 +277,7 @@ const TOUR_STEPS: TourStep[] = [
     icon: Crown,
     iconWrapClass: "text-background border-amber-300/40 [background:var(--gradient-golden)]",
     title: "Stellara Premium (optional)",
-    body: "Unlock unlimited likes, see who's interested in you, profile amplify, incognito mode and full synastry deep-dives whenever you're ready.",
+    body: "Go deeper into self-discovery: unlock your full Blueprint, unlimited Lyra conversations, cross-science synthesis readings and advanced compatibility deep-dives whenever you're ready.",
     cta: { label: "Explore Premium", path: "/premium", highlight: "premium-tiers" },
   },
   {

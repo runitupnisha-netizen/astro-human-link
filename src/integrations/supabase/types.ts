@@ -1662,6 +1662,39 @@ export type Database = {
         }
         Relationships: []
       }
+      time_travel_moments: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          moment_date: string
+          narrative_excerpt: string | null
+          reflection: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          moment_date: string
+          narrative_excerpt?: string | null
+          reflection?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          moment_date?: string
+          narrative_excerpt?: string | null
+          reflection?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

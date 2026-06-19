@@ -76,6 +76,7 @@ const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 const CallHistory = lazy(() => import("./pages/CallHistory"));
+const TimeTravel = lazy(() => import("./pages/TimeTravel"));
 
 const queryClient = new QueryClient();
 
@@ -341,6 +342,7 @@ const AppRoutes = () => {
             <Route path="/lyra" element={<PageTransition><ProtectedRoute skipVerificationCheck><ErrorBoundary><CosmicGuide /></ErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/guide" element={<Navigate to="/lyra" replace />} />
             <Route path="/check-connection" element={<PageTransition><ProtectedRoute><CheckConnection /></ProtectedRoute></PageTransition>} />
+            <Route path="/time-travel" element={<PageTransition><ProtectedRoute><TimeTravel /></ProtectedRoute></PageTransition>} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/admin/lyra" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="/admin/chart-parity" element={<Navigate to="/admin" replace />} />

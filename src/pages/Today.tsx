@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Compass, ArrowRight, Sun } from "lucide-react";
+import { Sparkles, Wand2, Compass, ArrowRight, Sun, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -181,6 +181,31 @@ const Today = () => {
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   Pick up where you left off in your Blueprint.
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform mt-1" />
+            </div>
+          </motion.button>
+
+          {/* Time Travel */}
+          <motion.button
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            onClick={() => navigate("/time-travel")}
+            className="group text-left rounded-2xl border border-amber-400/30 bg-card/70 backdrop-blur-md p-5 hover:border-amber-400/60 transition-all active:scale-[0.99]"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-display text-base font-semibold text-foreground">Time Travel</h2>
+                  <span className="text-[9px] uppercase tracking-[0.15em] text-amber-400 font-semibold">Premium</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Read what the sky was doing on any date of your life. First 3 readings are free.
                 </p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform mt-1" />

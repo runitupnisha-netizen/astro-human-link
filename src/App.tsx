@@ -76,6 +76,7 @@ const AdminSmsLogs = lazy(() => import("./pages/AdminSmsLogs"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const JoinWithCode = lazy(() => import("./pages/JoinWithCode"));
 const CallHistory = lazy(() => import("./pages/CallHistory"));
+const TimeTravel = lazy(() => import("./pages/TimeTravel"));
 
 const queryClient = new QueryClient();
 

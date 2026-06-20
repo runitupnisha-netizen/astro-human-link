@@ -480,6 +480,33 @@ const TimeTravel = () => {
           )}
         </div>
       </div>
+
+      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Name this moment</DialogTitle>
+            <DialogDescription>
+              Give this reading a short label so you can find it later (optional).
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            autoFocus
+            value={saveLabel}
+            onChange={(e) => setSaveLabel(e.target.value)}
+            placeholder="e.g. The summer everything shifted"
+            maxLength={80}
+            onKeyDown={(e) => { if (e.key === "Enter") confirmSaveMoment(); }}
+          />
+          <DialogFooter className="gap-2">
+            <Button variant="ghost" onClick={() => setSaveOpen(false)} disabled={saving}>
+              Cancel
+            </Button>
+            <Button onClick={confirmSaveMoment} disabled={saving}>
+              {saving ? "Saving…" : "Save moment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

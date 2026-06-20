@@ -5,7 +5,7 @@ import {
   User as UserIcon,
   Sparkles,
   Wand2,
-  Heart,
+  Users,
   MessageCircle,
   Moon,
   Crown,
@@ -236,7 +236,7 @@ const TOUR_STEPS: TourStep[] = [
     iconWrapClass: "bg-green-400/15 text-green-400 border-green-400/30",
     title: "Connect · explore with intention",
     body: "Browse a curated grid of cosmically aligned souls. Tap any profile to view their full blueprint, then choose Send a Like, Not aligned, or Spotlight — no swiping, no guesswork.",
-    cta: { label: "Open Connect", path: "/discover", highlight: "swipe-deck" },
+    cta: { label: "Open Connect", path: "/discover", highlight: "connect-grid" },
   },
   {
     icon: Wand2,
@@ -253,8 +253,8 @@ const TOUR_STEPS: TourStep[] = [
     lyraDemo: true,
   },
   {
-    icon: Heart,
-    iconWrapClass: "bg-pink-500/15 text-pink-300 border-pink-400/30",
+    icon: Users,
+    iconWrapClass: "bg-accent/15 text-accent border-accent/30",
     title: "Connections & Sacred Reveal",
     body: "Once your Self-Knowledge Foundation is complete, Connections opens — a quiet space for compatibility-led conversations. Each day, one cosmically aligned profile is gently surfaced in the Sacred Reveal.",
     cta: { label: "View Connections", path: "/connections", highlight: "connections-list" },

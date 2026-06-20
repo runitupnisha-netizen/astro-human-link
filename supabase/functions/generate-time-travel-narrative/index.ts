@@ -7,6 +7,9 @@
 // so re-visiting the same date is free.
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit } from "../_shared/rate-limiter.ts";
+
+const FREE_USE_LIMIT = 3;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -94,6 +97,10 @@ Deno.serve(async (req) => {
     }
     const userId = userData.user.id;
 
+    // Rate limit (per user) — 3 / 5 min
+    const rl = checkRateLimit(userId, "generate-time-travel-narrative", corsHeaders);
+    if (rl) return rl;
+
     const body = (await req.json().catch(() => null)) as Body | null;
     if (!body || !body.date || !body.natal || !body.transiting) {
       return new Response(JSON.stringify({ error: "Missing date / chart data" }), {
@@ -115,6 +122,70 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ narrative: cached.content, cached: true }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Server-side free-use gate. Premium bypasses entirely.
+    // Count distinct cached time-travel dates the user has already generated.
+    // If they're at the limit and this date isn't already cached (checked above),
+    // reject with 402 unless they're a Premium subscriber.
+    let isPremium = false;
+    try {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("bonus_pro_until")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const bonusActive =
+        !!prof?.bonus_pro_until && new Date(prof.bonus_pro_until as string) > new Date();
+
+      let iapActive = false;
+      try {
+        const { data: iapRow } = await supabase.rpc("has_active_iap", { _user_id: userId });
+        iapActive = !!iapRow;
+      } catch (_e) { /* function may be unavailable in some envs */ }
+
+      // Stripe subscription status (best-effort): check profiles.subscribed if present.
+      let stripeActive = false;
+      try {
+        const { data: subRow } = await supabase
+          .from("profiles")
+          .select("subscribed")
+          .eq("user_id", userId)
+          .maybeSingle();
+        // @ts-ignore — column may not exist in all schemas
+        stripeActive = !!(subRow?.subscribed);
+      } catch (_e) { /* ignore */ }
+
+      // Admin role bypass
+      let isAdmin = false;
+      try {
+        const { data: adminRow } = await supabase.rpc("has_role", {
+          _user_id: userId, _role: "admin",
+        });
+        isAdmin = !!adminRow;
+      } catch (_e) { /* ignore */ }
+
+      isPremium = bonusActive || iapActive || stripeActive || isAdmin;
+    } catch (e) {
+      console.warn("[time-travel] premium check failed, defaulting to non-premium", e);
+    }
+
+    if (!isPremium) {
+      const { data: usedRows } = await supabase
+        .from("blueprint_ai_cache")
+        .select("section_key")
+        .eq("user_id", userId)
+        .like("section_key", "time-travel:%");
+      const distinctDates = new Set((usedRows ?? []).map((r: any) => r.section_key));
+      if (distinctDates.size >= FREE_USE_LIMIT) {
+        return new Response(JSON.stringify({
+          error: "You've used your 3 free time-travel readings. Unlock unlimited with Premium.",
+          code: "FREE_LIMIT_REACHED",
+        }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");

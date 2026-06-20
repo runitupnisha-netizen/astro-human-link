@@ -18,6 +18,7 @@ const DEFAULT_LIMITS: Record<string, RateLimitConfig> = {
   "soulmate-sketch": { maxRequests: 5, windowMs: 300_000 },
   "generate-icebreaker": { maxRequests: 10, windowMs: 60_000 },
   "generate-weekly-insights": { maxRequests: 5, windowMs: 300_000 },
+  "generate-time-travel-narrative": { maxRequests: 3, windowMs: 300_000 },
   "analyze-compatibility": { maxRequests: 10, windowMs: 60_000 },
   "who-liked-me": { maxRequests: 15, windowMs: 60_000 },
   "push-vapid-key": { maxRequests: 10, windowMs: 60_000 },

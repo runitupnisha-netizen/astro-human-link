@@ -209,7 +209,7 @@ const Discover = () => {
 
         {/* Browse grid */}
         <TourHighlight
-          targetId="connection-grid"
+          targetId="connect-grid"
           label="Connection grid"
           className="relative w-full max-w-2xl mx-auto px-3"
         >

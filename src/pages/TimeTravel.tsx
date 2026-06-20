@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CosmicBackground from "@/components/CosmicBackground";
 import BackButton from "@/components/BackButton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   buildBirthDateUTC,
   planetLongitudes,
@@ -79,6 +82,9 @@ const TimeTravel = () => {
   const [narrative, setNarrative] = useState<string | null>(null);
   const [narrativeLoading, setNarrativeLoading] = useState(false);
   const [freeUses, setFreeUses] = useState<string[]>(() => readFreeUses());
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [saveLabel, setSaveLabel] = useState("");
+  const [saving, setSaving] = useState(false);
 
   /* ---------------- Load profile + saved moments ---------------- */
   useEffect(() => {
@@ -223,22 +229,30 @@ const TimeTravel = () => {
   /* ---------------- Bookmark this moment ---------------- */
   const saveMoment = async () => {
     if (!user || !narrative) return;
-    const label = window.prompt("Name this moment (optional):", "") ?? "";
+    setSaveLabel("");
+    setSaveOpen(true);
+  };
+
+  const confirmSaveMoment = async () => {
+    if (!user || !narrative) return;
+    setSaving(true);
     const { data, error } = await supabase
       .from("time_travel_moments")
       .insert({
         user_id: user.id,
         moment_date: selectedDate,
-        label: label.trim() || null,
+        label: saveLabel.trim() || null,
         narrative_excerpt: narrative.slice(0, 280),
       })
       .select("id, moment_date, label, reflection, narrative_excerpt")
       .single();
+    setSaving(false);
     if (error) {
       toast.error("Couldn't save.");
       return;
     }
     setMoments([data as Moment, ...moments]);
+    setSaveOpen(false);
     toast.success("Moment saved ✦");
   };
 
@@ -283,18 +297,18 @@ const TimeTravel = () => {
 
   return (
     <div className="min-h-[100svh] relative">
-      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
-        <BackButton fallback="/blueprint" />
-      </div>
       <CosmicBackground />
       <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto flex flex-col gap-6">
+          <BackButton fallback="/blueprint" />
           {/* Header */}
           <header>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-400" />
               <p className="text-[11px] uppercase tracking-[0.2em] text-amber-400 font-semibold">
-                Time Travel · Premium
+                {!subscribed && freeRemaining > 0
+                  ? `Time Travel · ${freeRemaining} free reading${freeRemaining === 1 ? "" : "s"}`
+                  : "Time Travel · Premium"}
               </p>
             </div>
             <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent mt-1">

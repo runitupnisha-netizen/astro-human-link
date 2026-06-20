@@ -56,6 +56,8 @@ const LyraStrip = ({ context, contextKey, payload, fallback, size = "sm", classN
 
   if (!text) return null;
 
+  const isLong = text.length > 200;
+
   return (
     <motion.p
       initial={{ opacity: 0 }}
@@ -67,9 +69,29 @@ const LyraStrip = ({ context, contextKey, payload, fallback, size = "sm", classN
       <Sparkles className="w-3 h-3 shrink-0 mt-[2px] opacity-80" />
       <span>
         <span className="opacity-80">Lyra: </span>
-        {text}
+        {isLong ? <LyraInline text={text} /> : text}
       </span>
     </motion.p>
+  );
+};
+
+/** Inline expand/collapse for long Lyra messages so they don't truncate mid-sentence. */
+const LyraInline = ({ text }: { text: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const cut = text.lastIndexOf(" ", 180);
+  const preview = expanded ? text : `${text.slice(0, cut > 0 ? cut : 180).trimEnd()}…`;
+  return (
+    <>
+      {preview}{" "}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="underline underline-offset-2 opacity-90 hover:opacity-100"
+        aria-expanded={expanded}
+      >
+        {expanded ? "Show less" : "Read more"}
+      </button>
+    </>
   );
 };
 

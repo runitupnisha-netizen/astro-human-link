@@ -75,9 +75,6 @@ const Growth = () => {
 
   return (
     <div className="min-h-[100svh] relative overflow-hidden" style={{ backgroundColor: BG }}>
-      <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
-        <BackButton fallback="/profile" />
-      </div>
       {/* Radial wash */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -105,6 +102,9 @@ const Growth = () => {
       </div>
 
       <div className="relative z-10 max-w-md mx-auto px-5 pt-28 md:pt-32 pb-28 md:pb-12">
+        <div className="mb-3 -ml-1">
+          <BackButton fallback="/profile" />
+        </div>
         {/* Lyra greeting strip */}
         <div className="mb-5">
           <LyraStrip

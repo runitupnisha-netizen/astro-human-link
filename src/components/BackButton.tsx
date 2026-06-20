@@ -21,7 +21,7 @@ const BackButton = ({
   fallback = "/",
   label = "Back",
   className = "",
-  color = "#9b84c8",
+  color = "#f5f0ff",
 }: BackButtonProps) => {
   const navigate = useNavigate();
 
@@ -38,10 +38,10 @@ const BackButton = ({
     <button
       onClick={handleClick}
       aria-label="Go back"
-      className={`inline-flex items-center gap-1 py-2 -ml-1 text-sm transition-colors min-h-[44px] ${className}`}
+      className={`inline-flex items-center gap-1.5 min-h-[44px] min-w-[44px] px-3 py-2 rounded-full text-sm font-medium transition-all bg-background/70 backdrop-blur-md border border-border/60 shadow-sm hover:bg-background/90 active:scale-[0.97] touch-manipulation ${className}`}
       style={{ color, fontFamily: "Poppins, sans-serif" }}
     >
-      <ChevronLeft className="w-5 h-5" />
+      <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
       <span>{label}</span>
     </button>
   );

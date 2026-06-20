@@ -8,7 +8,6 @@ import { Mail, Send, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import Footer from "@/components/Footer";
-import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -21,7 +20,6 @@ const contactSchema = z.object({
 const Contact = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
-  const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,55 +29,17 @@ const Contact = () => {
       toast({ title: first, variant: "destructive" });
       return;
     }
-    setSending(true);
-    try {
-      const { name, email, subject, message } = parsed.data;
-      const submissionId = crypto.randomUUID();
-
-      const adminPromise = supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "contact-notification",
-          idempotencyKey: `contact-notify-${submissionId}`,
-          templateData: { name, email, subject: subject || "", message },
-        },
-      });
-      const userPromise = supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "contact-confirmation",
-          recipientEmail: email,
-          idempotencyKey: `contact-confirm-${submissionId}`,
-          templateData: { name, subject: subject || "", message },
-        },
-      });
-
-      const [adminRes, userRes] = await Promise.all([adminPromise, userPromise]);
-      if (adminRes.error) console.error("Admin email error:", adminRes.error);
-      if (userRes.error) console.error("User email error:", userRes.error);
-
-      if (adminRes.error) {
-        toast({
-          title: "Couldn't send right now",
-          description: "Please try again in a moment, or email us directly at info@stellaraapp.net.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Message sent ✨",
-        description: "We've received your message. Check your inbox for confirmation — we'll reply within 24–48 hours.",
-      });
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (err) {
-      console.error("Contact submit failed:", err);
-      toast({
-        title: "Something went wrong",
-        description: "Please try again or email us at info@stellaraapp.net.",
-        variant: "destructive",
-      });
-    } finally {
-      setSending(false);
-    }
+    const { name, email, subject, message } = parsed.data;
+    const subj = encodeURIComponent(subject?.trim() || `Stellara contact from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\n${message}`
+    );
+    // Open the user's email client with the message pre-filled.
+    window.location.href = `mailto:info@stellaraapp.net?subject=${subj}&body=${body}`;
+    toast({
+      title: "Opening your email app ✨",
+      description: "Your message is pre-filled — just hit Send to reach us.",
+    });
   };
 
   return (
@@ -155,9 +115,9 @@ const Contact = () => {
                   maxLength={2000}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={sending}>
+              <Button type="submit" className="w-full">
                 <Send className="w-4 h-4 mr-2" />
-                {sending ? "Sending..." : "Send Message"}
+                Send Message
               </Button>
             </form>
           </CardContent>

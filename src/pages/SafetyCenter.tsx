@@ -63,7 +63,10 @@ const sections = [
 
 const SafetyCenter = () => {
   return (
-    <div className="min-h-screen bg-background pt-20 pb-24 px-4">
+    <div
+      className="min-h-screen bg-background pt-20 px-4"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 7rem)" }}
+    >
       <div data-back-button-injected className="absolute top-[calc(env(safe-area-inset-top,0px)+4rem)] left-2 z-40">
         <BackButton fallback="/" />
       </div>

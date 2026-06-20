@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 
 const Footer = () => (
-  <footer className="relative z-10 border-t border-border/30 bg-background/80 backdrop-blur-sm mt-16">
-    <div className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+  <footer
+    className="relative z-10 border-t border-border/30 bg-background/80 backdrop-blur-sm mt-16"
+    style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 5.5rem)" }}
+  >
+    <div className="max-w-4xl mx-auto px-6 pt-10 pb-2 md:pb-10 space-y-6">
       <p className="text-center font-display text-sm md:text-base bg-gradient-golden bg-clip-text text-transparent">
         Self-discovery first. Connection follows.
       </p>

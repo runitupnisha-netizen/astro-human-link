@@ -170,7 +170,7 @@ const ReferralShareCard = ({ code, big3, shareUrl }: Props) => {
       canvas.toBlob((b) => resolve(b), "image/png", 0.95);
     });
 
-  const message = `I've been using Stellara — it's like having a cosmic guide for my love life. Use my code ${code} and we both get a free month of Pro. ✦ ${shareUrl}`;
+  const message = `I've been using Stellara — it's like having a cosmic guide for my self-discovery journey. Use my code ${code} and we both get a free month of Pro. ✦ ${shareUrl}`;
 
   const handleShare = async () => {
     setBusy(true);

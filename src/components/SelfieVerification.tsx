@@ -95,33 +95,28 @@ const SelfieVerification = ({ redirectOnVerified = false }: SelfieVerificationPr
     setCameraStarting(false);
   }, []);
 
-  const startCamera = useCallback(async () => {
+  /**
+   * Apple App Review crash (Guideline 2.1a, iPhone 17 Pro Max / iOS 26.5):
+   * the previous implementation called `navigator.mediaDevices.getUserMedia`
+   * to render a live video preview inside the WKWebView. That path is
+   * unstable in Capacitor on iOS 26 and crashed the app when the reviewer
+   * tapped "Take Photo". We now exclusively use the platform-native camera
+   * via a hidden `<input type="file" capture="user">`, which triggers the
+   * native iOS camera sheet (governed by NSCameraUsageDescription) and
+   * cannot crash the WKWebView host. Desktop browsers fall back to the
+   * standard file picker, which is acceptable for verification.
+   */
+  const startCamera = useCallback(() => {
     setCapturedImage(null);
     setCameraError(null);
     setStep(2);
-
     try {
-      stopCamera();
-      setCameraStarting(true);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(e => console.error(e));
-          setCameraActive(true);
-          setCameraStarting(false);
-        };
-      }
-    } catch (err) {
-      stopCamera();
+      fileInputRef.current?.click();
+    } catch {
       setStep(1);
-      setCameraError("Please allow camera access to continue.");
+      setCameraError("We couldn't open the camera. Please try again.");
     }
-  }, [stopCamera]);
+  }, []);
 
   const handleMobileCapture = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

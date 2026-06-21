@@ -425,9 +425,20 @@ const CosmicGuide = () => {
         return;
       }
       if (resp.status === 402) {
-        toast({ title: "AI credits exhausted", description: "Add credits in workspace settings.", variant: "destructive" });
+        const errBody = await resp.json().catch(() => ({} as any));
+        if (errBody?.error === "FREE_LIMIT_REACHED") {
+          setMessages([
+            ...nextHistory,
+            {
+              role: "assistant",
+              content: "__LYRA_FREE_LIMIT__",
+            },
+          ]);
+        } else {
+          toast({ title: "AI credits exhausted", description: "Add credits in workspace settings.", variant: "destructive" });
+          setMessages(nextHistory);
+        }
         setStreaming(false);
-        setMessages(nextHistory);
         return;
       }
       if (!resp.ok || !resp.body) throw new Error("Stream failed");
@@ -853,6 +864,42 @@ const CosmicGuide = () => {
               )}
               {messages.map((m, i) => {
                 const isLastAssistant = m.role === "assistant" && i === messages.length - 1;
+                if (m.role === "assistant" && m.content === "__LYRA_FREE_LIMIT__") {
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="flex justify-start"
+                    >
+                      <div
+                        className="max-w-[88%] md:max-w-[78%] rounded-2xl px-5 py-4 text-sm leading-relaxed space-y-3"
+                        style={{
+                          background: "linear-gradient(135deg, rgba(120, 80, 200, 0.35), rgba(77, 58, 92, 0.6))",
+                          border: "1px solid rgba(245, 200, 100, 0.4)",
+                          color: "#f5f0ff",
+                          fontFamily: "Lora, Georgia, serif",
+                        }}
+                      >
+                        <p>
+                          You've used your 5 free chats with Lyra. Upgrade to Pro to continue your self-discovery journey.
+                        </p>
+                        <button
+                          onClick={() => navigate("/premium")}
+                          className="w-full rounded-full px-4 py-2 text-sm font-semibold transition-transform active:scale-95"
+                          style={{
+                            background: "linear-gradient(135deg, #f5c84a, #d4a017)",
+                            color: "#2a1a4a",
+                            fontFamily: "Poppins, sans-serif",
+                          }}
+                        >
+                          Unlock Lyra — Go Pro
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                }
                 return (
                   <motion.div
                     key={i}

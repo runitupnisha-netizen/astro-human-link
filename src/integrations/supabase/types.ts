@@ -1093,6 +1093,7 @@ export type Database = {
           kids_preference: string | null
           last_seen_at: string | null
           life_path_number: number | null
+          lyra_message_count: number
           mars_sign: string | null
           max_distance_km: number | null
           mercury_sign: string | null
@@ -1179,6 +1180,7 @@ export type Database = {
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
+          lyra_message_count?: number
           mars_sign?: string | null
           max_distance_km?: number | null
           mercury_sign?: string | null
@@ -1265,6 +1267,7 @@ export type Database = {
           kids_preference?: string | null
           last_seen_at?: string | null
           life_path_number?: number | null
+          lyra_message_count?: number
           mars_sign?: string | null
           max_distance_km?: number | null
           mercury_sign?: string | null

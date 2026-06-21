@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { EmailOtpType, Session } from "@supabase/supabase-js";
 
 export const AUTH_CALLBACK_PATH = "/auth/callback";
+export const NATIVE_AUTH_CALLBACK_URL = "com.runitupmedia.stellara://auth/callback";
 
 const CALLBACK_OTP_TYPES = new Set<EmailOtpType>(["magiclink", "email", "signup", "invite"]);
 
@@ -12,21 +13,36 @@ const cleanAuthUrl = () => {
   window.history.replaceState(null, document.title, "/");
 };
 
-export const isPasswordRecoveryRedirect = () => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+const getUrlParts = (url?: string) => {
+  if (!url) {
+    return {
+      pathname: window.location.pathname,
+      searchParams: new URLSearchParams(window.location.search),
+      hashParams: new URLSearchParams(window.location.hash.replace(/^#/, "")),
+    };
+  }
+
+  const parsed = new URL(url);
+  return {
+    pathname: parsed.pathname,
+    searchParams: new URLSearchParams(parsed.search),
+    hashParams: new URLSearchParams(parsed.hash.replace(/^#/, "")),
+  };
+};
+
+export const isPasswordRecoveryRedirect = (url?: string) => {
+  const { pathname, searchParams, hashParams } = getUrlParts(url);
   return (
-    window.location.pathname === "/reset-password" ||
+    pathname === "/reset-password" ||
     searchParams.get("type") === "recovery" ||
     hashParams.get("type") === "recovery"
   );
 };
 
-export const completeAuthRedirectFromUrl = async (): Promise<Session | null> => {
-  if (isPasswordRecoveryRedirect()) return null;
+export const completeAuthRedirectFromUrl = async (url?: string): Promise<Session | null> => {
+  if (isPasswordRecoveryRedirect(url)) return null;
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const { searchParams, hashParams } = getUrlParts(url);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const otpType = searchParams.get("type") as EmailOtpType | null;

@@ -277,6 +277,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Increment lifetime free-message counter for non-Pro / non-exempt users.
+    // Counted on successful AI dispatch (the user has effectively spent a message).
+    if (!bypassGate) {
+      try {
+        await supabase
+          .from("profiles")
+          .update({ lyra_message_count: lyraCount + 1 })
+          .eq("user_id", userId);
+      } catch (e) {
+        console.warn("[cosmic-guide] failed to increment lyra_message_count", e);
+      }
+    }
+
     return new Response(aiResp.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });

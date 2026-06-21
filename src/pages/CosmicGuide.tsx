@@ -425,9 +425,20 @@ const CosmicGuide = () => {
         return;
       }
       if (resp.status === 402) {
-        toast({ title: "AI credits exhausted", description: "Add credits in workspace settings.", variant: "destructive" });
+        const errBody = await resp.json().catch(() => ({} as any));
+        if (errBody?.error === "FREE_LIMIT_REACHED") {
+          setMessages([
+            ...nextHistory,
+            {
+              role: "assistant",
+              content: "__LYRA_FREE_LIMIT__",
+            },
+          ]);
+        } else {
+          toast({ title: "AI credits exhausted", description: "Add credits in workspace settings.", variant: "destructive" });
+          setMessages(nextHistory);
+        }
         setStreaming(false);
-        setMessages(nextHistory);
         return;
       }
       if (!resp.ok || !resp.body) throw new Error("Stream failed");

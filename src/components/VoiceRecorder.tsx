@@ -22,21 +22,12 @@ const VoiceRecorder = ({ onRecordingComplete, disabled }: VoiceRecorderProps) =>
   const startRecording = useCallback(async () => {
     setMicError(null);
 
-    // Check permission status (not supported in Safari, so wrap in try/catch)
-    try {
-      if (navigator.permissions) {
-        const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
-        if (status.state === "denied") {
-          const msg = "Microphone blocked. Enable it in your browser settings.";
-          setMicError(msg);
-          toast({ title: msg, variant: "destructive" });
-          return;
-        }
-      }
-    } catch {
-      // Safari doesn't support microphone permission query — continue
-    }
-
+    // IMPORTANT: do NOT await anything before getUserMedia. WKWebView
+    // (iOS Capacitor + Safari) drops the user-gesture context after the
+    // first await, which causes getUserMedia to reject with NotAllowedError
+    // even when the user has granted mic permission. Apple App Review
+    // flagged this on iPhone 17 Pro Max. Call getUserMedia synchronously
+    // from the click handler; rely on the OS prompt for permission UX.
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;

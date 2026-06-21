@@ -27,7 +27,7 @@ const PHONE_AUTH_ENABLED = false;
  * The button JSX and handler below are intentionally left in place for
  * a one-line re-enable.
  */
-const SOCIAL_AUTH_ENABLED = false;
+const SOCIAL_AUTH_ENABLED = true;
 import stellaraAppIcon from "@/assets/stellara-app-icon.png";
 import { motion } from "framer-motion";
 import { z } from "zod";
@@ -79,7 +79,18 @@ const dobSchema = z
   );
 
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
-const AUTH_CALLBACK_URL = `${PRODUCTION_ORIGIN}/auth/callback`;
+/**
+ * OAuth redirect target. On native iOS (Capacitor) and the Lovable
+ * preview, `window.location.origin` is NOT `stellaraapp.net`, so a
+ * hardcoded production URL breaks the return-to-app step (Apple
+ * reviewer reported "nothing happened" when tapping Sign in with
+ * Apple/Google). Always use the current origin so the OAuth provider
+ * can hand the session back to whatever shell launched the flow.
+ */
+const AUTH_CALLBACK_URL =
+  typeof window !== "undefined"
+    ? `${window.location.origin}/auth/callback`
+    : `${PRODUCTION_ORIGIN}/auth/callback`;
 
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();

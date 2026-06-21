@@ -83,12 +83,9 @@ const dobSchema = z
 
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
 /**
- * OAuth redirect target. On native iOS (Capacitor) and the Lovable
- * preview, `window.location.origin` is NOT `stellaraapp.net`, so a
- * hardcoded production URL breaks the return-to-app step (Apple
- * reviewer reported "nothing happened" when tapping Sign in with
- * Apple/Google). Always use the current origin so the OAuth provider
- * can hand the session back to whatever shell launched the flow.
+ * Web OAuth redirect target. Native iOS uses the custom-scheme flow
+ * below because `window.location.origin` is `capacitor://localhost`,
+ * which cannot complete the provider handoff inside the app shell.
  */
 const AUTH_CALLBACK_URL =
   typeof window !== "undefined"

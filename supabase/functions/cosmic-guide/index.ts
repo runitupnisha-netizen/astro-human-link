@@ -124,6 +124,61 @@ Deno.serve(async (req) => {
     }
     const userId = userData.user.id;
 
+    // Free-message gate: lifetime cap of 5 messages for non-Pro users.
+    // Exempt: demo/reviewer emails, admins, and Pro (bonus / IAP / Stripe-subscribed).
+    const FREE_LIMIT = 5;
+    const DEMO_PRO_EMAILS = new Set([
+      "demo@stellara.app",
+      "chef.tinisha@gmail.com",
+      "runitupnisha@gmail.com",
+    ]);
+    const userEmail = (userData.user.email ?? "").toLowerCase();
+    let isExempt = !!userEmail && DEMO_PRO_EMAILS.has(userEmail);
+
+    const { data: gateProfile } = await supabase
+      .from("profiles")
+      .select("lyra_message_count, bonus_pro_until, subscribed")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const lyraCount: number = (gateProfile?.lyra_message_count as number | null) ?? 0;
+    const bonusActive =
+      !!gateProfile?.bonus_pro_until &&
+      new Date(gateProfile.bonus_pro_until as string) > new Date();
+    // @ts-ignore — column may not exist in all schemas
+    const stripeActive = !!gateProfile?.subscribed;
+
+    let iapActive = false;
+    try {
+      const { data: iapRow } = await supabase.rpc("has_active_iap", { _user_id: userId });
+      iapActive = !!iapRow;
+    } catch (_e) { /* ignore */ }
+
+    let isAdmin = false;
+    try {
+      const { data: adminRow } = await supabase.rpc("has_role", {
+        _user_id: userId, _role: "admin",
+      });
+      isAdmin = !!adminRow;
+    } catch (_e) { /* ignore */ }
+
+    const isPro = bonusActive || stripeActive || iapActive || isAdmin;
+    const bypassGate = isExempt || isPro;
+
+    if (!bypassGate && lyraCount >= FREE_LIMIT) {
+      return new Response(
+        JSON.stringify({
+          error: "FREE_LIMIT_REACHED",
+          message:
+            "You've used your 5 free Lyra messages. Upgrade to Pro to keep chatting.",
+        }),
+        {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const conversationId: string | undefined = body?.conversation_id;
     const clientMessages: ChatMessage[] = Array.isArray(body?.messages) ? body.messages : [];

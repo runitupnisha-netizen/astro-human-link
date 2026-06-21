@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { EmailOtpType, Session } from "@supabase/supabase-js";
 
 export const AUTH_CALLBACK_PATH = "/auth/callback";
-export const NATIVE_AUTH_CALLBACK_URL = "com.runitupmedia.stellara://auth/callback";
+export const NATIVE_AUTH_CALLBACK_URL = "lovable://oauth-callback";
 
 const CALLBACK_OTP_TYPES = new Set<EmailOtpType>(["magiclink", "email", "signup", "invite"]);
 

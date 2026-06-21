@@ -65,6 +65,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.runitupmedia.stellara</string>
+				<string>lovable</string>
 			</array>
 		</dict>
 	</array>

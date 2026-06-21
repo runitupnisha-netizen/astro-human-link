@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
+import { NATIVE_AUTH_CALLBACK_URL } from "@/lib/authRedirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -80,17 +83,27 @@ const dobSchema = z
 
 const PRODUCTION_ORIGIN = "https://stellaraapp.net";
 /**
- * OAuth redirect target. On native iOS (Capacitor) and the Lovable
- * preview, `window.location.origin` is NOT `stellaraapp.net`, so a
- * hardcoded production URL breaks the return-to-app step (Apple
- * reviewer reported "nothing happened" when tapping Sign in with
- * Apple/Google). Always use the current origin so the OAuth provider
- * can hand the session back to whatever shell launched the flow.
+ * Web OAuth redirect target. Native iOS uses the custom-scheme flow
+ * below because `window.location.origin` is `capacitor://localhost`,
+ * which cannot complete the provider handoff inside the app shell.
  */
 const AUTH_CALLBACK_URL =
   typeof window !== "undefined"
-    ? `${window.location.origin}/auth/callback`
+    ? `${Capacitor.isNativePlatform() ? PRODUCTION_ORIGIN : window.location.origin}/auth/callback`
     : `${PRODUCTION_ORIGIN}/auth/callback`;
+
+const getNativeOAuthUrl = (provider: "google" | "apple") => {
+  const state = crypto.getRandomValues(new Uint8Array(16))
+    .reduce((value, byte) => value + byte.toString(16).padStart(2, "0"), "");
+  sessionStorage.setItem("oauth-native-pending", state);
+
+  const params = new URLSearchParams({
+    provider,
+    redirect_uri: NATIVE_AUTH_CALLBACK_URL,
+    state,
+  });
+  return `${PRODUCTION_ORIGIN}/~oauth/initiate?${params.toString()}`;
+};
 
 const friendlyAuthError = (message: string): string => {
   const m = message.toLowerCase();
@@ -139,6 +152,11 @@ const Auth = () => {
   const handleSocialLogin = async (provider: "google" | "apple") => {
     setSocialLoading(provider);
     try {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: getNativeOAuthUrl(provider), presentationStyle: "popover" });
+        return;
+      }
+
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: AUTH_CALLBACK_URL,
       });

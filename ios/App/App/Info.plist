@@ -61,10 +61,11 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.runitupmedia.stellara.spotify</string>
+			<string>com.runitupmedia.stellara</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.runitupmedia.stellara</string>
+				<string>lovable</string>
 			</array>
 		</dict>
 	</array>

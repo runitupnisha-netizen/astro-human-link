@@ -312,31 +312,18 @@ const SelfieVerification = ({ redirectOnVerified = false }: SelfieVerificationPr
                   className="hidden"
                   onChange={handleMobileCapture}
                 />
-                <video
-                  ref={videoRef}
-                  playsInline={true}
-                  autoPlay={true}
-                  muted={true}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity ${cameraActive || cameraStarting ? "opacity-100" : "opacity-0"}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
                 {capturedImage ? (
                   <img src={capturedImage} alt="Captured selfie" className="absolute inset-0 w-full h-full object-cover" />
-                ) : !cameraActive && !cameraStarting ? (
+                ) : !cameraStarting ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <Camera className="w-12 h-12 opacity-30" />
                     <span className="text-sm">Selfie preview</span>
                   </div>
                 ) : null}
-                {cameraStarting && !cameraActive && !capturedImage && (
+                {cameraStarting && !capturedImage && (
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-muted/80 text-muted-foreground">
                     <Loader2 className="w-8 h-8 animate-spin" />
                     <span className="text-sm">Opening camera…</span>
-                  </div>
-                )}
-                {cameraActive && !capturedImage && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-48 h-56 border-2 border-accent/40 rounded-[40%] border-dashed" />
                   </div>
                 )}
               </div>
@@ -366,15 +353,10 @@ const SelfieVerification = ({ redirectOnVerified = false }: SelfieVerificationPr
 
               {/* Controls */}
               <div className="flex justify-center gap-3">
-                {!cameraActive && !capturedImage && (
+                {!capturedImage && (
                   <Button onClick={startCamera} disabled={cameraStarting} className="gap-2" style={{ background: "var(--gradient-aurora)" }}>
                     {cameraStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    {cameraStarting ? "Opening…" : status === "rejected" ? "Try Again" : "Open Camera"}
-                  </Button>
-                )}
-                {cameraActive && !capturedImage && (
-                  <Button onClick={capturePhoto} size="lg" className="gap-2 rounded-full px-8" style={{ background: "var(--gradient-golden)" }}>
-                    <Camera className="w-5 h-5" /> Take Selfie
+                    {status === "rejected" ? "Try Again" : "Take Selfie"}
                   </Button>
                 )}
                 {capturedImage && (

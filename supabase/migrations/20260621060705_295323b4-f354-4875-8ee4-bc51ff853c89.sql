@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS lyra_message_count integer NOT NULL DEFAULT 0;

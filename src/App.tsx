@@ -209,7 +209,9 @@ const NativeOAuthRedirectHandler = () => {
 
       try {
         await Browser.close();
-      } catch {}
+      } catch {
+        // The browser may already be closed by iOS when the deep link arrives.
+      }
 
       try {
         const parsed = new URL(url);

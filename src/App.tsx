@@ -23,7 +23,11 @@ import { AccessibilityProvider } from "@/hooks/useAccessibility";
 import { captureReferralFromUrl } from "@/lib/referral";
 import { useKeyboardInsets } from "@/hooks/useKeyboardInsets";
 import { supabase } from "@/integrations/supabase/client";
-import { completeAuthRedirectFromUrl } from "@/lib/authRedirect";
+import { completeAuthRedirectFromUrl, NATIVE_AUTH_CALLBACK_URL } from "@/lib/authRedirect";
+import { App as CapApp } from "@capacitor/app";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
+import { toast } from "sonner";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -192,6 +196,55 @@ const ReferralCapture = () => {
   return null;
 };
 
+const NativeOAuthRedirectHandler = () => {
+  const navigate = useNavigate();
+  const handledUrlsRef = useRef(new Set<string>());
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const handleUrl = async (url?: string | null) => {
+      if (!url || handledUrlsRef.current.has(url) || !url.startsWith(NATIVE_AUTH_CALLBACK_URL)) return;
+      handledUrlsRef.current.add(url);
+
+      try {
+        await Browser.close();
+      } catch {}
+
+      try {
+        const parsed = new URL(url);
+        const returnedState = parsed.searchParams.get("state") || new URLSearchParams(parsed.hash.replace(/^#/, "")).get("state");
+        const expectedState = sessionStorage.getItem("oauth-native-pending");
+        sessionStorage.removeItem("oauth-native-pending");
+
+        if (expectedState && returnedState && expectedState !== returnedState) {
+          toast.error("Sign-in could not be verified. Please try again.");
+          navigate("/sign-in", { replace: true });
+          return;
+        }
+
+        const session = await completeAuthRedirectFromUrl(url);
+        navigate(session ? "/" : "/sign-in", { replace: true });
+      } catch {
+        toast.error("Sign-in did not complete. Please try again.");
+        navigate("/sign-in", { replace: true });
+      }
+    };
+
+    let listener: { remove: () => void } | undefined;
+    CapApp.addListener("appUrlOpen", ({ url }) => handleUrl(url)).then((handle) => {
+      listener = handle;
+    });
+    CapApp.getLaunchUrl().then(({ url }) => handleUrl(url));
+
+    return () => {
+      listener?.remove();
+    };
+  }, [navigate]);
+
+  return null;
+};
+
 const LegacyMobileLaunchRouteFix = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -287,6 +340,7 @@ const AppRoutes = () => {
     <>
       <AnalyticsTracker />
       <ReferralCapture />
+      <NativeOAuthRedirectHandler />
       <LegacyMobileLaunchRouteFix />
       <KeyboardInsetTracker />
       {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <Navigation />}

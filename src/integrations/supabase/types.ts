@@ -2163,6 +2163,12 @@ export type Database = {
         Returns: number
       }
       generate_referral_code: { Args: never; Returns: string }
+      get_user_id_by_email: {
+        Args: { p_email: string }
+        Returns: {
+          id: string
+        }[]
+      }
       hard_delete_expired_accounts: { Args: never; Returns: number }
       has_active_iap: { Args: { _user_id: string }; Returns: boolean }
       has_role: {

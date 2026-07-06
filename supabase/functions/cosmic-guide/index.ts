@@ -34,18 +34,20 @@ export function buildSystemPrompt(profile: Record<string, unknown> | null): stri
   const p = profile ?? {};
   const name = (p.display_name as string) || "friend";
   const bits: string[] = [];
+  // Human Design leads — it's the primary self-discovery lens in Stellara.
+  if (p.human_design_type) bits.push(`Human Design ${p.human_design_type}`);
+  if (p.human_design_authority) bits.push(`${p.human_design_authority} authority`);
+  if (p.human_design_profile) bits.push(`Profile ${p.human_design_profile}`);
+  if (p.gene_keys_life_purpose) bits.push(`Gene Keys Life Purpose ${p.gene_keys_life_purpose}`);
+  if (p.life_path_number) bits.push(`Life Path ${p.life_path_number}`);
+  if (p.personal_year_number) bits.push(`Personal Year ${p.personal_year_number}`);
+  // Astrology placements are supporting context, listed after Human Design.
   if (p.sun_sign) bits.push(`Sun ${p.sun_sign}`);
   if (p.moon_sign) bits.push(`Moon ${p.moon_sign}`);
   if (p.rising_sign) bits.push(`Rising ${p.rising_sign}`);
   if (p.venus_sign) bits.push(`Venus ${p.venus_sign}`);
   if (p.mars_sign) bits.push(`Mars ${p.mars_sign}`);
   if (p.mercury_sign) bits.push(`Mercury ${p.mercury_sign}`);
-  if (p.human_design_type) bits.push(`Human Design ${p.human_design_type}`);
-  if (p.human_design_authority) bits.push(`${p.human_design_authority} authority`);
-  if (p.human_design_profile) bits.push(`Profile ${p.human_design_profile}`);
-  if (p.life_path_number) bits.push(`Life Path ${p.life_path_number}`);
-  if (p.personal_year_number) bits.push(`Personal Year ${p.personal_year_number}`);
-  if (p.gene_keys_life_purpose) bits.push(`Gene Keys Life Purpose ${p.gene_keys_life_purpose}`);
 
   const blueprint = bits.length ? bits.join(" · ") : "blueprint not yet generated";
   const today = new Date().toLocaleDateString("en-US", {
@@ -78,7 +80,7 @@ SIGNATURE GREETING
 Open most responses with "Hey Luv…" — it's warm, familiar, and the official Stellara/Lyra greeting. Vary phrasing naturally (e.g. "Hey Luv… let's look at what's really going on here.") so it never feels scripted. Skip it only when the conversation is mid-flow and a greeting would feel weird.
 
 EARLY-IN-CONVERSATION GROUNDING
-On your FIRST response in a session (and when it deepens the reflection), reference at least one specific placement from ${name}'s blueprint above so it feels personal to them. Use ONLY the exact placements listed — never invent, swap, or guess a sign, type, or number that isn't there. If the blueprint hasn't been generated yet, lean on emotional intelligence and don't fabricate placements.
+On your FIRST response in a session, ALWAYS lead with ${name}'s Human Design if it's available in the blueprint above — reference their Type and Authority in the first sentence or two (e.g. "As a Generator with Emotional Authority, your strategy is to respond…"). Weave in Gene Keys, Numerology, or Astrology only AFTER the Human Design context lands. Use ONLY the exact placements listed — never invent, swap, or guess a type, sign, or number that isn't there. If Human Design hasn't been generated yet, lean on emotional intelligence and don't fabricate placements.
 
 TONE
 Warm, cool, sassy, upbeat, emotionally intelligent, grounded, trendy, relatable, honest, nonjudgmental. Youthful without sounding childish. Spiritual without sounding fake. Deep without being heavy. Funny without being dismissive.

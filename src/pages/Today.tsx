@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Compass, ArrowRight, Sun, Clock } from "lucide-react";
+import { Sparkles, Wand2, Compass, ArrowRight, Sun, Clock, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CosmicBackground from "@/components/CosmicBackground";
@@ -32,28 +32,67 @@ const moonToday = () => {
   return { name: "Waning Crescent", icon: "🌘" };
 };
 
+type HdProfile = {
+  human_design_type: string | null;
+  human_design_strategy: string | null;
+  human_design_authority: string | null;
+};
+
+const HD_DAILY_NUDGES: Record<string, string[]> = {
+  Generator: [
+    "Notice what lights up your sacral today — that 'uh-huh' is your compass. Say yes only to what you can feel.",
+    "Wait to respond. Life will bring you something worth your energy — you don't have to go chase it.",
+  ],
+  "Manifesting Generator": [
+    "Multi-passionate energy today. Respond to what pulls you, and inform the people your pivots affect.",
+    "Skip the step that bores you. Your shortcuts are a feature, not a bug — just loop others in.",
+  ],
+  Projector: [
+    "Wait for the invitation. Your wisdom lands ten times harder when it's been asked for.",
+    "Rest is productive for you. Guide, don't push — the right eyes will find you.",
+  ],
+  Manifestor: [
+    "Inform before you act. When people know what's coming, your initiations meet less resistance.",
+    "Follow the urge. You don't need consensus — you need to move, then tell them why.",
+  ],
+  Reflector: [
+    "Give it a lunar cycle before big decisions. Today, just sample the environment and notice the mirror.",
+    "Be with people who feel good in your body. You're reading the room for everyone.",
+  ],
+};
+
 const Today = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [firstName, setFirstName] = useState("");
+  const [hd, setHd] = useState<HdProfile | null>(null);
   const moon = moonToday();
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, human_design_type, human_design_strategy, human_design_authority")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         const n = (data?.display_name || "").split(" ")[0] || "";
         setFirstName(n);
+        if (data) {
+          setHd({
+            human_design_type: data.human_design_type ?? null,
+            human_design_strategy: data.human_design_strategy ?? null,
+            human_design_authority: data.human_design_authority ?? null,
+          });
+        }
       });
   }, [user]);
 
   // Deterministic daily prompt
   const dayIndex = Math.floor(Date.now() / 86400000) % COSMIC_PROMPTS.length;
   const dailyPrompt = COSMIC_PROMPTS[dayIndex];
+  const hdNudges = hd?.human_design_type ? HD_DAILY_NUDGES[hd.human_design_type] : null;
+  const hdNudge = hdNudges ? hdNudges[Math.floor(Date.now() / 86400000) % hdNudges.length] : null;
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
@@ -75,13 +114,55 @@ const Today = () => {
             <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent mt-1">
               {greeting}{firstName ? `, ${firstName}` : ""}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground flex items-center gap-1.5">
-              <span aria-hidden>{moon.icon}</span>
-              <span>{moon.name}</span>
-            </p>
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              {hd?.human_design_type && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] font-semibold text-accent">
+                  <Zap className="w-3 h-3" />
+                  {hd.human_design_type}
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <span aria-hidden>{moon.icon}</span>
+                <span>{moon.name}</span>
+              </span>
+            </div>
           </header>
 
-          {/* HERO: Daily Cosmic Nudge */}
+          {/* HERO: Human Design daily insight (leads over astrology) */}
+          {hd?.human_design_type && (
+            <motion.section
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl border border-accent/40 bg-card/80 backdrop-blur-md shadow-elevated p-6"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/15 via-transparent to-primary/10 pointer-events-none" />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-3">
+                  <Zap className="w-4 h-4 text-accent" />
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
+                    Your Human Design Today
+                  </span>
+                </div>
+                <p className="font-display text-lg leading-relaxed text-foreground">
+                  {hdNudge ?? `As a ${hd.human_design_type}, honor your strategy today.`}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                  {hd.human_design_strategy && (
+                    <span className="rounded-full bg-muted/40 border border-border/40 px-2 py-0.5">
+                      Strategy · {hd.human_design_strategy}
+                    </span>
+                  )}
+                  {hd.human_design_authority && (
+                    <span className="rounded-full bg-muted/40 border border-border/40 px-2 py-0.5">
+                      Authority · {hd.human_design_authority}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </motion.section>
+          )}
+
+          {/* Cosmic weather (astrology moved below Human Design) */}
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -92,7 +173,7 @@ const Today = () => {
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-accent" />
                 <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
-                  Daily Cosmic Nudge
+                  Cosmic weather
                 </span>
               </div>
               <p className="font-display text-lg leading-relaxed text-foreground">

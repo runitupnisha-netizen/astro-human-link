@@ -41,14 +41,14 @@ const HeroSection = () => {
           {...fadeUp(0.2)}
           className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 text-gradient-aurora leading-[1.1]"
         >
-          Your Cosmic Connection Awaits
+          Meet Your Human Design
         </motion.h1>
         
         <motion.p
           {...fadeUp(0.4)}
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-serif"
         >
-          Where love aligns with the stars. Find meaningful connections through the ancient wisdom of Astrology, Human Design & Gene Keys.
+          Self-discovery, decoded. Understand your Type, Strategy & Authority through Human Design — with Gene Keys, Numerology and Astrology as supporting layers.
         </motion.p>
 
         <motion.div {...fadeUp(0.6)} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
@@ -76,20 +76,20 @@ const HeroSection = () => {
           {[
             {
               icon: Star,
-              title: "More Than a Zodiac Sign",
-              desc: "We look at your full chart — houses, aspects, and placements — to find real compatibility",
+              title: "Human Design First",
+              desc: "Your Type, Strategy and Authority — the operating manual for how you're wired to move through life",
               delay: 0.8,
             },
             {
               icon: Heart,
-              title: "Personality First",
-              desc: "Prompts, interests, and your unique blueprint make every profile worth reading",
+              title: "Grow Into Yourself",
+              desc: "Gene Keys, Numerology and Astrology add depth — so self-discovery keeps unfolding, day by day",
               delay: 0.95,
             },
             {
               icon: Heart,
-              title: "Intentional Connection",
-              desc: "Less mindless scrolling, more meaningful connections with people who get you",
+              title: "Aligned Connection",
+              desc: "Once you know yourself, you meet people who match your energy — not just your algorithm",
               delay: 1.1,
             },
           ].map(({ icon: Icon, title, desc, delay }) => (

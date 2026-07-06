@@ -1,34 +1,43 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, Zap, Hash, ArrowRight, Clock } from "lucide-react";
+import { Star, Zap, Hash, ArrowRight, Clock, Dna } from "lucide-react";
 import CosmicBackground from "@/components/CosmicBackground";
 import SynthesisCard from "@/components/blueprint/SynthesisCard";
 import BackButton from "@/components/BackButton";
 
 const SECTIONS = [
   {
-    path: "/blueprint/astrology",
-    title: "Astrology",
-    blurb: "Sun, moon, rising · natal chart · current transits.",
-    icon: Star,
+    path: "/blueprint/human-design",
+    title: "Human Design",
+    blurb: "Your operating manual — Type, Strategy, Authority, Profile · full bodygraph.",
+    icon: Zap,
+    accent: "text-accent",
+    ring: "border-accent/40 hover:border-accent/70",
+    bg: "from-accent/15",
+  },
+  {
+    path: "/blueprint/human-design#gene-keys",
+    title: "Gene Keys",
+    blurb: "Life Purpose · Evolution · Radiance — the poetic layer beneath your design.",
+    icon: Dna,
     accent: "text-primary",
     ring: "border-primary/30 hover:border-primary/60",
     bg: "from-primary/10",
-  },
-  {
-    path: "/blueprint/human-design",
-    title: "Human Design",
-    blurb: "Type, strategy, authority, profile · body graph.",
-    icon: Zap,
-    accent: "text-accent",
-    ring: "border-accent/30 hover:border-accent/60",
-    bg: "from-accent/10",
   },
   {
     path: "/blueprint/numerology",
     title: "Numerology",
     blurb: "Life path · expression · soul urge · personal year.",
     icon: Hash,
+    accent: "text-primary",
+    ring: "border-primary/30 hover:border-primary/60",
+    bg: "from-primary/10",
+  },
+  {
+    path: "/blueprint/astrology",
+    title: "Astrology",
+    blurb: "Sun, moon, rising · natal chart · current transits.",
+    icon: Star,
     accent: "text-primary",
     ring: "border-primary/30 hover:border-primary/60",
     bg: "from-primary/10",
@@ -46,12 +55,12 @@ const Blueprint = () => {
       <div className="relative z-10 pt-20 md:pt-24 pb-28 md:pb-12 px-5">
         <div className="max-w-md mx-auto">
           <header className="mb-6">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">Three sciences of self</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">Self-discovery, layered</p>
             <h1 className="font-display text-3xl font-bold bg-gradient-aurora bg-clip-text text-transparent mt-1">
               Your Blueprint
             </h1>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              Strategy is what you do. Alignment is when you do it.
+              Start with your Human Design — how you're wired. Everything else adds depth.
             </p>
           </header>
 

@@ -17,6 +17,7 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 import AvatarUpload from "@/components/AvatarUpload";
 import PhotoGallery from "@/components/PhotoGallery";
+import BodyGraph from "@/components/blueprint/BodyGraph";
 
 type CosmicProfile = {
   sun_sign: string;
@@ -820,91 +821,21 @@ const Onboarding = () => {
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: "spring", damping: 12, delay: 0.2 }}
                 >
-                  <Sparkles className="w-10 h-10 text-background" />
+                  <Zap className="w-10 h-10 text-background" />
                 </motion.div>
-                <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">Your Cosmic Blueprint</h1>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Your Human Design Type</p>
+                <h1 className="font-display text-3xl md:text-4xl font-bold bg-gradient-golden bg-clip-text text-transparent">
+                  {profile.human_design_type || "Your Design"}
+                </h1>
                 <p className="text-muted-foreground mt-2 text-sm">
                   Born {birthDate}{knowsBirthTime && birthTime ? ` at ${birthTime}` : ""} in {birthPlace}
                 </p>
               </motion.div>
 
-              {/* Numerology */}
-              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
-                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
-                  <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
-                </div>
+              {/* HERO — Human Design bodygraph + Type / Strategy / Authority */}
+              <motion.div {...staggerCard(0.1)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <motion.div 
-                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
-                    whileHover={{ scale: 1.1, rotate: 10 }}
-                  >
-                    <Hash className="w-5 h-5 text-accent" />
-                  </motion.div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">Numerology</h2>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-                  {[
-                    { label: "Life Path", value: profile.life_path_number, meaning: lifePathMeaning(profile.life_path_number), emoji: "🔮" },
-                    { label: "Birthday", value: profile.birthday_number, meaning: birthdayNumberMeaning(profile.birthday_number), emoji: "🎂" },
-                    { label: "Personal Year", value: profile.personal_year_number, meaning: personalYearMeaning(profile.personal_year_number), emoji: "🌀" },
-                  ].map((item) => (
-                    <motion.div 
-                      key={item.label} 
-                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
-                      whileHover={{ y: -2 }}
-                    >
-                      <p className="text-xs text-muted-foreground mb-1">{item.emoji} {item.label}</p>
-                      <motion.div 
-                        className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl font-bold text-accent border-2 border-accent/30 mb-1.5" 
-                        style={{ background: "var(--gradient-mystical)" }}
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        {item.value}
-                      </motion.div>
-                      <p className="text-[10px] text-muted-foreground leading-tight">{item.meaning}</p>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {profile.numerology_summary && (
-                  <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
-                )}
-              </motion.div>
-
-              {/* Astrology */}
-              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
-                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
-                  <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <motion.div 
-                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
-                    whileHover={{ scale: 1.1, rotate: 10 }}
-                  >
-                    <Star className="w-5 h-5 text-primary" />
-                  </motion.div>
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">Astrology</h2>
-                </div>
-                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-                  {[{ label: "Sun", value: profile.sun_sign, emoji: "☀️" }, { label: "Moon", value: profile.moon_sign, emoji: "🌙" }, { label: "Rising", value: profile.rising_sign, emoji: "⬆️" }].map((item, i) => (
-                    <motion.div 
-                      key={item.label} 
-                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
-                      whileHover={{ y: -2 }}
-                    >
-                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
-                      <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
-                    </motion.div>
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{profile.astro_summary}</p>
-              </motion.div>
-
-              {/* Human Design */}
-              <motion.div {...staggerCard(0.3)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <motion.div 
+                  <motion.div
                     className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
                     whileHover={{ scale: 1.1, rotate: 10 }}
                   >
@@ -912,23 +843,36 @@ const Onboarding = () => {
                   </motion.div>
                   <h2 className="text-lg md:text-xl font-bold text-foreground">Human Design</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4">
-                  {[{ label: "Type", value: profile.human_design_type }, { label: "Strategy", value: profile.human_design_strategy }, { label: "Authority", value: profile.human_design_authority }, { label: "Profile", value: profile.human_design_profile }].map((item) => (
-                    <motion.div 
-                      key={item.label} 
-                      className="bg-muted/50 rounded-xl p-3 hover:bg-muted/70 transition-colors"
+
+                <div className="mb-5 flex justify-center">
+                  <BodyGraph type={profile.human_design_type} />
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[
+                    { label: "Energy Type", value: profile.human_design_type },
+                    { label: "Strategy", value: profile.human_design_strategy },
+                    { label: "Authority", value: profile.human_design_authority },
+                  ].map((item) => (
+                    <motion.div
+                      key={item.label}
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
                       whileHover={{ y: -2 }}
                     >
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
-                      <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{item.label}</p>
+                      <p className="text-sm font-semibold text-accent mt-1 leading-tight">{item.value}</p>
                     </motion.div>
                   ))}
+                </div>
+                <div className="bg-muted/40 rounded-xl p-3 mb-3">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Profile</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{profile.human_design_profile}</p>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.human_design_summary}</p>
               </motion.div>
 
               {/* Gene Keys */}
-              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
+              <motion.div {...staggerCard(0.2)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
                   <motion.div 
                     className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center"
@@ -951,6 +895,79 @@ const Onboarding = () => {
                   ))}
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{profile.gene_keys_summary}</p>
+              </motion.div>
+
+              {/* Numerology */}
+              <motion.div {...staggerCard(0.3)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
+                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
+                  <img src={numerologyMandala} alt="" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <motion.div
+                    className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Hash className="w-5 h-5 text-accent" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Numerology</h2>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[
+                    { label: "Life Path", value: profile.life_path_number, meaning: lifePathMeaning(profile.life_path_number), emoji: "🔮" },
+                    { label: "Birthday", value: profile.birthday_number, meaning: birthdayNumberMeaning(profile.birthday_number), emoji: "🎂" },
+                    { label: "Personal Year", value: profile.personal_year_number, meaning: personalYearMeaning(profile.personal_year_number), emoji: "🌀" },
+                  ].map((item) => (
+                    <motion.div
+                      key={item.label}
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground mb-1">{item.emoji} {item.label}</p>
+                      <motion.div
+                        className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl font-bold text-accent border-2 border-accent/30 mb-1.5"
+                        style={{ background: "var(--gradient-mystical)" }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {item.value}
+                      </motion.div>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{item.meaning}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {profile.numerology_summary && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">{profile.numerology_summary}</p>
+                )}
+              </motion.div>
+
+              {/* Astrology */}
+              <motion.div {...staggerCard(0.4)} className="glass-card glow-border p-5 md:p-6 group hover:shadow-mystical transition-shadow relative overflow-hidden">
+                <div className="absolute top-2 right-2 w-14 h-14 opacity-10">
+                  <img src={zodiacWheel} alt="" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <motion.div
+                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Star className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">Astrology</h2>
+                </div>
+                <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                  {[{ label: "Sun", value: profile.sun_sign, emoji: "☀️" }, { label: "Moon", value: profile.moon_sign, emoji: "🌙" }, { label: "Rising", value: profile.rising_sign, emoji: "⬆️" }].map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      className="bg-muted/50 rounded-xl p-3 text-center hover:bg-muted/70 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      <p className="text-xs text-muted-foreground">{item.emoji} {item.label}</p>
+                      <p className="text-sm font-semibold text-foreground mt-1">{item.value}</p>
+                    </motion.div>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">{profile.astro_summary}</p>
               </motion.div>
 
               {/* Compatibility Tags */}

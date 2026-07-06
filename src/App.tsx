@@ -58,6 +58,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
 const InnerWorld = lazy(() => import("./pages/InnerWorld"));
 const CosmicGuide = lazy(() => import("./pages/CosmicGuide"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
@@ -352,6 +353,7 @@ const AppRoutes = () => {
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
+            <Route path="/.lovable/oauth/consent" element={<PageTransition><OAuthConsent /></PageTransition>} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/index" element={<Navigate to="/" replace />} />
             <Route path="/auth" element={<Navigate to="/sign-in" replace />} />

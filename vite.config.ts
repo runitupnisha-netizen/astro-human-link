@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/supabase/vite";
 // NOTE: vite-plugin-pwa was removed in favour of the dedicated push
 // service worker at public/sw.js. Shipping both produced two competing
 // /sw.js files in dist and broke registration inside the iOS WKWebView
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
+    mcpPlugin(),
   ].filter(Boolean),
   resolve: {
     alias: {

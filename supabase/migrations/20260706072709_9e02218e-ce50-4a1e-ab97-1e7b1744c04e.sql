@@ -1,0 +1,1 @@
+update public.profiles set onboarding_complete = true where user_id = 'ae068da1-aa01-4e3f-bddd-6cc76b307660';

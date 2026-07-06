@@ -57,12 +57,24 @@ serve(async (req) => {
   try {
     // 1) Create or fetch demo auth user
     let demoUserId: string | null = null;
-    const { data: existing } = await admin.auth.admin.listUsers();
-    const found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL);
-    if (found) {
-      demoUserId = found.id;
+    // Look up existing demo user via raw SQL against auth.users (avoids
+    // listUsers pagination hitting rate/perPage limits on larger projects).
+    const { data: existingRow, error: lookupErr } = await admin
+      .rpc("get_user_id_by_email", { p_email: DEMO_EMAIL })
+      .maybeSingle();
+    if (!lookupErr && existingRow && (existingRow as any).id) {
+      demoUserId = (existingRow as any).id as string;
+    } else {
+      // Fallback: paginated scan
+      for (let page = 1; page <= 50 && !demoUserId; page++) {
+        const { data: existing } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+        const f = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL);
+        if (f) demoUserId = f.id;
+        if (!existing.users.length) break;
+      }
+    }
+    if (demoUserId) {
       log.push(`Demo user already exists: ${demoUserId}`);
-      // Reset password just in case
       await admin.auth.admin.updateUserById(demoUserId, {
         password: DEMO_PASSWORD, email_confirm: true,
       });

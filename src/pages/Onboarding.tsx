@@ -17,6 +17,7 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import BirthTimeHelpTooltip from "@/components/BirthTimeHelpTooltip";
 import AvatarUpload from "@/components/AvatarUpload";
 import PhotoGallery from "@/components/PhotoGallery";
+import BodyGraph from "@/components/blueprint/BodyGraph";
 
 type CosmicProfile = {
   sun_sign: string;

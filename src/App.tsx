@@ -352,7 +352,7 @@ const AppRoutes = () => {
       {!isRecoveryRoute && !isVerificationRoute && !isOnboardingRoute && !isAdminRoute && user && onboardingComplete && <LyraFAB />}
       <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            <Route path="/sign-in" element={<PageTransition>{authUser ? <Navigate to="/" replace /> : <Auth />}</PageTransition>} />
+            <Route path="/sign-in" element={<PageTransition>{authUser ? <SignedInRedirect /> : <Auth />}</PageTransition>} />
             <Route path="/.lovable/oauth/consent" element={<PageTransition><OAuthConsent /></PageTransition>} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/index" element={<Navigate to="/" replace />} />

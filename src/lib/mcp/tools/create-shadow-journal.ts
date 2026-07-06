@@ -19,7 +19,6 @@ export default defineTool({
     entry: z.string().trim().min(1).describe("The user's written reflection."),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
-  needsApproval: true,
   handler: async ({ prompt, entry }, ctx) => {
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };

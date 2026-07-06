@@ -28,7 +28,6 @@ export default defineTool({
     content: z.string().trim().min(1).describe("The entry content."),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
-  needsApproval: true,
   handler: async ({ phase, entry_type, content }, ctx) => {
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };

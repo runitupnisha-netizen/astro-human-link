@@ -58,10 +58,28 @@ serve(async (req) => {
     // 1) Create or fetch demo auth user
     let demoUserId: string | null = null;
     let found: any = null;
-    for (let page = 1; page <= 20 && !found; page++) {
-      const { data: existing } = await admin.auth.admin.listUsers({ page, perPage: 200 });
-      found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL) || null;
-      if (!existing.users.length) break;
+    try {
+      const { data: created, error: createErr } = await admin.auth.admin.createUser({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+        email_confirm: true,
+        user_metadata: { full_name: "Stellara Demo" },
+      });
+      if (createErr) throw createErr;
+      demoUserId = created.user!.id;
+      log.push(`Created demo user: ${demoUserId}`);
+    } catch (_e) {
+      // Already exists — look it up via SQL against auth.users
+      const { data: row } = await admin
+        .from("__auth_users_lookup_shim")
+        .select("id")
+        .limit(0);
+      // Fallback: scan multiple pages
+      for (let page = 1; page <= 50 && !found; page++) {
+        const { data: existing } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+        found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL) || null;
+        if (!existing.users.length) break;
+      }
     }
     if (found) {
       demoUserId = found.id;

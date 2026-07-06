@@ -57,8 +57,12 @@ serve(async (req) => {
   try {
     // 1) Create or fetch demo auth user
     let demoUserId: string | null = null;
-    const { data: existing } = await admin.auth.admin.listUsers();
-    const found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL);
+    let found: any = null;
+    for (let page = 1; page <= 20 && !found; page++) {
+      const { data: existing } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+      found = existing.users.find((u) => u.email?.toLowerCase() === DEMO_EMAIL) || null;
+      if (!existing.users.length) break;
+    }
     if (found) {
       demoUserId = found.id;
       log.push(`Demo user already exists: ${demoUserId}`);

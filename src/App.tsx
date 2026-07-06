@@ -59,6 +59,20 @@ const DailyBriefing = lazy(() => import("./pages/DailyBriefing"));
 const InnerWorld = lazy(() => import("./pages/InnerWorld"));
 const CosmicGuide = lazy(() => import("./pages/CosmicGuide"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
+
+/**
+ * When a signed-in user lands on /sign-in, respect a `?next=<relative-path>`
+ * query (used by the OAuth consent route) so agent-integration flows return
+ * to the consent screen instead of dropping the user on the home page.
+ */
+const SignedInRedirect = () => {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const rawNext = params.get("next") ?? "";
+  // Only allow same-origin relative paths to prevent open redirects.
+  const safeNext = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  return <Navigate to={safeNext} replace />;
+};
 const SmsConsent = lazy(() => import("./pages/SmsConsent"));
 const SpotifyCallback = lazy(() => import("./pages/SpotifyCallback"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));

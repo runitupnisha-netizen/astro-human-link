@@ -1,62 +1,63 @@
-# Stellara Repositioning: Self-Discovery Platform
 
-Reframes the app for App Store resubmission. Connections becomes a sub-feature unlocked only after the user completes a Self-Knowledge Foundation. No file rebuilds — copy, gating, and one onboarding tweak.
+# Reposition Stellara around Human Design
 
-## 6a. Gate the Connections tab
+Strategic repositioning: Human Design becomes the lead everywhere; astrology stays fully functional but visually and architecturally secondary. Not a rebuild — targeted edits across the surfaces below.
 
-Add a Foundation gate hook `useFoundationStatus` returning the four checks + `complete` boolean. Source data:
+## 1. Onboarding "wow moment"
 
-- Birth chart: `profiles.birth_date && birth_time && birth_location` (already collected in onboarding).
-- Profile Score ≥ 80%: reuse existing `ProfileCompletionScore` calculation (extract its scoring into a shared util if not already).
-- Insights read: track via `localStorage` key `stellara:insights-read` incremented on Weekly Insights view; threshold ≥ 3 OR `daily_briefings` row exists.
-- Lyra intro acknowledged: `localStorage` key `stellara:lyra-intro-ack`. Set when user dismisses the existing Lyra intro / first chat in `CosmicGuide`.
+- After birth info step, the reveal screen leads with the **Human Design bodygraph** (using existing `BodyGraph` component) instead of the natal wheel.
+- Headline: "Your Human Design Type: {Generator | Projector | Manifestor | Reflector | Manifesting Generator}"
+- Prominent trio of stat cards: Energy Type · Strategy · Authority
+- Natal wheel demoted to a smaller "Also in your blueprint" section below.
 
-In `Connections.tsx`, when `!foundation.complete` render a locked screen:
+## 2. Home / Today screen
 
-- Headline: "Complete your Self-Knowledge Foundation to unlock Cosmic Connections"
-- Progress bar (X of 4 steps).
-- Four interactive rows; tap → deep-link (`/onboarding`, `/profile`, `/insights`, `/lyra`).
+- New top hero card: Human Design daily insight (type + one-line strategy nudge for today).
+- HD type badge always visible in the header row (next to greeting/avatar).
+- Existing astrology-first cards (moon phase, transit, daily briefing) reflow into a "Cosmic weather" section below the HD block.
 
-Navigation tabs and `ProtectedRoute` stay unchanged — the gate lives inside the page.
+## 3. Blueprint / Profile screen
 
-## 6b. Onboarding reframe
+- Section order becomes: **Human Design → Gene Keys → Numerology → Astrology** (currently reversed).
+- `BodyGraph` renders first, full-width, with type/strategy/authority summary at top.
+- Astrology natal wheel remains but at the bottom of the Blueprint page and the sub-nav.
 
-- Replace "find your match" / "your matches will be filtered" copy in `Onboarding.tsx` with "begin your self-discovery journey" and "your blueprint will be shaped accordingly".
-- Hide the Connections nav tab in both `Navigation.tsx` (desktop + mobile bar) when `!foundation.complete` — instead show a "Blueprint" tab linking to `/blueprint` (see 6d).
+## 4. Lyra AI (cosmic-guide)
 
-## 6c. Rename language
+- Update system prompt in `supabase/functions/cosmic-guide/index.ts`:
+  - Grounding paragraph leads with `Human Design {type} · {authority} · Profile {profile}` before astrology placements.
+  - Opening template becomes: "As a {Type} with {Authority} authority, your strategy is to {strategy}…" then astrology context.
+- Astrology placements remain in the prompt but move after HD context.
 
-Replace across `useTranslation.tsx` (all 6 locales), `Premium.tsx`, `PremiumUpsellModal.tsx`, `WhoLikedMe.tsx`, `DiscoverySection.tsx`, `HeroSection.tsx`, empty states:
+## 5. Navigation + labels
 
-| From | To |
-|---|---|
-| Matches | Connections |
-| See Who Likes You | See Who Resonates |
-| cosmic matches | cosmic connections |
-| Find your match | Discover aligned souls |
-| Your matches | Your connections |
+- Rename any "Birth Chart" / "Astrology"-led labels to "Your Blueprint" (nav items, page titles, breadcrumbs, MyChart route heading).
+- No screen title starts with "Astrology". Blueprint sub-route `/blueprint/human-design` becomes the default landing when someone taps the Blueprint tab.
 
-Leave intra-Connections page strings (after unlock) untouched per spec.
+## 6. App metadata + copy
 
-## 6d. Blueprint section
+- `index.html` `<title>` and meta description lead with Human Design & self-discovery, not astrology.
+- Marketing/hero copy (`HeroSection`, onboarding intro, empty states, Premium page pitch, Footer tagline) replaces "astrology app" / "cosmic astrology" with "Human Design & self-discovery".
+- Keep secondary mentions of astrology/numerology/Gene Keys as supporting pillars.
 
-Create `src/pages/Blueprint.tsx` consolidating:
+## 7. Demo account
 
-- Astrology: Sun / Moon / Rising (from `profiles.cosmic_profile`).
-- Human Design type + authority.
-- Numerology life path.
-
-Pull from existing `useCosmicProfile`/`profiles` queries. Route `/blueprint`. Add a top-of-Profile "Your Blueprint" card linking to it, and a nav entry (replacing Connections slot pre-unlock).
-
-## 6e. Daily Cosmic Nudge
-
-In `Discover.tsx`, hoist `<CosmicNudge />` to render above the swipe deck so it's the first content rendered after the safe-area header. Add `mt-0 mb-4` and ensure it always mounts (currently conditional on premium? verify).
+- Ensure `demo@stellara.app` has a fully generated Human Design profile (Generator preferred — richest bodygraph) with type, authority, profile, defined centers, channels, and gates populated.
+- Runs via existing `seed-demo-account` edge function; add/adjust birth data to guarantee a Generator or Projector result and re-seed.
+- Verify bodygraph renders without gaps on the Today, Blueprint, and Profile screens for the demo user.
 
 ## Technical notes
 
-- New file: `src/hooks/useFoundationStatus.tsx`
-- New file: `src/pages/Blueprint.tsx`
-- New component: `src/components/ConnectionsLocked.tsx`
-- Touch: `Navigation.tsx`, `Connections.tsx`, `Onboarding.tsx`, `Discover.tsx`, `Profile.tsx`, `App.tsx` (route), `useTranslation.tsx`, `Premium.tsx`, `PremiumUpsellModal.tsx`, `WhoLikedMe.tsx`, `DiscoverySection.tsx`, `HeroSection.tsx`.
-- No DB migrations needed — Foundation flags derived from existing data + localStorage.
-- ~12 files, no rebuilds.
+- Files likely touched: `src/pages/Onboarding.tsx`, `src/pages/SacredReveal.tsx`, `src/pages/Today.tsx`, `src/pages/Blueprint.tsx`, `src/pages/blueprint/HumanDesign.tsx`, `src/pages/blueprint/Astrology.tsx`, `src/pages/Profile.tsx`, `src/pages/MyChart.tsx`, `src/components/Navigation.tsx`, `src/components/HeroSection.tsx`, `src/components/SoulBlueprintCard.tsx`, `src/components/blueprint/BodyGraph.tsx` (reuse only), `supabase/functions/cosmic-guide/index.ts`, `supabase/functions/seed-demo-account/index.ts`, `index.html`.
+- No schema changes. No feature removal. Astrology components, routes, and data pipelines remain in place.
+- Memory updates: refresh `mem://brand/positioning-strategy` and add a Core rule so future sessions default to Human Design-first framing.
+- Verification: after each surface, screenshot via Playwright at mobile viewport (Onboarding reveal, Today, Blueprint, Lyra first message with demo login) to confirm HD leads visually.
+
+## Rollout order
+
+1. Prompt + metadata (fast wins, no UI risk): Lyra system prompt, `index.html`, hero copy.
+2. Blueprint reorder (single page).
+3. Onboarding reveal swap.
+4. Today screen HD hero.
+5. Navigation label pass.
+6. Demo account reseed + screenshot verification.

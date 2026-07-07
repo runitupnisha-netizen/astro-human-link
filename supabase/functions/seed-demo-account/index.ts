@@ -85,9 +85,26 @@ serve(async (req) => {
         email_confirm: true,
         user_metadata: { full_name: "Stellara Demo" },
       });
-      if (error) throw error;
-      demoUserId = created.user!.id;
-      log.push(`Created demo user: ${demoUserId}`);
+      if (error) {
+        // The user may already exist even though our lookups didn't find it
+        // (e.g. listUsers fell over on a NULL confirmation_token row). Retry
+        // the RPC lookup before giving up.
+        const { data: retryRow } = await admin
+          .rpc("get_user_id_by_email", { p_email: DEMO_EMAIL })
+          .maybeSingle();
+        if (retryRow && (retryRow as any).id) {
+          demoUserId = (retryRow as any).id as string;
+          await admin.auth.admin.updateUserById(demoUserId, {
+            password: DEMO_PASSWORD, email_confirm: true,
+          });
+          log.push(`Recovered existing demo user after create conflict: ${demoUserId}`);
+        } else {
+          throw error;
+        }
+      } else {
+        demoUserId = created.user!.id;
+        log.push(`Created demo user: ${demoUserId}`);
+      }
     }
 
     // 2) Upsert demo profile.
@@ -163,9 +180,11 @@ serve(async (req) => {
       const fp = FAKE_PROFILES[i];
       const fakeEmail = `demo-match-${i + 1}@stellara.app`;
       let uid: string | null = null;
-      const exist = existing.users.find((u) => u.email?.toLowerCase() === fakeEmail);
-      if (exist) {
-        uid = exist.id;
+      const { data: existRow } = await admin
+        .rpc("get_user_id_by_email", { p_email: fakeEmail })
+        .maybeSingle();
+      if (existRow && (existRow as any).id) {
+        uid = (existRow as any).id as string;
       } else {
         const { data: c, error: e } = await admin.auth.admin.createUser({
           email: fakeEmail,
@@ -173,8 +192,19 @@ serve(async (req) => {
           email_confirm: true,
           user_metadata: { full_name: fp.display_name },
         });
-        if (e) throw e;
-        uid = c.user!.id;
+        if (e) {
+          // Race or pre-existing user not visible via RPC — look up again.
+          const { data: retryRow } = await admin
+            .rpc("get_user_id_by_email", { p_email: fakeEmail })
+            .maybeSingle();
+          if (retryRow && (retryRow as any).id) {
+            uid = (retryRow as any).id as string;
+          } else {
+            throw e;
+          }
+        } else {
+          uid = c.user!.id;
+        }
       }
       fakeUserIds.push(uid!);
 

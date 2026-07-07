@@ -83,7 +83,7 @@
     "tz-lookup": "^6.1.25",
     "tzwhere": "^1.0.1",
     "vaul": "^0.9.9",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.10",
     "zod": "^4.4.3"
   },
   "devDependencies": {

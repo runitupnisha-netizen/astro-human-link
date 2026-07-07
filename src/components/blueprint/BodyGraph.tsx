@@ -17,12 +17,26 @@ const CENTERS = [
 ];
 
 const DEFINED_BY_TYPE: Record<string, string[]> = {
-  Manifestor: ["throat"],
-  Generator: ["sacral"],
-  "Manifesting Generator": ["sacral", "throat"],
-  Projector: ["g"],
+  Manifestor: ["throat", "heart", "solar", "root"],
+  Generator: ["sacral", "root", "solar", "throat"],
+  "Manifesting Generator": ["sacral", "throat", "root", "solar", "heart"],
+  Projector: ["g", "ajna", "throat", "spleen"],
   Reflector: [],
 };
+
+// Channels between defined centers to give the graph richer visual structure.
+const CHANNEL_PAIRS: Array<[string, string]> = [
+  ["throat", "g"],
+  ["throat", "ajna"],
+  ["ajna", "head"],
+  ["g", "sacral"],
+  ["sacral", "root"],
+  ["sacral", "solar"],
+  ["solar", "root"],
+  ["heart", "g"],
+  ["heart", "throat"],
+  ["spleen", "sacral"],
+];
 
 const Shape = ({ shape, x, y, defined }: { shape: string; x: number; y: number; defined: boolean }) => {
   const fill = defined ? "hsl(280 70% 60% / 0.85)" : "transparent";
@@ -49,9 +63,27 @@ const Shape = ({ shape, x, y, defined }: { shape: string; x: number; y: number; 
 
 const BodyGraph = ({ type }: { type?: string | null }) => {
   const defined = type ? DEFINED_BY_TYPE[type] || [] : [];
+  const centerMap = Object.fromEntries(CENTERS.map((c) => [c.id, c]));
   return (
     <div className="flex items-center justify-center">
       <svg width={200} height={300} viewBox="0 0 200 310" className="drop-shadow-lg">
+        {CHANNEL_PAIRS.map(([a, b], i) => {
+          const ca = centerMap[a];
+          const cb = centerMap[b];
+          if (!ca || !cb) return null;
+          const bothDefined = defined.includes(a) && defined.includes(b);
+          return (
+            <line
+              key={`ch-${i}`}
+              x1={ca.x}
+              y1={ca.y}
+              x2={cb.x}
+              y2={cb.y}
+              stroke={bothDefined ? "hsl(280 70% 65% / 0.85)" : "hsl(280 30% 55% / 0.25)"}
+              strokeWidth={bothDefined ? 2.5 : 1}
+            />
+          );
+        })}
         {CENTERS.map((c) => (
           <Shape key={c.id} shape={c.shape} x={c.x} y={c.y} defined={defined.includes(c.id)} />
         ))}
